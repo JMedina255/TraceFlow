@@ -101,7 +101,7 @@ La documentación de TraceFlow SCM emplea un vocabulario técnico especializado 
 
 - **`ECS` (Elemento de Configuración de Software):** Unidad atómica o compuesta de artefacto de software (código fuente, esquema de base de datos, archivo de configuración, especificación de requerimientos) sometida a control de versiones y auditoría.
 - **`RFC` (Request for Change / Solicitud de Cambio):** Documento formal donde el Solicitante registra la necesidad de modificación, indicando descripción, justificación, prioridad y ECS afectado.
-- **`ECN/ECO` (Engineering Change Notice / Engineering Change Order):** Orden formal de cambio emitida exclusivamente por el CCB tras la aprobación de una RFC, la cual autoriza el inicio de los trabajos técnicos.
+- **`ECN/ECO` (Engineering Change Notice / Engineering Change Order):** Orden formal de cambio emitida por el Comité de Control de Cambios (CCB) para Cambios Mayores, o bajo autoridad operativa delegada compartida entre el Analista de Requerimientos / Gestor y el Arquitecto / Especialista Técnico para Cambios Menores. La ECN/ECO autoriza formalmente el inicio de trabajos técnicos sobre los ECS.
 - **`Check-Out`:** Operación controlada mediante la cual un ECS autorizado es transferido desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo para su modificación.
 - **`Check-In`:** Operación controlada mediante la cual un ECS verificado y certificado por QA es reintegrado formalmente a la Biblioteca Maestra o de Soporte.
 - **`Biblioteca de Trabajo`:** Espacio aislado de desarrollo y modificación donde los consultores implementan los cambios asignados sobre copias de trabajo de los ECS.

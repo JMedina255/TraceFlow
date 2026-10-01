@@ -27,15 +27,15 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | :--- | :--- | :--- | :---: | :---: |
 | [DG-01](#dg-01--organigrama-del-c-sharkteam-y-entorno-cliente) | Organigrama del C-SharkTeam y Entorno Cliente | Estructura Organizacional | APROBADO | 1.0 |
 | [DG-02](#dg-02--diagrama-de-actividades-del-proceso-actual-as-is) | Diagrama de Actividades del Proceso Actual (AS-IS) | Actividades | REVISION | 1.0 |
-| [DG-03](#dg-03--diagrama-del-proceso-propuesto-de-gestión-de-cambios-to-be) | Diagrama del Proceso Propuesto de Gestión de Cambios (TO-BE) | Actividades (Swimlanes) | APROBADO | 1.1 |
-| [DG-04](#dg-04--diagrama-de-paquetes-arquitecturales) | Diagrama de Paquetes Arquitecturales de TraceFlow SCM | Paquetes | APROBADO | 1.0 |
-| [DG-05](#dg-05--diagrama-general-de-casos-de-uso) | Diagrama General de Casos de Uso | Casos de Uso | APROBADO | 1.0 |
+| [DG-03](#dg-03--diagrama-del-proceso-propuesto-de-gestión-de-cambios-to-be-v2) | Diagrama del Proceso Propuesto de Gestión de Cambios (TO-BE v2) | Actividades (Swimlanes) | APROBADO | 2.0 |
+| [DG-04](#dg-04--diagrama-de-paquetes-arquitecturales) | Diagrama de Paquetes Arquitecturales de TraceFlow SCM | Paquetes | APROBADO | 1.1 |
+| [DG-05](#dg-05--diagrama-general-de-casos-de-uso) | Diagrama General de Casos de Uso | Casos de Uso | APROBADO | 1.1 |
 | [DG-06](#dg-06--casos-de-uso-administración-de-usuarios-y-proyectos) | Casos de Uso: Administración de Usuarios y Proyectos | Casos de Uso | APROBADO | 1.0 |
-| [DG-07](#dg-07--casos-de-uso-registro-y-evaluación-de-rfc-e-incidencias) | Casos de Uso: Registro y Evaluación de RFC e Incidencias | Casos de Uso | APROBADO | 1.0 |
+| [DG-07](#dg-07--casos-de-uso-registro-y-evaluación-de-rfc-e-incidencias) | Casos de Uso: Registro y Evaluación de RFC e Incidencias | Casos de Uso | APROBADO | 1.1 |
 | [DG-08](#dg-08--casos-de-uso-scm-core-ecs-bibliotecas-y-líneas-base) | Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base) | Casos de Uso | APROBADO | 1.0 |
-| [DG-09](#dg-09--casos-de-uso-implementación-y-validación-de-calidad) | Casos de Uso: Implementación y Validación de Calidad | Casos de Uso | APROBADO | 1.0 |
+| [DG-09](#dg-09--casos-de-uso-implementación-y-validación-de-calidad) | Casos de Uso: Implementación y Validación de Calidad | Casos de Uso | APROBADO | 1.1 |
 | [DG-10](#dg-10--casos-de-uso-trazabilidad-auditoría-e-integridad) | Casos de Uso: Trazabilidad, Auditoría e Integridad | Casos de Uso | APROBADO | 1.0 |
-| [DG-11](#dg-11--diagrama-de-estados-del-ciclo-de-vida-de-la-rfc) | Diagrama de Estados del Ciclo de Vida de la RFC | Estados | APROBADO | 1.0 |
+| [DG-11](#dg-11--diagrama-de-estados-del-ciclo-de-vida-de-la-rfc) | Diagrama de Estados del Ciclo de Vida de la RFC (14 Estados Oficiales) | Estados | APROBADO | 2.0 |
 | [DG-SEQ-01](#dg-seq-01--gestionar-usuarios-y-roles-cu-01) | Secuencia: Gestionar usuarios y roles (CU-01) | Secuencia | APROBADO | 1.0 |
 | [DG-SEQ-02](#dg-seq-02--crear-y-administrar-proyectos-cu-02) | Secuencia: Crear y administrar proyectos (CU-02) | Secuencia | APROBADO | 1.0 |
 | [DG-SEQ-04](#dg-seq-04--registrar-solicitud-de-cambio-rfc-cu-04) | Secuencia: Registrar Solicitud de Cambio (RFC) (CU-04) | Secuencia | APROBADO | 1.0 |
@@ -245,23 +245,23 @@ endif
 
 ---
 
-# DG-03 — Diagrama del Proceso Propuesto de Gestión de Cambios (TO-BE)
+# DG-03 — Diagrama del Proceso Propuesto de Gestión de Cambios (TO-BE v2)
 
 **ID:** DG-03  
-**Nombre:** Proceso de Gestión de Cambios de Elementos de Configuración (TraceFlow SCM)  
+**Nombre:** Proceso de Gestión de Cambios de Elementos de Configuración (TraceFlow SCM - TO-BE v2)  
 **Tipo:** Actividades con Calles (Swimlanes)  
 **Estado:** APROBADO  
-**Versión:** 1.1  
+**Versión:** 2.0  
 **RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-17  
 **RN relacionadas:** RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-08, RN-09  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y `assets/proceso_gestion_cambios.puml`  
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y actualización TO-BE v2  
 
 ![DG-03](../assets/DG-03.png)
 
 ```plantuml
 @startuml
-title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración</b>
+title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)</b>
 
 ' =========================================================
 ' CONFIGURACIÓN GENERAL
@@ -305,234 +305,297 @@ skinparam note {
 |#FDEDEC|Equipo de Calidad / Testing|
 
 ' =========================================================
-' FASE 1 - REGISTRO Y CLASIFICACIÓN
+' FASE 1 - REGISTRO DE LA RFC
 ' =========================================================
 |Solicitante|
 start
-:<color:white><b>FASE 1\nRegistro y Clasificación de la RFC</b></color>; <<#34495E>>
+:<color:white><b>FASE 1\nRegistro de Solicitud de Cambio (RFC)</b></color>; <<#34495E>>
 
-:Identificar necesidad de cambio;
+:Identificar necesidad o defecto;
 
-:Registrar Solicitud de Cambio (RFC)
-indicando descripción, justificación,
-prioridad y ECS afectado;
+:Registrar RFC con justificación,
+prioridad y ECS afectado (CU-04);
 
 note left
-<b>RFC</b>
-- Descripción del cambio
-- Justificación
-- Prioridad
-- ECS afectado
-- Fecha
+<b>RFC [Estado: Registrada]</b>
+- Descripción de necesidad
+- Justificación de negocio
+- Nivel de prioridad inicial
+- ECS y versión base afectada
 end note
+
+' =========================================================
+' FASE 2 - VALIDACIÓN Y CLASIFICACIÓN INICIAL
+' =========================================================
+|Analista de Requerimientos / Gestor|
+:<color:white><b>FASE 2\nValidación y Clasificación Inicial</b></color>; <<#34495E>>
+
+:Recepcionar y evaluar completitud
+de la RFC (CU-05);
+
+if (¿Información suficiente y consistente?) then (No)
+    :Registrar observaciones (CU-05);
+    note right: RFC pasa a [En Subsanación]
+
+    |Solicitante|
+    if (¿Solicitante subsana dentro del plazo?) then (Sí)
+        :Subsanar información requerida;
+        |Analista de Requerimientos / Gestor|
+        :Reevaluar información subsanada;
+    else (No)
+        |Analista de Requerimientos / Gestor|
+        :Emitir dictamen de no conformidad
+        inicial y desestimar solicitud;
+        
+        |Solicitante|
+        :Recibir notificación de desestimación;
+        note left
+            <b>Estado Terminal 1:</b>
+            <b>DESESTIMADA</b>
+            (Filtro inicial no superado)
+        end note
+        stop
+    endif
+endif
 
 |Analista de Requerimientos / Gestor|
-:Recepcionar y revisar
-la Solicitud de Cambio;
-
-if (¿Información completa?) then (Sí)
-    :Clasificar tipo y criticidad
-    de la solicitud;
-else (No)
-    :Registrar observaciones;
-
-    |Solicitante|
-    :Subsanar información
-    de la RFC;
-
-    |Analista de Requerimientos / Gestor|
-    :Revisar nuevamente
-    la solicitud;
-endif
+:Validar consistencia de la RFC;
+note right: RFC pasa a [Clasificada]
 
 ' =========================================================
-' FASE 2 - ANÁLISIS TÉCNICO
+' FASE 3 - ANÁLISIS DE IMPACTO TÉCNICO
 ' =========================================================
 |Arquitecto / Especialista Técnico|
-:<color:white><b>FASE 2\nAnálisis Técnico</b></color>; <<#34495E>>
+:<color:white><b>FASE 3\nAnálisis de Impacto Técnico</b></color>; <<#34495E>>
+note right: RFC pasa a [En Análisis Técnico]
 
-:Analizar impacto del cambio;
+:Analizar impacto sobre arquitectura,
+dependencias y trazabilidad (CU-06);
 
-note right
-<b>Análisis de Impacto</b>
-- Arquitectura
-- Dependencias
-- Esfuerzo
-- Costo
-- Tiempo
-- Riesgos
-end note
+:Evaluar afectación a la Triple Restricción
+(Alcance, Tiempo y Costo);
 
-:Generar Informe Técnico
-de Impacto;
+:Elaborar Informe Técnico de Impacto (CU-06);
 
-' =========================================================
-' FASE 3 - DECISIÓN DEL CCB
-' =========================================================
-|Comité de Control de Cambios (CCB)|
-:<color:white><b>FASE 3\nEvaluación y Decisión del CCB</b></color>; <<#34495E>>
+if (¿Afecta alcance, tiempo o costo?) then (Sí)
+    :Clasificar como <b>CAMBIO MAYOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        Afecta al menos 1 dimensión
+        de la Triple Restricción.
+        Requiere aprobación del CCB.
+    end note
+    
+    ' =========================================================
+    ' FASE 4A - EVALUACIÓN COLEGIADA CCB (CAMBIO MAYOR)
+    ' =========================================================
+    |Comité de Control de Cambios (CCB)|
+    :<color:white><b>FASE 4A\nEvaluación Colegiada en CCB (Cambio Mayor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
 
-:Evaluar Informe Técnico
-y Solicitud de Cambio;
+    :Evaluar Informe Técnico, riesgos,
+    viabilidad y conveniencia (CU-07);
 
-if (¿Técnicamente viable?) then (Sí)
-    if (¿Cambio aprobado por el CCB?) then (Sí)
-        :Aprobar RFC;
+    if (¿Cambio Mayor Aprobado por CCB?) then (Sí)
+        :Aprobar formalmente el cambio (CU-07);
+        note right: RFC pasa a [Autorizada]
 
         :Emitir Orden de Cambio
-        (ECN / ECO);
+        formal (ECN / ECO) (CU-08);
+        note right: RFC pasa a [Orden Emitida]
     else (No)
-        :Registrar
-        Rechazo Administrativo;
+        :Registrar dictamen formal
+        de rechazo (técnico o de gestión);
 
         |Solicitante|
-        :Recibir notificación
-        de rechazo administrativo;
+        :Recibir notificación con fundamentación;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Dictamen formal negativo del CCB)
+        end note
         stop
     endif
-else (No)
-    :Registrar
-    Rechazo Técnico;
 
-    |Solicitante|
-    :Recibir notificación
-    de rechazo técnico;
-    stop
+else (No)
+    :Clasificar como <b>CAMBIO MENOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        NO afecta alcance, tiempo ni costo.
+        Ruta operativa delegada sin CCB.
+    end note
+
+    ' =========================================================
+    ' FASE 4B - AUTORIZACIÓN OPERATIVA DELEGADA (CAMBIO MENOR)
+    ' =========================================================
+    |Analista de Requerimientos / Gestor|
+    :<color:white><b>FASE 4B\nAutorización Operativa Delegada (Cambio Menor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
+
+    :Revisar impacto operativo del Cambio Menor (CU-30);
+
+    |Arquitecto / Especialista Técnico|
+    :Revisar viabilidad técnica del Cambio Menor (CU-30);
+
+    if (¿Conformidad de ambas autoridades delegadas?) then (Sí)
+        :Autorizar Cambio Menor conjuntamente (CU-30);
+        note right: RFC pasa a [Autorizada]
+
+        :Emitir Orden de Cambio (ECN/ECO)
+        bajo autoridad operativa delegada (CU-08/CU-30);
+        note right: RFC pasa a [Orden Emitida]
+    else (No)
+        :Registrar dictamen de no autorización;
+
+        |Solicitante|
+        :Recibir notificación de rechazo operativo;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Rechazo bajo autoridad delegada)
+        end note
+        stop
+    endif
 endif
 
 ' =========================================================
-' FASE 4 - CHECK-OUT E IMPLEMENTACIÓN
+' FASE 5 - CHECK-OUT Y CONTROL DE CONCURRENCIA
 ' =========================================================
 |Administrador de Configuración / Bibliotecario|
-:<color:white><b>FASE 4\nCheck-Out e Implementación</b></color>; <<#34495E>>
+:<color:white><b>FASE 5\nCheck-Out y Bloqueo de Sincronización</b></color>; <<#34495E>>
 
-:Efectuar Check-Out del ECS
-desde la Biblioteca de Soporte
-hacia la Biblioteca de Trabajo;
+:Verificar validez formal de la ECN/ECO;
+
+:Efectuar Check-Out del ECS desde
+Biblioteca de Soporte hacia Trabajo (CU-10);
 
 :Aplicar bloqueo de sincronización
-sobre el ECS;
+exclusivo sobre el ECS (CU-11);
+note right: RFC pasa a [En Implementación]
 
-note right
-El ECS permanece bloqueado
-hasta completar Check-In
-o ejecutar Rollback.
-end note
-
+' =========================================================
+' FASE 6 - IMPLEMENTACIÓN Y PRUEBAS UNITARIAS
+' =========================================================
 |Ingeniero de Software / Desarrollador|
-:Recibir Orden de Cambio
-y ECS autorizado;
+:<color:white><b>FASE 6\nImplementación y Pruebas Unitarias</b></color>; <<#34495E>>
 
-:Implementar modificación
-sobre el ECS en la
+:Recibir ECN/ECO y espacio en
 Biblioteca de Trabajo;
 
-:Ejecutar pruebas
-unitarias locales;
+:Modificar ECS según especificación (CU-14);
 
-if (¿Pruebas unitarias conformes?) then (Sí)
-    :Entregar ECS modificado
-    para validación QA;
-else (No)
-    :Corregir defectos
-    detectados;
+:Ejecutar pruebas unitarias locales (CU-15);
 
-    :Reejecutar
-    pruebas unitarias;
+if (¿Pruebas unitarias conformes?) then (No)
+    :Corregir defectos en código local;
+    :Reejecutar pruebas unitarias locales;
 endif
 
+:Poner ECS a disposición para validación QA;
+
 ' =========================================================
-' FASE 5 - QA
+' FASE 7 - VALIDACIÓN TÉCNICA DE CALIDAD (QA)
 ' =========================================================
 |Equipo de Calidad / Testing|
-:<color:white><b>FASE 5\nValidación y Certificación QA</b></color>; <<#34495E>>
+:<color:white><b>FASE 7\nValidación Técnica de Calidad (QA)</b></color>; <<#34495E>>
+note right: RFC pasa a [En Pruebas]
 
-:Ejecutar pruebas
-de integración;
+:Ejecutar pruebas de integración
+y verificación técnica funcional (CU-16);
 
-:Ejecutar validación
-funcional;
-
-if (¿Cambio conforme?) then (Sí)
-    :Emitir Certificación
-    de Conformidad;
-else (No)
-    :Registrar No Conformidades
-    y hallazgos;
+if (¿Defectos o no conformidades identificadas?) then (Sí)
+    :Registrar reporte de no conformidad (CU-18);
 
     |Ingeniero de Software / Desarrollador|
-    :Corregir defectos
-    identificados;
+    :Corregir defectos reportados;
 
     |Equipo de Calidad / Testing|
-    :Ejecutar re-testeo;
+    :Reevaluar y re-testear (CU-19);
 
-    if (¿Re-testeo superado?) then (Sí)
-        :Emitir Certificación
-        de Conformidad;
-    else (No)
+    if (¿Fallo técnico no subsanado?) then (Sí)
         |Administrador de Configuración / Bibliotecario|
-        :Ejecutar Rollback
-        del ECS;
-
-        :Restaurar estado previo
-        del ECS en la
-        Biblioteca de Trabajo;
-
-        :Liberar bloqueo
-        de sincronización;
-
-        :Cancelar Orden de Cambio;
+        :Ejecutar Rollback en Biblioteca de Trabajo (CU-21);
+        :Liberar bloqueo de sincronización;
+        :Cancelar Orden de Cambio (ECN/ECO) (CU-22);
 
         |Solicitante|
-        :Recibir notificación de
-        Cancelación por
-        Fallo No Subsanado;
+        :Recibir notificación de cancelación;
+        note left
+            <b>Estado Terminal 3:</b>
+            <b>CANCELADA</b>
+            (Rollback por fallo no subsanado)
+        end note
         stop
     endif
 endif
 
+|Equipo de Calidad / Testing|
+:Emitir Certificación Técnica
+de Conformidad (CU-17);
+
 ' =========================================================
-' FASE 6 - CHECK-IN Y LÍNEA BASE
+' FASE 8 - VALIDACIÓN Y ACEPTACIÓN POR EL USUARIO (UAT)
+' =========================================================
+|Solicitante|
+:<color:white><b>FASE 8\nValidación y Aceptación por el Usuario (UAT)</b></color>; <<#34495E>>
+note left: RFC pasa a [En Aceptación]
+
+:Ejecutar pruebas de aceptación en
+entorno de validación (CU-29);
+
+if (¿Comportamiento y necesidad plenamente conformes?) then (No)
+    :Registrar observaciones de aceptación;
+    |Ingeniero de Software / Desarrollador|
+    :Ajustar implementación según observaciones;
+    |Equipo de Calidad / Testing|
+    :Revalidar técnicamente la corrección;
+    |Solicitante|
+    :Reejecutar pruebas de aceptación (CU-29);
+endif
+
+:Emitir y suscribir Aceptación
+Formal del Usuario (CU-29);
+
+' =========================================================
+' FASE 9 - CHECK-IN, LÍNEA BASE Y DESBLOQUEO
 ' =========================================================
 |Administrador de Configuración / Bibliotecario|
-:<color:white><b>FASE 6\nCheck-In y Línea Base</b></color>; <<#34495E>>
+:<color:white><b>FASE 9\nCheck-In, Nueva Línea Base y Desbloqueo</b></color>; <<#34495E>>
 
-:Efectuar Check-In
-del ECS certificado;
+:Verificar Certificación QA y Aceptación UAT;
 
-:Integrar ECS verificado
-a la Biblioteca
-Maestra / Soporte;
+:Efectuar Check-In del ECS hacia
+Biblioteca Maestra y de Soporte (CU-12);
 
-:Registrar nueva versión;
+:Registrar nueva versión identificada unívocamente;
 
-:Crear y congelar
-nueva Línea Base;
+:Crear y congelar nueva Línea Base (CU-20);
 
-:Liberar bloqueo
-de sincronización;
+:Liberar bloqueo de sincronización del ECS;
 
-:Actualizar inventario
-de Elementos de Configuración;
+:Actualizar catálogo e inventario de configuración;
 
 ' =========================================================
-' FASE 7 - CIERRE
+' FASE 10 - CIERRE FORMAL Y NOTIFICACIÓN
 ' =========================================================
 |Comité de Control de Cambios (CCB)|
-:<color:white><b>FASE 7\nCierre Formal</b></color>; <<#34495E>>
+:<color:white><b>FASE 10\nCierre Formal Administrativo</b></color>; <<#34495E>>
 
-:Registrar cierre formal
-del cambio;
+:Registrar cierre administrativo formal (RF-14);
 
-:Actualizar trazabilidad
-RFC - ECN/ECO - ECS - Línea Base;
+:Consolidar trazabilidad completa
+(RFC - ECN/ECO - ECS - QA - UAT - Baseline);
 
 |Solicitante|
-:Recibir notificación
-de implementación exitosa;
+:Recibir notificación de cambio implementado y cerrado;
 
-:Cambio Cerrado - Implementado;
+note left
+    <b>Estado Terminal 4:</b>
+    <b>IMPLEMENTADA</b>
+    (Cambio validado, promovido a Maestra,
+    congelado en Baseline y cerrado formalmente)
+end note
+
 stop
 @enduml
 ```
@@ -545,11 +608,11 @@ stop
 **Nombre:** Diagrama de Paquetes Arquitecturales de TraceFlow SCM  
 **Tipo:** Paquetes  
 **Estado:** APROBADO  
-**Versión:** 1.0  
+**Versión:** 1.1  
 **RF relacionados:** RF-01 a RF-18  
 **RN relacionadas:** RN-01 a RN-09  
-**CU relacionados:** CU-01 a CU-28  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32)  
+**CU relacionados:** CU-01 a CU-30  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32) y actualización TO-BE v2  
 
 ![DG-04](../assets/DG-04.png)
 
@@ -585,9 +648,12 @@ package "Gestión de Bibliotecas" as PKG_LIB {
 }
 
 package "Control de Cambios" as PKG_CHG {
-    class "Gestión de RFC" as MOD_RFC
-    class "Análisis de Impacto" as MOD_IMP
-    class "Evaluación CCB y ECN/ECO" as MOD_CCB
+    class "Gestión y Clasificación de RFC" as MOD_RFC
+    class "Análisis de Impacto Técnico" as MOD_IMP
+    class "Evaluación CCB (Cambios Mayores)" as MOD_CCB
+    class "Autorización Delegada (Cambios Menores)" as MOD_AUTH_MIN
+    class "Emisión de ECN/ECO" as MOD_ECN
+    class "Validación QA y Aceptación UAT" as MOD_QA_UAT
     class "Orquestación Check-Out / Check-In" as MOD_ORQ
 }
 
@@ -631,11 +697,11 @@ PKG_REP ..> PKG_LIB : consulta inventario
 **Nombre:** Diagrama General de Casos de Uso del Sistema TraceFlow SCM  
 **Tipo:** Casos de Uso  
 **Estado:** APROBADO  
-**Versión:** 1.0  
+**Versión:** 1.1  
 **RF relacionados:** RF-01 a RF-18  
 **RN relacionadas:** RN-01 a RN-09  
-**CU relacionados:** CU-01 a CU-28  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33) y `TB-10`  
+**CU relacionados:** CU-01 a CU-30  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33), `TB-10` y actualización TO-BE v2  
 
 ![DG-05](../assets/DG-05.png)
 
@@ -675,6 +741,7 @@ rectangle "TraceFlow SCM" {
         usecase "CU-06: Realizar análisis de impacto técnico" as UC06
         usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
         usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
+        usecase "CU-30: Autorizar Cambio Menor" as UC30
     }
 
     package "Gestión de ECS y Bibliotecas" {
@@ -692,6 +759,7 @@ rectangle "TraceFlow SCM" {
         usecase "CU-17: Certificar conformidad del cambio" as UC17
         usecase "CU-18: Reportar no conformidad" as UC18
         usecase "CU-19: Reevaluar y re-testear" as UC19
+        usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
     }
 
     package "Líneas Base y Rollback" {
@@ -721,6 +789,9 @@ ACT_ARQ --> UC06
 ACT_CCB --> UC07
 ACT_CCB --> UC08
 
+ACT_ANA --> UC30
+ACT_ARQ --> UC30
+
 ACT_ARQ --> UC09
 ACT_ADM --> UC10
 ACT_ADM --> UC11
@@ -733,6 +804,7 @@ ACT_QA --> UC16
 ACT_QA --> UC17
 ACT_QA --> UC18
 ACT_QA --> UC19
+ACT_SOL --> UC29
 
 ACT_ADM --> UC20
 ACT_ADM --> UC21
@@ -805,11 +877,11 @@ UC02 ..> ACT_ADM : <<secundario>>
 **Nombre:** Diagrama de Casos de Uso - Registro y Evaluación de RFC e Incidencias  
 **Tipo:** Casos de Uso Específico  
 **Estado:** APROBADO  
-**Versión:** 1.0  
+**Versión:** 1.1  
 **RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-15  
 **RN relacionadas:** RN-01, RN-05, RN-07  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)  
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25, CU-30  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34) y actualización TO-BE v2  
 
 ![DG-07](../assets/DG-07.png)
 
@@ -835,7 +907,8 @@ rectangle "Gestión de Solicitudes e Incidencias" {
     usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
     usecase "CU-05: Validar y clasificar la solicitud" as UC05
     usecase "CU-06: Realizar análisis de impacto técnico" as UC06
-    usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
+    usecase "CU-07: Evaluar Cambio Mayor en CCB" as UC07
+    usecase "CU-30: Autorizar Cambio Menor" as UC30
     usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
 
     usecase "Subsanar información de RFC" as UC_SUBSANAR
@@ -853,10 +926,14 @@ UC05 ..> UC_SUBSANAR : <<extend>> (datos incompletos)
 ACT_SOL --> UC_SUBSANAR
 
 ACT_ARQ --> UC06
-ACT_CCB --> UC07
-ACT_CCB --> UC08
 
+' Evaluación y Decisión: Ruta Mayor (CCB) vs Menor (Delegada)
+ACT_CCB --> UC07
 UC07 ..> UC08 : <<include>> (si aprueba)
+
+ACT_ANA --> UC30
+ACT_ARQ --> UC30
+UC30 ..> UC08 : <<include>> (si autoriza)
 @enduml
 ```
 
@@ -922,11 +999,11 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 **Nombre:** Diagrama de Casos de Uso - Implementación y Validación de la Calidad  
 **Tipo:** Casos de Uso Específico  
 **Estado:** APROBADO  
-**Versión:** 1.0  
+**Versión:** 1.1  
 **RF relacionados:** RF-07, RF-09, RF-10, RF-11  
 **RN relacionadas:** RN-08, RN-09  
-**CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)  
+**CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-29  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35) y actualización TO-BE v2  
 
 ![DG-09](../assets/DG-09.png)
 
@@ -941,6 +1018,7 @@ title <b>TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad<
 
 actor "Ingeniero de Software / Desarrollador" as ACT_DEV
 actor "Equipo de Calidad / Testing" as ACT_QA
+actor "Solicitante" as ACT_SOL
 
 rectangle "Módulo de Implementación y QA" {
     usecase "CU-14: Implementar cambio en el ECS" as UC14
@@ -949,6 +1027,7 @@ rectangle "Módulo de Implementación y QA" {
     usecase "CU-17: Certificar conformidad del cambio" as UC17
     usecase "CU-18: Reportar no conformidad" as UC18
     usecase "CU-19: Reevaluar y re-testear" as UC19
+    usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
 }
 
 ACT_DEV --> UC14
@@ -964,6 +1043,10 @@ UC16 ..> UC17 : <<extend>> (si conforme)
 UC16 ..> UC18 : <<extend>> (si defectos)
 UC18 ..> UC19 : <<triggers>> (tras corrección)
 ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
+
+' Validación UAT del Solicitante / Usuario Final
+ACT_SOL --> UC29
+UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
 @enduml
 ```
 
@@ -1018,14 +1101,14 @@ UC28 ..> UC_EXP : <<extend>>
 # DG-11 — Diagrama de Estados del Ciclo de Vida de la RFC
 
 **ID:** DG-11  
-**Nombre:** Diagrama de Estados del Ciclo de Vida de una Solicitud de Cambio (RFC)  
+**Nombre:** Diagrama de Estados del Ciclo de Vida de una Solicitud de Cambio (RFC - 14 Estados Oficiales)  
 **Tipo:** Máquina de Estados  
 **Estado:** APROBADO  
-**Versión:** 1.0  
-**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-10, RF-11, RF-12, RF-13, RF-14  
+**Versión:** 2.0  
+**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14  
 **RN relacionadas:** RN-01, RN-05, RN-07, RN-08, RN-09  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-14, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27) y `TB-07`  
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27), `TB-07` y actualización TO-BE v2  
 
 ![DG-11](../assets/DG-11.png)
 
@@ -1035,68 +1118,100 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC</b>
+title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales)</b>
 
-[*] --> Registrado : Solicitante registra RFC
+[*] --> Registrada : Solicitante registra RFC (CU-04)
 
-state Registrado {
-    Registrado : Esperando revisión inicial
+state Registrada {
+    Registrada : Esperando validación de completitud
 }
 
-Registrado --> EnSubsanacion : Analista detecta datos incompletos
-EnSubsanacion --> Registrado : Solicitante remite información subsanada
+Registrada --> EnSubsanacion : Analista detecta datos incompletos (CU-05)
+EnSubsanacion --> Registrada : Solicitante entrega datos subsanados
+EnSubsanacion --> Desestimada : Plazo vencido sin subsanación
 
-Registrado --> Clasificado : Analista valida información completa
-Clasificado --> EnAnalisisTecnico : Asignado a Arquitecto
+Registrada --> Clasificada : Analista valida consistencia y completitud (CU-05)
+Registrada --> Desestimada : Solicitud inviable o improcedente (CU-05)
+
+state Clasificada {
+    Clasificada : Lista para análisis de impacto técnico
+}
+
+Clasificada --> EnAnalisisTecnico : Asignada a Arquitecto (CU-06)
 
 state EnAnalisisTecnico {
-    EnAnalisisTecnico : Elaborando Informe Técnico de Impacto
+    EnAnalisisTecnico : Evaluación de impacto y Triple Restricción
 }
 
-EnAnalisisTecnico --> EnEvaluacionCCB : Informe Técnico remitido al CCB
+EnAnalisisTecnico --> EnEvaluacion : Informe Técnico generado (CU-06)
 
-state EnEvaluacionCCB {
-    state "Evaluando Viabilidad" as S_EVAL
-    state "Decisión Colegiada" as S_DEC
-    [*] --> S_EVAL
-    S_EVAL --> S_DEC : Dictamen técnico emitido
+state EnEvaluacion {
+    state "Ruta Cambio Mayor (CCB)" as S_MAYOR
+    state "Ruta Cambio Menor (Delegada)" as S_MENOR
 }
 
-EnEvaluacionCCB --> RechazadoTecnico : CCB dictamina inviabilidad técnica
-EnEvaluacionCCB --> RechazadoAdministrativo : CCB decide no aprobar por gestión
+EnEvaluacion --> Rechazada : CCB rechaza Mayor (CU-07) o Autoridad Delegada rechaza Menor (CU-30)
+EnEvaluacion --> Autorizada : CCB aprueba Mayor (CU-07) o Autoridad Delegada autoriza Menor (CU-30)
 
-RechazadoTecnico --> [*] : Cierre formal y notificación al Solicitante
-RechazadoAdministrativo --> [*] : Cierre formal y notificación al Solicitante
+state Autorizada {
+    Autorizada : Dictamen formal aprobatorio registrado
+}
 
-EnEvaluacionCCB --> AprobadoOrdenEmitida : CCB aprueba y emite ECN/ECO
+Autorizada --> OrdenEmitida : Emisión formal de ECN/ECO (CU-08 / CU-30)
 
-AprobadoOrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out\ny aplica bloqueo de sincronización
+state OrdenEmitida {
+    OrdenEmitida : ECN/ECO formalmente vigente
+}
+
+OrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out y aplica bloqueo (CU-10, CU-11)
 
 state EnImplementacion {
-    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo\ny corre pruebas unitarias locales
+    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo\ny ejecuta pruebas unitarias (CU-14, CU-15)
 }
 
-EnImplementacion --> EnValidacionQA : Pruebas unitarias aprobadas;\nremitido a QA
+EnImplementacion --> EnPruebas : Pruebas unitarias conformes;\nentrega a QA (CU-16)
 
-state EnValidacionQA {
-    EnValidacionQA : QA ejecuta pruebas de integración\ny funcionales
+state EnPruebas {
+    state "Validación de Integración" as S_INTEG
+    state "Re-testeo por Corrección" as S_RETEST
+    [*] --> S_INTEG
+    S_INTEG --> S_RETEST : Defectos reportados (CU-18) y subsanados
+    S_RETEST --> S_INTEG : Reevaluación (CU-19)
 }
 
-EnValidacionQA --> EnCorreccion : QA detecta defectos (No Conformidad)
+EnPruebas --> Cancelada : Fallo no subsanado; Rollback y cancelación (CU-21, CU-22)
+EnPruebas --> EnAceptacion : QA emite Certificación Técnica de Conformidad (CU-17)
 
-state EnCorreccion {
-    EnCorreccion : Desarrollador corrige defectos reportados
+state EnAceptacion {
+    EnAceptacion : Solicitante ejecuta pruebas de aceptación UAT (CU-29)
 }
 
-EnCorreccion --> EnValidacionQA : Desarrollador entrega corrección;\nse ejecuta re-testeo
+EnAceptacion --> EnImplementacion : Hallazgo o disconformidad UAT; requiere ajuste
+EnAceptacion --> Implementada : Solicitante valida UAT (CU-29); Administrador ejecuta Check-In a Maestra (CU-12),\ncongela Línea Base (CU-20), libera bloqueo y CCB formaliza cierre (RF-14)
 
-EnCorreccion --> CanceladoFalloNoSubsanado : Reintentos de re-test agotados;\nAdministrador ejecuta Rollback en Trabajo
+' =========================================================
+' ESTADOS TERMINALES (4 Estados Normativos)
+' =========================================================
+state Desestimada #FFCDD2 {
+    Desestimada : Terminal 1: Filtro inicial no superado
+}
 
-CanceladoFalloNoSubsanado --> [*] : Cierre formal por cancelación
+state Rechazada #FFCDD2 {
+    Rechazada : Terminal 2: Dictamen formal negativo (CCB o Delegado)
+}
 
-EnValidacionQA --> CerradoImplementado : QA emite Certificación de Conformidad;\nAdministrador hace Check-In a Maestra,\ncongela Línea Base y libera bloqueo
+state Cancelada #FFCDD2 {
+    Cancelada : Terminal 3: Rollback por fallo técnico o desistimiento
+}
 
-CerradoImplementado --> [*] : Cierre formal exitoso
+state Implementada #C8E6C9 {
+    Implementada : Terminal 4: Promovida a Maestra, congelada en Baseline y cerrada con éxito
+}
+
+Desestimada --> [*] : Cierre formal y notificación
+Rechazada --> [*] : Cierre formal y notificación
+Cancelada --> [*] : Cierre formal y notificación
+Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 @enduml
 ```
 

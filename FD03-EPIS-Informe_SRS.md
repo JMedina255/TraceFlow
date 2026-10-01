@@ -665,26 +665,27 @@ endif
 
 ## 4.2. Diagrama del Proceso Propuesto - Diagrama de actividades Inicial
 
-El proceso propuesto formaliza el ciclo de vida completo de una Solicitud de Cambio (RFC) mediante siete roles especializados. El Solicitante identifica la necesidad de cambio y completa el formulario de RFC. El Analista de Requerimientos / Gestor recepciona la solicitud, valida que la información esté completa (solicitando subsanación en caso contrario) y clasifica su tipo y criticidad. El Arquitecto / Especialista Técnico realiza el análisis de impacto y genera el Informe Técnico correspondiente. El Comité de Control de Cambios (CCB) evalúa la viabilidad técnica y decide la aprobación; si el cambio es rechazado por inviabilidad o por decisión del comité, se notifica formalmente al solicitante y el trámite se cierra. Una vez aprobado, se emite la Orden de Cambio (ECN/ECO) y el Administrador de Configuración / Bibliotecario efectúa el Check-Out del Elemento de Configuración (ECS) desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo, aplicando un bloqueo de sincronización que evita sobreescrituras. El Ingeniero de Software / Desarrollador implementa el cambio y ejecuta pruebas unitarias locales, tras lo cual el Equipo de Calidad / Testing ejecuta pruebas de integración y validación funcional. Si la validación no es conforme, se habilita un ciclo de corrección y re-testeo; si el re-test también falla, se ejecuta un Rollback en la Biblioteca de Trabajo, se restaura el estado previo del ECS y se cancela la Orden de Cambio por fallo no subsanado. Si la validación es conforme, el Administrador de Configuración realiza el Check-In del ECS verificado hacia la Biblioteca Maestra / Soporte, establece una nueva Línea Base, libera el bloqueo de sincronización y registra el cierre formal del cambio, notificando al solicitante la implementación exitosa
+El proceso propuesto (TO-BE v2) formaliza el ciclo de vida completo de una Solicitud de Cambio (RFC) mediante siete roles especializados estructurados en diez fases operativas. El Solicitante identifica la necesidad de cambio y registra la RFC indicando justificación, prioridad y ECS afectado (CU-04). El Analista de Requerimientos / Gestor recepciona la solicitud, valida que la información esté completa y sea consistente (CU-05); si presenta omisiones se abre un ciclo de subsanación y, de no subsanarse o resultar inviable, la solicitud concluye en el estado terminal **Desestimada**. Una vez clasificada, el Arquitecto / Especialista Técnico elabora el Informe Técnico de Impacto (CU-06) evaluando exhaustivamente la afectación a la Triple Restricción (alcance, tiempo y costo). Si el cambio no afecta ninguna dimensión de la triple restricción, se clasifica como **Cambio Menor** y se canaliza hacia la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto (CU-30); si afecta al menos una dimensión, se clasifica como **Cambio Mayor** y se eleva a evaluación colegiada del Comité de Control de Cambios (CCB) (CU-07). Si la evaluación resulta desfavorable por motivos técnicos o administrativos, la RFC pasa al estado terminal **Rechazada** con notificación motivada al solicitante. Si el cambio es autorizado por la autoridad correspondiente, pasa al estado **Autorizada** y se formaliza mediante la emisión obligatoria de una Orden de Cambio (ECN/ECO) (CU-08), la cual puede ser emitida por el CCB (Cambios Mayores) o bajo autoridad operativa delegada (Cambios Menores), pasando al estado **Orden Emitida**.
+
+Con la ECN/ECO formalmente vigente, el Administrador de Configuración / Bibliotecario verifica su validez y efectúa el Check-Out del ECS desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo (CU-10), aplicando un bloqueo de sincronización exclusivo que evita sobreescrituras concurrentes (CU-11), situando la RFC en estado **En Implementación**. El Ingeniero de Software / Desarrollador ejecuta las modificaciones autorizadas (CU-14) y valida sus cambios mediante pruebas unitarias locales (CU-15). Concluidas las pruebas unitarias, el ECS modificado se remite al Equipo de Calidad / Testing situando la RFC en estado **En Pruebas** para la ejecución de pruebas de integración y validación técnica funcional (CU-16). Si se presentan no conformidades, se reportan los defectos (CU-18) para su corrección y re-testeo (CU-19); de subsistir fallos técnicos no subsanables, el Administrador ejecuta el Rollback en la Biblioteca de Trabajo (CU-21), libera los bloqueos y cancela la orden de cambio (CU-22), derivando al estado terminal **Cancelada**. Si la validación de QA es satisfactoria, se emite la Certificación Técnica de Conformidad (CU-17) y el cambio se pone a disposición del Solicitante / Usuario Final en estado **En Aceptación**. El Solicitante ejecuta las pruebas de aceptación de usuario (UAT) (CU-29) y, tras validar plenamente el comportamiento y la cobertura de la necesidad, suscribe el acta de aceptación formal. Con la doble validación superada (Certificación QA y Aceptación UAT), el Administrador de Configuración realiza el Check-In del ECS hacia la Biblioteca Maestra y de Soporte (CU-12), registra la nueva versión unívoca, crea y congela una nueva Línea Base (CU-20), libera el bloqueo de sincronización y actualiza el inventario. Finalmente, el CCB registra el cierre administrativo formal del cambio y consolida la trazabilidad integral (RF-14), alcanzando el estado terminal **Implementada** y notificando formalmente al Solicitante y a los interesados.
 
 
 <!-- Página 20 del PDF original -->
 
 
-**Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE)**
+**Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)**
 
-![TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración](assets/proceso_gestion_cambios.png)
+![Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)](assets/DG-03.png)
 
 #### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
-title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración</b>
+title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)</b>
 
 ' =========================================================
 ' CONFIGURACIÓN GENERAL
 ' =========================================================
-
 skinparam ActivityMaxWidth 220
 skinparam ranksep 22
 skinparam nodesep 18
@@ -696,7 +697,6 @@ skinparam conditionStyle inside
 
 skinparam arrowColor #2C3E50
 skinparam arrowThickness 1.2
-
 skinparam swimlaneBorderColor #7F8C8D
 skinparam swimlaneBorderThickness 1.2
 
@@ -714,9 +714,8 @@ skinparam note {
 }
 
 ' =========================================================
-' ACTORES / SWIMLANES
+' ACTORES / SWIMLANES CANÓNICOS
 ' =========================================================
-
 |#E8F4F8|Solicitante|
 |#EBF5FB|Analista de Requerimientos / Gestor|
 |#E8F8F5|Arquitecto / Especialista Técnico|
@@ -726,299 +725,309 @@ skinparam note {
 |#FDEDEC|Equipo de Calidad / Testing|
 
 ' =========================================================
-' FASE 1 - REGISTRO Y CLASIFICACIÓN
+' FASE 1 - REGISTRO DE LA RFC
 ' =========================================================
-
 |Solicitante|
-
 start
+:<color:white><b>FASE 1
+Registro de Solicitud de Cambio (RFC)</b></color>; <<#34495E>>
 
-:<color:white><b>FASE 1\nRegistro y Clasificación de la RFC</b></color>; <<#34495E>>
+:Identificar necesidad o defecto;
 
-:Identificar necesidad de cambio;
-
-:Registrar Solicitud de Cambio (RFC)
-indicando descripción, justificación,
-prioridad y ECS afectado;
+:Registrar RFC con justificación,
+prioridad y ECS afectado (CU-04);
 
 note left
-<b>RFC</b>
-- Descripción del cambio
-- Justificación
-- Prioridad
-- ECS afectado
-- Fecha
+<b>RFC [Estado: Registrada]</b>
+- Descripción de necesidad
+- Justificación de negocio
+- Nivel de prioridad inicial
+- ECS y versión base afectada
 end note
 
+' =========================================================
+' FASE 2 - VALIDACIÓN Y CLASIFICACIÓN INICIAL
+' =========================================================
+|Analista de Requerimientos / Gestor|
+:<color:white><b>FASE 2
+Validación y Clasificación Inicial</b></color>; <<#34495E>>
+
+:Recepcionar y evaluar completitud
+de la RFC (CU-05);
+
+if (¿Información suficiente y consistente?) then (No)
+    :Registrar observaciones (CU-05);
+    note right: RFC pasa a [En Subsanación]
+
+    |Solicitante|
+    if (¿Solicitante subsana dentro del plazo?) then (Sí)
+        :Subsanar información requerida;
+        |Analista de Requerimientos / Gestor|
+        :Reevaluar información subsanada;
+    else (No)
+        |Analista de Requerimientos / Gestor|
+        :Emitir dictamen de no conformidad
+        inicial y desestimar solicitud;
+        
+        |Solicitante|
+        :Recibir notificación de desestimación;
+        note left
+            <b>Estado Terminal 1:</b>
+            <b>DESESTIMADA</b>
+            (Filtro inicial no superado)
+        end note
+        stop
+    endif
+endif
 
 |Analista de Requerimientos / Gestor|
-
-:Recepcionar y revisar
-la Solicitud de Cambio;
-
-if (¿Información completa?) then (Sí)
-
-    :Clasificar tipo y criticidad
-    de la solicitud;
-
-else (No)
-
-    :Registrar observaciones;
-
-    |Solicitante|
-
-    :Subsanar información
-    de la RFC;
-
-    |Analista de Requerimientos / Gestor|
-
-    :Revisar nuevamente
-    la solicitud;
-
-endif
-
+:Validar consistencia de la RFC;
+note right: RFC pasa a [Clasificada]
 
 ' =========================================================
-' FASE 2 - ANÁLISIS TÉCNICO
+' FASE 3 - ANÁLISIS DE IMPACTO TÉCNICO
 ' =========================================================
-
 |Arquitecto / Especialista Técnico|
+:<color:white><b>FASE 3
+Análisis de Impacto Técnico</b></color>; <<#34495E>>
+note right: RFC pasa a [En Análisis Técnico]
 
-:<color:white><b>FASE 2\nAnálisis Técnico</b></color>; <<#34495E>>
+:Analizar impacto sobre arquitectura,
+dependencias y trazabilidad (CU-06);
 
-:Analizar impacto del cambio;
+:Evaluar afectación a la Triple Restricción
+(Alcance, Tiempo y Costo);
 
-note right
-<b>Análisis de Impacto</b>
-- Arquitectura
-- Dependencias
-- Esfuerzo
-- Costo
-- Tiempo
-- Riesgos
-end note
+:Elaborar Informe Técnico de Impacto (CU-06);
 
-:Generar Informe Técnico
-de Impacto;
+if (¿Afecta alcance, tiempo o costo?) then (Sí)
+    :Clasificar como <b>CAMBIO MAYOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        Afecta al menos 1 dimensión
+        de la Triple Restricción.
+        Requiere aprobación del CCB.
+    end note
+    
+    ' =========================================================
+    ' FASE 4A - EVALUACIÓN COLEGIADA CCB (CAMBIO MAYOR)
+    ' =========================================================
+    |Comité de Control de Cambios (CCB)|
+    :<color:white><b>FASE 4A
+Evaluación Colegiada en CCB (Cambio Mayor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
 
+    :Evaluar Informe Técnico, riesgos,
+    viabilidad y conveniencia (CU-07);
 
-' =========================================================
-' FASE 3 - DECISIÓN DEL CCB
-' =========================================================
-
-|Comité de Control de Cambios (CCB)|
-
-:<color:white><b>FASE 3\nEvaluación y Decisión del CCB</b></color>; <<#34495E>>
-
-:Evaluar Informe Técnico
-y Solicitud de Cambio;
-
-if (¿Técnicamente viable?) then (Sí)
-
-    if (¿Cambio aprobado por el CCB?) then (Sí)
-
-        :Aprobar RFC;
+    if (¿Cambio Mayor Aprobado por CCB?) then (Sí)
+        :Aprobar formalmente el cambio (CU-07);
+        note right: RFC pasa a [Autorizada]
 
         :Emitir Orden de Cambio
-        (ECN / ECO);
-
+        formal (ECN / ECO) (CU-08);
+        note right: RFC pasa a [Orden Emitida]
     else (No)
-
-        :Registrar
-        Rechazo Administrativo;
+        :Registrar dictamen formal
+        de rechazo (técnico o de gestión);
 
         |Solicitante|
-
-        :Recibir notificación
-        de rechazo administrativo;
-
+        :Recibir notificación con fundamentación;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Dictamen formal negativo del CCB)
+        end note
         stop
-
     endif
 
 else (No)
+    :Clasificar como <b>CAMBIO MENOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        NO afecta alcance, tiempo ni costo.
+        Ruta operativa delegada sin CCB.
+    end note
 
-    :Registrar
-    Rechazo Técnico;
+    ' =========================================================
+    ' FASE 4B - AUTORIZACIÓN OPERATIVA DELEGADA (CAMBIO MENOR)
+    ' =========================================================
+    |Analista de Requerimientos / Gestor|
+    :<color:white><b>FASE 4B
+Autorización Operativa Delegada (Cambio Menor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
 
-    |Solicitante|
+    :Revisar impacto operativo del Cambio Menor (CU-30);
 
-    :Recibir notificación
-    de rechazo técnico;
+    |Arquitecto / Especialista Técnico|
+    :Revisar viabilidad técnica del Cambio Menor (CU-30);
 
-    stop
+    if (¿Conformidad de ambas autoridades delegadas?) then (Sí)
+        :Autorizar Cambio Menor conjuntamente (CU-30);
+        note right: RFC pasa a [Autorizada]
 
+        :Emitir Orden de Cambio (ECN/ECO)
+        bajo autoridad operativa delegada (CU-08/CU-30);
+        note right: RFC pasa a [Orden Emitida]
+    else (No)
+        :Registrar dictamen de no autorización;
+
+        |Solicitante|
+        :Recibir notificación de rechazo operativo;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Rechazo bajo autoridad delegada)
+        end note
+        stop
+    endif
 endif
 
-
 ' =========================================================
-' FASE 4 - CHECK-OUT E IMPLEMENTACIÓN
+' FASE 5 - CHECK-OUT Y CONTROL DE CONCURRENCIA
 ' =========================================================
-
 |Administrador de Configuración / Bibliotecario|
+:<color:white><b>FASE 5
+Check-Out y Bloqueo de Sincronización</b></color>; <<#34495E>>
 
-:<color:white><b>FASE 4\nCheck-Out e Implementación</b></color>; <<#34495E>>
+:Verificar validez formal de la ECN/ECO;
 
-:Efectuar Check-Out del ECS
-desde la Biblioteca de Soporte
-hacia la Biblioteca de Trabajo;
+:Efectuar Check-Out del ECS desde
+Biblioteca de Soporte hacia Trabajo (CU-10);
 
 :Aplicar bloqueo de sincronización
-sobre el ECS;
+exclusivo sobre el ECS (CU-11);
+note right: RFC pasa a [En Implementación]
 
-note right
-El ECS permanece bloqueado
-hasta completar Check-In
-o ejecutar Rollback.
-end note
-
-
+' =========================================================
+' FASE 6 - IMPLEMENTACIÓN Y PRUEBAS UNITARIAS
+' =========================================================
 |Ingeniero de Software / Desarrollador|
+:<color:white><b>FASE 6
+Implementación y Pruebas Unitarias</b></color>; <<#34495E>>
 
-:Recibir Orden de Cambio
-y ECS autorizado;
-
-:Implementar modificación
-sobre el ECS en la
+:Recibir ECN/ECO y espacio en
 Biblioteca de Trabajo;
 
-:Ejecutar pruebas
-unitarias locales;
+:Modificar ECS según especificación (CU-14);
 
-if (¿Pruebas unitarias conformes?) then (Sí)
+:Ejecutar pruebas unitarias locales (CU-15);
 
-    :Entregar ECS modificado
-    para validación QA;
-
-else (No)
-
-    :Corregir defectos
-    detectados;
-
-    :Reejecutar
-    pruebas unitarias;
-
+if (¿Pruebas unitarias conformes?) then (No)
+    :Corregir defectos en código local;
+    :Reejecutar pruebas unitarias locales;
 endif
 
+:Poner ECS a disposición para validación QA;
 
 ' =========================================================
-' FASE 5 - QA
+' FASE 7 - VALIDACIÓN TÉCNICA DE CALIDAD (QA)
 ' =========================================================
-
 |Equipo de Calidad / Testing|
+:<color:white><b>FASE 7
+Validación Técnica de Calidad (QA)</b></color>; <<#34495E>>
+note right: RFC pasa a [En Pruebas]
 
-:<color:white><b>FASE 5\nValidación y Certificación QA</b></color>; <<#34495E>>
+:Ejecutar pruebas de integración
+y verificación técnica funcional (CU-16);
 
-:Ejecutar pruebas
-de integración;
-
-:Ejecutar validación
-funcional;
-
-if (¿Cambio conforme?) then (Sí)
-
-    :Emitir Certificación
-    de Conformidad;
-
-else (No)
-
-    :Registrar No Conformidades
-    y hallazgos;
+if (¿Defectos o no conformidades identificadas?) then (Sí)
+    :Registrar reporte de no conformidad (CU-18);
 
     |Ingeniero de Software / Desarrollador|
-
-    :Corregir defectos
-    identificados;
+    :Corregir defectos reportados;
 
     |Equipo de Calidad / Testing|
+    :Reevaluar y re-testear (CU-19);
 
-    :Ejecutar re-testeo;
-
-    if (¿Re-testeo superado?) then (Sí)
-
-        :Emitir Certificación
-        de Conformidad;
-
-    else (No)
-
+    if (¿Fallo técnico no subsanado?) then (Sí)
         |Administrador de Configuración / Bibliotecario|
-
-        :Ejecutar Rollback
-        del ECS;
-
-        :Restaurar estado previo
-        del ECS en la
-        Biblioteca de Trabajo;
-
-        :Liberar bloqueo
-        de sincronización;
-
-        :Cancelar Orden de Cambio;
+        :Ejecutar Rollback en Biblioteca de Trabajo (CU-21);
+        :Liberar bloqueo de sincronización;
+        :Cancelar Orden de Cambio (ECN/ECO) (CU-22);
 
         |Solicitante|
-
-        :Recibir notificación de
-        Cancelación por
-        Fallo No Subsanado;
-
+        :Recibir notificación de cancelación;
+        note left
+            <b>Estado Terminal 3:</b>
+            <b>CANCELADA</b>
+            (Rollback por fallo no subsanado)
+        end note
         stop
-
     endif
-
 endif
 
+|Equipo de Calidad / Testing|
+:Emitir Certificación Técnica
+de Conformidad (CU-17);
 
 ' =========================================================
-' FASE 6 - CHECK-IN Y LÍNEA BASE
+' FASE 8 - VALIDACIÓN Y ACEPTACIÓN POR EL USUARIO (UAT)
 ' =========================================================
+|Solicitante|
+:<color:white><b>FASE 8
+Validación y Aceptación por el Usuario (UAT)</b></color>; <<#34495E>>
+note left: RFC pasa a [En Aceptación]
 
+:Ejecutar pruebas de aceptación en
+entorno de validación (CU-29);
+
+if (¿Comportamiento y necesidad plenamente conformes?) then (No)
+    :Registrar observaciones de aceptación;
+    |Ingeniero de Software / Desarrollador|
+    :Ajustar implementación según observaciones;
+    |Equipo de Calidad / Testing|
+    :Revalidar técnicamente la corrección;
+    |Solicitante|
+    :Reejecutar pruebas de aceptación (CU-29);
+endif
+
+:Emitir y suscribir Aceptación
+Formal del Usuario (CU-29);
+
+' =========================================================
+' FASE 9 - CHECK-IN, LÍNEA BASE Y DESBLOQUEO
+' =========================================================
 |Administrador de Configuración / Bibliotecario|
+:<color:white><b>FASE 9
+Check-In, Nueva Línea Base y Desbloqueo</b></color>; <<#34495E>>
 
-:<color:white><b>FASE 6\nCheck-In y Línea Base</b></color>; <<#34495E>>
+:Verificar Certificación QA y Aceptación UAT;
 
-:Efectuar Check-In
-del ECS certificado;
+:Efectuar Check-In del ECS hacia
+Biblioteca Maestra y de Soporte (CU-12);
 
-:Integrar ECS verificado
-a la Biblioteca
-Maestra / Soporte;
+:Registrar nueva versión identificada unívocamente;
 
-:Registrar nueva versión;
+:Crear y congelar nueva Línea Base (CU-20);
 
-:Crear y congelar
-nueva Línea Base;
+:Liberar bloqueo de sincronización del ECS;
 
-:Liberar bloqueo
-de sincronización;
-
-:Actualizar inventario
-de Elementos de Configuración;
-
+:Actualizar catálogo e inventario de configuración;
 
 ' =========================================================
-' FASE 7 - CIERRE
+' FASE 10 - CIERRE FORMAL Y NOTIFICACIÓN
 ' =========================================================
-
 |Comité de Control de Cambios (CCB)|
+:<color:white><b>FASE 10
+Cierre Formal Administrativo</b></color>; <<#34495E>>
 
-:<color:white><b>FASE 7\nCierre Formal</b></color>; <<#34495E>>
+:Registrar cierre administrativo formal (RF-14);
 
-:Registrar cierre formal
-del cambio;
-
-:Actualizar trazabilidad
-RFC - ECN/ECO - ECS - Línea Base;
-
+:Consolidar trazabilidad completa
+(RFC - ECN/ECO - ECS - QA - UAT - Baseline);
 
 |Solicitante|
+:Recibir notificación de cambio implementado y cerrado;
 
-:Recibir notificación
-de implementación exitosa;
-
-:Cambio Cerrado - Implementado;
+note left
+    <b>Estado Terminal 4:</b>
+    <b>IMPLEMENTADA</b>
+    (Cambio validado, promovido a Maestra,
+    congelado en Baseline y cerrado formalmente)
+end note
 
 stop
-
 @enduml
 ```
 
@@ -1042,16 +1051,16 @@ A continuación se detalla el cuadro de Requerimientos Funcionales (RF-01 a RF-1
 | RF-02 | Gestión de Proyectos | El sistema debe permitir crear y administrar múltiples proyectos de clientes de ÉXODO S.A.C. de forma aislada entre sí. | Alta |
 | RF-03 | Identificación de ECS | El sistema debe permitir registrar y clasificar los Elementos de Configuración (código, documentos, esquemas de BD) de cada proyecto. | Alta |
 | RF-04 | Registro de Solicitudes de Cambio (RFC) | El sistema debe permitir al Solicitante registrar una Solicitud de Cambio indicando descripción, justificación, prioridad, ECS afectado y fecha, y permitir su subsanación cuando la información esté incompleta. | Alta |
-| RF-05 | Clasificación y Análisis de Impacto | El sistema debe permitir al Analista de Requerimientos clasificar el tipo y criticidad de la solicitud, y al Arquitecto/Especialista Técnico registrar el análisis de impacto (arquitectura, esfuerzo, costo, tiempo y riesgos) en un Informe Técnico de Impacto. | Alta |
-| RF-06 | Evaluación y Aprobación por el CCB | El sistema debe permitir al Comité de Control de Cambios evaluar la viabilidad técnica de una solicitud, aprobarla o rechazarla, y registrar las causales de no aprobación cuando corresponda. | Alta |
-| RF-07 | Gestión de Órdenes de Cambio | El sistema debe permitir generar la Orden de Cambio (ECN/ECO) una vez aprobada una solicitud por el CCB, y actualizar el plan de gestión del proyecto asociado. | Media |
+| RF-05 | Clasificación y Análisis de Impacto | El sistema debe permitir al Arquitecto/Especialista Técnico registrar el análisis de impacto técnico (arquitectura, dependencias, riesgos, esfuerzo, tiempo y costo), evaluando la afectación de la Triple Restricción para emitir el dictamen formal de clasificación en Cambio Menor o Cambio Mayor. | Alta |
+| RF-06 | Evaluación y Aprobación de Cambios Mayores por el CCB | El sistema debe permitir al Comité de Control de Cambios (CCB) evaluar colegiadamente las solicitudes clasificadas como Cambios Mayores, deliberar sobre su viabilidad técnica y de gestión, registrar la votación y aprobarlas o rechazarlas fundamentando las causales en acta formal. | Alta |
+| RF-07 | Gestión y Emisión de Órdenes de Cambio (ECN/ECO) | El sistema debe permitir generar y formalizar la Orden de Cambio (ECN/ECO) una vez autorizada la solicitud, sea mediante resolución colegiada del CCB para Cambios Mayores o mediante autoridad operativa delegada compartida (Analista de Requerimientos/Gestor y Arquitecto/Especialista Técnico) para Cambios Menores, actualizando el plan del proyecto asociado. | Media |
 | RF-08 | Gestión de Bibliotecas de Software | El sistema debe administrar al menos tres bibliotecas por proyecto (Biblioteca de Trabajo, Biblioteca de Soporte y Biblioteca Maestra), permitiendo mover un ECS entre ellas mediante operaciones de Check-Out y Check-In. | Alta |
 | RF-09 | Control de Versiones y Bloqueos de Sincronización | El sistema debe registrar cada Check-in/Check-out de un ECS con autor, fecha y descripción del cambio, y aplicar/liberar bloqueos de sincronización que impidan la edición concurrente del mismo ECS en la Biblioteca de Trabajo. | Alta |
-| RF-10 | Gestión de Pruebas y Certificación de Conformidad | El sistema debe permitir al Equipo de Calidad registrar los resultados de pruebas de integración y validación funcional, certificar la conformidad de un cambio o reportar no conformidades con hallazgos asociados. | Alta |
+| RF-10 | Gestión de Pruebas, Certificación QA y Aceptación del Usuario | El sistema debe permitir al Equipo de Calidad registrar los resultados de pruebas de integración y validación funcional emitiendo la Certificación de Conformidad técnica, y permitir al Solicitante/Usuario Final registrar las pruebas de aceptación y suscribir el Acta de Aceptación formal en el entorno controlado de validación previo a la liberación. | Alta |
 | RF-11 | Reevaluación y Re-testeo | El sistema debe permitir registrar ciclos de corrección de defectos y re-testeo sobre un cambio no conforme, hasta su certificación o hasta agotar los reintentos permitidos. | Media |
-| RF-12 | Rollback y Cancelación de Órdenes de Cambio | El sistema debe permitir al Administrador de Configuración ejecutar un rollback del ECS en la Biblioteca de Trabajo y cancelar la Orden de Cambio cuando el re-test no sea superado exitosamente. | Alta |
-| RF-13 | Gestión de Líneas Base | El sistema debe permitir crear y congelar líneas base a partir de un ECS verificado al momento del Check-In a la Biblioteca Maestra/Soporte, registrando la versión resultante. | Alta |
-| RF-14 | Cierre Formal del Cambio y Notificaciones | El sistema debe registrar el cierre formal de una Solicitud de Cambio (por implementación exitosa, rechazo técnico, rechazo administrativo o cancelación) y notificar automáticamente al Solicitante el resultado. | Alta |
+| RF-12 | Rollback y Cancelación de Órdenes de Cambio | El sistema debe permitir al Administrador de Configuración ejecutar un rollback del ECS en la Biblioteca de Trabajo y cancelar la Orden de Cambio cuando el re-test no sea superado exitosamente o ante rechazo formal insubsanable en la aceptación del usuario. | Alta |
+| RF-13 | Gestión de Líneas Base | El sistema debe permitir crear y congelar líneas base a partir de un ECS verificado al momento del Check-In a la Biblioteca Maestra/Soporte, registrando la versión resultante tras contar con la certificación de QA y la aceptación del usuario. | Alta |
+| RF-14 | Cierre Formal del Cambio y Notificaciones | El sistema debe registrar el cierre formal de una Solicitud de Cambio bajo uno de cuatro estados terminales mutuamente excluyentes (Cerrado – Implementado, Rechazado Técnico, Rechazado Administrativo o Cancelado – Fallo No Subsanado), consolidar la trazabilidad completa del expediente y notificar formalmente al Solicitante y a las partes interesadas. | Alta |
 | RF-15 | Gestión de Incidencias y Soporte | El sistema debe permitir registrar, dar seguimiento y derivar incidencias reportadas por consultores o clientes hacia una nueva Solicitud de Cambio. | Media |
 | RF-16 | Trazabilidad de Configuración | El sistema debe permitir visualizar las relaciones entre los ECS, las Solicitudes de Cambio, las Órdenes de Cambio y las líneas base a lo largo del tiempo. | Alta |
 | RF-17 | Auditoría e Integridad | El sistema debe registrar las acciones críticas de los usuarios en cada etapa del flujo y validar la integridad de los artefactos mediante checksums (SHA-256). | Alta |
@@ -1094,15 +1103,15 @@ Las Reglas de Negocio (RN-01 a RN-09) formalizan las políticas y restricciones 
 
 | ID | Nombre de la Regla | Descripción | Autoridad | Situación Actual (Problemática) |
 | :--- | :--- | :--- | :--- | :--- |
-| RN-01 | Aprobación Obligatoria de Integración | Ningún ECS puede integrarse a la Biblioteca Maestra/Soporte de un proyecto sin la revisión y aprobación de una Solicitud de Cambio por el CCB. | Comité de Control de Cambios (CCB) | Se integraban cambios directamente sin revisión previa. |
+| RN-01 | Aprobación Obligatoria Previa a Modificación e Integración | Ningún ECS puede ser modificado ni transferido a la Biblioteca de Trabajo sin una Orden de Cambio (ECN/ECO) emitida formalmente por el CCB (para Cambios Mayores) o bajo autoridad operativa delegada compartida entre el Analista de Requerimientos/Gestor y el Arquitecto/Especialista Técnico (para Cambios Menores). Asimismo, la integración definitiva a la Biblioteca Maestra exige las debidas certificaciones de calidad y aceptación del usuario. | Comité de Control de Cambios (CCB) / Autoridad Operativa Delegada | Se modificaban e integraban cambios directamente sin autorización formal. |
 | RN-02 | Identificación Unívoca de Versiones | Toda línea base establecida tras un Check-In a la Biblioteca Maestra debe estar identificada con un estándar de versionamiento (mayor.menor.parche). | Administrador de Configuración / Bibliotecario | Se usaban nombres de carpetas y archivos comprimidos con nombres arbitrarios. |
 | RN-03 | Trazabilidad de Cambios | Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO) previamente emitida. | Analista de Requerimientos / Gestor *(ver nota en Inconsistencias)* | No existía registro de quién ni por qué se modificaba el código. |
 | RN-04 | Restricción de Bibliotecas Congeladas | Un ECS almacenado en la Biblioteca Maestra no puede modificarse directamente; cualquier corrección exige un nuevo ciclo completo de RFC, Check-Out y Check-In. | Administrador de Configuración / Bibliotecario | Los consultores editaban directamente los archivos entregados al cliente. |
-| RN-05 | Evaluación Técnica Obligatoria | Ninguna Solicitud de Cambio puede pasar a evaluación del CCB sin contar previamente con un Informe Técnico de Impacto elaborado por el Arquitecto/Especialista Técnico. | Arquitecto / Especialista Técnico | Los cambios se aprobaban sin un análisis técnico documentado. |
+| RN-05 | Evaluación Técnica y Clasificación Obligatoria | Ninguna Solicitud de Cambio puede ser autorizada (por vía delegada o por el CCB) sin contar previamente con un Informe Técnico de Impacto elaborado por el Arquitecto/Especialista Técnico que evalúe arquitectura, dependencias, riesgos y el impacto sobre la Triple Restricción (alcance, tiempo y costo), dictaminando si clasifica como Cambio Menor o Mayor. | Arquitecto / Especialista Técnico | Los cambios se aprobaban sin análisis técnico documentado ni evaluación de impacto en la triple restricción. |
 | RN-06 | Bloqueo de Sincronización Obligatorio | Todo ECS que ingresa a la Biblioteca de Trabajo mediante Check-Out debe quedar bloqueado para otros usuarios hasta su Check-In o rollback. | Administrador de Configuración / Bibliotecario | Varios consultores editaban el mismo archivo de forma simultánea, generando sobreescrituras. |
-| RN-07 | Diferenciación de Resultados de Cierre | Toda Solicitud de Cambio debe cerrarse con uno de tres resultados formales y mutuamente excluyentes: Rechazo Técnico (inviabilidad detectada por el CCB), Rechazo Administrativo (decisión del CCB pese a viabilidad técnica) o Cancelación por Fallo No Subsanado (re-test fallido tras corrección). | Comité de Control de Cambios (CCB) / Administrador de Configuración | No existía distinción entre los motivos de cierre de un cambio no exitoso. |
-| RN-08 | Reversión Obligatoria ante Fallo No Subsanado | Si el re-test posterior a una corrección no es superado exitosamente, el Administrador de Configuración debe ejecutar un rollback del ECS en la Biblioteca de Trabajo antes de cancelar la Orden de Cambio. | Administrador de Configuración / Bibliotecario | El código con errores permanecía en el entorno de trabajo sin reversión formal. |
-| RN-09 | Validación de QA Previa al Check-In a Biblioteca Maestra | Ningún ECS puede pasar de la Biblioteca de Trabajo a la Biblioteca Maestra/Soporte sin la certificación de conformidad del Equipo de Calidad/Testing. | Equipo de Calidad / Testing | El código se entregaba al cliente sin pruebas formales previas. |
+| RN-07 | Diferenciación de Resultados Formales de Cierre | Toda Solicitud de Cambio debe cerrarse formalmente bajo uno de cuatro resultados terminales y mutuamente excluyentes: Cerrado – Implementado (Check-In y Línea Base conformes tras QA y UAT), Rechazado Técnico (inviabilidad dictaminada por el CCB), Rechazado Administrativo (decisión del CCB o de la autoridad delegada por alcance/costo/prioridad) o Cancelado por Fallo No Subsanado (fallo en re-test de QA o rechazo insubsanable en UAT con rollback ejecutado). | Comité de Control de Cambios (CCB) / Autoridad Operativa Delegada / Administrador de Configuración | No existía distinción formal entre los motivos de cierre ni cobertura para el cierre exitoso. |
+| RN-08 | Reversión Obligatoria ante Fallo No Subsanado | Si el re-test posterior a una corrección no es superado exitosamente, o si se formula rechazo insubsanable en la aceptación del usuario, el Administrador de Configuración debe ejecutar un rollback del ECS en la Biblioteca de Trabajo antes de cancelar la Orden de Cambio. | Administrador de Configuración / Bibliotecario | El código con errores permanecía en el entorno de trabajo sin reversión formal. |
+| RN-09 | Doble Validación Previa al Check-In a Biblioteca Maestra | Ningún ECS modificado puede ser transferido a la Biblioteca Maestra ni congelado en una nueva Línea Base sin contar concurrentemente con la Certificación de Conformidad técnica emitida por el Equipo de Calidad/Testing y el Acta de Aceptación formal suscrita por el Solicitante/Usuario Final en el entorno controlado de validación previo a la liberación. | Equipo de Calidad / Testing y Solicitante / Usuario Final | El código se integraba y entregaba al cliente sin pruebas formales ni aceptación documentada. |
 
 Nota: Elaboración Propia
 
@@ -1116,19 +1125,20 @@ En concordancia con el flujo de gestión de cambios adoptado por TraceFlow
 
 | N.º | Nombre del Estado | Actor / Responsable Principal | Tipo de Estado | Descripción y Criterio de Transición |
 | :---: | :--- | :--- | :--- | :--- |
-| 1 | **Registrado** | Solicitante / Analista de Requerimientos | Inicial | La solicitud fue creada por el Solicitante y recepcionada por el Analista de Requerimientos. |
-| 2 | **En Subsanación** | Solicitante | Intermedio (Bucle) | La información de la solicitud está incompleta y se encuentra en espera de datos adicionales subsanados. |
-| 3 | **Clasificado** | Analista de Requerimientos / Gestor | Intermedio | El Analista de Requerimientos validó la información completa y definió el tipo y la criticidad del cambio. |
-| 4 | **En Análisis Técnico** | Arquitecto / Especialista Técnico | Intermedio | El Arquitecto está elaborando el Informe Técnico de Impacto (arquitectura, dependencias, esfuerzo, costo, tiempo, riesgos). |
-| 5 | **En Evaluación CCB** | Comité de Control de Cambios (CCB) | Intermedio | El Comité de Control de Cambios está evaluando la viabilidad técnica y decidiendo la aprobación del cambio. |
-| 6 | **Rechazado (Técnico)** | Comité de Control de Cambios (CCB) | Terminal | El CCB determinó que el cambio no es técnicamente viable. Se notifica al Solicitante y el trámite finaliza. |
-| 7 | **Rechazado (Administrativo)** | Comité de Control de Cambios (CCB) | Terminal | El CCB decidió no aprobar el cambio por razones de gestión, alcance o costo, pese a ser técnicamente viable. Se notifica al Solicitante y finaliza. |
-| 8 | **Aprobado – Orden Emitida** | Comité de Control de Cambios (CCB) | Intermedio | El CCB aprobó la RFC y emitió la Orden de Cambio (ECN/ECO), autorizando la transferencia del ECS hacia la Biblioteca de Trabajo. |
-| 9 | **En Implementación** | Ingeniero de Software / Desarrollador | Intermedio | El Desarrollador recibió el ECS bajo Check-Out con bloqueo activo y ejecuta las modificaciones y pruebas unitarias locales. |
-| 10 | **En Validación QA** | Equipo de Calidad / Testing | Intermedio | El Equipo de Calidad está ejecutando pruebas de integración y validación funcional sobre el ECS modificado. |
-| 11 | **En Corrección** | Ingeniero de Software / Desarrollador | Intermedio (Bucle) | QA detectó no conformidades y el cambio se encuentra en ciclo de corrección de defectos y re-testeo. |
-| 12 | **Cancelado (Fallo No Subsanado)** | Administrador de Configuración / Bibliotecario | Terminal | El re-testeo no fue superado tras los reintentos permitidos; el Administrador ejecuta rollback del ECS en la Biblioteca de Trabajo y cancela la Orden de Cambio. |
-| 13 | **Cerrado – Implementado** | Administrador de Configuración / CCB | Terminal | El ECS certificado completó Check-In en la Biblioteca Maestra, se congeló una nueva Línea Base, se liberó el bloqueo y se formalizó el cierre exitoso. |
+| 1 | **Registrada** | Solicitante | Inicial | La Solicitud de Cambio (RFC) ha sido creada y registrada en el sistema mediante CU-04, quedando pendiente de revisión inicial de completitud. |
+| 2 | **En Subsanación** | Solicitante | Intermedio (Bucle) | El Analista de Requerimientos identificó datos incompletos o inconsistentes (CU-05); el Solicitante dispone de un plazo reglamentario para subsanar observaciones. |
+| 3 | **Clasificada** | Analista de Requerimientos / Gestor | Intermedio | La solicitud superó el filtro inicial de completitud (CU-05), se categorizó preliminarmente y queda formalmente admitida para análisis técnico de impacto. |
+| 4 | **En Análisis Técnico** | Arquitecto / Especialista Técnico | Intermedio | El Arquitecto elabora el Informe Técnico de Impacto (CU-06), evaluando arquitectura, dependencias y la afectación a la Triple Restricción (Alcance, Tiempo, Costo) para determinar si es Cambio Menor o Mayor. |
+| 5 | **En Evaluación** | CCB / Autoridad Operativa Delegada | Intermedio | La solicitud y su informe de impacto son deliberados colegiadamente por el CCB (Cambio Mayor, CU-07) o evaluados conjuntamente por la Autoridad Delegada (Cambio Menor, CU-30). |
+| 6 | **Autorizada** | CCB / Autoridad Operativa Delegada | Intermedio | El cambio recibió dictamen aprobatorio formal (CU-07 o CU-30), habilitando la emisión de la orden de cambio y la asignación de recursos. |
+| 7 | **Orden Emitida** | CCB / Autoridad Operativa Delegada | Intermedio | Se emitió y formalizó la Orden de Cambio (ECN/ECO) mediante CU-08, autorizando el Check-Out del ECS y el inicio de los trabajos en la Biblioteca de Trabajo. |
+| 8 | **En Implementación** | Ingeniero de Software / Desarrollador | Intermedio | El Administrador ejecutó el Check-Out (CU-10) con bloqueo de sincronización (CU-11) y el Desarrollador efectúa las modificaciones y pruebas unitarias locales (CU-14, CU-15). |
+| 9 | **En Pruebas** | Equipo de Calidad / Testing | Intermedio | El ECS modificado fue entregado a QA para ejecución de pruebas de integración y funcionales (CU-16), incluyendo posibles ciclos de corrección y re-testeo (CU-18, CU-19). |
+| 10 | **En Aceptación** | Solicitante / Usuario Final | Intermedio | Habiéndose emitido la Certificación Técnica de Conformidad por QA (CU-17), el Solicitante evalúa el comportamiento del cambio en entorno de validación (CU-29, UAT). |
+| 11 | **Desestimada** | Analista de Requerimientos / Gestor | Terminal | Cierre formal anticipado debido a que la solicitud fue declarada inviable/improcedente en revisión inicial o no se subsanaron las observaciones requeridas en el plazo establecido (CU-05). |
+| 12 | **Rechazada** | CCB / Autoridad Operativa Delegada | Terminal | Cierre formal por dictamen colegiado negativo del CCB (por inviabilidad técnica o motivos de gestión/alcance, CU-07) o rechazo de la Autoridad Delegada (CU-30). Se notifica al Solicitante con fundamentación. |
+| 13 | **Cancelada** | Administrador de Configuración / Bibliotecario | Terminal | Cierre formal por fallo técnico no subsanado tras re-testeo en QA o desistimiento justificado; el Administrador ejecuta rollback del ECS en la Biblioteca de Trabajo (CU-21) y cancela la ECN/ECO (CU-22). |
+| 14 | **Implementada** | Administrador de Configuración / CCB | Terminal | Cierre formal exitoso: con la doble conformidad (QA + UAT), el Administrador ejecutó Check-In a Biblioteca Maestra (CU-12), congeló la nueva Línea Base (CU-20), liberó el bloqueo y el CCB formalizó el cierre (RF-14). |
 
 **Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC**
 
@@ -1142,68 +1152,103 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC</b>
+title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales)</b>
 
-[*] --> Registrado : Solicitante registra RFC
+[*] --> Registrada : Solicitante registra RFC (CU-04)
 
-state Registrado {
-    Registrado : Esperando revisión inicial
+state Registrada {
+    Registrada : Esperando validación de completitud
 }
 
-Registrado --> EnSubsanacion : Analista detecta datos incompletos
-EnSubsanacion --> Registrado : Solicitante remite información subsanada
+Registrada --> EnSubsanacion : Analista detecta datos incompletos (CU-05)
+EnSubsanacion --> Registrada : Solicitante entrega datos subsanados
+EnSubsanacion --> Desestimada : Plazo vencido sin subsanación
 
-Registrado --> Clasificado : Analista valida información completa
-Clasificado --> EnAnalisisTecnico : Asignado a Arquitecto
+Registrada --> Clasificada : Analista valida consistencia y completitud (CU-05)
+Registrada --> Desestimada : Solicitud inviable o improcedente (CU-05)
+
+state Clasificada {
+    Clasificada : Lista para análisis de impacto técnico
+}
+
+Clasificada --> EnAnalisisTecnico : Asignada a Arquitecto (CU-06)
 
 state EnAnalisisTecnico {
-    EnAnalisisTecnico : Elaborando Informe Técnico de Impacto
+    EnAnalisisTecnico : Evaluación de impacto y Triple Restricción
 }
 
-EnAnalisisTecnico --> EnEvaluacionCCB : Informe Técnico remitido al CCB
+EnAnalisisTecnico --> EnEvaluacion : Informe Técnico generado (CU-06)
 
-state EnEvaluacionCCB {
-    state "Evaluando Viabilidad" as S_EVAL
-    state "Decisión Colegiada" as S_DEC
-    [*] --> S_EVAL
-    S_EVAL --> S_DEC : Dictamen técnico emitido
+state EnEvaluacion {
+    state "Ruta Cambio Mayor (CCB)" as S_MAYOR
+    state "Ruta Cambio Menor (Delegada)" as S_MENOR
 }
 
-EnEvaluacionCCB --> RechazadoTecnico : CCB dictamina inviabilidad técnica
-EnEvaluacionCCB --> RechazadoAdministrativo : CCB decide no aprobar por gestión
+EnEvaluacion --> Rechazada : CCB rechaza Mayor (CU-07) o Autoridad Delegada rechaza Menor (CU-30)
+EnEvaluacion --> Autorizada : CCB aprueba Mayor (CU-07) o Autoridad Delegada autoriza Menor (CU-30)
 
-RechazadoTecnico --> [*] : Cierre formal y notificación al Solicitante
-RechazadoAdministrativo --> [*] : Cierre formal y notificación al Solicitante
+state Autorizada {
+    Autorizada : Dictamen formal aprobatorio registrado
+}
 
-EnEvaluacionCCB --> AprobadoOrdenEmitida : CCB aprueba y emite ECN/ECO
+Autorizada --> OrdenEmitida : Emisión formal de ECN/ECO (CU-08 / CU-30)
 
-AprobadoOrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out\ny aplica bloqueo de sincronización
+state OrdenEmitida {
+    OrdenEmitida : ECN/ECO formalmente vigente
+}
+
+OrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out y aplica bloqueo (CU-10, CU-11)
 
 state EnImplementacion {
-    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo\ny corre pruebas unitarias locales
+    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo
+y ejecuta pruebas unitarias (CU-14, CU-15)
 }
 
-EnImplementacion --> EnValidacionQA : Pruebas unitarias aprobadas;\nremitido a QA
+EnImplementacion --> EnPruebas : Pruebas unitarias conformes;
+entrega a QA (CU-16)
 
-state EnValidacionQA {
-    EnValidacionQA : QA ejecuta pruebas de integración\ny funcionales
+state EnPruebas {
+    state "Validación de Integración" as S_INTEG
+    state "Re-testeo por Corrección" as S_RETEST
+    [*] --> S_INTEG
+    S_INTEG --> S_RETEST : Defectos reportados (CU-18) y subsanados
+    S_RETEST --> S_INTEG : Reevaluación (CU-19)
 }
 
-EnValidacionQA --> EnCorreccion : QA detecta defectos (No Conformidad)
+EnPruebas --> Cancelada : Fallo no subsanado; Rollback y cancelación (CU-21, CU-22)
+EnPruebas --> EnAceptacion : QA emite Certificación Técnica de Conformidad (CU-17)
 
-state EnCorreccion {
-    EnCorreccion : Desarrollador corrige defectos reportados
+state EnAceptacion {
+    EnAceptacion : Solicitante ejecuta pruebas de aceptación UAT (CU-29)
 }
 
-EnCorreccion --> EnValidacionQA : Desarrollador entrega corrección;\nse ejecuta re-testeo
+EnAceptacion --> EnImplementacion : Hallazgo o disconformidad UAT; requiere ajuste
+EnAceptacion --> Implementada : Solicitante valida UAT (CU-29); Administrador ejecuta Check-In a Maestra (CU-12),
+congela Línea Base (CU-20), libera bloqueo y CCB formaliza cierre (RF-14)
 
-EnCorreccion --> CanceladoFalloNoSubsanado : Reintentos de re-test agotados;\nAdministrador ejecuta Rollback en Trabajo
+' =========================================================
+' ESTADOS TERMINALES (4 Estados Normativos)
+' =========================================================
+state Desestimada #FFCDD2 {
+    Desestimada : Terminal 1: Filtro inicial no superado
+}
 
-CanceladoFalloNoSubsanado --> [*] : Cierre formal por cancelación
+state Rechazada #FFCDD2 {
+    Rechazada : Terminal 2: Dictamen formal negativo (CCB o Delegado)
+}
 
-EnValidacionQA --> CerradoImplementado : QA emite Certificación de Conformidad;\nAdministrador hace Check-In a Maestra,\ncongela Línea Base y libera bloqueo
+state Cancelada #FFCDD2 {
+    Cancelada : Terminal 3: Rollback por fallo técnico o desistimiento
+}
 
-CerradoImplementado --> [*] : Cierre formal exitoso
+state Implementada #C8E6C9 {
+    Implementada : Terminal 4: Promovida a Maestra, congelada en Baseline y cerrada con éxito
+}
+
+Desestimada --> [*] : Cierre formal y notificación
+Rechazada --> [*] : Cierre formal y notificación
+Cancelada --> [*] : Cierre formal y notificación
+Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 @enduml
 ```
 
@@ -1296,9 +1341,12 @@ package "Gestión de Bibliotecas" as PKG_LIB {
 }
 
 package "Control de Cambios" as PKG_CHG {
-    class "Gestión de RFC" as MOD_RFC
-    class "Análisis de Impacto" as MOD_IMP
-    class "Evaluación CCB y ECN/ECO" as MOD_CCB
+    class "Gestión y Clasificación de RFC" as MOD_RFC
+    class "Análisis de Impacto Técnico" as MOD_IMP
+    class "Evaluación CCB (Cambios Mayores)" as MOD_CCB
+    class "Autorización Delegada (Cambios Menores)" as MOD_AUTH_MIN
+    class "Emisión de ECN/ECO" as MOD_ECN
+    class "Validación QA y Aceptación UAT" as MOD_QA_UAT
     class "Orquestación Check-Out / Check-In" as MOD_ORQ
 }
 
@@ -1389,6 +1437,7 @@ rectangle "TraceFlow SCM" {
         usecase "CU-06: Realizar análisis de impacto técnico" as UC06
         usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
         usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
+        usecase "CU-30: Autorizar Cambio Menor" as UC30
     }
 
     package "Gestión de ECS y Bibliotecas" {
@@ -1406,6 +1455,7 @@ rectangle "TraceFlow SCM" {
         usecase "CU-17: Certificar conformidad del cambio" as UC17
         usecase "CU-18: Reportar no conformidad" as UC18
         usecase "CU-19: Reevaluar y re-testear" as UC19
+        usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
     }
 
     package "Líneas Base y Rollback" {
@@ -1435,6 +1485,9 @@ ACT_ARQ --> UC06
 ACT_CCB --> UC07
 ACT_CCB --> UC08
 
+ACT_ANA --> UC30
+ACT_ARQ --> UC30
+
 ACT_ARQ --> UC09
 ACT_ADM --> UC10
 ACT_ADM --> UC11
@@ -1447,6 +1500,7 @@ ACT_QA --> UC16
 ACT_QA --> UC17
 ACT_QA --> UC18
 ACT_QA --> UC19
+ACT_SOL --> UC29
 
 ACT_ADM --> UC20
 ACT_ADM --> UC21
@@ -1533,7 +1587,8 @@ rectangle "Gestión de Solicitudes e Incidencias" {
     usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
     usecase "CU-05: Validar y clasificar la solicitud" as UC05
     usecase "CU-06: Realizar análisis de impacto técnico" as UC06
-    usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
+    usecase "CU-07: Evaluar Cambio Mayor en CCB" as UC07
+    usecase "CU-30: Autorizar Cambio Menor" as UC30
     usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
 
     usecase "Subsanar información de RFC" as UC_SUBSANAR
@@ -1551,10 +1606,14 @@ UC05 ..> UC_SUBSANAR : <<extend>> (datos incompletos)
 ACT_SOL --> UC_SUBSANAR
 
 ACT_ARQ --> UC06
-ACT_CCB --> UC07
-ACT_CCB --> UC08
 
+' Evaluación y Decisión: Ruta Mayor (CCB) vs Menor (Delegada)
+ACT_CCB --> UC07
 UC07 ..> UC08 : <<include>> (si aprueba)
+
+ACT_ANA --> UC30
+ACT_ARQ --> UC30
+UC30 ..> UC08 : <<include>> (si autoriza)
 @enduml
 ```
 
@@ -1619,6 +1678,7 @@ title <b>TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad<
 
 actor "Ingeniero de Software / Desarrollador" as ACT_DEV
 actor "Equipo de Calidad / Testing" as ACT_QA
+actor "Solicitante" as ACT_SOL
 
 rectangle "Módulo de Implementación y QA" {
     usecase "CU-14: Implementar cambio en el ECS" as UC14
@@ -1627,6 +1687,7 @@ rectangle "Módulo de Implementación y QA" {
     usecase "CU-17: Certificar conformidad del cambio" as UC17
     usecase "CU-18: Reportar no conformidad" as UC18
     usecase "CU-19: Reevaluar y re-testear" as UC19
+    usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
 }
 
 ACT_DEV --> UC14
@@ -1642,6 +1703,10 @@ UC16 ..> UC17 : <<extend>> (si conforme)
 UC16 ..> UC18 : <<extend>> (si defectos)
 UC18 ..> UC19 : <<triggers>> (tras corrección)
 ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
+
+' Validación UAT del Solicitante / Usuario Final
+ACT_SOL --> UC29
+UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
 @enduml
 ```
 
@@ -1682,6 +1747,45 @@ UC28 ..> UC_EXP : <<extend>>
 ```
 
 ### 6.1.3. Escenarios de Caso de Uso (narrativa)
+
+El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo canónico de 30 casos de uso (`CU-01` a `CU-30`). Esta estructura conserva la numeración histórica de los 28 casos de uso originales (`CU-01` a `CU-28`), incorporando explícitamente las dos capacidades normativas del proceso TO-BE v2: `CU-29: Validar aceptación del cambio por el usuario (UAT)` a cargo del actor Solicitante, y `CU-30: Autorizar Cambio Menor` a cargo de la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto. A continuación se presenta el catálogo general consolidado (TB-10) y la especificación detallada de cada escenario:
+
+**Tabla TB-10: Catálogo General de Casos de Uso del Sistema TraceFlow SCM**
+
+| Cód. Orig. | ID Estándar | Nombre del Caso de Uso | Tipo | Actor Principal | Actores Secundarios | Módulo Relacionado | Requerimiento Asociado Explícito |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| CUS01 | CU-01 | Gestionar usuarios y roles | Secundario, administrativo | Administrador de Configuración / Bibliotecario | Usuarios del sistema | Gestión de Usuarios y Proyectos | RF-01 – Gestión de Usuarios y Roles |
+| CUS02 | CU-02 | Crear y administrar proyectos | Primario, administrativo | Analista de Requerimientos / Gestor | Administrador de Configuración / Bibliotecario | Gestión de Usuarios y Proyectos | RF-02 – Gestión de Proyectos |
+| CUS03 | CU-03 | Consultar proyecto | Secundario, de consulta | Analista de Requerimientos / Gestor | Usuarios autorizados | Gestión de Usuarios y Proyectos | RF-02 – Gestión de Proyectos |
+| CUS04 | CU-04 | Registrar Solicitud de Cambio (RFC) | Primario, operativo | Solicitante | Analista de Requerimientos / Gestor | Registro y Evaluación de la RFC | RF-04 – Registro de Solicitudes de Cambio (RFC) |
+| CUS05 | CU-05 | Validar y clasificar la solicitud | Primario, operativo | Analista de Requerimientos / Gestor | Solicitante | Registro y Evaluación de la RFC | RF-04, RF-05 – Registro, Clasificación y Análisis de Impacto |
+| CUS06 | CU-06 | Realizar análisis de impacto técnico | Primario, analítico | Arquitecto / Especialista Técnico | Analista de Requerimientos / Gestor | Registro y Evaluación de la RFC | RF-05 – Clasificación y Análisis de Impacto |
+| CUS07 | CU-07 | Evaluar viabilidad y aprobar/rechazar | Primario, decisional | Comité de Control de Cambios (CCB) | Solicitante, Analista de Requerimientos | Registro y Evaluación de la RFC | RF-06 – Evaluación y Aprobación de Cambios Mayores por el CCB |
+| CUS08 | CU-08 | Emitir Orden de Cambio (ECN/ECO) | Primario, formalización | Comité de Control de Cambios (CCB) / Analista de Requerimientos / Gestor | Administrador de Configuración / Bibliotecario | Registro y Evaluación de la RFC | RF-07 – Gestión y Emisión de Órdenes de Cambio (ECN/ECO) |
+| CUS09 | CU-09 | Registrar ECS | Primario, configuración | Arquitecto / Especialista Técnico | Administrador de Configuración / Bibliotecario | Gestión de ECS y Bibliotecas | RF-03 – Identificación de ECS |
+| CUS10 | CU-10 | Efectuar Check-Out (Soporte → Trabajo) | Primario, operación SCM | Administrador de Configuración / Bibliotecario | Ingeniero de Software / Desarrollador | Gestión de ECS y Bibliotecas | RF-08, RF-09 – Gestión de Bibliotecas y Control de Versiones |
+| CUS11 | CU-11 | Aplicar bloqueo de sincronización | Secundario, soporte SCM | Administrador de Configuración / Bibliotecario | Sistema TraceFlow SCM | Gestión de ECS y Bibliotecas | RF-09 – Control de Versiones y Bloqueos de Sincronización |
+| CUS12 | CU-12 | Efectuar Check-In (Trabajo → Maestra/Soporte) | Primario, operación SCM | Administrador de Configuración / Bibliotecario | Equipo de Calidad / Testing, Solicitante | Gestión de ECS y Bibliotecas | RF-08, RF-09, RF-10 – Gestión de Bibliotecas, Control de Versiones y Aceptación |
+| CUS13 | CU-13 | Consultar historial de versiones | Secundario, auditoría | Administrador de Configuración / Bibliotecario | Usuarios autorizados | Gestión de ECS y Bibliotecas | RF-09, RF-16 – Control de Versiones y Trazabilidad |
+| CUS14 | CU-14 | Implementar cambio en el ECS | Primario, desarrollo | Ingeniero de Software / Desarrollador | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-07, RF-09 – Orden de Cambio y Control de Versiones |
+| CUS15 | CU-15 | Ejecutar pruebas unitarias locales | Secundario, verificación | Ingeniero de Software / Desarrollador | Sistema de Pruebas Unitarias | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+| CUS16 | CU-16 | Ejecutar pruebas de integración | Primario, validación QA | Equipo de Calidad / Testing | Ingeniero de Software / Desarrollador | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+| CUS17 | CU-17 | Certificar conformidad del cambio | Primario, certificación | Equipo de Calidad / Testing | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+| CUS18 | CU-18 | Reportar no conformidad | Alternativo, QA | Equipo de Calidad / Testing | Ingeniero de Software / Desarrollador | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+| CUS19 | CU-19 | Reevaluar y re-testear | Alternativo, esencial | Equipo de Calidad / Testing | Ingeniero de Software / Desarrollador | Implementación y Validación | RF-11 – Reevaluación y Re-testeo |
+| CUS20 | CU-20 | Crear y congelar línea base | Primario, esencial | Administrador de Configuración / Bibliotecario | Equipo de Calidad / Testing, Solicitante | Líneas Base y Rollback | RF-13 – Gestión de Líneas Base |
+| CUS21 | CU-21 | Ejecutar rollback en Biblioteca de Trabajo | Alternativo, correctivo | Administrador de Configuración / Bibliotecario | Ingeniero de Software / Desarrollador | Líneas Base y Rollback | RF-12 – Rollback y Cancelación de Órdenes de Cambio |
+| CUS22 | CU-22 | Cancelar Orden de Cambio | Alternativo, cierre fallido | Administrador de Configuración / Bibliotecario | Solicitante, CCB | Líneas Base y Rollback | RF-12, RF-14 – Rollback, Cancelación y Cierre Formal |
+| CUS23 | CU-23 | Registrar incidencia | Primario, soporte | Solicitante | Analista de Requerimientos / Gestor | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
+| CUS24 | CU-24 | Consultar estado de ticket | Secundario, consulta | Solicitante | Analista de Requerimientos / Gestor | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
+| CUS25 | CU-25 | Derivar incidencia a RFC | Primario, transición | Analista de Requerimientos / Gestor | Solicitante | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
+| CUS26 | CU-26 | Validar integridad (checksum) | Secundario, seguridad | Administrador de Configuración / Bibliotecario | Sistema TraceFlow SCM | Trazabilidad, Auditoría y Reportes | RF-17, RNF-03 – Auditoría e Integridad |
+| CUS27 | CU-27 | Auditar acciones del sistema | Secundario, control | Comité de Control de Cambios (CCB) | Administrador de Configuración / Bibliotecario | Trazabilidad, Auditoría y Reportes | RF-16, RF-17 – Trazabilidad de Configuración y Auditoría |
+| CUS28 | CU-28 | Generar reportes de estado | Secundario, reporte | Administrador de Configuración / Bibliotecario | Gestores y Dirección de Proyecto | Trazabilidad, Auditoría y Reportes | RF-18 – Generación de Reportes |
+| CUS29 | CU-29 | Validar aceptación del cambio por el usuario (UAT) | Primario, validación usuario | Solicitante | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-10 – Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| CUS30 | CU-30 | Autorizar Cambio Menor | Primario, decisional | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico | Solicitante, Ingeniero de Software / Desarrollador | Registro y Evaluación de la RFC | RF-05, RF-07 – Clasificación, Análisis de Impacto y Gestión de Órdenes de Cambio |
+
+---
 
 | Campo | Descripción |
 | --- | --- |
@@ -4323,7 +4427,7 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 # TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso
 
 **Estado:** APROBADO  
-**Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3  
+**Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 y actualización TO-BE v2  
 
 | ID RF | Nombre del Requerimiento Funcional | Casos de Uso que lo Instrumentan (Código Oficial / Original) | Sustento Documental (Campo Requerimiento Asociado en CU) |
 | :--- | :--- | :--- | :--- |
@@ -4331,16 +4435,16 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 | RF-02 | Gestión de Proyectos | CU-02 (CUS02), CU-03 (CUS03) | Explícito en CUS02 y CUS03 |
 | RF-03 | Identificación de ECS | CU-09 (CUS09) | Explícito en CUS09 |
 | RF-04 | Registro de Solicitudes de Cambio (RFC) | CU-04 (CUS04), CU-05 (CUS05) | Explícito en CUS04 y CUS05 |
-| RF-05 | Clasificación y Análisis de Impacto | CU-05 (CUS05), CU-06 (CUS06) | Explícito en CUS05 y CUS06 |
-| RF-06 | Evaluación y Aprobación por el CCB | CU-07 (CUS07) | Explícito en CUS07 |
-| RF-07 | Gestión de Órdenes de Cambio | CU-08 (CUS08), CU-14 (CUS14) | Explícito en CUS08 y CUS14 |
+| RF-05 | Clasificación y Análisis de Impacto | CU-05 (CUS05), CU-06 (CUS06), CU-30 | Explícito en CUS05, CUS06 y CU-30 (Evaluación de triple restricción y bifurcación Menor/Mayor) |
+| RF-06 | Evaluación y Aprobación por el CCB | CU-07 (CUS07) | Explícito en CUS07 (Exclusivo para Cambios Mayores) |
+| RF-07 | Gestión de Órdenes de Cambio | CU-08 (CUS08), CU-14 (CUS14), CU-30 | Explícito en CUS08 (Emisión formal ECN/ECO), CUS14 y CU-30 (Autorización y habilitación de emisión delegada) |
 | RF-08 | Gestión de Bibliotecas de Software | CU-10 (CUS10), CU-12 (CUS12) | Explícito en CUS10 y CUS12 |
 | RF-09 | Control de Versiones y Bloqueos de Sincronización | CU-10 (CUS10), CU-11 (CUS11), CU-12 (CUS12), CU-13 (CUS13), CU-14 (CUS14) | Explícito en CUS10, CUS11, CUS12, CUS13 y CUS14 |
-| RF-10 | Gestión de Pruebas y Certificación de Conformidad | CU-15 (CUS15), CU-16 (CUS16), CU-17 (CUS17), CU-18 (CUS18) | Explícito en CUS15, CUS16, CUS17 y CUS18 |
+| RF-10 | Gestión de Pruebas y Certificación de Conformidad | CU-15 (CUS15), CU-16 (CUS16), CU-17 (CUS17), CU-18 (CUS18), CU-29 | Explícito en CUS15, CUS16, CUS17, CUS18 y CU-29 (Validación y aceptación del usuario - UAT) |
 | RF-11 | Reevaluación y Re-testeo | CU-19 (CUS19) | Explícito en CUS19 |
 | RF-12 | Rollback y Cancelación de Órdenes de Cambio | CU-21 (CUS21), CU-22 (CUS22) | Explícito en CUS21 y CUS22 |
 | RF-13 | Gestión de Líneas Base | CU-20 (CUS20) | Explícito en CUS20 |
-| RF-14 | Cierre Formal del Cambio y Notificaciones | CU-22 (CUS22) | Explícito en CUS22 *(ver PENDIENTE DE VALIDACIÓN para cierre exitoso)* |
+| RF-14 | Cierre Formal del Cambio y Notificaciones | CU-05 (CUS05), CU-07 (CUS07), CU-20 (CUS20), CU-22 (CUS22), CU-30 | Instrumenta los 4 estados terminales: Desestimado (CU-05), Rechazado (CU-07/CU-30), Cancelado (CU-22) e Implementado (CU-20 tras UAT) |
 | RF-15 | Gestión de Incidencias y Soporte | CU-23 (CUS23), CU-24 (CUS24), CU-25 (CUS25) | Explícito en CUS23, CUS24 y CUS25 |
 | RF-16 | Trazabilidad de Configuración | CU-13 (CUS13), CU-27 (CUS27) | Explícito en CUS13 y CUS27 |
 | RF-17 | Auditoría e Integridad | CU-26 (CUS26), CU-27 (CUS27) | Explícito en CUS26 y CUS27 |
@@ -4350,38 +4454,38 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 
 # TB-13 — Matriz de Trazabilidad: Reglas de Negocio vs Casos de Uso
 
-**Estado:** REVISION  
-**Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3  
+**Estado:** APROBADO  
+**Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3 actualizados con TO-BE v2  
 
 > [!NOTE]
-> Las relaciones directas se sustentan en los flujos principales, alternativos y de excepción de cada caso de uso. Las relaciones marcadas como `PENDIENTE DE VALIDACION` representan implicaciones operativas derivadas que requieren confirmación colegiada del CCB.
+> Las relaciones directas se sustentan en los flujos principales, alternativos y de excepción de cada caso de uso conforme a la gobernanza TO-BE v2.
 
 | ID RN | Regla de Negocio | Autoridad Responsable | Casos de Uso Directamente Vinculados | Casos de Uso con Afectación Operativa Directa | Estado de Trazabilidad |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| RN-01 | Aprobación Obligatoria de Integración | Comité de Control de Cambios (CCB) | CU-07 (Evaluar viabilidad y aprobar/rechazar), CU-12 (Check-In) | CU-08 (Emitir ECN/ECO) | APROBADO |
+| RN-01 | Aprobación Obligatoria de Integración | Comité de Control de Cambios (CCB) / Autoridad Operativa Delegada | CU-07 (Evaluar Cambio Mayor en CCB), CU-30 (Autorizar Cambio Menor), CU-12 (Check-In) | CU-08 (Emitir ECN/ECO) | APROBADO |
 | RN-02 | Identificación Unívoca de Versiones | Administrador de Configuración / Bibliotecario | CU-20 (Crear y congelar línea base), CU-12 (Check-In) | CU-13 (Consultar historial de versiones) | APROBADO |
-| RN-03 | Trazabilidad de Cambios | Analista de Requerimientos / Gestor *(ver Inconsistencias)* | CU-08 (Emitir ECN/ECO), CU-12 (Check-In), CU-14 (Implementar cambio) | CU-27 (Auditar acciones) | APROBADO |
+| RN-03 | Trazabilidad de Cambios | Administrador de Configuración / Bibliotecario y Analista | CU-08 (Emitir ECN/ECO), CU-12 (Check-In), CU-14 (Implementar cambio) | CU-27 (Auditar acciones) | APROBADO |
 | RN-04 | Restricción de Bibliotecas Congeladas | Administrador de Configuración / Bibliotecario | CU-04 (Registrar RFC), CU-10 (Check-Out), CU-12 (Check-In), CU-20 (Línea Base) | CU-09 (Registrar ECS) | APROBADO |
-| RN-05 | Evaluación Técnica Obligatoria | Arquitecto / Especialista Técnico | CU-06 (Análisis de impacto técnico), CU-07 (Evaluar viabilidad) | CU-05 (Validar y clasificar solicitud) | APROBADO |
+| RN-05 | Evaluación Técnica Obligatoria y Clasificación | Arquitecto / Especialista Técnico | CU-06 (Análisis de impacto técnico), CU-07 (Evaluar Cambio Mayor), CU-30 (Autorizar Cambio Menor) | CU-05 (Validar y clasificar solicitud) | APROBADO |
 | RN-06 | Bloqueo de Sincronización Obligatorio | Administrador de Configuración / Bibliotecario | CU-10 (Check-Out), CU-11 (Aplicar bloqueo), CU-12 (Check-In), CU-21 (Rollback) | CU-14 (Implementar cambio en ECS) | APROBADO |
-| RN-07 | Diferenciación de Resultados de Cierre | Comité de Control de Cambios (CCB) / Administrador | CU-07 (Evaluar viabilidad: Rechazo Técnico/Admin), CU-22 (Cancelar Orden de Cambio) | CU-20 (Línea base para cierre exitoso: PENDIENTE DE VALIDACION) | REVISION |
+| RN-07 | Diferenciación de Resultados y Estados de Cierre | Comité de Control de Cambios (CCB) / Autoridad Delegada / Administrador | CU-05 (Desestimar RFC), CU-07 (Rechazar Mayor), CU-30 (Rechazar Menor), CU-20 (Línea base - Implementado), CU-22 (Cancelar Orden) | CU-29 (Validar aceptación del cambio - UAT), CU-28 (Reportes) | APROBADO |
 | RN-08 | Reversión Obligatoria ante Fallo No Subsanado | Administrador de Configuración / Bibliotecario | CU-19 (Reevaluar y re-testear), CU-21 (Rollback en Trabajo), CU-22 (Cancelar Orden) | CU-18 (Reportar no conformidad) | APROBADO |
-| RN-09 | Validación de QA Previa al Check-In a Biblioteca Maestra | Equipo de Calidad / Testing | CU-16 (Pruebas de integración), CU-17 (Certificar conformidad), CU-12 (Check-In) | CU-18 (Reportar no conformidad) | APROBADO |
+| RN-09 | Validación Técnica de QA y Aceptación de Usuario (UAT) Previas a Biblioteca Maestra | Equipo de Calidad / Testing y Solicitante | CU-16 (Pruebas de integración), CU-17 (Certificar conformidad QA), CU-29 (Validar aceptación usuario - UAT), CU-12 (Check-In) | CU-18 (Reportar no conformidad), CU-19 (Reevaluar y re-testear) | APROBADO |
 
 ---
 
 # TB-14 — Matriz General de Trazabilidad SCM
 
-**Estado:** REVISION  
+**Estado:** APROBADO  
 **Fuente:** Consolidada a partir de `TB-03`, `TB-04`, `TB-06`, `TB-09` y `TB-10`  
 
 | Necesidad Detectada (TB-03) | Requerimiento Funcional (TB-04) | Regla de Negocio Asociada (TB-06) | Casos de Uso Instrumentadores (TB-10) | Actor / Rol Responsable Principal (TB-09) |
 | :--- | :--- | :--- | :--- | :--- |
 | Pérdida de fuentes (Código disperso sin control) | RF-02 (Gestión de Proyectos)<br>RF-03 (Identificación de ECS)<br>RF-08 (Gestión de Bibliotecas) | RN-04 (Restricción de Bibliotecas Congeladas)<br>RN-06 (Bloqueo de Sincronización) | CU-02, CU-03, CU-09, CU-10, CU-12 | Administrador de Configuración / Bibliotecario<br>Arquitecto / Especialista Técnico |
-| Modificaciones arbitrarias (Cambios informales) | RF-04 (Registro de RFC)<br>RF-05 (Clasificación e Impacto)<br>RF-06 (Evaluación por CCB)<br>RF-07 (Gestión de ECN/ECO) | RN-01 (Aprobación Obligatoria)<br>RN-05 (Evaluación Técnica Obligatoria)<br>RN-07 (Diferenciación de Cierre) | CU-04, CU-05, CU-06, CU-07, CU-08, CU-14 | Solicitante<br>Analista de Requerimientos<br>Arquitecto<br>Comité de Control de Cambios (CCB) |
+| Modificaciones arbitrarias (Cambios informales) | RF-04 (Registro de RFC)<br>RF-05 (Clasificación e Impacto)<br>RF-06 (Evaluación por CCB)<br>RF-07 (Gestión de ECN/ECO) | RN-01 (Aprobación Obligatoria)<br>RN-05 (Evaluación Técnica Obligatoria)<br>RN-07 (Diferenciación de Estados de Cierre) | CU-04, CU-05, CU-06, CU-07, CU-08, CU-14, CU-30 | Solicitante<br>Analista de Requerimientos / Gestor<br>Arquitecto / Especialista Técnico<br>Comité de Control de Cambios (CCB) |
 | Confusión sobre la versión vigente (Sin baselines) | RF-09 (Control de Versiones / Bloqueos)<br>RF-13 (Gestión de Líneas Base) | RN-02 (Identificación Unívoca de Versiones)<br>RN-04 (Restricción de Bibliotecas Congeladas) | CU-10, CU-11, CU-12, CU-13, CU-20 | Administrador de Configuración / Bibliotecario |
-| No se identifica al responsable de una falla | RF-01 (Usuarios y Roles RBAC)<br>RF-16 (Trazabilidad de Configuración)<br>RF-17 (Auditoría e Integridad) | RN-03 (Trazabilidad de Cambios) | CU-01, CU-13, CU-26, CU-27 | Administrador de Configuración<br>Comité de Control de Cambios (CCB) |
-| Entregas al cliente sin validación previa | RF-10 (Gestión de Pruebas y Certificación)<br>RF-11 (Reevaluación y Re-test)<br>RF-12 (Rollback y Cancelación)<br>RF-14 (Cierre Formal del Cambio) | RN-08 (Reversión ante Fallo No Subsanado)<br>RN-09 (Validación de QA previa a Maestra) | CU-15, CU-16, CU-17, CU-18, CU-19, CU-21, CU-22 | Equipo de Calidad / Testing<br>Ingeniero de Software / Desarrollador<br>Administrador de Configuración |
+| No se identifica al responsable de una falla | RF-01 (Usuarios y Roles RBAC)<br>RF-16 (Trazabilidad de Configuración)<br>RF-17 (Auditoría e Integridad) | RN-03 (Trazabilidad de Cambios) | CU-01, CU-13, CU-26, CU-27 | Administrador de Configuración / Bibliotecario<br>Comité de Control de Cambios (CCB) |
+| Entregas al cliente sin validación previa | RF-10 (Gestión de Pruebas y Certificación de Conformidad y Aceptación)<br>RF-11 (Reevaluación y Re-test)<br>RF-12 (Rollback y Cancelación)<br>RF-14 (Cierre Formal del Cambio) | RN-08 (Reversión ante Fallo No Subsanado)<br>RN-09 (Validación Técnica de QA y UAT Previas a Maestra) | CU-15, CU-16, CU-17, CU-18, CU-19, CU-21, CU-22, CU-29 | Equipo de Calidad / Testing<br>Solicitante<br>Ingeniero de Software / Desarrollador<br>Administrador de Configuración / Bibliotecario |
 | Gestión de fallas de clientes hacia cambios | RF-15 (Gestión de Incidencias y Soporte) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para incidencias en SRS) | CU-23, CU-24, CU-25 | Solicitante<br>Analista de Requerimientos / Gestor |
 | Transparencia y reportería de gestión | RF-18 (Generación de Reportes) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para reportes en SRS) | CU-28 | Administrador de Configuración / Bibliotecario |
 

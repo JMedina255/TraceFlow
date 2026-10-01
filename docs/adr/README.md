@@ -113,7 +113,7 @@ Cada ADR individual documenta el contexto del problema, los criterios de evaluac
 
 | **ADR-007** | Bloqueo Persistente Condicional | **APROBADO** | **NINGUNO** | RN-06, RF-07, RF-08, CU-10, CU-12, CU-21, CU-22. Se elimina desbloqueo administrativo forzado (requeriría RFC). Liberación solo por CU canónicos. |
 
-| **ADR-008** | Auditoría Append-Only en PostgreSQL | **APROBADO** | **NINGUNO** | RN-02, RN-08, RNF-06. Reformulado como inmutabilidad lógica por software. SHA-256 como hash de integridad. RNF-06 acotado a consultas SRS. |
+| **ADR-008** | Auditoría Append-Only en PostgreSQL | **APROBADO** | **NINGUNO** | RN-02, RNF-03, RF-17, RNF-06. Reformulado como inmutabilidad lógica por software. SHA-256 como hash de integridad. RNF-06 acotado a consultas SRS. |
 
 | **ADR-009** | API RESTful + JSON + OpenAPI 3.0 | **APROBADO** | **NINGUNO** | RF-01..18, CU-01..30, CU-04.1. Todas las rutas se marcan como ejemplos de diseño. Catálogo definitivo se derivará en SAD de Diseño. |
 

@@ -102,21 +102,21 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-13](#dg-13--modelo-lógico-de-la-arquitectura-traceflow-scm) | Modelo Lógico de la Arquitectura TraceFlow SCM | Componentes / Arquitectura Física | PENDIENTE (SAD) | 1.0 |
 | [DG-SAD-A01](#dg-sad-a01--contexto-arquitectónico-de-traceflow-scm-fase-de-análisis) | Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis) | Contexto / Arquitectura Conceptual | APROBADO | 1.0 |
 | [DG-SAD-A02](#dg-sad-a02--arquitectura-lógica-conceptual-de-traceflow-scm) | Arquitectura Lógica Conceptual de TraceFlow SCM | Paquetes / Arquitectura Conceptual | APROBADO | 1.0 |
-| [DG-D01](#dg-d01--arquitectura-física-de-traceflow-scm) | Arquitectura Física de TraceFlow SCM | Componentes / Arquitectura Física | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-D02](#dg-d02--componentes-del-monolito-modular-backend) | Componentes del Monolito Modular Backend (MOD-01..09) | Componentes / Modularidad | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-D03](#dg-d03--modelo-relacional-lógico-de-base-de-datos) | Modelo Relacional Lógico de Base de Datos | Entidad-Relación / Lógico | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-D04](#dg-d04--arquitectura-de-storage-y-bibliotecas) | Arquitectura de Storage y Transición entre 3 Bibliotecas | Componentes / Almacenamiento | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-D05](#dg-d05--flujo-técnico-de-autenticación-y-autorización) | Flujo Técnico de Autenticación, RBAC y SoD | Interacción / Seguridad | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-D06](#dg-d06--diagrama-de-despliegue-de-traceflow-scm) | Diagrama de Despliegue de TraceFlow SCM (Docker) | Despliegue / Nodos OCI | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-04](#dg-dseq-04--registrar-solicitud-de-cambio-rfc) | Secuencia Diseño: Registrar Solicitud de Cambio (CU-04) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-08](#dg-dseq-08--emitir-orden-de-cambio-ecneco) | Secuencia Diseño: Emitir Orden de Cambio (CU-08) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-10](#dg-dseq-10--efectuar-check-out-y-bloqueo-de-sincronización) | Secuencia Diseño: Efectuar Check-Out y Bloqueo (CU-10, CU-11) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-12](#dg-dseq-12--efectuar-check-in-con-verificación-sha-256) | Secuencia Diseño: Efectuar Check-In con SHA-256 (CU-12) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-17](#dg-dseq-17--certificar-conformidad-del-cambio-en-qa) | Secuencia Diseño: Certificar Conformidad QA (CU-17) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-20](#dg-dseq-20--crear-y-congelar-línea-base) | Secuencia Diseño: Crear y Congelar Línea Base (CU-20) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-21](#dg-dseq-21--ejecutar-rollback-de-ecs) | Secuencia Diseño: Ejecutar Rollback de ECS (CU-21) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-29](#dg-dseq-29--validar-aceptación-del-cambio-por-el-usuario-uat) | Secuencia Diseño: Validar Aceptación UAT (CU-29) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
-| [DG-DSEQ-30](#dg-dseq-30--autorizar-cambio-menor-por-vía-delegada) | Secuencia Diseño: Autorizar Cambio Menor (CU-30) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.1 |
+| [DG-D01](#dg-d01--arquitectura-física-de-traceflow-scm) | Arquitectura Física de TraceFlow SCM | Componentes / Arquitectura Física | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-D02](#dg-d02--componentes-del-monolito-modular-backend) | Componentes del Monolito Modular Backend (MOD-01..09) | Componentes / Modularidad | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-D03](#dg-d03--modelo-relacional-lógico-de-base-de-datos) | Modelo Relacional Lógico de Base de Datos | Entidad-Relación / Lógico | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-D04](#dg-d04--arquitectura-de-storage-y-bibliotecas) | Arquitectura de Storage y Transición entre 3 Bibliotecas | Componentes / Almacenamiento | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-D05](#dg-d05--flujo-técnico-de-autenticación-y-autorización) | Flujo Técnico de Autenticación, RBAC y SoD | Interacción / Seguridad | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-D06](#dg-d06--diagrama-de-despliegue-de-traceflow-scm) | Diagrama de Despliegue de TraceFlow SCM (Docker) | Despliegue / Nodos OCI | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-04](#dg-dseq-04--registrar-solicitud-de-cambio-rfc) | Secuencia Diseño: Registrar Solicitud de Cambio (CU-04) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-08](#dg-dseq-08--emitir-orden-de-cambio-ecneco) | Secuencia Diseño: Emitir Orden de Cambio (CU-08) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-10](#dg-dseq-10--efectuar-check-out-y-bloqueo-de-sincronización) | Secuencia Diseño: Efectuar Check-Out y Bloqueo (CU-10, CU-11) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-12](#dg-dseq-12--efectuar-check-in-con-verificación-sha-256) | Secuencia Diseño: Efectuar Check-In con SHA-256 (CU-12) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-17](#dg-dseq-17--certificar-conformidad-del-cambio-en-qa) | Secuencia Diseño: Certificar Conformidad QA (CU-17) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-20](#dg-dseq-20--crear-y-congelar-línea-base) | Secuencia Diseño: Crear y Congelar Línea Base (CU-20) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-21](#dg-dseq-21--ejecutar-rollback-de-ecs) | Secuencia Diseño: Ejecutar Rollback de ECS (CU-21) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-29](#dg-dseq-29--validar-aceptación-del-cambio-por-el-usuario-uat) | Secuencia Diseño: Validar Aceptación UAT (CU-29) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-DSEQ-30](#dg-dseq-30--autorizar-cambio-menor-por-vía-delegada) | Secuencia Diseño: Autorizar Cambio Menor (CU-30) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
 
 ---
 
@@ -4410,6 +4410,8 @@ M_AUD <-- M_BASE : "registra congelamientos y reversiones"
 
 ---
 
+---
+
 # ==============================================================================
 # PARTE III — DIAGRAMAS ARQUITECTÓNICOS DE DISEÑO (FASE DE DISEÑO)
 # ==============================================================================
@@ -4421,7 +4423,7 @@ M_AUD <-- M_BASE : "registra congelamientos y reversiones"
 
 # DG-D01 — Arquitectura Física de TraceFlow SCM
 
-**ID:** DG-D01 | **Tipo:** Componentes / Arquitectura Física | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D01 | **Tipo:** Componentes / Arquitectura Física | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-001 a ADR-010 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 3.2
 
 ![DG-D01](../assets/DG-D01.png)
@@ -4435,53 +4437,53 @@ skinparam defaultFontName Arial
 title <b>DG-D01: Arquitectura Física de Software de TraceFlow SCM</b>
 
 node "Dispositivo Cliente (Actor Canónico)" as ClientDevice {
-    component [Navegador Web\n(Chrome / Firefox / Edge)] as Browser
-    artifact [React SPA Bundle\n(HTML5 / TS / React 18-19)] as SPAApp
+    component [Navegador Web\\n(Chrome / Firefox / Edge)] as Browser
+    artifact [React SPA Bundle\\n(HTML5 / TS / React 18-19)] as SPAApp
     Browser *-down-> SPAApp
 }
 
 node "Servidor Host / Plataforma de Ejecución (Docker Engine 24+)" as AppServer {
     
     node "Contenedor: Reverse Proxy (Nginx 1.26+)" as NginxContainer {
-        component [Nginx Proxy Inverso\n& Servidor Estático] as NginxEngine
-        folder "/usr/share/nginx/html\n(Activos Estáticos SPA)" as StaticFolder
+        component [Nginx Proxy Inverso\\n& Servidor Estático] as NginxEngine
+        folder "/usr/share/nginx/html\\n(Activos Estáticos SPA)" as StaticFolder
         NginxEngine -down-> StaticFolder : Sirve estáticos
     }
 
     node "Contenedor: Backend Core (NestJS / Node.js 24 LTS)" as BackendContainer {
-        component [Monolito Modular NestJS\n(MOD-01 a MOD-09)] as ModularMonolith
-        interface "REST API / OpenAPI 3.0\n(/api/v1/*)" as RestInterface
-        interface "StoragePort\n(Puerto de Dominio)" as StoragePortInterface
+        component [Monolito Modular NestJS\\n(MOD-01 a MOD-09)] as ModularMonolith
+        interface "REST API / OpenAPI 3.0\\n(/api/v1/*)" as RestInterface
+        interface "StoragePort\\n(Puerto de Dominio)" as StoragePortInterface
         ModularMonolith -up- RestInterface
         ModularMonolith -down- StoragePortInterface
     }
 
     node "Contenedor: Base de Datos Relacional (PostgreSQL 16+)" as DBContainer {
-        database "PostgreSQL DB\n- Esquemas Relacionales\n- Índices Condicionales (RN-06)\n- Logs Append-Only (RN-02)" as PostgresDB
-        folder "/var/lib/postgresql/data\n(Volumen tf_pg_data)" as DBVolume
+        database "PostgreSQL DB\\n- Esquemas Relacionales\\n- Índices Condicionales (RN-06)\\n- Logs Append-Only (RN-02)" as PostgresDB
+        folder "/var/lib/postgresql/data\\n(Volumen tf_pg_data)" as DBVolume
         PostgresDB -down-> DBVolume
     }
 
     node "Volumen Montado: Custodia de Artefactos (ECS Storage)" as StorageVolume {
-        folder "/storage\n├── trabajo/ (Staging / Dev)\n├── soporte/ (QA Testing)\n└── maestra/ (Líneas Base)" as PhysicalStorage
+        folder "/storage\\n├── trabajo/ (Staging / Dev)\\n├── soporte/ (QA Testing)\\n└── maestra/ (Líneas Base)" as PhysicalStorage
     }
 
     node "Contenedor: Respaldo Automatizado (Backup Worker)" as BackupContainer {
-        component [Servicio de Respaldo\n(Unidad Lógica RNF-09)] as BackupService
+        component [Servicio de Respaldo\\n(Unidad Lógica RNF-09)] as BackupService
     }
 }
 
 node "Almacenamiento Secundario / Cloud Externo" as ExternalStorage {
-    folder "/backups/traceflow\n(Snapshot DB + Snapshot Storage + Manifest)" as RemoteBackups
+    folder "/backups/traceflow\\n(Snapshot DB + Snapshot Storage + Manifest)" as RemoteBackups
 }
 
-Browser --> NginxEngine : HTTPS (443)\nTLS 1.3 / Cookie HttpOnly
-NginxEngine --> RestInterface : HTTP Reverse Proxy\n(Balanceo a réplicas NestJS)
-ModularMonolith --> PostgresDB : TCP / Pool de Conexiones\nTransacciones ACID (Puerto 5432)
-StoragePortInterface ..> PhysicalStorage : LocalStorageAdapter\n(I/O de Archivos)
+Browser --> NginxEngine : HTTPS (443)\\nTLS 1.3 / Cookie HttpOnly
+NginxEngine --> RestInterface : HTTP Reverse Proxy\\n(Balanceo a réplicas NestJS)
+ModularMonolith --> PostgresDB : TCP / Pool de Conexiones\\nTransacciones ACID (Puerto 5432)
+StoragePortInterface ..> PhysicalStorage : LocalStorageAdapter\\n(I/O de Archivos)
 BackupService -left-> PostgresDB : pg_dump consistente
 BackupService -up-> PhysicalStorage : Snapshot de Artefactos (tar.gz)
-BackupService -right-> RemoteBackups : Transferencia Segura\nPaquete Maestro (.pkg)
+BackupService -right-> RemoteBackups : Transferencia Segura\\nPaquete Maestro (.pkg)
 
 @enduml
 ```
@@ -4490,7 +4492,7 @@ BackupService -right-> RemoteBackups : Transferencia Segura\nPaquete Maestro (.p
 
 # DG-D02 — Componentes del Monolito Modular Backend
 
-**ID:** DG-D02 | **Tipo:** Componentes / Modularidad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D02 | **Tipo:** Componentes / Modularidad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** MOD-01 a MOD-09, ADR-001, ADR-003 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 4.4
 
 ![DG-D02](../assets/DG-D02.png)
@@ -4600,7 +4602,7 @@ S07 .left.> M09 : Emite evento de congelación LB
 
 # DG-D03 — Modelo Relacional Lógico de Base de Datos
 
-**ID:** DG-D03 | **Tipo:** Entidad-Relación / Lógico | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D03 | **Tipo:** Entidad-Relación / Lógico | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** Derivado de DG-12, ADR-004, ADR-007 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 7.2
 
 ![DG-D03](../assets/DG-D03.png)
@@ -4687,8 +4689,9 @@ entity "ecs_version" as ecs_version {
     --
     * ecs_id : UUID [FK -> config_item.id]
     * version_number : VARCHAR(20) <<mayor.menor.parche - RN-02>>
-    * sha256_checksum : VARCHAR(64) <<RN-08>>
+    * sha256_checksum : VARCHAR(64) <<RNF-03, RF-17>>
     * storage_path : VARCHAR(255)
+    * storage_status : VARCHAR(20) <<PENDING_STORAGE, COMMITTED, STORAGE_FAILED>>
     * file_size_bytes : BIGINT
     * check_in_by : UUID [FK -> app_user.id]
     * change_order_id : UUID [NULLABLE]
@@ -4741,6 +4744,19 @@ entity "ccb_resolution" as ccb_resolution {
     * observations : TEXT
     * resolved_by : UUID [FK -> app_user.id]
     * resolved_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "change_authorization" as change_authorization {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [FK -> change_request.id]
+    * authorizer_role : VARCHAR(40) <<GESTOR, ARQUITECTO>>
+    * authorizer_user_id : UUID [FK -> app_user.id]
+    * decision : VARCHAR(20) <<APROBADO, OBSERVADO, RECHAZADO>>
+    * technical_notes : TEXT
+    * authorized_at : TIMESTAMP WITH TIME ZONE
+    --
+    CONSTRAINT uq_rfc_authorizer_role UNIQUE(rfc_id, authorizer_role)
 }
 
 entity "change_order" as change_order {
@@ -4849,7 +4865,8 @@ project ||--o{ config_item : "contiene"
 config_item ||--o{ ecs_version : "versionado en"
 config_item ||--o{ change_request : "afectado por"
 change_request ||--o| impact_assessment : "evaluado en"
-change_request ||--o{ ccb_resolution : "deliberado en"
+change_request ||--o{ ccb_resolution : "deliberado en (CU-07)"
+change_request ||--o{ change_authorization : "autorizado por (CU-30)"
 change_request ||--o| change_order : "formalizado en"
 change_order ||--o| sync_lock : "aplica"
 change_order ||--o{ qa_certification : "probado en"
@@ -4860,6 +4877,7 @@ ecs_version ||--o{ baseline_item : "incluida en"
 project ||--o{ incident_ticket : "registra"
 incident_ticket ||--o| change_request : "deriva en"
 app_user ||--o{ audit_log : "origina"
+app_user ||--o{ change_authorization : "suscribe"
 
 @enduml
 ```
@@ -4868,7 +4886,7 @@ app_user ||--o{ audit_log : "origina"
 
 # DG-D04 — Arquitectura de Storage y Bibliotecas
 
-**ID:** DG-D04 | **Tipo:** Componentes / Almacenamiento | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D04 | **Tipo:** Componentes / Almacenamiento | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-005, RN-04, RN-08, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 8.3
 
 ![DG-D04](../assets/DG-D04.png)
@@ -4921,9 +4939,9 @@ LocalStorage --> F_Trabajo : 2. Promueve tras Check-Out / Dev
 LocalStorage --> F_Soporte : 3. Transfiere para pruebas QA (RN-01)
 LocalStorage --> F_Maestra : 4. Congela con Doble Conformidad (RN-09)
 
-F_Trabajo .[#blue].> F_Soporte : Entrega para Testing
-F_Soporte .[#green].> F_Maestra : Promoción tras QA + UAT
-F_Trabajo .[#red].> F_Trabajo : Rollback elimina copia de trabajo (RN-08)
+F_Trabajo .[#blue].> F_Soporte : Entrega para Testing (Check-In Técnico)
+F_Soporte .[#green].> F_Maestra : Promoción definitiva tras QA + UAT
+F_Trabajo .[#red].> F_Trabajo : Rollback purga copia de trabajo (RN-08)
 
 @enduml
 ```
@@ -4932,7 +4950,7 @@ F_Trabajo .[#red].> F_Trabajo : Rollback elimina copia de trabajo (RN-08)
 
 # DG-D05 — Flujo Técnico de Autenticación, RBAC y SoD
 
-**ID:** DG-D05 | **Tipo:** Interacción / Seguridad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D05 | **Tipo:** Interacción / Seguridad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-006, RN-01, RN-04, SoD | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 10.3
 
 ![DG-D05](../assets/DG-D05.png)
@@ -4958,7 +4976,7 @@ database "PostgreSQL\n(user_session)" as DB
 User -> UI : 1. Ingresar credenciales
 UI -> Nginx : 2. POST /api/v1/auth/login
 Nginx -> AppService : 3. Proxy a NestJS
-AppService -> DB : 4. Valida credenciales y genera token (256 bits)
+AppService -> DB : 4. Valida credenciales con Argon2id y genera token (256 bits)
 DB --> AppService : 5. Persiste hash de sesión
 AppService --> Nginx : 6. 200 OK + Set-Cookie: tf_session (HttpOnly, Secure, SameSite=Strict)
 Nginx --> UI : 7. Respuesta con Cookie segura
@@ -4997,7 +5015,7 @@ end
 
 # DG-D06 — Diagrama de Despliegue de TraceFlow SCM
 
-**ID:** DG-D06 | **Tipo:** Despliegue / Nodos OCI | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-D06 | **Tipo:** Despliegue / Nodos OCI | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-010, RNF-02, RNF-08, RNF-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 13.2
 
 ![DG-D06](../assets/DG-D06.png)
@@ -5053,7 +5071,7 @@ node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostS
 }
 
 node "Servidor de Respaldo Secundario / Cloud S3" as RemoteBackupNode <<External System>> {
-    folder "/remote_backups/traceflow\n(Paquetes Maestros .pkg)" as RemoteDisk
+    folder "/remote_backups/traceflow\n(Paquetes Maestros .pkg Cifrados AES-256)" as RemoteDisk
 }
 
 WebClient --> NginxComp : HTTPS (443)\nTLS 1.3 / Cookie HttpOnly
@@ -5070,7 +5088,7 @@ BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
 
 # DG-DSEQ-04 — Secuencia de Diseño: Registrar Solicitud de Cambio (RFC) (CU-04)
 
-**ID:** DG-DSEQ-04 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-04 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-04, RF-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-04](../assets/DG-DSEQ-04.png)
@@ -5091,23 +5109,26 @@ participant "ChangeRequestService" as Service
 participant "ChangeRequest (Domain)" as Domain
 participant "ChangeRequestRepoPort" as Repo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Completa formulario RFC (título, justificación, ECS)
+Actor -> UI : 1. Completa formulario de RFC (título, justificación, ECS afectado)
 UI -> Ctrl : 2. POST /api/v1/rfcs (CreateRfcDto)
 Ctrl -> Guard : 3. canActivate(context)
-Guard --> Ctrl : 4. Permitido (Rol: SOLICITANTE)
+Guard --> Ctrl : 4. Permitido (Rol Canónico: SOLICITANTE)
 Ctrl -> Service : 5. registerRfc(dto, userId)
 Service -> Domain : 6. create(dto, userId)
-Domain --> Service : 7. Instancia RFC (Estado: REGISTRADA)
+Domain --> Service : 7. Instancia RFC (Estado Inicial: REGISTRADA)
 Service -> Repo : 8. save(changeRequest)
 Repo -> DB : 9. INSERT INTO change_request (...)
 DB --> Repo : 10. Confirmado
-Service -> Audit : 11. logEvent('RFC_REGISTERED', rfcId, userId)
-Audit -> DB : 12. INSERT INTO audit_log (...)
-Service --> Ctrl : 13. RfcResponseDto
-Ctrl --> UI : 14. 201 Created
-UI --> Actor : 15. Muestra confirmación y código RFC asignado
+Service -> Notify : 11. notifyRfcRegistered(rfcId, 'GESTOR')
+Notify --> Service : Evento encolado
+Service -> Audit : 12. logEvent('RFC_REGISTERED', rfcId, userId)
+Audit -> DB : 13. INSERT INTO audit_log (...)
+Service --> Ctrl : 14. RfcResponseDto
+Ctrl --> UI : 15. 201 Created
+UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 
 @enduml
 ```
@@ -5116,7 +5137,7 @@ UI --> Actor : 15. Muestra confirmación y código RFC asignado
 
 # DG-DSEQ-08 — Secuencia de Diseño: Emitir Orden de Cambio (ECN/ECO) (CU-08)
 
-**ID:** DG-DSEQ-08 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-08 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-08, RF-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-08](../assets/DG-DSEQ-08.png)
@@ -5129,7 +5150,7 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
 
-actor "CCB / Autoridad Delegada" as Actor
+actor "Comité de Control de Cambios (CCB) /\nAnalista de Requerimientos / Gestor" as Actor
 participant "React SPA" as UI
 participant "ChangeRequestController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5137,25 +5158,28 @@ participant "ChangeRequestService" as Service
 participant "ChangeOrder (Domain)" as Domain
 participant "ChangeOrderRepoPort" as Repo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Selecciona RFC autorizada y asigna desarrollador
+Actor -> UI : 1. Selecciona RFC autorizada y asigna desarrollador responsable
 UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/change-order (IssueEcnDto)
 Ctrl -> Guard : 3. Valida sesión y rol (LIDER_CCB / GESTOR)
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. issueChangeOrder(rfcId, developerId)
 Service -> DB : 6. Valida estado RFC = 'AUTORIZADA'
 Service -> Domain : 7. createChangeOrder(rfcId, ecsId, developerId)
-Domain --> Service : 8. Instancia ECN (Estado: EMITIDA)
+Domain --> Service : 8. Instancia Orden ECN (Estado: EMITIDA)
 Service -> Repo : 9. Inicia Transacción ACID
 Repo -> DB : 10. INSERT INTO change_order (...)
 Repo -> DB : 11. UPDATE change_request SET status = 'ORDEN_EMITIDA'
 Repo -> DB : 12. COMMIT
-Service -> Audit : 13. logEvent('ECN_ISSUED', ecnId, userId)
-Audit -> DB : 14. INSERT INTO audit_log (...)
-Service --> Ctrl : 15. ChangeOrderResponseDto
-Ctrl --> UI : 16. 201 Created
-UI --> Actor : 17. Presenta Orden de Cambio formalizada
+Service -> Notify : 13. notifyEcnIssued(ecnId, 'BIBLIOTECARIO', developerId)
+Notify --> Service : Notificación despachada
+Service -> Audit : 14. logEvent('ECN_ISSUED', ecnId, userId)
+Audit -> DB : 15. INSERT INTO audit_log (...)
+Service --> Ctrl : 16. ChangeOrderResponseDto
+Ctrl --> UI : 17. 201 Created
+UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 
 @enduml
 ```
@@ -5164,7 +5188,7 @@ UI --> Actor : 17. Presenta Orden de Cambio formalizada
 
 # DG-DSEQ-10 — Secuencia de Diseño: Efectuar Check-Out y Bloqueo (CU-10, CU-11, RN-06)
 
-**ID:** DG-DSEQ-10 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-10 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-10, CU-11, RF-08, RF-09, RN-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-10](../assets/DG-DSEQ-10.png)
@@ -5177,7 +5201,8 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-10: Efectuar Check-Out y Bloqueo de Sincronización (CU-10, CU-11, RN-06)</b>
 
-actor "Desarrollador" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+actor "Ingeniero de Software /\nDesarrollador" as Dev
 participant "React SPA" as UI
 participant "VersionControlController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5187,31 +5212,33 @@ participant "StoragePort" as Storage
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Solicita Check-Out de ECS con ECN autorizada
+Actor -> UI : 1. Selecciona ECN autorizada y ejecuta Check-Out de ECS
 UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-out (CheckOutDto)
-Ctrl -> Guard : 3. Valida rol (DESARROLLADOR) y asignación ECN
+Ctrl -> Guard : 3. Valida rol canónico (BIBLIOTECARIO)
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. executeCheckOut(ecsId, ecnId, developerId)
-Service -> LockRepo : 6. Inicia Transacción ACID: acquireLock(ecsId, ecnId, developerId)
-LockRepo -> DB : 7. INSERT INTO sync_lock (ecs_id, status='ACTIVE', ...)
+Service -> LockRepo : 6. Inicia Transacción: acquireLock(ecsId, ecnId, developerId)
+LockRepo -> DB : 7. INSERT INTO sync_lock (ecs_id, change_order_id, status='ACTIVE', locked_by=developerId)
 
 alt Conflicto: ECS ya bloqueado por otra orden (Violación RN-06)
-    DB --> LockRepo : Error de Restricción Única Condicional (uq_active_sync_lock_per_ecs)
+    DB --> LockRepo : Error por Restricción Única Condicional (uq_active_sync_lock_per_ecs)
     LockRepo --> Service : Excepción SyncLockActiveException
-    Service --> Ctrl : Mapea a 409 Conflict
-    Ctrl --> UI : 409 Conflict (Problem Details RFC 7807)
-    UI --> Actor : Notifica error: "ECS bloqueado por otra orden activa"
+    Service --> Ctrl : Mapea a 409 Conflict (RFC 7807)
+    Ctrl --> UI : 409 Conflict
+    UI --> Actor : Alerta: "ECS bloqueado por otra orden activa"
 else Bloqueo Adquirido Exitosamente
-    DB --> LockRepo : Inserción Exitosa
+    DB --> LockRepo : Inserción Exitosa (Lock ACTIVE)
     Service -> DB : 8. UPDATE config_item SET is_locked = true, current_library = 'TRABAJO'
-    Service -> Storage : 9. copy(maestraPath, trabajoPath)
-    Storage --> Service : Copia habilitada en Biblioteca de Trabajo
-    Service -> DB : 10. COMMIT Transacción
-    Service -> Audit : 11. logEvent('CHECK_OUT_APPLIED', ecsId, developerId)
-    Audit -> DB : 12. INSERT INTO audit_log (...)
-    Service --> Ctrl : 13. CheckOutSuccessDto
-    Ctrl --> UI : 14. 200 OK + URL de descarga de trabajo
-    UI --> Actor : 15. Habilita espacio de modificación de trabajo
+    Service -> DB : 9. UPDATE change_request SET status = 'EN_IMPLEMENTACION'
+    Service -> Storage : 10. copy(soportePath, trabajoPath)
+    Storage --> Service : Archivo copiado en /storage/trabajo/
+    Service -> DB : 11. COMMIT Transacción
+    Service -> Audit : 12. logEvent('CHECK_OUT_APPLIED', ecsId, developerId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. CheckOutSuccessDto
+    Ctrl --> UI : 15. 200 OK + URL de entrega de artefacto
+    UI --> Actor : 16. Notifica Check-Out exitoso y entrega workspace al Desarrollador
+    UI --> Dev : 17. Habilita espacio de trabajo y descarga de código autorizado
 end
 
 @enduml
@@ -5219,10 +5246,10 @@ end
 
 ---
 
-# DG-DSEQ-12 — Secuencia de Diseño: Efectuar Check-In con SHA-256 (CU-12, RN-08)
+# DG-DSEQ-12 — Secuencia de Diseño: Efectuar Check-In de Ítem de Configuración (CU-12)
 
-**ID:** DG-DSEQ-12 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
-**Trazabilidad:** CU-12, RF-08, RF-09, RN-08 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
+**ID:** DG-DSEQ-12 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**Trazabilidad:** CU-12, RF-08, RF-09, RNF-03, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-12](../assets/DG-DSEQ-12.png)
 
@@ -5232,9 +5259,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-12: Efectuar Check-In con Verificación SHA-256 (CU-12, RN-08)</b>
+title <b>DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RN-09)</b>
 
-actor "Desarrollador" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "VersionControlController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5245,38 +5272,67 @@ participant "SyncLockRepoPort" as LockRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Sube archivo modificado, mensaje y hash esperado
-UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-in (Multipart Stream + Dto)
-Ctrl -> Guard : 3. Valida sesión y rol DESARROLLADOR
+Actor -> UI : 1. Selecciona tipo de Check-In (Técnico a Soporte o Definitivo a Maestra)
+UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-in (Multipart Stream + CheckInDto)
+Ctrl -> Guard : 3. Valida sesión y rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
-Ctrl -> Service : 5. executeCheckIn(ecsId, fileStream, commitMsg, expectedHash)
+Ctrl -> Service : 5. executeCheckIn(ecsId, fileStream, dto)
 
-== Fase 1: Staging Temporal y Validación SHA-256 ==
+== Etapa 1: Custodia Temporal en Staging y Cómputo SHA-256 (RNF-03 / RF-17) ==
 Service -> Storage : 6. storeTemporary(tempId, fileStream, expectedHash)
 Storage --> Service : 7. tempPath almacenado + shaCalculado
 
-alt Checksum no coincide con el hash reportado (Fallo RN-08)
+alt Checksum no coincide con el hash declarado (Fallo RNF-03)
     Service -> Storage : Compensación: removeTemporary(tempPath)
-    Service --> Ctrl : 400 Bad Request: Checksum Inválido
+    Service --> Ctrl : 400 Bad Request: Checksum SHA-256 Inválido
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Notifica fallo de integridad
-else Checksum Válido
-    == Fase 2: Transacción ACID en Base de Datos ==
-    Service -> VersionRepo : 8. Inicia Transacción ACID
-    VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, version_number, ...)
-    Service -> LockRepo : 10. Actualiza sync_lock SET status='RELEASED', release_reason='CHECK_IN'
-    LockRepo -> DB : 11. UPDATE sync_lock (...)
-    Service -> DB : 12. UPDATE config_item SET current_library='SOPORTE', is_locked=false
-    Service -> DB : 13. COMMIT Transacción
+    UI --> Actor : Alerta de fallo de integridad
+else Checksum Válido y Conforme
+    == Etapa 2: Pre-registro Transaccional en Base de Datos ==
+    Service -> VersionRepo : 8. Inicia Transacción BD 1
+    VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, storage_status='PENDING_STORAGE', ...)
+    VersionRepo -> DB : 10. COMMIT Transacción 1
     
-    == Fase 3: Promoción Permanente de Almacenamiento ==
-    Service -> Storage : 14. promote(tempPath, 'soporte', verifiedSha)
-    Storage --> Service : Archivo promovido a Biblioteca de Soporte
-    Service -> Audit : 15. logEvent('CHECK_IN_COMMITTED', ecsId, developerId)
-    Audit -> DB : 16. INSERT INTO audit_log (...)
-    Service --> Ctrl : 17. CheckInResultDto
-    Ctrl --> UI : 18. 201 Created
-    UI --> Actor : 19. Confirmación de Check-In y entrega a QA
+    alt Variante A: Check-In Técnico (Trabajo -> Soporte para Pruebas QA)
+        Service -> Storage : 11a. promote(tempPath, 'soporte', verifiedSha)
+        Storage --> Service : Archivo promovido a /storage/soporte/
+        Service -> VersionRepo : 12a. Inicia Transacción BD 2
+        VersionRepo -> DB : 13a. UPDATE ecs_version SET storage_status='COMMITTED'
+        VersionRepo -> DB : 14a. UPDATE config_item SET current_library='SOPORTE'
+        VersionRepo -> DB : 15a. UPDATE change_request SET status='EN_PRUEBAS'
+        VersionRepo -> DB : 16a. COMMIT Transacción 2
+        Service -> Audit : 17a. logEvent('CHECK_IN_TECHNICAL_COMMITTED', ecsId, userId)
+        Audit -> DB : 18a. INSERT INTO audit_log (...)
+        Service --> Ctrl : 19a. CheckInResponseDto (Puesto a disposición de QA)
+        Ctrl --> UI : 20a. 201 Created (Entrega a Soporte conforme)
+        UI --> Actor : 21a. Notifica entrega lista para pruebas de QA (CU-16)
+        
+    else Variante B: Check-In Definitivo (Soporte -> Maestra con Doble Conformidad RN-09)
+        Service -> DB : 11b. Valida Certificación QA (CU-17) y Acta UAT (CU-29) (RN-09)
+        alt Falta Certificación QA o Acta UAT
+            Service -> Storage : Compensación: removeTemporary(tempPath)
+            Service -> DB : UPDATE ecs_version SET storage_status='STORAGE_FAILED'
+            Service --> Ctrl : 400 Bad Request: "Exige Doble Conformidad (QA + UAT) según RN-09"
+            Ctrl --> UI : 400 Bad Request
+            UI --> Actor : Bloqueo: No se puede integrar a Maestra sin doble conformidad
+        else Doble Conformidad Conforme
+            Service -> Storage : 12b. promote(tempPath, 'maestra', verifiedSha)
+            Storage --> Service : Archivo inmovilizado en /storage/maestra/ (Solo Lectura)
+            Service -> VersionRepo : 13b. Inicia Transacción BD 2
+            VersionRepo -> DB : 14b. UPDATE ecs_version SET storage_status='COMMITTED'
+            VersionRepo -> DB : 15b. UPDATE config_item SET current_library='MAESTRA', is_locked=false
+            VersionRepo -> LockRepo : 16b. UPDATE sync_lock SET status='RELEASED', release_reason='CHECK_IN'
+            LockRepo -> DB : 17b. Libera bloqueo de sincronización (RN-06)
+            VersionRepo -> DB : 18b. UPDATE change_order SET status='CERRADA'
+            VersionRepo -> DB : 19b. UPDATE change_request SET status='IMPLEMENTADA'
+            VersionRepo -> DB : 20b. COMMIT Transacción 2
+            Service -> Audit : 21b. logEvent('CHECK_IN_MASTER_COMMITTED', ecsId, userId)
+            Audit -> DB : 22b. INSERT INTO audit_log (...)
+            Service --> Ctrl : 23b. CheckInResponseDto (Integración Exitosa)
+            Ctrl --> UI : 24b. 201 Created (Check-In Definitivo)
+            UI --> Actor : 25b. Confirma integración definitiva en Maestra y liberación de lock
+        end
+    end
 end
 
 @enduml
@@ -5286,8 +5342,8 @@ end
 
 # DG-DSEQ-17 — Secuencia de Diseño: Certificar Conformidad de Calidad en QA (CU-17)
 
-**ID:** DG-DSEQ-17 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
-**Trazabilidad:** CU-17, RF-10, SoD QA | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
+**ID:** DG-DSEQ-17 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**Trazabilidad:** CU-17, RF-10, SoD Dinámico | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-17](../assets/DG-DSEQ-17.png)
 
@@ -5299,7 +5355,7 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-17: Certificar Conformidad del Cambio en QA (CU-17, SoD Dinámico)</b>
 
-actor "Asegurador de Calidad" as Actor
+actor "Equipo de Calidad / Testing" as Actor
 participant "React SPA" as UI
 participant "QualityController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5310,31 +5366,32 @@ participant "QaCertRepoPort" as CertRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Registra resultados de pruebas y emite certificación
+Actor -> UI : 1. Registra informe de pruebas conformes y certifica
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/qa-certification (CertifyQaDto)
-Ctrl -> Guard : 3. Valida sesión y rol EQUIPO_CALIDAD
+Ctrl -> Guard : 3. Valida sesión y rol canónico EQUIPO_CALIDAD
 Guard --> Ctrl : 4. Permitido
 
 Ctrl -> SodGuard : 5. evaluateSod(ecnId, userId)
 SodGuard -> EcnRepo : 6. findById(ecnId)
 EcnRepo -> DB : 7. SELECT assigned_developer_id FROM change_order WHERE id = ...
-DB --> EcnRepo : Retorna developerId
+DB --> EcnRepo : Retorna developerId asignado
 
-alt Violación SoD: El usuario es el mismo desarrollador que implementó el cambio
+alt Violación SoD: El evaluador es el mismo desarrollador que implementó el cambio
     SodGuard --> Ctrl : Excepción SodViolationException
-    Ctrl --> UI : 403 Forbidden: "Violación de Segregación de Funciones: El desarrollador no puede certificar su propio cambio"
-    UI --> Actor : Alerta de bloqueo por SoD
-else Segregación de Funciones Conforme (Actor != Desarrollador)
+    Ctrl --> UI : 403 Forbidden: "Violación de SoD: El desarrollador no puede certificar su propio cambio"
+    UI --> Actor : Alerta de bloqueo por Segregación de Funciones
+else Segregación de Funciones Conforme (Evaluador != Desarrollador)
     SodGuard --> Ctrl : SoD Aprobada
     Ctrl -> Service : 8. certifyConformity(ecnId, dto, userId)
-    Service -> CertRepo : 9. INSERT INTO qa_certification (...)
-    CertRepo -> DB : 10. Persiste certificación CONFORME
-    Service -> DB : 11. UPDATE change_request SET status = 'EN_ACEPTACION'
-    Service -> Audit : 12. logEvent('QA_CERTIFIED', ecnId, userId)
-    Audit -> DB : 13. INSERT INTO audit_log (...)
-    Service --> Ctrl : 14. QaCertResponseDto
-    Ctrl --> UI : 15. 201 Created
-    UI --> Actor : 16. Muestra Certificado de Conformidad emitido
+    Service -> CertRepo : 9. Inicia Transacción ACID
+    CertRepo -> DB : 10. INSERT INTO qa_certification (result='CONFORME', ...)
+    CertRepo -> DB : 11. UPDATE change_request SET status = 'EN_ACEPTACION'
+    CertRepo -> DB : 12. COMMIT
+    Service -> Audit : 13. logEvent('QA_CERTIFIED_CONFORME', ecnId, userId)
+    Audit -> DB : 14. INSERT INTO audit_log (...)
+    Service --> Ctrl : 15. QaCertResponseDto
+    Ctrl --> UI : 16. 201 Created
+    UI --> Actor : 17. Presenta Certificado de Conformidad y habilita etapa de aceptación UAT
 end
 
 @enduml
@@ -5342,9 +5399,9 @@ end
 
 ---
 
-# DG-DSEQ-20 — Secuencia de Diseño: Crear y Congelar Línea Base (CU-20, RN-09)
+# DG-DSEQ-20 — Secuencia de Diseño: Crear y Congelar Línea Base (CU-20)
 
-**ID:** DG-DSEQ-20 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-20 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-20, RF-13, RN-02, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-20](../assets/DG-DSEQ-20.png)
@@ -5355,42 +5412,49 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-09)</b>
+title <b>DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)</b>
 
-actor "Gestor de Configuración" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "BaselineController" as Ctrl
 participant "Auth/RolesGuard" as Guard
 participant "BaselineService" as Service
-participant "StoragePort" as Storage
 participant "BaselineRepoPort" as BaselineRepo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Selecciona proyecto y solicita congelar Línea Base
+note over Service
+  <b>Delimitación Nítida vs CU-12</b>:
+  La promoción física de archivos a la Biblioteca Maestra fue
+  ejecutada en CU-12 (Variante B). CU-20 formaliza la agrupación
+  lógica, asigna el identificador mayor.menor.parche (RN-02)
+  y congela la Línea Base. No duplica copias de archivos.
+end note
+
+Actor -> UI : 1. Selecciona proyecto y versiones en Maestra para Línea Base
 UI -> Ctrl : 2. POST /api/v1/projects/{id}/baselines (FreezeBaselineDto)
-Ctrl -> Guard : 3. Valida rol GESTOR_CONFIGURACION / BIBLIOTECARIO
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. freezeBaseline(projectId, dto, userId)
 
-Service -> DB : 6. Valida Doble Conformidad (QA + UAT) de los ECS (RN-09)
+Service -> DB : 6. Valida Doble Conformidad (QA + UAT) de los ECS seleccionados (RN-09)
 alt Algún ECS no cuenta con Certificación QA y Acta UAT
-    Service --> Ctrl : 400 Bad Request: "Requisito RN-09 no satisfecho"
+    Service --> Ctrl : 400 Bad Request: "Requisito RN-09 no satisfecho para todos los ECS"
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Notifica impedimento de congelamiento
-else Doble Conformidad Verificada
+    UI --> Actor : Notifica impedimento de congelamiento por falta de conformidad
+else Doble Conformidad Verificada y Conforme
     Service -> BaselineRepo : 7. Inicia Transacción ACID
-    BaselineRepo -> DB : 8. INSERT INTO baseline (code, status='CONGELADA', ...)
+    BaselineRepo -> DB : 8. INSERT INTO baseline (code, version_label, status='CONGELADA', frozen_by, frozen_at)
     BaselineRepo -> DB : 9. INSERT INTO baseline_item (baseline_id, ecs_version_id)
-    Service -> Storage : 10. copy('soporte', 'maestra', itemPaths)
-    Storage --> Service : Artefactos inmovilizados en Biblioteca Maestra
-    Service -> DB : 11. UPDATE config_item SET current_library='MAESTRA'
-    Service -> DB : 12. COMMIT Transacción
-    Service -> Audit : 13. logEvent('BASELINE_FROZEN', baselineId, userId)
-    Audit -> DB : 14. INSERT INTO audit_log (...)
-    Service --> Ctrl : 15. BaselineResponseDto
-    Ctrl --> UI : 16. 201 Created
-    UI --> Actor : 17. Presenta Línea Base congelada formalmente
+    BaselineRepo -> DB : 10. COMMIT Transacción
+    Service -> Notify : 11. notifyBaselineFrozen(baselineId, projectId)
+    Notify --> Service : Notificación a interesados
+    Service -> Audit : 12. logEvent('BASELINE_FROZEN', baselineId, userId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. BaselineResponseDto
+    Ctrl --> UI : 15. 201 Created
+    UI --> Actor : 16. Muestra Línea Base congelada formalmente con estándar RN-02
 end
 
 @enduml
@@ -5398,9 +5462,9 @@ end
 
 ---
 
-# DG-DSEQ-21 — Secuencia de Diseño: Ejecutar Rollback de ECS (CU-21, RN-08)
+# DG-DSEQ-21 — Secuencia de Diseño: Revertir Versión de ECS - Rollback en Trabajo (CU-21)
 
-**ID:** DG-DSEQ-21 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-21 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-21, RF-12, RN-08 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-21](../assets/DG-DSEQ-21.png)
@@ -5411,9 +5475,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-21: Ejecutar Rollback de ECS (CU-21, RN-08)</b>
+title <b>DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)</b>
 
-actor "Gestor de Configuración" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "BaselineController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5423,36 +5487,43 @@ participant "StoragePort" as Storage
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Solicita rollback de ECS ante fallo insubsanable
+note over Service
+  <b>Salvaguarda de la Biblioteca Maestra</b>:
+  El rollback purga exclusivamente los artefactos defectuosos en la
+  Biblioteca de Trabajo. La Biblioteca Maestra y la Biblioteca de Soporte
+  preservan sus versiones estables inalteradas.
+end note
+
+Actor -> UI : 1. Solicita rollback de ECS ante fallo no subsanado en re-test o UAT (RN-08)
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/rollback (RollbackDto)
-Ctrl -> Guard : 3. Valida rol GESTOR_CONFIGURACION
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. executeRollback(ecnId, reason, userId)
 
 Service -> DB : 6. Inicia Transacción ACID
 Service -> LockRepo : 7. UPDATE sync_lock SET status='RELEASED', release_reason='ROLLBACK'
-LockRepo -> DB : 8. Persiste liberación de bloqueo
-Service -> DB : 9. UPDATE config_item SET is_locked=false, current_library='MAESTRA'
+LockRepo -> DB : 8. Libera bloqueo de sincronización (RN-06)
+Service -> DB : 9. UPDATE config_item SET is_locked=false, current_library='SOPORTE'
 Service -> DB : 10. UPDATE change_order SET status='CANCELADA'
 Service -> DB : 11. UPDATE change_request SET status='CANCELADA'
 Service -> DB : 12. COMMIT Transacción
 
-Service -> Storage : 13. Purgar archivos en trabajo y soporte
-Storage --> Service : Espacio temporal restaurado
+Service -> Storage : 13. Purga y restaura espacio de trabajo en /storage/trabajo/{projectId}/{ecsId}/
+Storage --> Service : Espacio de trabajo purgado y restaurado
 Service -> Audit : 14. logEvent('ROLLBACK_EXECUTED', ecsId, userId)
 Audit -> DB : 15. INSERT INTO audit_log (...)
 Service --> Ctrl : 16. RollbackSuccessDto
 Ctrl --> UI : 17. 200 OK
-UI --> Actor : 18. Notifica reversión completada y bloqueo liberado
+UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberado y orden cancelada
 
 @enduml
 ```
 
 ---
 
-# DG-DSEQ-29 — Secuencia de Diseño: Validar Aceptación UAT (CU-29, RN-09)
+# DG-DSEQ-29 — Secuencia de Diseño: Validar Aceptación UAT (CU-29)
 
-**ID:** DG-DSEQ-29 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-29 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-29, RF-10, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-29](../assets/DG-DSEQ-29.png)
@@ -5463,9 +5534,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29)</b>
+title <b>DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)</b>
 
-actor "Solicitante / Usuario Final" as Actor
+actor "Solicitante\n(Usuario Final)" as Actor
 participant "React SPA" as UI
 participant "QualityController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -5474,26 +5545,31 @@ participant "UatRepoPort" as UatRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Evalúa cambio en entorno controlado y suscribe Acta UAT
+Actor -> UI : 1. Evalúa cambio en entorno controlado de validación y suscribe Acta UAT
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/uat-acceptance (SubmitUatDto)
-Ctrl -> Guard : 3. Valida rol SOLICITANTE
+Ctrl -> Guard : 3. Valida rol canónico SOLICITANTE
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. submitUatAcceptance(ecnId, dto, userId)
 
-Service -> DB : 6. Valida existencia de Certificación QA Conforme previa
-alt Sin certificación técnica de QA previa
-    Service --> Ctrl : 400 Bad Request: "El cambio no cuenta con certificación QA"
+Service -> DB : 6. Valida existencia de Certificación QA Conforme previa (RN-09)
+alt Sin certificación previa emitida por Equipo de Calidad
+    Service --> Ctrl : 400 Bad Request: "El cambio no cuenta con certificación QA conforme previa"
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Rechaza registro de UAT prematuro
+    UI --> Actor : Alerta: No se puede suscribir UAT sin certificación previa de QA
 else Certificación QA Conforme Verificada
-    Service -> UatRepo : 7. INSERT INTO uat_acceptance (result, observations, ...)
-    UatRepo -> DB : 8. Persiste Acta UAT
-    Service -> DB : 9. Actualiza estado según resultado (ACEPTADO -> listo para congelar)
-    Service -> Audit : 10. logEvent('UAT_ACCEPTED', ecnId, userId)
-    Audit -> DB : 11. INSERT INTO audit_log (...)
-    Service --> Ctrl : 12. UatResponseDto
-    Ctrl --> UI : 13. 201 Created
-    UI --> Actor : 14. Presenta Acta de Aceptación suscrita
+    Service -> UatRepo : 7. Inicia Transacción ACID
+    UatRepo -> DB : 8. INSERT INTO uat_acceptance (change_order_id, result, observations, accepted_by, ...)
+    alt Acta Aceptada Favorablemente
+        Service -> DB : 9a. Persiste conformidad UAT (habilita Check-In definitivo a Maestra)
+    else Acta Rechazada
+        Service -> DB : 9b. Registra rechazo UAT (deriva a re-evaluación o rollback RN-08)
+    end
+    Service -> DB : 10. COMMIT
+    Service -> Audit : 11. logEvent('UAT_REGISTERED', ecnId, userId)
+    Audit -> DB : 12. INSERT INTO audit_log (...)
+    Service --> Ctrl : 13. UatResponseDto
+    Ctrl --> UI : 14. 201 Created
+    UI --> Actor : 15. Presenta Acta de Aceptación suscrita formalmente
 end
 
 @enduml
@@ -5501,9 +5577,9 @@ end
 
 ---
 
-# DG-DSEQ-30 — Secuencia de Diseño: Autorizar Cambio Menor por Vía Delegada (CU-30)
+# DG-DSEQ-30 — Secuencia de Diseño: Autorizar Cambio Menor por Vía Delegada Compartida (CU-30)
 
-**ID:** DG-DSEQ-30 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.1  
+**ID:** DG-DSEQ-30 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-30, RF-07, RN-01, RN-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-30](../assets/DG-DSEQ-30.png)
@@ -5514,38 +5590,61 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada (CU-30)</b>
+title <b>DG-DSEQ-30: Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05)</b>
 
-actor "Autoridad Delegada\n(Gestor / Arquitecto)" as Actor
+actor "Analista de Requerimientos /\nGestor" as Gestor
+actor "Arquitecto /\nEspecialista Técnico" as Arq
 participant "React SPA" as UI
 participant "ChangeRequestController" as Ctrl
 participant "Auth/RolesGuard" as Guard
 participant "ChangeRequestService" as Service
-participant "ChangeRequestRepoPort" as Repo
+participant "ChangeAuthRepoPort" as AuthRepo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Evalúa Informe de Impacto de Cambio Menor y autoriza
-UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/authorize-minor (AuthorizeMinorDto)
-Ctrl -> Guard : 3. Valida rol GESTOR / ARQUITECTO
-Guard --> Ctrl : 4. Permitido
-Ctrl -> Service : 5. authorizeMinorChange(rfcId, observations, userId)
+note over Service
+  <b>Modelo de Doble Llave Operativa (RN-01, RN-05)</b>:
+  La autorización de un Cambio Menor no es unipersonal. Exige
+  concurrentemente dos registros de conformidad en la tabla
+  change_authorization: el visto bueno de Gestión y el visto bueno de Arquitectura.
+end note
 
-Service -> DB : 6. Valida que Informe Técnico clasifique como 'MENOR' (RN-05)
-alt Clasificación del informe no es Cambio Menor
-    Service --> Ctrl : 400 Bad Request: "El cambio requiere deliberación en CCB"
-    Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Redirige flujo a evaluación por CCB (CU-07)
-else Cambio Menor Válido
-    Service -> Repo : 7. Inicia Transacción
-    Repo -> DB : 8. UPDATE change_request SET status = 'AUTORIZADA'
-    Repo -> DB : 9. INSERT INTO ccb_resolution (decision='AUTORIZADA_DELEGADA', ...)
-    Repo -> DB : 10. COMMIT
-    Service -> Audit : 11. logEvent('MINOR_CHANGE_AUTHORIZED', rfcId, userId)
-    Audit -> DB : 12. INSERT INTO audit_log (...)
-    Service --> Ctrl : 13. RfcResponseDto
-    Ctrl --> UI : 14. 200 OK
-    UI --> Actor : 15. Habilita emisión inmediata de Orden de Cambio
+== Visto Bueno 1: Evaluación por Arquitecto / Especialista Técnico ==
+Arq -> UI : 1. Emite conformidad técnica basada en Informe de Impacto (RN-05)
+UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: ARQUITECTO)
+Ctrl -> Guard : 3. Valida rol ARQUITECTO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. submitAuthorization(rfcId, 'ARQUITECTO', dto, arqUserId)
+Service -> AuthRepo : 6. INSERT INTO change_authorization (rfc_id, authorizer_role='ARQUITECTO', decision='APROBADO')
+AuthRepo -> DB : 7. Persiste conformidad técnica
+Service -> Audit : 8. logEvent('MINOR_CHANGE_ARCH_APPROVED', rfcId, arqUserId)
+Audit -> DB : 9. INSERT INTO audit_log (...)
+Service --> Ctrl : 10. 201 Created (Conformidad técnica registrada)
+Ctrl --> UI : 11. 201 Created
+UI --> Arq : 12. Muestra conformidad técnica registrada (esperando visto bueno de Gestión)
+
+== Visto Bueno 2: Evaluación por Analista de Requerimientos / Gestor y Cierre ==
+Gestor -> UI : 13. Emite visto bueno de alcance, planificación y prioridad
+UI -> Ctrl : 14. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: GESTOR)
+Ctrl -> Guard : 15. Valida rol GESTOR
+Guard --> Ctrl : 16. Permitido
+Ctrl -> Service : 17. submitAuthorization(rfcId, 'GESTOR', dto, gestorUserId)
+Service -> AuthRepo : 18. INSERT INTO change_authorization (rfc_id, authorizer_role='GESTOR', decision='APROBADO')
+AuthRepo -> DB : 19. Persiste conformidad de gestión
+
+Service -> DB : 20. Valida existencia concurrente de AMBAS conformidades (GESTOR + ARQUITECTO)
+alt Ambas Conformidades Aprobadas Existen
+    Service -> DB : 21. Inicia Transacción ACID
+    Service -> DB : 22. UPDATE change_request SET status = 'AUTORIZADA'
+    Service -> DB : 23. COMMIT
+    Service -> Notify : 24. notifyMinorChangeAuthorized(rfcId)
+    Notify --> Service : Notificación a Solicitante y CCB
+    Service -> Audit : 25. logEvent('MINOR_CHANGE_FULLY_AUTHORIZED', rfcId, gestorUserId)
+    Audit -> DB : 26. INSERT INTO audit_log (...)
+    Service --> Ctrl : 27. ChangeAuthResponseDto (Estado: AUTORIZADA)
+    Ctrl --> UI : 28. 200 OK (Autorización Compartida Completa)
+    UI --> Gestor : 29. Muestra RFC como AUTORIZADA y habilita emisión de ECN (CU-08)
 end
 
 @enduml

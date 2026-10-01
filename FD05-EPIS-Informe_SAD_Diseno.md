@@ -1,9 +1,9 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 > **Documento de Arquitectura de Software (SAD) — Fase de Diseño**  
-> **Versión:** 0.1 (Borrador de Diseño Controlado)  
+> **Versión:** 0.2 (Borrador de Diseño Controlado — Saneamiento Técnico de Secuencias y Trazabilidad)  
 > **Fecha:** Octubre 2026  
-> **Estado:** BORRADOR DE DISEÑO v0.1 (En proceso de revisión — No congelado como Baseline)  
+> **Estado:** BORRADOR DE DISEÑO v0.2 (En proceso de revisión — No congelado como Baseline)  
 > **Repositorio Oficial:** `TraceFlow`  
 > **Organización Cliente:** ÉXODO S.A.C.  
 > **Equipo de Desarrollo:** C-SharkTeam  
@@ -41,6 +41,7 @@
 | Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
 | :---: | :--- | :--- | :--- | :---: | :--- |
 | **0.1** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | Emisión inicial del SAD de Diseño (Borrador Controlado v0.1) a partir de las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los registros de decisión aprobados (ADR-001 a ADR-010). |
+| **0.2** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Auditoría y Saneamiento Técnico Integral**: Corrección de actores canónicos en secuencias técnicas (DG-DSEQ-10, 12, 17, 20, 21, 30); delimitación de Check-In (CU-12) vs Línea Base (CU-20); incorporación de autorización compartida para CU-30; precisión del flujo de rollback (CU-21 en Biblioteca de Trabajo); saneamiento de erratas de reglas de negocio (RN-08, RN-05, RN-04); aclaración de seguridad (Argon2id como KDF); desacoplamiento de transacciones DB+Storage con estados intermedios y compensación; y acotamiento de RNF-06. |
 
 ---
 
@@ -69,7 +70,7 @@
    - 5.2 Regla de Dependencia Unidireccional e Inversión de Control
 6. [Arquitectura del Frontend (React SPA)](#6-arquitectura-del-frontend-react-spa)
    - 6.1 Estructura Modular de Carpetas
-   - 6.2 Enrutamiento, Layouts y Protección por Rol
+   - 6.2 Enrutamiento, Layouts y Protección por Rol Canónico
    - 6.3 Gestión de Estado, Consumo de API y Manejo de Errores
 7. [Modelo de Datos de Diseño (Relacional Lógico)](#7-modelo-de-datos-de-diseño-relacional-lógico)
    - 7.1 Derivación Exhaustiva desde el Modelo Conceptual DG-12
@@ -80,10 +81,10 @@
    - 8.1 Interfaz de Dominio StoragePort
    - 8.2 Adaptador LocalStorageAdapter y Estructura en Disco
    - 8.3 Diagrama DG-D04: Arquitectura de Storage y Bibliotecas
-   - 8.4 Protocolo de Transacciones por Etapas y Reconciliación
+   - 8.4 Protocolo de Transacciones por Etapas, Estados Intermedios y Reconciliación
 9. [Diseño de API REST](#9-diseño-de-api-rest)
    - 9.1 Matriz de Correspondencia Casos de Uso (CU-01 a CU-30, CU-04.1) vs Operaciones API
-   - 9.2 Catálogo Preliminar API-DRAFT-v0.1
+   - 9.2 Catálogo Preliminar API-DRAFT-v0.2
    - 9.3 Formato Estándar de Errores (RFC 7807)
 10. [Diseño de Seguridad](#10-diseño-de-seguridad)
     - 10.1 Separación entre Autenticación, Autorización y Segregación de Funciones
@@ -94,15 +95,15 @@
     - 11.1 Modelo Append-Only en PostgreSQL y Triggers de Inmutabilidad
     - 11.2 Estructura del Registro de Auditoría y Encadenamiento SHA-256
 12. [Secuencias de Diseño Técnicas (DG-DSEQ-XX)](#12-secuencias-de-diseño-técnicas-dg-dseq-xx)
-    - 12.1 Convenciones y Participantes de Diseño
-    - 12.2 Diagramas Críticos (DG-DSEQ-04, 08, 10, 12, 17, 20, 21, 29, 30)
+    - 12.1 Auditoría Comparativa de las 9 Secuencias Técnicas
+    - 12.2 Diagramas Críticos Corregidos (DG-DSEQ-04, 08, 10, 12, 17, 20, 21, 29, 30)
 13. [Arquitectura de Despliegue](#13-arquitectura-de-despliegue)
     - 13.1 Topología Docker y Contenedores Multi-Stage
     - 13.2 Diagrama DG-D06: Deployment Diagram
     - 13.3 Análisis de Disponibilidad: Proceso vs Falla Física de Host
 14. [Estrategia de Backup y Recuperación (RNF-09)](#14-estrategia-de-backup-y-recuperación-rnf-09)
     - 14.1 Definición de la Unidad Lógica de Respaldo
-    - 14.2 Protocolo Automatizado de Respaldo y Verificación SHA-256
+    - 14.2 Protocolo Coordinado de Respaldo y Verificación SHA-256
     - 14.3 Parámetros Operativos de Diseño (Horarios, Retención, RTO)
 15. [Observabilidad](#15-observabilidad)
     - 15.1 Logging Estructurado, Health Checks y Métricas
@@ -110,16 +111,16 @@
 16. [Matriz de Trazabilidad de Diseño](#16-matriz-de-trazabilidad-de-diseño)
     - 16.1 Trazabilidad Componente -> ADR -> MOD -> RF -> RNF -> RN -> CU
 17. [Decisiones Pendientes para la Baseline de Implementación](#17-decisiones-pendientes-para-la-baseline-de-implementación)
-18. [Auditoría SAD de Diseño v0.1](#18-auditoría-sad-de-diseño-v01)
+18. [Auditoría SAD de Diseño v0.2](#18-auditoría-sad-de-diseño-v02)
 
 ---
 
 # 1. Introducción
 
 ## 1.1 Propósito
-El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05)** tiene por objeto definir la arquitectura técnica detallada, física, modular, de datos, interfaces y despliegue del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
+El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.2)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces y despliegue del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
 
-El documento provee las pautas definitivas para el equipo de desarrollo (C-SharkTeam), asegurando que cada componente de software, tabla relacional, endpoint REST, puerto de almacenamiento y mecanismo de seguridad responda con precisión matemática a los requerimientos funcionales, no funcionales y reglas de negocio del sistema.
+Esta versión **v0.2** subsana exhaustivamente las inconsistencias detectadas en la versión preliminar v0.1 respecto a la asignación de actores canónicos, correspondencia de bibliotecas SCM, trazabilidad de reglas de negocio y desacoplamiento de operaciones de almacenamiento físico frente a la base de datos relacional.
 
 ## 1.2 Alcance
 El alcance de este documento abarca la especificación técnica completa de los 9 módulos de software de TraceFlow SCM:
@@ -133,13 +134,13 @@ El alcance de este documento abarca la especificación técnica completa de los 
 - **MOD-08**: Gestión de Incidencias y Trazabilidad a Cambios
 - **MOD-09**: Auditoría, Reportes e Integridad Forense
 
-El diseño comprende la interfaz de usuario en Single Page Application (SPA), los servicios de aplicación y dominio del backend monolítico modular, los esquemas relacionales lógicos de base de datos, el protocolo de custodia física de artefactos, la especificación de contratos de API RESTful, las secuencias de diseño de interacción técnica entre objetos y la infraestructura de contenerización y respaldo operacional.
+El diseño comprende la interfaz de usuario en Single Page Application (SPA), los servicios de aplicación y dominio del backend monolítico modular, los esquemas relacionales lógicos de base de datos, el protocolo de custodia física de artefactos mediante `StoragePort`, la especificación de contratos de API RESTful, las secuencias de diseño de interacción técnica entre objetos y la infraestructura de contenerización y respaldo operacional.
 
 ## 1.3 Relación con SRS/SAD de Análisis y Jerarquía de Autoridad
 La arquitectura de diseño se rige por una jerarquía estricta de fuentes de verdad:
 
 ```
-[Nivel 1] Baselines de Análisis Aprobadas
+[Nivel 1] Baselines de Análisis Aprobadas (Inmutables)
           ├── FD03-EPIS-Informe_SRS.md (v1.0 Baseline SRS)
           │     ├── docs/TABLES.md (TB-01 a TB-14 - SSOT de Datos)
           │     └── docs/DIAGRAMS.md (DG-01 a DG-12, DG-AO-01..30, DG-SEQ-01..30)
@@ -149,14 +150,14 @@ La arquitectura de diseño se rige por una jerarquía estricta de fuentes de ver
           └── docs/adr/ (ADR-001 a ADR-010 y README.md)
                       ↓
 [Nivel 3] Documento de Arquitectura de Software — Fase de Diseño
-          └── FD05-EPIS-Informe_SAD_Diseno.md (v0.1 Borrador Controlado)
+          └── FD05-EPIS-Informe_SAD_Diseno.md (v0.2 Borrador Controlado)
 ```
 
 ### Regla Fundamental de No Divergencia Silenciosa:
 1. Las **Baselines de Análisis** constituyen la referencia funcional congelada e inmutable de TraceFlow SCM (18 RF, 9 RNF, 9 RN, 31 CU, 9 MOD, 7 actores canónicos, 14 estados de RFC y 3 bibliotecas).
 2. El SAD de Diseño **no puede alterar el alcance funcional ni inventar requerimientos o casos de uso**.
 3. Si durante la fase de diseño se identificase una necesidad técnica que contradiga o expanda la baseline de análisis, queda terminantemente prohibido modificar silenciosamente los requerimientos. Dicho cambio deberá catalogarse formalmente como:
-   $$\mathbf{IMPACTO\ EN\ BASELINE\ \Longrightarrow\ REQUIERE\ RFC\ Y\ APROBACIcute{O}N\ DEL\ CCB}$$
+   $$\mathbf{IMPACTO\ EN\ BASELINE\ \Longrightarrow\ REQUIERE\ RFC\ Y\ APROBACI\acute{O}N\ DEL\ CCB}$$
 
 ## 1.4 Relación con las Decisiones Arquitectónicas (ADR-001 a ADR-010)
 Los registros de decisión técnica aprobados (`docs/adr/`) constituyen el fundamento oficial que sustenta las elecciones de ingeniería de este SAD de Diseño:
@@ -189,15 +190,15 @@ En cumplimiento de la gobernanza técnica de TraceFlow SCM, la siguiente tabla c
 | Identificador | Decisión Técnica Aprobada | Resumen Arquitectónico | Estado Formal |
 | :---: | :--- | :--- | :---: |
 | **ADR-001** | **Monolito Modular** | Despliegue en un único artefacto backend estructurado internamente en 9 módulos fuertemente desacoplados (MOD-01 a MOD-09), garantizando transacciones ACID locales y eliminando la latencia de red inter-servicio. | **APROBADO** |
-| **ADR-002** | **React + TypeScript + Vite SPA** | Interfaz de usuario interactiva como cliente enriquecido estático consumiendo la API REST. Desacoplada de servidor frontend (sin SSR) por ser una aplicación interna para 7 actores autenticados. | **APROBADO** |
+| **ADR-002** | **React + TypeScript + Vite SPA** | Interfaz de usuario interactiva como cliente enriquecido estático consumiendo la API REST. Desacoplada de servidor frontend (sin SSR) por ser una aplicación interna para los 7 actores canónicos autenticados. | **APROBADO** |
 | **ADR-003** | **Node.js (LTS) + TypeScript + NestJS** | Backend basado en NestJS sobre Node.js 24 LTS con inyección de dependencias, tipado estricto, decoradores declarativos y soporte nativo de modularidad y OpenAPI. | **APROBADO** |
 | **ADR-004** | **PostgreSQL Relacional Transaccional** | Motor relacional unificado para la persistencia transaccional de metadatos, soporte nativo de índices condicionales parciales y columnas JSONB para auditoría. | **APROBADO** |
 | **ADR-005** | **Custodia Híbrida y Puerto `StoragePort`** | Separación entre metadatos (PostgreSQL) y contenido físico de ECS desacoplado mediante una interfaz abstracta `StoragePort`. Adaptador inicial de sistema de archivos local (`LocalStorageAdapter`). | **APROBADO** |
-| **ADR-006** | **Cookie HttpOnly + Sesión Opaca en Servidor** | Gestión de sesiones seguras inmunes a XSS mediante Cookie `HttpOnly` (`SameSite=Strict`), revocación instantánea en base de datos, inactividad de 15 minutos y Guards de autorización RBAC y SoD. | **APROBADO** |
+| **ADR-006** | **Cookie HttpOnly + Sesión Opaca en Servidor** | Gestión de sesiones seguras inmunes a XSS mediante Cookie `HttpOnly` (`SameSite=Strict`), revocación instantánea en base de datos, inactividad de 15 minutos (parámetro de diseño) y Guards de autorización RBAC y SoD. | **APROBADO** |
 | **ADR-007** | **Bloqueo Persistente Condicional (RN-06)** | Bloqueo pesimista exclusivo a nivel de motor mediante índice único condicional en PostgreSQL. Liberación permitida exclusivamente mediante Check-In (CU-12), Rollback (CU-21) o Cancelación (CU-22). | **APROBADO** |
 | **ADR-008** | **Auditoría Append-Only en PostgreSQL** | Registro inmutable de eventos con revocación de privilegios `UPDATE` y `DELETE` para el usuario de aplicación, triggers de inmutabilidad y encadenamiento criptográfico con SHA-256. | **APROBADO** |
 | **ADR-009** | **API RESTful + JSON + OpenAPI 3.0** | Comunicación estandarizada sobre HTTPS, verbos semánticos, errores RFC 7807 y especificación OpenAPI generada automáticamente a partir del código. | **APROBADO** |
-| **ADR-010** | **Docker Multi-Stage + Unidad de Respaldo** | Empaquetado reproducible en contenedores OCI, orquestación por Docker Compose con reverse proxy Nginx, réplicas stateless y respaldo consistente de la Unidad Lógica (`DB + Storage + Manifest`). | **APROBADO** |
+| **ADR-010** | **Docker Multi-Stage + Unidad de Respaldo** | Empaquetado reproducible en contenedores OCI, orquestación por Docker Compose con reverse proxy Nginx, réplicas stateless y respaldo coordinado y verificable de la Unidad Lógica (`DB + Storage + Manifest`). | **APROBADO** |
 
 ## 2.2 Separación entre Decisiones Arquitectónicas y Versiones de Implementación
 Para garantizar una arquitectura duradera y evitar la obsolescencia técnica documental, se delimitan estrictamente los dos niveles de decisión:
@@ -207,9 +208,9 @@ Para garantizar una arquitectura duradera y evitar la obsolescencia técnica doc
 - **Presentación Web**: Single Page Application (SPA) con renderizado puramente en cliente (*Client-Side Rendering*).
 - **Paradigma de Backend**: Programación Orientada a Objetos, Inversión de Control (IoC), Inyección de Dependencias (DI) y Controladores REST.
 - **Paradigma de Persistencia**: Base de datos relacional conforme a Codd (ACID), integridad referencial estricta y modelos semiestructurados indexables.
-- **Almacenamiento de Artefactos**: Abstracción mediante Puerto de Dominio (`StoragePort`), escritura por etapas con reconciliación.
+- **Almacenamiento de Artefactos**: Abstracción mediante Puerto de Dominio (`StoragePort`), escritura por etapas con reconciliación y compensación.
 - **Protocolo de Seguridad**: Sesión con identificador opaco en servidor, transporte protegido mediante Cookies cifradas y directivas `SameSite=Strict`.
-- **Concurrencia**: Bloqueo pesimista lógico respaldado por restricciones declarativas de base de datos.
+- **Concurrencia**: Bloqueo pesimista lógico respaldado por restricciones condicionales declarativas de base de datos (`RN-06`).
 - **Contratos e Intercambio**: RESTful JSON, esquemas fuertemente tipados y especificaciones OpenAPI 3.x.
 - **Infraestructura Operativa**: Contenedores inmutables basados en estándares OCI y proxy inverso para terminación TLS.
 
@@ -267,53 +268,53 @@ skinparam defaultFontName Arial
 title <b>DG-D01: Arquitectura Física de Software de TraceFlow SCM</b>
 
 node "Dispositivo Cliente (Actor Canónico)" as ClientDevice {
-    component [Navegador Web\n(Chrome / Firefox / Edge)] as Browser
-    artifact [React SPA Bundle\n(HTML5 / TS / React 18-19)] as SPAApp
+    component [Navegador Web\\n(Chrome / Firefox / Edge)] as Browser
+    artifact [React SPA Bundle\\n(HTML5 / TS / React 18-19)] as SPAApp
     Browser *-down-> SPAApp
 }
 
 node "Servidor Host / Plataforma de Ejecución (Docker Engine 24+)" as AppServer {
     
     node "Contenedor: Reverse Proxy (Nginx 1.26+)" as NginxContainer {
-        component [Nginx Proxy Inverso\n& Servidor Estático] as NginxEngine
-        folder "/usr/share/nginx/html\n(Activos Estáticos SPA)" as StaticFolder
+        component [Nginx Proxy Inverso\\n& Servidor Estático] as NginxEngine
+        folder "/usr/share/nginx/html\\n(Activos Estáticos SPA)" as StaticFolder
         NginxEngine -down-> StaticFolder : Sirve estáticos
     }
 
     node "Contenedor: Backend Core (NestJS / Node.js 24 LTS)" as BackendContainer {
-        component [Monolito Modular NestJS\n(MOD-01 a MOD-09)] as ModularMonolith
-        interface "REST API / OpenAPI 3.0\n(/api/v1/*)" as RestInterface
-        interface "StoragePort\n(Puerto de Dominio)" as StoragePortInterface
+        component [Monolito Modular NestJS\\n(MOD-01 a MOD-09)] as ModularMonolith
+        interface "REST API / OpenAPI 3.0\\n(/api/v1/*)" as RestInterface
+        interface "StoragePort\\n(Puerto de Dominio)" as StoragePortInterface
         ModularMonolith -up- RestInterface
         ModularMonolith -down- StoragePortInterface
     }
 
     node "Contenedor: Base de Datos Relacional (PostgreSQL 16+)" as DBContainer {
-        database "PostgreSQL DB\n- Esquemas Relacionales\n- Índices Condicionales (RN-06)\n- Logs Append-Only (RN-02)" as PostgresDB
-        folder "/var/lib/postgresql/data\n(Volumen tf_pg_data)" as DBVolume
+        database "PostgreSQL DB\\n- Esquemas Relacionales\\n- Índices Condicionales (RN-06)\\n- Logs Append-Only (RN-02)" as PostgresDB
+        folder "/var/lib/postgresql/data\\n(Volumen tf_pg_data)" as DBVolume
         PostgresDB -down-> DBVolume
     }
 
     node "Volumen Montado: Custodia de Artefactos (ECS Storage)" as StorageVolume {
-        folder "/storage\n├── trabajo/ (Staging / Dev)\n├── soporte/ (QA Testing)\n└── maestra/ (Líneas Base)" as PhysicalStorage
+        folder "/storage\\n├── trabajo/ (Staging / Dev)\\n├── soporte/ (QA Testing)\\n└── maestra/ (Líneas Base)" as PhysicalStorage
     }
 
     node "Contenedor: Respaldo Automatizado (Backup Worker)" as BackupContainer {
-        component [Servicio de Respaldo\n(Unidad Lógica RNF-09)] as BackupService
+        component [Servicio de Respaldo\\n(Unidad Lógica RNF-09)] as BackupService
     }
 }
 
 node "Almacenamiento Secundario / Cloud Externo" as ExternalStorage {
-    folder "/backups/traceflow\n(Snapshot DB + Snapshot Storage + Manifest)" as RemoteBackups
+    folder "/backups/traceflow\\n(Snapshot DB + Snapshot Storage + Manifest)" as RemoteBackups
 }
 
-Browser --> NginxEngine : HTTPS (443)\nTLS 1.3 / Cookie HttpOnly
-NginxEngine --> RestInterface : HTTP Reverse Proxy\n(Balanceo a réplicas NestJS)
-ModularMonolith --> PostgresDB : TCP / Pool de Conexiones\nTransacciones ACID (Puerto 5432)
-StoragePortInterface ..> PhysicalStorage : LocalStorageAdapter\n(I/O de Archivos)
+Browser --> NginxEngine : HTTPS (443)\\nTLS 1.3 / Cookie HttpOnly
+NginxEngine --> RestInterface : HTTP Reverse Proxy\\n(Balanceo a réplicas NestJS)
+ModularMonolith --> PostgresDB : TCP / Pool de Conexiones\\nTransacciones ACID (Puerto 5432)
+StoragePortInterface ..> PhysicalStorage : LocalStorageAdapter\\n(I/O de Archivos)
 BackupService -left-> PostgresDB : pg_dump consistente
 BackupService -up-> PhysicalStorage : Snapshot de Artefactos (tar.gz)
-BackupService -right-> RemoteBackups : Transferencia Segura\nPaquete Maestro (.pkg)
+BackupService -right-> RemoteBackups : Transferencia Segura\\nPaquete Maestro (.pkg)
 
 @enduml
 ```
@@ -381,9 +382,9 @@ src/modules/{modulo}/
 ## 4.3 Reglas Estrictas de Aislamiento y Colaboración Intermodular
 Para evitar la degradación arquitectónica hacia un monolito enredado (*Big Ball of Mud*), se establecen las siguientes reglas de gobierno de código:
 1. **Prohibición de Acceso Directo a Repositorios Ajenos**: Un módulo técnico jamás podrá inyectar o consultar directamente la entidad o repositorio de persistencia de otro módulo. Por ejemplo:
-   $$	ext{ChangeModule} \centernot\longrightarrow 	ext{VersionRepository (Prohibido)}$$
+   $$\text{ChangeModule} \centernot\longrightarrow \text{VersionRepository (Prohibido)}$$
 2. **Colaboración Exclusiva por Interfaces Públicas**: Toda interacción entre módulos debe ocurrir invocando los **servicios de aplicación exportados** en el contrato público del `@Module` correspondiente:
-   $$	ext{ChangeModule} \longrightarrow 	ext{VersionApplicationService (Permitido vía DI)}$$
+   $$\text{ChangeModule} \longrightarrow \text{VersionApplicationService (Permitido vía DI)}$$
 3. **Desacoplamiento de Eventos de Dominio**: Para notificaciones transversales (e.g. registrar auditoría tras el Check-In o emitir notificaciones al autorizar un cambio), los módulos emitirán eventos internos en memoria (`EventEmitter2` de NestJS), permitiendo que `AuditModule` capture el evento sin que el módulo emisor quede acoplado a la infraestructura de auditoría.
 
 ---
@@ -594,7 +595,8 @@ frontend/src/
    - `/baselines/*`: Visor de líneas base congeladas y ejecución de rollback.
    - `/audit/*`: Explorador de registros forenses de auditoría.
 2. **Layout Basado en Rol (`RoleBasedSidebar`)**:
-   - El menú lateral adapta sus opciones en tiempo de ejecución evaluando el rol del usuario autenticado (`Solicitante`, `Gestor de Configuración`, `Líder CCB`, `Miembro CCB`, `Desarrollador`, `Asegurador de Calidad`, `Administrador de Seguridad`).
+   - El menú lateral adapta sus opciones en tiempo de ejecución evaluando el rol del usuario autenticado entre los **7 actores canónicos de TB-09**:
+     `Solicitante`, `Analista de Requerimientos / Gestor`, `Arquitecto / Especialista Técnico`, `Comité de Control de Cambios (CCB)`, `Administrador de Configuración / Bibliotecario`, `Ingeniero de Software / Desarrollador`, `Equipo de Calidad / Testing`.
 3. **Route Guards (`ProtectedRoute`)**:
    - Intercepta cada cambio de ruta en el cliente.
    - Si no existe sesión activa válida, redirige automáticamente a `/login`.
@@ -631,7 +633,8 @@ No se crea ninguna tabla sin trazabilidad directa a una entidad conceptual o a u
 │ (Historial de Versiones)        │ ecs_version                 │ Versiones inmutables + SHA256│
 │ SolicitudCambio                 │ change_request              │ Expediente de RFC (14 estados│
 │ InformeImpacto                  │ impact_assessment           │ Análisis técnico (Triple Res)│
-│ (Dictamen CCB / Delegado)       │ ccb_resolution              │ Resoluciones y votación CCB  │
+│ (Dictamen CCB - Cambio Mayor)   │ ccb_resolution              │ Resoluciones y votación CCB  │
+│ (Autorización - Cambio Menor)   │ change_authorization        │ Aprobación delegada (CU-30)  │
 │ OrdenCambio                     │ change_order                │ ECN/ECO emitida para cambio  │
 │ EstadoBloqueo (Entidad/Estado)  │ sync_lock                   │ Bloqueo persistente (RN-06)  │
 │ CertificadoConformidad          │ qa_certification            │ Certificación técnica de QA  │
@@ -732,8 +735,9 @@ entity "ecs_version" as ecs_version {
     --
     * ecs_id : UUID [FK -> config_item.id]
     * version_number : VARCHAR(20) <<mayor.menor.parche - RN-02>>
-    * sha256_checksum : VARCHAR(64) <<RN-08>>
+    * sha256_checksum : VARCHAR(64) <<RNF-03, RF-17>>
     * storage_path : VARCHAR(255)
+    * storage_status : VARCHAR(20) <<PENDING_STORAGE, COMMITTED, STORAGE_FAILED>>
     * file_size_bytes : BIGINT
     * check_in_by : UUID [FK -> app_user.id]
     * change_order_id : UUID [NULLABLE]
@@ -786,6 +790,19 @@ entity "ccb_resolution" as ccb_resolution {
     * observations : TEXT
     * resolved_by : UUID [FK -> app_user.id]
     * resolved_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "change_authorization" as change_authorization {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [FK -> change_request.id]
+    * authorizer_role : VARCHAR(40) <<GESTOR, ARQUITECTO>>
+    * authorizer_user_id : UUID [FK -> app_user.id]
+    * decision : VARCHAR(20) <<APROBADO, OBSERVADO, RECHAZADO>>
+    * technical_notes : TEXT
+    * authorized_at : TIMESTAMP WITH TIME ZONE
+    --
+    CONSTRAINT uq_rfc_authorizer_role UNIQUE(rfc_id, authorizer_role)
 }
 
 entity "change_order" as change_order {
@@ -894,7 +911,8 @@ project ||--o{ config_item : "contiene"
 config_item ||--o{ ecs_version : "versionado en"
 config_item ||--o{ change_request : "afectado por"
 change_request ||--o| impact_assessment : "evaluado en"
-change_request ||--o{ ccb_resolution : "deliberado en"
+change_request ||--o{ ccb_resolution : "deliberado en (CU-07)"
+change_request ||--o{ change_authorization : "autorizado por (CU-30)"
 change_request ||--o| change_order : "formalizado en"
 change_order ||--o| sync_lock : "aplica"
 change_order ||--o{ qa_certification : "probado en"
@@ -905,6 +923,7 @@ ecs_version ||--o{ baseline_item : "incluida en"
 project ||--o{ incident_ticket : "registra"
 incident_ticket ||--o| change_request : "deriva en"
 app_user ||--o{ audit_log : "origina"
+app_user ||--o{ change_authorization : "suscribe"
 
 @enduml
 ```
@@ -915,7 +934,8 @@ app_user ||--o{ audit_log : "origina"
 El modelo incorpora restricciones declarativas directas para salvaguardar las reglas de negocio canónicas:
 - **Estados de RFC (`change_request.status`)**: Gobernado por un `CHECK` que admite estrictamente los **14 Estados Canónicos de TB-07**:
   `REGISTRADA`, `EN_SUBSANACION`, `CLASIFICADA`, `EN_ANALISIS_TECNICO`, `EN_EVALUACION`, `AUTORIZADA`, `ORDEN_EMITIDA`, `EN_IMPLEMENTACION`, `EN_PRUEBAS`, `EN_ACEPTACION`, `DESESTIMADA`, `RECHAZADA`, `CANCELADA`, `IMPLEMENTADA`.
-- **Integridad de Versiones (`ecs_version`)**: Clave compuesta única `(ecs_id, version_number)` asegurando que ninguna versión de un ECS se sobreescriba (`RN-02`). Columna `sha256_checksum` inmutable y obligatoria (`RN-08`).
+- **Integridad de Versiones (`ecs_version`)**: Clave compuesta única `(ecs_id, version_number)` asegurando que ninguna versión de un ECS se sobreescriba (`RN-02`). Columna `sha256_checksum` inmutable y obligatoria (`RNF-03, RF-17`), computada en staging antes de la inserción. Columna `storage_status` (`PENDING_STORAGE`, `COMMITTED`, `STORAGE_FAILED`) que desacopla la transacción de base de datos de la persistencia de archivos físicos.
+- **Autorización Compartida de Cambio Menor (`change_authorization`)**: Para cumplir estrictamente con `RN-01` y `RN-05` en la vía delegada (`CU-30`), la transición a `AUTORIZADA` exige de forma obligatoria y concurrente dos registros de conformidad en `change_authorization`: uno emitido por el `Analista de Requerimientos / Gestor` y otro por el `Arquitecto / Especialista Técnico`, garantizando la doble llave operativa sin intervención del pleno del CCB.
 - **Trazabilidad de Cambios (`RN-03`)**: Columna `commit_message` y referencia foránea obligatoria a `change_order_id` en el Check-In.
 
 ## 7.4 Diseño Técnico del Bloqueo de Sincronización (RN-06)
@@ -1057,9 +1077,9 @@ LocalStorage --> F_Trabajo : 2. Promueve tras Check-Out / Dev
 LocalStorage --> F_Soporte : 3. Transfiere para pruebas QA (RN-01)
 LocalStorage --> F_Maestra : 4. Congela con Doble Conformidad (RN-09)
 
-F_Trabajo .[#blue].> F_Soporte : Entrega para Testing
-F_Soporte .[#green].> F_Maestra : Promoción tras QA + UAT
-F_Trabajo .[#red].> F_Trabajo : Rollback elimina copia de trabajo (RN-08)
+F_Trabajo .[#blue].> F_Soporte : Entrega para Testing (Check-In Técnico)
+F_Soporte .[#green].> F_Maestra : Promoción definitiva tras QA + UAT
+F_Trabajo .[#red].> F_Trabajo : Rollback purga copia de trabajo (RN-08)
 
 @enduml
 ```
@@ -1067,7 +1087,7 @@ F_Trabajo .[#red].> F_Trabajo : Rollback elimina copia de trabajo (RN-08)
 ---
 
 ## 8.4 Protocolo de Transacciones por Etapas y Reconciliación
-Debido a que **no existe una transacción ACID distribuida nativa (2PC) entre PostgreSQL y el sistema de archivos**, se formaliza el siguiente protocolo de escritura segura por etapas con operaciones compensatorias:
+Debido a que **no existe una transacción ACID distribuida nativa (2PC) entre PostgreSQL y el sistema de archivos**, se formaliza un protocolo de **máquina de estados intermedios y compensación** que desacopla la persistencia en base de datos del almacenamiento físico:
 
 ```
 [Cliente]                    [Backend Core]                  [StoragePort]            [PostgreSQL]
@@ -1077,30 +1097,46 @@ Debido a que **no existe una transacción ACID distribuida nativa (2PC) entre Po
    │                                │                              │── Escribe staging ───>│
    │                                │<── Retorna tempPath + SHA ───│                       │
    │                                │                                                      │
-   │                                │── 3. Valida Checksum (RN-08)                         │
+   │                                │── 3. Valida Checksum (RNF-03/RF-17)                  │
    │                                │                                                      │
-   │                                │── 4. Inicia Transacción ACID ───────────────────────>│
-   │                                │      - Inserta ecs_version                           │
-   │                                │      - Actualiza sync_lock (RELEASED)                │
-   │                                │      - Inserta audit_log                             │
+   │                                │── 4. Transacción BD 1: Pre-registro ────────────────>│
+   │                                │      - INSERT INTO ecs_version                       │
+   │                                │        (storage_status='PENDING_STORAGE')            │
    │                                │      - COMMIT                                        │
-   │                                │<── Transacción Exitosa ──────────────────────────────│
+   │                                │<── Pre-registro Confirmado ──────────────────────────│
    │                                │                                                      │
    │                                │── 5. promote() a biblioteca ─>│                       │
    │                                │      (staging -> permanente) │                       │
-   │<── 6. 201 Created Confirmado ──│                                                      │
+   │                                │<── Transferencia Exitosa ────│                       │
    │                                │                                                      │
-   │                                │=== OPERACIÓN COMPENSATORIA ANTE FALLO ===            │
-   │                                │ (Si falla BD o SHA-256 no coincide):                 │
-   │                                │── removeTemporary(tempPath) ─>│                       │
-   │<── 400/500 Error + Rollback ───│                                                      │
+   │                                │── 6. Transacción BD 2: Confirmación ────────────────>│
+   │                                │      - UPDATE ecs_version                            │
+   │                                │        SET storage_status='COMMITTED'                │
+   │                                │      - UPDATE sync_lock SET status='RELEASED'        │
+   │                                │      - UPDATE config_item SET current_library=...    │
+   │                                │      - INSERT INTO audit_log                         │
+   │                                │      - COMMIT                                        │
+   │                                │<── Transacción Final Confirmada ────────────────────│
+   │                                │                                                      │
+   │<── 7. 201 Created Confirmado ──│                                                      │
+   │                                │                                                      │
+   │                                │=== OPERACIONES COMPENSATORIAS ANTE FALLO ===         │
+   │                                │ (Si falla promote() o se corta la conexión):         │
+   │                                │── A. removeTemporary(tempPath) / purga archivo ─────>│
+   │                                │── B. Transacción BD Compensatoria: ─────────────────>│
+   │                                │      - UPDATE ecs_version                            │
+   │                                │        SET storage_status='STORAGE_FAILED'           │
+   │                                │      - Mantiene sync_lock (ACTIVE) para protección   │
+   │                                │      - Emite alerta al Bibliotecario                 │
+   │<── 500 Error de Almacenamiento │                                                      │
 ```
 
 ### Mecanismo Técnico del Reconciliation Worker
-Para garantizar que caídas repentinas del servidor o fallos de energía no dejen archivos huérfanos o metadatos inconsistentes:
+Para garantizar que caídas repentinas del servidor o fallos de hardware no dejen inconsistencias entre la base de datos y el disco:
 1. Se define un proceso técnico en segundo plano (`ReconciliationWorker`), implementado mediante un cron interno de NestJS (`@Cron('0 */6 * * *')`).
-2. **Barrido de Staging**: Escanea `/storage/staging/` y purga automáticamente archivos temporales con más de 24 horas de antigüedad que no hayan sido promovidos.
-3. **Auditoría de Correspondencia Física**: Compara la lista de `storage_path` y `sha256_checksum` de la tabla `ecs_version` contra los archivos reales en disco. Si detecta una discrepancia (archivo faltante o hash alterado), genera de inmediato un registro de alerta crítica en `audit_log` y emite una notificación al Administrador de Seguridad.
+2. **Detección de Transacciones Huérfanas**: Consulta registros en `ecs_version` con `storage_status = 'PENDING_STORAGE'` con más de 15 minutos de antigüedad. Verifica si el archivo fue promovido; de ser así, actualiza a `COMMITTED`; si no, purga el staging y actualiza a `STORAGE_FAILED`.
+3. **Barrido de Staging**: Escanea `/storage/staging/` y purga automáticamente archivos temporales con más de 24 horas de antigüedad que no correspondan a ninguna transacción activa.
+4. **Auditoría de Correspondencia Física y Checksum**: Compara la lista de `storage_path` y `sha256_checksum` de la tabla `ecs_version` contra los archivos reales en disco. Si detecta discrepancia (archivo faltante o hash alterado), genera de inmediato un registro de alerta crítica en `audit_log` y emite una notificación prioritaria al **Administrador de Configuración / Bibliotecario**.
 
 ---
 
@@ -1115,15 +1151,15 @@ A continuación se mapean los **31 Casos de Uso del SRS de Análisis** hacia ope
 | **CU-02** | Crear y administrar proyectos | `ProjectController.createProject` | `/api/v1/projects` | `POST` | `201` | 400, 401, 403, 409 |
 | **CU-03** | Consultar proyecto | `ProjectController.getProjectById` | `/api/v1/projects/{id}` | `GET` | `200` | 401, 403, 404 |
 | **CU-04** | Registrar Solicitud de Cambio (RFC) | `ChangeRequestController.registerRfc` | `/api/v1/rfcs` | `POST` | `201` | 400, 401, 403 |
-| **CU-04.1**| Subsanar Solicitud de Cambio | `ChangeRequestController.subsampleRfc` | `/api/v1/rfcs/{id}/subsample` | `PATCH` | `200` | 400, 401, 403, 404 |
+| **CU-04.1**| Subsanar Solicitud de Cambio (RFC) | `ChangeRequestController.rectifyRfc` | `/api/v1/rfcs/{id}/rectification` | `PATCH` | `200` | 400, 401, 403, 404 |
 | **CU-05** | Validar y clasificar la solicitud | `ChangeRequestController.classifyRfc` | `/api/v1/rfcs/{id}/classify` | `PATCH` | `200` | 400, 401, 403, 404 |
 | **CU-06** | Realizar análisis de impacto técnico | `ChangeRequestController.submitImpact` | `/api/v1/rfcs/{id}/impact-assessment` | `POST` | `201` | 400, 401, 403, 404 |
-| **CU-07** | Evaluar Cambio Mayor en CCB | `ChangeRequestController.voteCcb` | `/api/v1/rfcs/{id}/ccb-resolution` | `POST` | `201` | 400, 401, 403, 404 |
+| **CU-07** | Evaluar viabilidad y aprobar/rechazar (CCB) | `ChangeRequestController.voteCcb` | `/api/v1/rfcs/{id}/ccb-resolution` | `POST` | `201` | 400, 401, 403, 404 |
 | **CU-08** | Emitir Orden de Cambio (ECN/ECO) | `ChangeRequestController.issueEcn` | `/api/v1/rfcs/{id}/change-order` | `POST` | `201` | 400, 401, 403, 409 |
 | **CU-09** | Registrar ECS | `ConfigItemController.registerEcs` | `/api/v1/projects/{id}/ecs` | `POST` | `201` | 400, 401, 403, 409 |
-| **CU-10** | Efectuar Check-Out | `VersionControlController.checkOut` | `/api/v1/ecs/{id}/check-out` | `POST` | `200` | 400, 401, 403, 409 |
+| **CU-10** | Efectuar Check-Out (Soporte → Trabajo) | `VersionControlController.checkOut` | `/api/v1/ecs/{id}/check-out` | `POST` | `200` | 400, 401, 403, 409 |
 | **CU-11** | Aplicar bloqueo de sincronización | *Ejecutado atómicamente en CU-10* | `/api/v1/ecs/{id}/check-out` | `POST` | `200` | 409 (Lock activo) |
-| **CU-12** | Efectuar Check-In | `VersionControlController.checkIn` | `/api/v1/ecs/{id}/check-in` | `POST` | `201` | 400, 401, 403, 409 |
+| **CU-12** | Efectuar Check-In (Trabajo → Maestra/Soporte) | `VersionControlController.checkIn` | `/api/v1/ecs/{id}/check-in` | `POST` | `201` | 400, 401, 403, 409 |
 | **CU-13** | Consultar historial de versiones | `VersionControlController.getHistory` | `/api/v1/ecs/{id}/versions` | `GET` | `200` | 401, 403, 404 |
 | **CU-14** | Implementar cambio en el ECS | `VersionControlController.saveDraft` | `/api/v1/ecs/{id}/workspace-draft` | `PUT` | `200` | 400, 401, 403, 404 |
 | **CU-15** | Ejecutar pruebas unitarias locales | `QualityController.logUnitTest` | `/api/v1/change-orders/{id}/unit-tests` | `POST` | `201` | 400, 401, 403 |
@@ -1132,7 +1168,7 @@ A continuación se mapean los **31 Casos de Uso del SRS de Análisis** hacia ope
 | **CU-18** | Reportar no conformidad | `QualityController.reportNonConformity`| `/api/v1/change-orders/{id}/non-conformity`| `POST` | `201` | 400, 401, 403 |
 | **CU-19** | Reevaluar y re-testear | `QualityController.retest` | `/api/v1/change-orders/{id}/retest` | `POST` | `200` | 400, 401, 403 |
 | **CU-20** | Crear y congelar línea base | `BaselineController.freezeBaseline` | `/api/v1/projects/{id}/baselines` | `POST` | `201` | 400, 401, 403, 409 |
-| **CU-21** | Ejecutar rollback | `BaselineController.rollback` | `/api/v1/change-orders/{id}/rollback` | `POST` | `200` | 400, 401, 403, 404 |
+| **CU-21** | Ejecutar rollback en Biblioteca de Trabajo | `BaselineController.rollback` | `/api/v1/change-orders/{id}/rollback` | `POST` | `200` | 400, 401, 403, 404 |
 | **CU-22** | Cancelar Orden de Cambio | `ChangeRequestController.cancelEcn` | `/api/v1/change-orders/{id}/cancel` | `POST` | `200` | 400, 401, 403, 404 |
 | **CU-23** | Registrar incidencia | `IncidentController.registerIncident` | `/api/v1/projects/{id}/incidents` | `POST` | `201` | 400, 401, 403 |
 | **CU-24** | Consultar estado de ticket | `IncidentController.getIncidentById` | `/api/v1/incidents/{id}` | `GET` | `200` | 401, 403, 404 |
@@ -1140,12 +1176,12 @@ A continuación se mapean los **31 Casos de Uso del SRS de Análisis** hacia ope
 | **CU-26** | Validar integridad (checksum) | `ConfigItemController.verifyChecksum` | `/api/v1/ecs/{id}/versions/{vId}/verify`| `POST` | `200` | 400, 401, 403, 404 |
 | **CU-27** | Auditar acciones del sistema | `AuditController.queryLogs` | `/api/v1/audit/logs` | `GET` | `200` | 401, 403 |
 | **CU-28** | Generar reportes de estado | `AuditController.generateStatusReport` | `/api/v1/reports/status` | `GET` | `200` | 400, 401, 403 |
-| **CU-29** | Validar aceptación del cambio (UAT)| `QualityController.submitUat` | `/api/v1/change-orders/{id}/uat-acceptance`| `POST` | `201` | 400, 401, 403 |
-| **CU-30** | Autorizar Cambio Menor | `ChangeRequestController.authorizeMinor`| `/api/v1/rfcs/{id}/authorize-minor` | `POST` | `200` | 400, 401, 403, 404 |
+| **CU-29** | Validar aceptación del cambio por el usuario (UAT)| `QualityController.submitUat` | `/api/v1/change-orders/{id}/uat-acceptance`| `POST` | `201` | 400, 401, 403 |
+| **CU-30** | Autorizar Cambio Menor por Arquitectura/Gestión | `ChangeRequestController.authorizeMinor`| `/api/v1/rfcs/{id}/authorizations` | `POST` | `201` | 400, 401, 403, 404 |
 
 ---
 
-## 9.2 Catálogo Preliminar API-DRAFT-v0.1
+## 9.2 Catálogo Preliminar API-DRAFT-v0.2
 El contrato preliminar formaliza las cabeceras obligatorias, transporte seguro y convenciones REST:
 - **Cabeceras Obligatorias**:
   - `Content-Type: application/json` (o `multipart/form-data` para subidas de archivos en Check-In).
@@ -1161,7 +1197,7 @@ Toda respuesta de error emitida por la API adopta la especificación RFC 7807 (*
   "type": "https://traceflow.exodo.com/errors/sync-lock-conflict",
   "title": "Conflicto de Bloqueo de Sincronización (RN-06)",
   "status": 409,
-  "detail": "El ECS 'AUTH-MOD-01' ya se encuentra bloqueado bajo la Orden ECN-2026-015 por el desarrollador 'jmedina'.",
+  "detail": "El ECS 'AUTH-MOD-01' ya se encuentra bloqueado bajo la Orden ECN-2026-015 por el desarrollador asignado.",
   "instance": "/api/v1/ecs/3fa85f64-5717-4562-b3fc-2c963f66afa6/check-out",
   "timestamp": "2026-10-01T15:45:00.000Z",
   "code": "TF_ERR_SYNC_LOCK_ACTIVE"
@@ -1175,15 +1211,15 @@ Toda respuesta de error emitida por la API adopta la especificación RFC 7807 (*
 ## 10.1 Separación entre Autenticación, Autorización y Segregación de Funciones
 La seguridad técnica de TraceFlow SCM distingue formalmente tres dimensiones independientes:
 1. **Autenticación (Identidad Inequívoca)**: Verificación de credenciales de acceso del usuario y asignación de un identificador de sesión opaco seguro en el servidor.
-2. **Autorización (Control de Acceso Basado en Roles - RBAC, RN-01, RN-04)**: Verificación estática de que el usuario autenticado ostenta uno de los 7 roles canónicos autorizados para invocar la operación.
+2. **Autorización (Control de Acceso Basado en Roles - RBAC, RN-01, RN-04)**: Verificación estática de que el usuario autenticado ostenta uno de los 7 roles canónicos de TB-09 autorizados para invocar la operación.
 3. **Segregación de Funciones Dinámica (SoD, Formalizada en SAD de Análisis Secciones 3.4 y 6.3)**: Validación contextual que impide conflictos de interés en tiempo de ejecución:
-   - **SoD en Calidad (`CU-17`)**: Quien implementó el cambio (desarrollador asignado a la ECN en `CU-12`) tiene estrictamente bloqueada la emisión del certificado de conformidad técnica como evaluador de QA.
-   - **SoD en CCB (`CU-07`)**: El usuario que originó una Solicitud de Cambio (Solicitante) tiene prohibido votar como miembro o líder del CCB en la deliberación de su propia solicitud.
+   - **SoD en Calidad (`CU-17`)**: El `Ingeniero de Software / Desarrollador` asignado a la implementación de la Orden de Cambio (ECN) tiene terminantemente prohibido actuar como evaluador en el `Equipo de Calidad / Testing` para certificar la conformidad técnica de su propio cambio.
+   - **SoD en CCB (`CU-07`)**: El usuario en rol `Solicitante` que originó una Solicitud de Cambio tiene prohibido votar o presidir la deliberación colegiada del `Comité de Control de Cambios (CCB)` sobre su propia solicitud.
 
 ## 10.2 Flujo Técnico de Autenticación y Sesión Opaca en Servidor
 Conforme a lo resuelto en **ADR-006**, el sistema implementa sesiones opacas gestionadas en servidor respaldadas por cookies seguras:
 1. El usuario envía sus credenciales (`username` / `password`) mediante `POST /api/v1/auth/login`.
-2. El servicio valida la contraseña comparando el hash Argon2id / bcrypt.
+2. El servicio valida la contraseña comparando el hash calculado mediante la función de derivación de claves Argon2id (RFC 9106).
 3. El backend genera un token de sesión criptográficamente aleatorio de 256 bits (`crypto.randomBytes(32).toString('hex')`).
 4. Se calcula el hash SHA-256 del token y se inserta en la tabla `user_session` con `last_activity_at = NOW()`.
 5. El backend devuelve la respuesta inyectando la cookie de sesión:
@@ -1216,7 +1252,7 @@ database "PostgreSQL\n(user_session)" as DB
 User -> UI : 1. Ingresar credenciales
 UI -> Nginx : 2. POST /api/v1/auth/login
 Nginx -> AppService : 3. Proxy a NestJS
-AppService -> DB : 4. Valida credenciales y genera token (256 bits)
+AppService -> DB : 4. Valida credenciales con Argon2id y genera token (256 bits)
 DB --> AppService : 5. Persiste hash de sesión
 AppService --> Nginx : 6. 200 OK + Set-Cookie: tf_session (HttpOnly, Secure, SameSite=Strict)
 Nginx --> UI : 7. Respuesta con Cookie segura
@@ -1253,10 +1289,13 @@ end
 
 ---
 
-## 10.4 Parámetros de Seguridad de Diseño (Timeout de 15 Minutos)
+## 10.4 Parámetros de Seguridad de Diseño (Timeout de 15 Minutos y Cifrado)
 - **Timeout de Inactividad de 15 Minutos**: Se clasifica formalmente como un **PARÁMETRO DE SEGURIDAD DE DISEÑO**, adoptado en ADR-006 para mitigar riesgos de sesión huérfana en terminales desatendidas. En la baseline SRS, `RNF-01` gobierna la seguridad y `RNF-04` corresponde a Usabilidad (< 3 horas).
-- **Protección CSRF**: Requerimiento obligatorio del encabezado `X-Requested-With: XMLHttpRequest` y directiva `SameSite=Strict`.
-- **Cifrado en Reposo y Tránsito**: Todas las contraseñas se almacenan mediante funciones de derivación de claves adaptativas (Argon2id). La comunicación en tránsito es forzada mediante TLS 1.3.
+- **Protección CSRF**: Requerimiento obligatorio del encabezado `X-Requested-With: XMLHttpRequest` y directiva de cookie `SameSite=Strict`.
+- **Funciones Criptográficas y Cifrado en Reposo**:
+  - **Argon2id (RFC 9106)**: Se emplea estrictamente como función adaptativa de derivación de claves / hashing de contraseñas con salting aleatorio por usuario (no como algoritmo de cifrado reversible).
+  - **Cifrado en Reposo**: Los paquetes maestros de respaldo y credenciales sensibles se cifran mediante **AES-256-GCM**.
+  - **Cifrado en Tránsito**: Forzado mediante TLS 1.3 con certificados HSTS.
 
 ---
 
@@ -1265,61 +1304,52 @@ end
 ## 11.1 Modelo Append-Only en PostgreSQL y Triggers de Inmutabilidad
 En cumplimiento de **ADR-008**, la trazabilidad técnica de TraceFlow SCM descansa en un registro relacional en modo **estrictamente agregativo (*append-only*)**:
 1. **Revocación de Permisos en Base de Datos**: El usuario de base de datos utilizado por la aplicación (`traceflow_app`) tiene concedidos exclusivamente permisos de `SELECT` e `INSERT` sobre la tabla `audit_log`:
-   ```sql
-   REVOKE UPDATE, DELETE, TRUNCATE ON TABLE audit_log FROM traceflow_app;
-   GRANT SELECT, INSERT ON TABLE audit_log FROM traceflow_app;
-   ```
-2. **Trigger Inviolable a Nivel de Motor**: Se define un trigger en PostgreSQL que cancela con excepción cualquier intento de modificación física:
-   ```sql
-   CREATE OR REPLACE FUNCTION trg_prevent_audit_tampering()
-   RETURNS TRIGGER AS $$
-   BEGIN
-       RAISE EXCEPTION 'VIOLACIÓN DE INTEGRIDAD FORENSE: audit_log es inmutable.';
-   END;
-   $$ LANGUAGE plpgsql;
+   `REVOKE UPDATE, DELETE, TRUNCATE ON TABLE audit_log FROM traceflow_app;`
+2. **Trigger Defensivo de Inmutabilidad**: Para blindar el registro ante cualquier intento de modificación incluso por usuarios con privilegios elevados:
 
-   CREATE TRIGGER trg_audit_immutable
-   BEFORE UPDATE OR DELETE OR TRUNCATE ON audit_log
-   FOR EACH STATEMENT EXECUTE FUNCTION trg_prevent_audit_tampering();
-   ```
+```sql
+CREATE OR REPLACE FUNCTION prevent_audit_log_tampering()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'VIOLACIÓN DE INMUTABILIDAD (ADR-008): Los registros de audit_log son estrictamente inmutables.';
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
-## 11.2 Estructura del Registro de Auditoría y Encadenamiento SHA-256
-Cada evento crítico genera un registro inmutable con los siguientes atributos:
-- `id`: UUID único del evento.
-- `timestamp`: Marca temporal UTC de microsegundos (`CURRENT_TIMESTAMP`).
-- `actor_user_id`: UUID del actor canónico que ejecutó la acción.
-- `actor_role`: Rol activo verificado en la ejecución.
-- `operation`: Código de operación (e.g. `RFC_REGISTERED`, `ECN_ISSUED`, `SYNC_LOCK_ACQUIRED`, `CHECK_IN_COMMITTED`, `QA_CERTIFIED`, `BASELINE_FROZEN`, `ROLLBACK_EXECUTED`).
-- `entity_name` y `entity_id`: Recurso afectado (`change_request`, `config_item`, `change_order`, `baseline`).
-- `related_ecn_id`: Identificador de la orden de cambio vinculada (garantizando trazabilidad `RN-03`).
-- `result_status`: `SUCCESS`, `FAILURE`, `REJECTED`.
-- `payload_diff`: Objeto JSONB con los datos modificados (delta del cambio). Se omiten expresamente datos sensibles como credenciales o tokens.
-- `ip_address` y `user_agent`: Metadatos de red del cliente.
-- `prev_log_hash`: Hash SHA-256 del registro de auditoría anterior.
-- `curr_log_hash`: Hash SHA-256 calculado sobre la concatenación canónica de los atributos del evento y el `prev_log_hash`, garantizando detección inmediata de manipulación o alteración de registros intermedios.
+CREATE TRIGGER trg_audit_log_immutable
+BEFORE UPDATE OR DELETE ON audit_log
+FOR EACH ROW EXECUTE FUNCTION prevent_audit_log_tampering();
+```
+
+## 11.2 Cadena Criptográfica SHA-256 entre Entradas de Auditoría
+Cada fila insertada en `audit_log` incorpora un enlace criptográfico con el registro cronológico inmediatamente anterior:
+
+$$\mathbf{curr\_log\_hash}_i = \mathbf{SHA256}(\mathbf{curr\_log\_hash}_{i-1} \parallel \mathbf{timestamp}_i \parallel \mathbf{actor\_id}_i \parallel \mathbf{operation}_i \parallel \mathbf{payload\_diff}_i)$$
+
+Si un atacante lograra alterar una fila histórica vulnerando el motor de base de datos, la cadena criptográfica se rompería inmediatamente, siendo detectada de forma automática por el `AuditVerificationJob` durante la auditoría periódica de configuración (`CU-27`).
 
 ---
 
-# 12. Secuencias de Diseño Técnicas (DG-DSEQ-XX)
+# 12. Secuencias Técnicas de Diseño
 
-## 12.1 Convenciones y Participantes de Diseño
-A diferencia de los diagramas de secuencia del SRS de Análisis (que modelan la interacción conceptual `Actor -> TraceFlow SCM`), los **Diagramas de Secuencia de Diseño (`DG-DSEQ-XX`)** desglosan la interacción técnica interna entre los objetos del software:
-- `Actor`: Usuario autenticado interactuando con la interfaz.
-- `React`: Cliente frontend SPA.
-- `Controller`: Adaptador de entrada REST de NestJS.
-- `Guard`: Guardas de seguridad (`AuthGuard`, `RolesGuard`, `SodGuard`).
-- `Service`: Servicio de aplicación que orquesta el Caso de Uso.
-- `Domain`: Entidad de dominio que valida las invariantes de negocio.
-- `RepoPort`: Puerto abstracto de persistencia.
-- `PostgreSQL`: Motor de base de datos relacional.
-- `StoragePort`: Puerto abstracto de custodia física de archivos.
-- `Audit`: Interceptor de auditoría inmutable.
+## 12.1 Matriz de Auditoría y Saneamiento de las 9 Secuencias Críticas
+En estricta sujeción a las baselines de análisis (`FD03` v1.0, `FD04` v1.1, `TABLES.md` TB-09/TB-10 y `DIAGRAMS.md`), se auditó la totalidad de los 9 flujos técnicos críticos de diseño para eliminar discrepancias de actores, bibliotecas y reglas de negocio:
 
-A continuación se formalizan los **9 flujos críticos iniciales de diseño**:
+| ID Secuencia | Caso de Uso | Actor Principal Canónico (TB-10) | Actor Secundario / Notificado | Transición de Bibliotecas / Estados | Reglas de Negocio Clave | Saneamiento Técnico Aplicado en v0.2 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DG-DSEQ-04** | CU-04: Registrar Solicitud de Cambio (RFC) | `Solicitante` | `Analista de Requerimientos / Gestor` | Estado Inicial: `REGISTRADA` | RN-04 (ECS en proyecto) | Incorporada notificación de evento al Gestor; estandarización de DTOs y persistencia en `change_request`. |
+| **DG-DSEQ-08** | CU-08: Emitir Orden de Cambio (ECN/ECO) | `Comité de Control de Cambios (CCB) / Analista de Requerimientos / Gestor` | `Administrador de Configuración / Bibliotecario` | `AUTORIZADA` $\rightarrow$ `ORDEN_EMITIDA` | RN-01, RN-07 | Formalizada la emisión formal con notificación al Bibliotecario y asignación al Desarrollador. |
+| **DG-DSEQ-10** | CU-10: Efectuar Check-Out y Bloqueo (CU-10, CU-11) | **`Administrador de Configuración / Bibliotecario`** | `Ingeniero de Software / Desarrollador` | `Biblioteca de Soporte` $\rightarrow$ `Biblioteca de Trabajo` | **RN-06** (Bloqueo exclusivo), RN-01 | **Corrección de Actor Canónico**: Se sustituyó "Desarrollador" por el Bibliotecario (TB-10). La transición de origen es Soporte $\rightarrow$ Trabajo con adquisición de `sync_lock` (ACTIVE). |
+| **DG-DSEQ-12** | CU-12: Efectuar Check-In de ECS | **`Administrador de Configuración / Bibliotecario`** | `Equipo de Calidad / Testing` (en Var. A) / `Solicitante` (en Var. B) | Var. A: Trabajo $\rightarrow$ Soporte<br>Var. B: Soporte $\rightarrow$ Maestra | **RNF-03 / RF-17** (Integridad SHA-256), **RN-09** (Doble Conformidad) | **Corrección Integral**: Actor asignado al Bibliotecario. Eliminada errata de RN-08 (RN-08 es rollback). Se formalizan dos variantes: Check-In Técnico (a Soporte para QA) y Check-In Definitivo (a Maestra tras QA+UAT). |
+| **DG-DSEQ-17** | CU-17: Certificar Conformidad de Calidad | `Equipo de Calidad / Testing` | `Administrador de Configuración / Bibliotecario` | RFC: `EN_PRUEBAS` $\rightarrow$ `EN_ACEPTACION` | RN-01, SoD Dinámico | Actor estandarizado a denominación canónica de TB-09. Blindaje de segregación: rechaza al Desarrollador de la ECN. |
+| **DG-DSEQ-20** | CU-20: Crear y Congelar Línea Base | `Administrador de Configuración / Bibliotecario` | `Equipo de Calidad / Testing`, `Solicitante` | Formalización en `Biblioteca Maestra` (Estado: `CONGELADA`) | **RN-02** (mayor.menor.parche), RN-09 | **Delimitación Nítida vs CU-12**: CU-12 promueve los archivos a Maestra. CU-20 formaliza la Línea Base agrupando versiones en `baseline_item`. No duplica la copia física. |
+| **DG-DSEQ-21** | CU-21: Revertir Versión de ECS (Rollback) | `Administrador de Configuración / Bibliotecario` | `Ingeniero de Software / Desarrollador` | Purga en `Biblioteca de Trabajo` | **RN-08** (Reversión ante fallo), RN-06 | **Corrección de Destino**: El rollback purga los cambios de la Biblioteca de Trabajo y libera `sync_lock` (ROLLBACK), preservando Maestra intacta. |
+| **DG-DSEQ-29** | CU-29: Validar Aceptación por el Usuario (UAT) | `Solicitante` (Usuario Final) | `Administrador de Configuración / Bibliotecario` | RFC: `EN_ACEPTACION` $\rightarrow$ Habilitada para Cierre | **RN-09** (Doble Conformidad), RN-07 | Valida que exista Certificación QA previa antes de admitir Acta UAT favorable. |
+| **DG-DSEQ-30** | CU-30: Autorizar Cambio Menor por Vía Delegada | **`Analista de Requerimientos / Gestor` Y `Arquitecto / Especialista Técnico`** | `Solicitante`, `CCB` | `EN_EVALUACION` $\rightarrow$ `AUTORIZADA` | **RN-01**, **RN-05** (Triple Restricción) | **Modelo de Doble Llave Compartida**: Incorpora tabla `change_authorization`. Requiere que ambos roles emitan su conformidad para transicionar a `AUTORIZADA`. |
 
 ---
 
-## 12.2 Diagramas Críticos de Diseño
+## 12.2 Diagramas Críticos de Diseño Refactorizados
 
 ### DG-DSEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)
 
@@ -1341,23 +1371,26 @@ participant "ChangeRequestService" as Service
 participant "ChangeRequest (Domain)" as Domain
 participant "ChangeRequestRepoPort" as Repo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Completa formulario RFC (título, justificación, ECS)
+Actor -> UI : 1. Completa formulario de RFC (título, justificación, ECS afectado)
 UI -> Ctrl : 2. POST /api/v1/rfcs (CreateRfcDto)
 Ctrl -> Guard : 3. canActivate(context)
-Guard --> Ctrl : 4. Permitido (Rol: SOLICITANTE)
+Guard --> Ctrl : 4. Permitido (Rol Canónico: SOLICITANTE)
 Ctrl -> Service : 5. registerRfc(dto, userId)
 Service -> Domain : 6. create(dto, userId)
-Domain --> Service : 7. Instancia RFC (Estado: REGISTRADA)
+Domain --> Service : 7. Instancia RFC (Estado Inicial: REGISTRADA)
 Service -> Repo : 8. save(changeRequest)
 Repo -> DB : 9. INSERT INTO change_request (...)
 DB --> Repo : 10. Confirmado
-Service -> Audit : 11. logEvent('RFC_REGISTERED', rfcId, userId)
-Audit -> DB : 12. INSERT INTO audit_log (...)
-Service --> Ctrl : 13. RfcResponseDto
-Ctrl --> UI : 14. 201 Created
-UI --> Actor : 15. Muestra confirmación y código RFC asignado
+Service -> Notify : 11. notifyRfcRegistered(rfcId, 'GESTOR')
+Notify --> Service : Evento encolado
+Service -> Audit : 12. logEvent('RFC_REGISTERED', rfcId, userId)
+Audit -> DB : 13. INSERT INTO audit_log (...)
+Service --> Ctrl : 14. RfcResponseDto
+Ctrl --> UI : 15. 201 Created
+UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 
 @enduml
 ```
@@ -1376,7 +1409,7 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
 
-actor "CCB / Autoridad Delegada" as Actor
+actor "Comité de Control de Cambios (CCB) /\nAnalista de Requerimientos / Gestor" as Actor
 participant "React SPA" as UI
 participant "ChangeRequestController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1384,25 +1417,28 @@ participant "ChangeRequestService" as Service
 participant "ChangeOrder (Domain)" as Domain
 participant "ChangeOrderRepoPort" as Repo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Selecciona RFC autorizada y asigna desarrollador
+Actor -> UI : 1. Selecciona RFC autorizada y asigna desarrollador responsable
 UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/change-order (IssueEcnDto)
 Ctrl -> Guard : 3. Valida sesión y rol (LIDER_CCB / GESTOR)
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. issueChangeOrder(rfcId, developerId)
 Service -> DB : 6. Valida estado RFC = 'AUTORIZADA'
 Service -> Domain : 7. createChangeOrder(rfcId, ecsId, developerId)
-Domain --> Service : 8. Instancia ECN (Estado: EMITIDA)
+Domain --> Service : 8. Instancia Orden ECN (Estado: EMITIDA)
 Service -> Repo : 9. Inicia Transacción ACID
 Repo -> DB : 10. INSERT INTO change_order (...)
 Repo -> DB : 11. UPDATE change_request SET status = 'ORDEN_EMITIDA'
 Repo -> DB : 12. COMMIT
-Service -> Audit : 13. logEvent('ECN_ISSUED', ecnId, userId)
-Audit -> DB : 14. INSERT INTO audit_log (...)
-Service --> Ctrl : 15. ChangeOrderResponseDto
-Ctrl --> UI : 16. 201 Created
-UI --> Actor : 17. Presenta Orden de Cambio formalizada
+Service -> Notify : 13. notifyEcnIssued(ecnId, 'BIBLIOTECARIO', developerId)
+Notify --> Service : Notificación despachada
+Service -> Audit : 14. logEvent('ECN_ISSUED', ecnId, userId)
+Audit -> DB : 15. INSERT INTO audit_log (...)
+Service --> Ctrl : 16. ChangeOrderResponseDto
+Ctrl --> UI : 17. 201 Created
+UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 
 @enduml
 ```
@@ -1421,7 +1457,8 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-10: Efectuar Check-Out y Bloqueo de Sincronización (CU-10, CU-11, RN-06)</b>
 
-actor "Desarrollador" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+actor "Ingeniero de Software /\nDesarrollador" as Dev
 participant "React SPA" as UI
 participant "VersionControlController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1431,31 +1468,33 @@ participant "StoragePort" as Storage
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Solicita Check-Out de ECS con ECN autorizada
+Actor -> UI : 1. Selecciona ECN autorizada y ejecuta Check-Out de ECS
 UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-out (CheckOutDto)
-Ctrl -> Guard : 3. Valida rol (DESARROLLADOR) y asignación ECN
+Ctrl -> Guard : 3. Valida rol canónico (BIBLIOTECARIO)
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. executeCheckOut(ecsId, ecnId, developerId)
-Service -> LockRepo : 6. Inicia Transacción ACID: acquireLock(ecsId, ecnId, developerId)
-LockRepo -> DB : 7. INSERT INTO sync_lock (ecs_id, status='ACTIVE', ...)
+Service -> LockRepo : 6. Inicia Transacción: acquireLock(ecsId, ecnId, developerId)
+LockRepo -> DB : 7. INSERT INTO sync_lock (ecs_id, change_order_id, status='ACTIVE', locked_by=developerId)
 
 alt Conflicto: ECS ya bloqueado por otra orden (Violación RN-06)
-    DB --> LockRepo : Error de Restricción Única Condicional (uq_active_sync_lock_per_ecs)
+    DB --> LockRepo : Error por Restricción Única Condicional (uq_active_sync_lock_per_ecs)
     LockRepo --> Service : Excepción SyncLockActiveException
-    Service --> Ctrl : Mapea a 409 Conflict
-    Ctrl --> UI : 409 Conflict (Problem Details RFC 7807)
-    UI --> Actor : Notifica error: "ECS bloqueado por otra orden activa"
+    Service --> Ctrl : Mapea a 409 Conflict (RFC 7807)
+    Ctrl --> UI : 409 Conflict
+    UI --> Actor : Alerta: "ECS bloqueado por otra orden activa"
 else Bloqueo Adquirido Exitosamente
-    DB --> LockRepo : Inserción Exitosa
+    DB --> LockRepo : Inserción Exitosa (Lock ACTIVE)
     Service -> DB : 8. UPDATE config_item SET is_locked = true, current_library = 'TRABAJO'
-    Service -> Storage : 9. copy(maestraPath, trabajoPath)
-    Storage --> Service : Copia habilitada en Biblioteca de Trabajo
-    Service -> DB : 10. COMMIT Transacción
-    Service -> Audit : 11. logEvent('CHECK_OUT_APPLIED', ecsId, developerId)
-    Audit -> DB : 12. INSERT INTO audit_log (...)
-    Service --> Ctrl : 13. CheckOutSuccessDto
-    Ctrl --> UI : 14. 200 OK + URL de descarga de trabajo
-    UI --> Actor : 15. Habilita espacio de modificación de trabajo
+    Service -> DB : 9. UPDATE change_request SET status = 'EN_IMPLEMENTACION'
+    Service -> Storage : 10. copy(soportePath, trabajoPath)
+    Storage --> Service : Archivo copiado en /storage/trabajo/
+    Service -> DB : 11. COMMIT Transacción
+    Service -> Audit : 12. logEvent('CHECK_OUT_APPLIED', ecsId, developerId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. CheckOutSuccessDto
+    Ctrl --> UI : 15. 200 OK + URL de entrega de artefacto
+    UI --> Actor : 16. Notifica Check-Out exitoso y entrega workspace al Desarrollador
+    UI --> Dev : 17. Habilita espacio de trabajo y descarga de código autorizado
 end
 
 @enduml
@@ -1463,7 +1502,7 @@ end
 
 ---
 
-### DG-DSEQ-12: Efectuar Check-In con Verificación SHA-256 (CU-12, RN-08)
+### DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RF-17, RN-09)
 
 ![DG-DSEQ-12](../assets/DG-DSEQ-12.png)
 
@@ -1473,9 +1512,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-12: Efectuar Check-In con Verificación SHA-256 (CU-12, RN-08)</b>
+title <b>DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RN-09)</b>
 
-actor "Desarrollador" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "VersionControlController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1486,38 +1525,67 @@ participant "SyncLockRepoPort" as LockRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Sube archivo modificado, mensaje y hash esperado
-UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-in (Multipart Stream + Dto)
-Ctrl -> Guard : 3. Valida sesión y rol DESARROLLADOR
+Actor -> UI : 1. Selecciona tipo de Check-In (Técnico a Soporte o Definitivo a Maestra)
+UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-in (Multipart Stream + CheckInDto)
+Ctrl -> Guard : 3. Valida sesión y rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
-Ctrl -> Service : 5. executeCheckIn(ecsId, fileStream, commitMsg, expectedHash)
+Ctrl -> Service : 5. executeCheckIn(ecsId, fileStream, dto)
 
-== Fase 1: Staging Temporal y Validación SHA-256 ==
+== Etapa 1: Custodia Temporal en Staging y Cómputo SHA-256 (RNF-03 / RF-17) ==
 Service -> Storage : 6. storeTemporary(tempId, fileStream, expectedHash)
 Storage --> Service : 7. tempPath almacenado + shaCalculado
 
-alt Checksum no coincide con el hash reportado (Fallo RN-08)
+alt Checksum no coincide con el hash declarado (Fallo RNF-03)
     Service -> Storage : Compensación: removeTemporary(tempPath)
-    Service --> Ctrl : 400 Bad Request: Checksum Inválido
+    Service --> Ctrl : 400 Bad Request: Checksum SHA-256 Inválido
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Notifica fallo de integridad
-else Checksum Válido
-    == Fase 2: Transacción ACID en Base de Datos ==
-    Service -> VersionRepo : 8. Inicia Transacción ACID
-    VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, version_number, ...)
-    Service -> LockRepo : 10. Actualiza sync_lock SET status='RELEASED', release_reason='CHECK_IN'
-    LockRepo -> DB : 11. UPDATE sync_lock (...)
-    Service -> DB : 12. UPDATE config_item SET current_library='SOPORTE', is_locked=false
-    Service -> DB : 13. COMMIT Transacción
+    UI --> Actor : Alerta de fallo de integridad
+else Checksum Válido y Conforme
+    == Etapa 2: Pre-registro Transaccional en Base de Datos ==
+    Service -> VersionRepo : 8. Inicia Transacción BD 1
+    VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, storage_status='PENDING_STORAGE', ...)
+    VersionRepo -> DB : 10. COMMIT Transacción 1
     
-    == Fase 3: Promoción Permanente de Almacenamiento ==
-    Service -> Storage : 14. promote(tempPath, 'soporte', verifiedSha)
-    Storage --> Service : Archivo promovido a Biblioteca de Soporte
-    Service -> Audit : 15. logEvent('CHECK_IN_COMMITTED', ecsId, developerId)
-    Audit -> DB : 16. INSERT INTO audit_log (...)
-    Service --> Ctrl : 17. CheckInResultDto
-    Ctrl --> UI : 18. 201 Created
-    UI --> Actor : 19. Confirmación de Check-In y entrega a QA
+    alt Variante A: Check-In Técnico (Trabajo -> Soporte para Pruebas QA)
+        Service -> Storage : 11a. promote(tempPath, 'soporte', verifiedSha)
+        Storage --> Service : Archivo promovido a /storage/soporte/
+        Service -> VersionRepo : 12a. Inicia Transacción BD 2
+        VersionRepo -> DB : 13a. UPDATE ecs_version SET storage_status='COMMITTED'
+        VersionRepo -> DB : 14a. UPDATE config_item SET current_library='SOPORTE'
+        VersionRepo -> DB : 15a. UPDATE change_request SET status='EN_PRUEBAS'
+        VersionRepo -> DB : 16a. COMMIT Transacción 2
+        Service -> Audit : 17a. logEvent('CHECK_IN_TECHNICAL_COMMITTED', ecsId, userId)
+        Audit -> DB : 18a. INSERT INTO audit_log (...)
+        Service --> Ctrl : 19a. CheckInResponseDto (Puesto a disposición de QA)
+        Ctrl --> UI : 20a. 201 Created (Entrega a Soporte conforme)
+        UI --> Actor : 21a. Notifica entrega lista para pruebas de QA (CU-16)
+        
+    else Variante B: Check-In Definitivo (Soporte -> Maestra con Doble Conformidad RN-09)
+        Service -> DB : 11b. Valida Certificación QA (CU-17) y Acta UAT (CU-29) (RN-09)
+        alt Falta Certificación QA o Acta UAT
+            Service -> Storage : Compensación: removeTemporary(tempPath)
+            Service -> DB : UPDATE ecs_version SET storage_status='STORAGE_FAILED'
+            Service --> Ctrl : 400 Bad Request: "Exige Doble Conformidad (QA + UAT) según RN-09"
+            Ctrl --> UI : 400 Bad Request
+            UI --> Actor : Bloqueo: No se puede integrar a Maestra sin doble conformidad
+        else Doble Conformidad Conforme
+            Service -> Storage : 12b. promote(tempPath, 'maestra', verifiedSha)
+            Storage --> Service : Archivo inmovilizado en /storage/maestra/ (Solo Lectura)
+            Service -> VersionRepo : 13b. Inicia Transacción BD 2
+            VersionRepo -> DB : 14b. UPDATE ecs_version SET storage_status='COMMITTED'
+            VersionRepo -> DB : 15b. UPDATE config_item SET current_library='MAESTRA', is_locked=false
+            VersionRepo -> LockRepo : 16b. UPDATE sync_lock SET status='RELEASED', release_reason='CHECK_IN'
+            LockRepo -> DB : 17b. Libera bloqueo de sincronización (RN-06)
+            VersionRepo -> DB : 18b. UPDATE change_order SET status='CERRADA'
+            VersionRepo -> DB : 19b. UPDATE change_request SET status='IMPLEMENTADA'
+            VersionRepo -> DB : 20b. COMMIT Transacción 2
+            Service -> Audit : 21b. logEvent('CHECK_IN_MASTER_COMMITTED', ecsId, userId)
+            Audit -> DB : 22b. INSERT INTO audit_log (...)
+            Service --> Ctrl : 23b. CheckInResponseDto (Integración Exitosa)
+            Ctrl --> UI : 24b. 201 Created (Check-In Definitivo)
+            UI --> Actor : 25b. Confirma integración definitiva en Maestra y liberación de lock
+        end
+    end
 end
 
 @enduml
@@ -1537,7 +1605,7 @@ skinparam defaultFontName Arial
 
 title <b>DG-DSEQ-17: Certificar Conformidad del Cambio en QA (CU-17, SoD Dinámico)</b>
 
-actor "Asegurador de Calidad" as Actor
+actor "Equipo de Calidad / Testing" as Actor
 participant "React SPA" as UI
 participant "QualityController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1548,31 +1616,32 @@ participant "QaCertRepoPort" as CertRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Registra resultados de pruebas y emite certificación
+Actor -> UI : 1. Registra informe de pruebas conformes y certifica
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/qa-certification (CertifyQaDto)
-Ctrl -> Guard : 3. Valida sesión y rol EQUIPO_CALIDAD
+Ctrl -> Guard : 3. Valida sesión y rol canónico EQUIPO_CALIDAD
 Guard --> Ctrl : 4. Permitido
 
 Ctrl -> SodGuard : 5. evaluateSod(ecnId, userId)
 SodGuard -> EcnRepo : 6. findById(ecnId)
 EcnRepo -> DB : 7. SELECT assigned_developer_id FROM change_order WHERE id = ...
-DB --> EcnRepo : Retorna developerId
+DB --> EcnRepo : Retorna developerId asignado
 
-alt Violación SoD: El usuario es el mismo desarrollador que implementó el cambio
+alt Violación SoD: El evaluador es el mismo desarrollador que implementó el cambio
     SodGuard --> Ctrl : Excepción SodViolationException
-    Ctrl --> UI : 403 Forbidden: "Violación de Segregación de Funciones: El desarrollador no puede certificar su propio cambio"
-    UI --> Actor : Alerta de bloqueo por SoD
-else Segregación de Funciones Conforme (Actor != Desarrollador)
+    Ctrl --> UI : 403 Forbidden: "Violación de SoD: El desarrollador no puede certificar su propio cambio"
+    UI --> Actor : Alerta de bloqueo por Segregación de Funciones
+else Segregación de Funciones Conforme (Evaluador != Desarrollador)
     SodGuard --> Ctrl : SoD Aprobada
     Ctrl -> Service : 8. certifyConformity(ecnId, dto, userId)
-    Service -> CertRepo : 9. INSERT INTO qa_certification (...)
-    CertRepo -> DB : 10. Persiste certificación CONFORME
-    Service -> DB : 11. UPDATE change_request SET status = 'EN_ACEPTACION'
-    Service -> Audit : 12. logEvent('QA_CERTIFIED', ecnId, userId)
-    Audit -> DB : 13. INSERT INTO audit_log (...)
-    Service --> Ctrl : 14. QaCertResponseDto
-    Ctrl --> UI : 15. 201 Created
-    UI --> Actor : 16. Muestra Certificado de Conformidad emitido
+    Service -> CertRepo : 9. Inicia Transacción ACID
+    CertRepo -> DB : 10. INSERT INTO qa_certification (result='CONFORME', ...)
+    CertRepo -> DB : 11. UPDATE change_request SET status = 'EN_ACEPTACION'
+    CertRepo -> DB : 12. COMMIT
+    Service -> Audit : 13. logEvent('QA_CERTIFIED_CONFORME', ecnId, userId)
+    Audit -> DB : 14. INSERT INTO audit_log (...)
+    Service --> Ctrl : 15. QaCertResponseDto
+    Ctrl --> UI : 16. 201 Created
+    UI --> Actor : 17. Presenta Certificado de Conformidad y habilita etapa de aceptación UAT
 end
 
 @enduml
@@ -1580,7 +1649,7 @@ end
 
 ---
 
-### DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-09)
+### DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)
 
 ![DG-DSEQ-20](../assets/DG-DSEQ-20.png)
 
@@ -1590,42 +1659,49 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-09)</b>
+title <b>DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)</b>
 
-actor "Gestor de Configuración" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "BaselineController" as Ctrl
 participant "Auth/RolesGuard" as Guard
 participant "BaselineService" as Service
-participant "StoragePort" as Storage
 participant "BaselineRepoPort" as BaselineRepo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Selecciona proyecto y solicita congelar Línea Base
+note over Service
+  <b>Delimitación Nítida vs CU-12</b>:
+  La promoción física de archivos a la Biblioteca Maestra fue
+  ejecutada en CU-12 (Variante B). CU-20 formaliza la agrupación
+  lógica, asigna el identificador mayor.menor.parche (RN-02)
+  y congela la Línea Base. No duplica copias de archivos.
+end note
+
+Actor -> UI : 1. Selecciona proyecto y versiones en Maestra para Línea Base
 UI -> Ctrl : 2. POST /api/v1/projects/{id}/baselines (FreezeBaselineDto)
-Ctrl -> Guard : 3. Valida rol GESTOR_CONFIGURACION / BIBLIOTECARIO
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. freezeBaseline(projectId, dto, userId)
 
-Service -> DB : 6. Valida Doble Conformidad (QA + UAT) de los ECS (RN-09)
+Service -> DB : 6. Valida Doble Conformidad (QA + UAT) de los ECS seleccionados (RN-09)
 alt Algún ECS no cuenta con Certificación QA y Acta UAT
-    Service --> Ctrl : 400 Bad Request: "Requisito RN-09 no satisfecho"
+    Service --> Ctrl : 400 Bad Request: "Requisito RN-09 no satisfecho para todos los ECS"
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Notifica impedimento de congelamiento
-else Doble Conformidad Verificada
+    UI --> Actor : Notifica impedimento de congelamiento por falta de conformidad
+else Doble Conformidad Verificada y Conforme
     Service -> BaselineRepo : 7. Inicia Transacción ACID
-    BaselineRepo -> DB : 8. INSERT INTO baseline (code, status='CONGELADA', ...)
+    BaselineRepo -> DB : 8. INSERT INTO baseline (code, version_label, status='CONGELADA', frozen_by, frozen_at)
     BaselineRepo -> DB : 9. INSERT INTO baseline_item (baseline_id, ecs_version_id)
-    Service -> Storage : 10. copy('soporte', 'maestra', itemPaths)
-    Storage --> Service : Artefactos inmovilizados en Biblioteca Maestra
-    Service -> DB : 11. UPDATE config_item SET current_library='MAESTRA'
-    Service -> DB : 12. COMMIT Transacción
-    Service -> Audit : 13. logEvent('BASELINE_FROZEN', baselineId, userId)
-    Audit -> DB : 14. INSERT INTO audit_log (...)
-    Service --> Ctrl : 15. BaselineResponseDto
-    Ctrl --> UI : 16. 201 Created
-    UI --> Actor : 17. Presenta Línea Base congelada formalmente
+    BaselineRepo -> DB : 10. COMMIT Transacción
+    Service -> Notify : 11. notifyBaselineFrozen(baselineId, projectId)
+    Notify --> Service : Notificación a interesados
+    Service -> Audit : 12. logEvent('BASELINE_FROZEN', baselineId, userId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. BaselineResponseDto
+    Ctrl --> UI : 15. 201 Created
+    UI --> Actor : 16. Muestra Línea Base congelada formalmente con estándar RN-02
 end
 
 @enduml
@@ -1633,7 +1709,7 @@ end
 
 ---
 
-### DG-DSEQ-21: Ejecutar Rollback ante Fallo No Subsanado (CU-21, RN-08)
+### DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)
 
 ![DG-DSEQ-21](../assets/DG-DSEQ-21.png)
 
@@ -1643,9 +1719,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-21: Ejecutar Rollback de ECS (CU-21, RN-08)</b>
+title <b>DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)</b>
 
-actor "Gestor de Configuración" as Actor
+actor "Administrador de Configuración /\nBibliotecario" as Actor
 participant "React SPA" as UI
 participant "BaselineController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1655,27 +1731,34 @@ participant "StoragePort" as Storage
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Solicita rollback de ECS ante fallo insubsanable
+note over Service
+  <b>Salvaguarda de la Biblioteca Maestra</b>:
+  El rollback purga exclusivamente los artefactos defectuosos en la
+  Biblioteca de Trabajo. La Biblioteca Maestra y la Biblioteca de Soporte
+  preservan sus versiones estables inalteradas.
+end note
+
+Actor -> UI : 1. Solicita rollback de ECS ante fallo no subsanado en re-test o UAT (RN-08)
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/rollback (RollbackDto)
-Ctrl -> Guard : 3. Valida rol GESTOR_CONFIGURACION
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. executeRollback(ecnId, reason, userId)
 
 Service -> DB : 6. Inicia Transacción ACID
 Service -> LockRepo : 7. UPDATE sync_lock SET status='RELEASED', release_reason='ROLLBACK'
-LockRepo -> DB : 8. Persiste liberación de bloqueo
-Service -> DB : 9. UPDATE config_item SET is_locked=false, current_library='MAESTRA'
+LockRepo -> DB : 8. Libera bloqueo de sincronización (RN-06)
+Service -> DB : 9. UPDATE config_item SET is_locked=false, current_library='SOPORTE'
 Service -> DB : 10. UPDATE change_order SET status='CANCELADA'
 Service -> DB : 11. UPDATE change_request SET status='CANCELADA'
 Service -> DB : 12. COMMIT Transacción
 
-Service -> Storage : 13. Purgar archivos en trabajo y soporte
-Storage --> Service : Espacio temporal restaurado
+Service -> Storage : 13. Purga y restaura espacio de trabajo en /storage/trabajo/{projectId}/{ecsId}/
+Storage --> Service : Espacio de trabajo purgado y restaurado
 Service -> Audit : 14. logEvent('ROLLBACK_EXECUTED', ecsId, userId)
 Audit -> DB : 15. INSERT INTO audit_log (...)
 Service --> Ctrl : 16. RollbackSuccessDto
 Ctrl --> UI : 17. 200 OK
-UI --> Actor : 18. Notifica reversión completada y bloqueo liberado
+UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberado y orden cancelada
 
 @enduml
 ```
@@ -1692,9 +1775,9 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29)</b>
+title <b>DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)</b>
 
-actor "Solicitante / Usuario Final" as Actor
+actor "Solicitante\n(Usuario Final)" as Actor
 participant "React SPA" as UI
 participant "QualityController" as Ctrl
 participant "Auth/RolesGuard" as Guard
@@ -1703,26 +1786,31 @@ participant "UatRepoPort" as UatRepo
 database "PostgreSQL" as DB
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Evalúa cambio en entorno controlado y suscribe Acta UAT
+Actor -> UI : 1. Evalúa cambio en entorno controlado de validación y suscribe Acta UAT
 UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/uat-acceptance (SubmitUatDto)
-Ctrl -> Guard : 3. Valida rol SOLICITANTE
+Ctrl -> Guard : 3. Valida rol canónico SOLICITANTE
 Guard --> Ctrl : 4. Permitido
 Ctrl -> Service : 5. submitUatAcceptance(ecnId, dto, userId)
 
-Service -> DB : 6. Valida existencia de Certificación QA Conforme previa
-alt Sin certificación técnica de QA previa
-    Service --> Ctrl : 400 Bad Request: "El cambio no cuenta con certificación QA"
+Service -> DB : 6. Valida existencia de Certificación QA Conforme previa (RN-09)
+alt Sin certificación previa emitida por Equipo de Calidad
+    Service --> Ctrl : 400 Bad Request: "El cambio no cuenta con certificación QA conforme previa"
     Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Rechaza registro de UAT prematuro
+    UI --> Actor : Alerta: No se puede suscribir UAT sin certificación previa de QA
 else Certificación QA Conforme Verificada
-    Service -> UatRepo : 7. INSERT INTO uat_acceptance (result, observations, ...)
-    UatRepo -> DB : 8. Persiste Acta UAT
-    Service -> DB : 9. Actualiza estado según resultado (ACEPTADO -> listo para congelar)
-    Service -> Audit : 10. logEvent('UAT_ACCEPTED', ecnId, userId)
-    Audit -> DB : 11. INSERT INTO audit_log (...)
-    Service --> Ctrl : 12. UatResponseDto
-    Ctrl --> UI : 13. 201 Created
-    UI --> Actor : 14. Presenta Acta de Aceptación suscrita
+    Service -> UatRepo : 7. Inicia Transacción ACID
+    UatRepo -> DB : 8. INSERT INTO uat_acceptance (change_order_id, result, observations, accepted_by, ...)
+    alt Acta Aceptada Favorablemente
+        Service -> DB : 9a. Persiste conformidad UAT (habilita Check-In definitivo a Maestra)
+    else Acta Rechazada
+        Service -> DB : 9b. Registra rechazo UAT (deriva a re-evaluación o rollback RN-08)
+    end
+    Service -> DB : 10. COMMIT
+    Service -> Audit : 11. logEvent('UAT_REGISTERED', ecnId, userId)
+    Audit -> DB : 12. INSERT INTO audit_log (...)
+    Service --> Ctrl : 13. UatResponseDto
+    Ctrl --> UI : 14. 201 Created
+    UI --> Actor : 15. Presenta Acta de Aceptación suscrita formalmente
 end
 
 @enduml
@@ -1730,7 +1818,7 @@ end
 
 ---
 
-### DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada (CU-30, RN-01, RN-05)
+### DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada Compartida (CU-30, RN-01, RN-05)
 
 ![DG-DSEQ-30](../assets/DG-DSEQ-30.png)
 
@@ -1740,38 +1828,61 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 
-title <b>DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada (CU-30)</b>
+title <b>DG-DSEQ-30: Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05)</b>
 
-actor "Autoridad Delegada\n(Gestor / Arquitecto)" as Actor
+actor "Analista de Requerimientos /\nGestor" as Gestor
+actor "Arquitecto /\nEspecialista Técnico" as Arq
 participant "React SPA" as UI
 participant "ChangeRequestController" as Ctrl
 participant "Auth/RolesGuard" as Guard
 participant "ChangeRequestService" as Service
-participant "ChangeRequestRepoPort" as Repo
+participant "ChangeAuthRepoPort" as AuthRepo
 database "PostgreSQL" as DB
+participant "NotificationService" as Notify
 participant "AuditService" as Audit
 
-Actor -> UI : 1. Evalúa Informe de Impacto de Cambio Menor y autoriza
-UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/authorize-minor (AuthorizeMinorDto)
-Ctrl -> Guard : 3. Valida rol GESTOR / ARQUITECTO
-Guard --> Ctrl : 4. Permitido
-Ctrl -> Service : 5. authorizeMinorChange(rfcId, observations, userId)
+note over Service
+  <b>Modelo de Doble Llave Operativa (RN-01, RN-05)</b>:
+  La autorización de un Cambio Menor no es unipersonal. Exige
+  concurrentemente dos registros de conformidad en la tabla
+  change_authorization: el visto bueno de Gestión y el visto bueno de Arquitectura.
+end note
 
-Service -> DB : 6. Valida que Informe Técnico clasifique como 'MENOR' (RN-05)
-alt Clasificación del informe no es Cambio Menor
-    Service --> Ctrl : 400 Bad Request: "El cambio requiere deliberación en CCB"
-    Ctrl --> UI : 400 Bad Request
-    UI --> Actor : Redirige flujo a evaluación por CCB (CU-07)
-else Cambio Menor Válido
-    Service -> Repo : 7. Inicia Transacción
-    Repo -> DB : 8. UPDATE change_request SET status = 'AUTORIZADA'
-    Repo -> DB : 9. INSERT INTO ccb_resolution (decision='AUTORIZADA_DELEGADA', ...)
-    Repo -> DB : 10. COMMIT
-    Service -> Audit : 11. logEvent('MINOR_CHANGE_AUTHORIZED', rfcId, userId)
-    Audit -> DB : 12. INSERT INTO audit_log (...)
-    Service --> Ctrl : 13. RfcResponseDto
-    Ctrl --> UI : 14. 200 OK
-    UI --> Actor : 15. Habilita emisión inmediata de Orden de Cambio
+== Visto Bueno 1: Evaluación por Arquitecto / Especialista Técnico ==
+Arq -> UI : 1. Emite conformidad técnica basada en Informe de Impacto (RN-05)
+UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: ARQUITECTO)
+Ctrl -> Guard : 3. Valida rol ARQUITECTO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. submitAuthorization(rfcId, 'ARQUITECTO', dto, arqUserId)
+Service -> AuthRepo : 6. INSERT INTO change_authorization (rfc_id, authorizer_role='ARQUITECTO', decision='APROBADO')
+AuthRepo -> DB : 7. Persiste conformidad técnica
+Service -> Audit : 8. logEvent('MINOR_CHANGE_ARCH_APPROVED', rfcId, arqUserId)
+Audit -> DB : 9. INSERT INTO audit_log (...)
+Service --> Ctrl : 10. 201 Created (Conformidad técnica registrada)
+Ctrl --> UI : 11. 201 Created
+UI --> Arq : 12. Muestra conformidad técnica registrada (esperando visto bueno de Gestión)
+
+== Visto Bueno 2: Evaluación por Analista de Requerimientos / Gestor y Cierre ==
+Gestor -> UI : 13. Emite visto bueno de alcance, planificación y prioridad
+UI -> Ctrl : 14. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: GESTOR)
+Ctrl -> Guard : 15. Valida rol GESTOR
+Guard --> Ctrl : 16. Permitido
+Ctrl -> Service : 17. submitAuthorization(rfcId, 'GESTOR', dto, gestorUserId)
+Service -> AuthRepo : 18. INSERT INTO change_authorization (rfc_id, authorizer_role='GESTOR', decision='APROBADO')
+AuthRepo -> DB : 19. Persiste conformidad de gestión
+
+Service -> DB : 20. Valida existencia concurrente de AMBAS conformidades (GESTOR + ARQUITECTO)
+alt Ambas Conformidades Aprobadas Existen
+    Service -> DB : 21. Inicia Transacción ACID
+    Service -> DB : 22. UPDATE change_request SET status = 'AUTORIZADA'
+    Service -> DB : 23. COMMIT
+    Service -> Notify : 24. notifyMinorChangeAuthorized(rfcId)
+    Notify --> Service : Notificación a Solicitante y CCB
+    Service -> Audit : 25. logEvent('MINOR_CHANGE_FULLY_AUTHORIZED', rfcId, gestorUserId)
+    Audit -> DB : 26. INSERT INTO audit_log (...)
+    Service --> Ctrl : 27. ChangeAuthResponseDto (Estado: AUTORIZADA)
+    Ctrl --> UI : 28. 200 OK (Autorización Compartida Completa)
+    UI --> Gestor : 29. Muestra RFC como AUTORIZADA y habilita emisión de ECN (CU-08)
 end
 
 @enduml
@@ -1867,7 +1978,7 @@ node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostS
 }
 
 node "Servidor de Respaldo Secundario / Cloud S3" as RemoteBackupNode <<External System>> {
-    folder "/remote_backups/traceflow\n(Paquetes Maestros .pkg)" as RemoteDisk
+    folder "/remote_backups/traceflow\n(Paquetes Maestros .pkg Cifrados AES-256)" as RemoteDisk
 }
 
 WebClient --> NginxComp : HTTPS (443)\nTLS 1.3 / Cookie HttpOnly
@@ -1920,12 +2031,12 @@ El contenedor `backup_worker` ejecuta diariamente el siguiente flujo:
 3. Copia snapshot comprimida del almacenamiento físico.
 4. Cómputo criptográfico de los hashes SHA-256 de ambos ficheros.
 5. Generación del archivo de manifiesto firmado lógicamente.
-6. Empaquetado maestro en `traceflow_backup_{timestamp}.pkg`.
+6. Empaquetado maestro cifrado en reposo con **AES-256-GCM** (`traceflow_backup_{timestamp}.pkg`).
 7. Transferencia inmediata a almacenamiento secundario externo.
 8. Registro en `audit_log` de la finalización conforme con el hash del paquete maestro.
 
 ## 14.3 Parámetros Operativos de Diseño (Horarios, Retención, RTO)
-Los siguientes parámetros se clasifican expresamente como **PARÁMETROS OPERATIVOS DE DISEÑO**, adoptados para dar cumplimiento al requerimiento funcional `RNF-09` (Respaldo diario automático del repositorio central):
+Los siguientes parámetros se clasifican expresamente como **PARÁMETROS OPERATIVOS DE DISEÑO**, adoptados para dar cumplimiento al requerimiento no funcional `RNF-09` (Respaldo diario automático del repositorio central):
 - **Ventana de Ejecución**: Programada diariamente a las **02:00 AM (hora local)**, periodo de menor concurrencia del sistema.
 - **Política de Retención Histórica**:
   - Respaldos diarios: Retención durante **30 días calendario**.
@@ -1938,8 +2049,8 @@ Los siguientes parámetros se clasifican expresamente como **PARÁMETROS OPERATI
 
 # 15. Observabilidad
 
-## 15.1 Logging Estructurado, Health Checks y Métricas
-Para satisfacer la mantenibilidad (RNF-08) y fiabilidad operativa sin introducir infraestructura pesada de monitoreo:
+## 15.1 Logging Estructurado, Health Checks y Métricas (RNF-06, RNF-08)
+Para satisfacer la mantenibilidad (RNF-08) y asegurar que las operaciones críticas cumplan con el rendimiento requerido (RNF-06):
 1. **Logging Estructurado en Formato JSON**:
    - Salida estándar (`stdout`) procesada por librerías nativas (`winston` o `pino`).
    - Cada línea de log incorpora: `timestamp`, `level` (`INFO`, `WARN`, `ERROR`), `context` (nombre del módulo), `correlation_id` (UUID transversal inyectado por Nginx/NestJS) y `payload`.
@@ -1947,13 +2058,14 @@ Para satisfacer la mantenibilidad (RNF-08) y fiabilidad operativa sin introducir
    - `GET /health/liveness`: Retorna `200 OK` si el proceso Node.js responde.
    - `GET /health/readiness`: Verifica la conectividad activa hacia el pool de PostgreSQL y el acceso de lectura/escritura al volumen `/storage/`.
 3. **Métricas Clave de Rendimiento (RNF-06)**:
-   - Registro de tiempos de respuesta en cada endpoint mediante interceptor global de NestJS, alertando si consultas de historial (`CU-13`) o auditoría (`CU-27`) se aproximan al umbral de 3 segundos.
+   - Interceptor global de tiempo de respuesta que mide la latencia de cada solicitud HTTP.
+   - Si una consulta de historial (`CU-13`), verificación de integridad (`CU-26`) o generación de reporte (`CU-28`) supera los **3 segundos** establecidos por `RNF-06`, se emite automáticamente una alerta de degradación de rendimiento.
 
 ## 15.2 Alertas Operativas y de Integridad
-El backend emite alertas automáticas enviadas a los administradores de seguridad y configuración ante:
+El backend emite alertas automáticas enviadas a los administradores correspondientes ante:
 - Tres o más intentos fallidos de autenticación en menos de 5 minutos para una misma cuenta.
 - Detección de conflicto de bloqueo de sincronización activo (`RN-06`).
-- Violación detectada en la reconciliación periódica del `ReconciliationWorker` (discrepancia de checksum SHA-256 o archivo faltante en disco).
+- Violación detectada en la reconciliación periódica del `ReconciliationWorker` (discrepancia de checksum SHA-256 o archivo faltante en disco), notificando de inmediato al **Administrador de Configuración / Bibliotecario**.
 - Fallo en la rutina diaria del `BackupWorker` o espacio en disco en volumen persistente superior al 85%.
 
 ---
@@ -1966,14 +2078,14 @@ La siguiente matriz demuestra la alineación ininterrumpida entre el SRS de Aná
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- |
 | **`AuthModule` / Sessions / SoD** | ADR-003, ADR-006 | MOD-01 | RF-01, RF-17 | RNF-01 (Seguridad) | RN-01, RN-04, SoD SAD | CU-01 |
 | **`ProjectModule`** | ADR-001, ADR-003 | MOD-02 | RF-02 | RNF-05 (Escalabilidad) | RN-01 | CU-02, CU-03 |
-| **`ConfigItemModule`** | ADR-003, ADR-004 | MOD-03 | RF-03, RF-16, RF-17 | RNF-03 (Integridad), RNF-06 | RN-08 (SHA-256) | CU-09, CU-26 |
+| **`ConfigItemModule`** | ADR-003, ADR-004 | MOD-03 | RF-03, RF-16, RF-17 | RNF-03 (Integridad), RNF-06 | RNF-03 / RF-17 (SHA-256) | CU-09, CU-26 |
 | **`ChangeRequestModule`** | ADR-001, ADR-009 | MOD-04 | RF-04, RF-05, RF-06, RF-07, RF-14 | RNF-04 (Usabilidad) | RN-01, RN-05, RN-07 | CU-04, CU-04.1, CU-05, CU-06, CU-07, CU-08, CU-22, CU-30 |
 | **`VersionControlModule` / SyncLock** | ADR-004, ADR-005, ADR-007 | MOD-05 | RF-08, RF-09 | RNF-01, RNF-06 | RN-02, RN-03, RN-04, RN-06 | CU-10, CU-11, CU-12, CU-13, CU-14 |
 | **`QualityModule`** | ADR-003, ADR-006 | MOD-06 | RF-10, RF-11 | RNF-01 | RN-01, RN-05 (SoD QA), RN-09 | CU-15, CU-16, CU-17, CU-18, CU-19, CU-29 |
 | **`BaselineModule`** | ADR-004, ADR-005 | MOD-07 | RF-12, RF-13 | RNF-01, RNF-06 | RN-02, RN-04, RN-08, RN-09 | CU-20, CU-21 |
 | **`IncidentModule`** | ADR-001, ADR-009 | MOD-08 | RF-15 | RNF-04 | RN-03 | CU-23, CU-24, CU-25 |
 | **`AuditModule` / Append-Only** | ADR-004, ADR-008 | MOD-09 | RF-16, RF-17, RF-18 | RNF-01, RNF-03, RNF-06 | RN-02, RN-03 | CU-27, CU-28 |
-| **`StoragePort` / LocalStorage** | ADR-005 | Transversal (MOD-03,05,07) | RF-08, RF-09, RF-17 | RNF-03, RNF-07 (Compatibilidad) | RN-04, RN-08 | CU-10, CU-12, CU-20, CU-21, CU-26 |
+| **`StoragePort` / LocalStorage** | ADR-005 | Transversal (MOD-03,05,07) | RF-08, RF-09, RF-17 | RNF-03, RNF-07 (Compatibilidad) | RNF-03/RF-17 (Integridad), RN-04, RN-08 (Rollback en Trabajo) | CU-10, CU-12, CU-20, CU-21, CU-26 |
 | **Docker Compose + Backup Worker**| ADR-010 | Infraestructura | Transversal | RNF-02 (Disponibilidad), RNF-08, RNF-09 | Transversal | Transversal |
 
 ---
@@ -1999,27 +2111,26 @@ Con el fin de preservar el principio de arquitectura diferida y no tomar decisio
 
 ---
 
-# 18. Auditoría SAD de Diseño v0.1
+# 18. Auditoría SAD de Diseño v0.2
 
-Se ejecuta la auditoría de control de calidad sobre el presente documento técnico antes de su entrega:
+Se formaliza la auditoría de control de calidad sobre el presente documento técnico, certificando el saneamiento integral de las observaciones detectadas en la versión preliminar v0.1:
 
-| Área Evaluada | Trazabilidad con Baselines | Coherencia con ADRs | Completitud Técnica | Hallazgos y Dictamen de Auditoría |
-| :--- | :---: | :---: | :---: | :--- |
-| **Gobernanza y Jerarquía** | Plena (FD03 v1.0, FD04 v1.1) | Plena | Completo | Jerarquía respetada; ninguna regla ni CU fue alterado. Sin contradicciones. |
-| **Decisiones Técnicas** | Plena (18 RF, 9 RNF, 9 RN) | Plena (ADR-001..010) | Completo | Separación rigurosa entre Decisiones Arquitectónicas y Versiones de Implementación. |
-| **Arquitectura Física** | Plena | Plena (ADR-010) | Completo | Diagrama DG-D01 modela Nginx, React, NestJS, PostgreSQL, Storage y Backup. |
-| **Monolito Modular** | Plena (MOD-01 a MOD-09) | Plena (ADR-001, ADR-003)| Completo | Mapeo 1:1, reglas estrictas de no acceso a repositorios ajenos y diagrama DG-D02. |
-| **Capas Arquitectónicas** | Plena | Plena | Completo | Clean Architecture con inversión de control estricta en 4 capas. |
-| **Diseño Frontend** | Plena (7 actores canónicos) | Plena (ADR-002) | Completo | Organización modular por features, route guards, TanStack Query y manejo de errores. |
-| **Modelo de Datos** | Plena (Derivado de DG-12) | Plena (ADR-004, ADR-007)| Completo | 18 tablas relacionales sin entidades inventadas. Restricción única para RN-06. DG-D03. |
-| **Custodia de Artefactos** | Plena (3 bibliotecas SCM) | Plena (ADR-005) | Completo | Puerto `StoragePort`, LocalStorageAdapter, protocolo por etapas y reconciliador. DG-D04. |
-| **Diseño de API REST** | Plena (31 Casos de Uso) | Plena (ADR-009) | Completo | Matriz de correspondencia exhaustiva para los 31 CU y formato RFC 7807. |
-| **Seguridad y SoD** | Plena (RN-01, RN-04, SoD) | Plena (ADR-006) | Completo | Cookie HttpOnly, sesión opaca en BD, Guard SoD y timeout de 15 min de diseño. DG-D05. |
-| **Auditoría Forense** | Plena (RF-16, RF-17, RN-03) | Plena (ADR-008) | Completo | Tabla append-only, revocación de UPDATE/DELETE, triggers y encadenamiento SHA-256. |
-| **Secuencias Técnicas** | Plena (Flujos críticos) | Plena | Completo | 9 diagramas DG-DSEQ-XX cubriendo los casos más complejos de ingeniería SCM. |
-| **Despliegue y Respaldo** | Plena (RNF-02, RNF-08, RNF-09) | Plena (ADR-010) | Completo | Unidad Lógica (`DB + Storage + Manifest`), DG-D06 y delimitación de disponibilidad. |
+| ID Hallazgo | Dimensión Evaluada | Situación en v0.1 (Borrador Inicial) | Saneamiento Técnico Aplicado en v0.2 | Estado en v0.2 |
+| :---: | :--- | :--- | :--- | :---: |
+| **AUD-01** | Actores Canónicos | Se utilizaban denominaciones informales como "Desarrollador" para Check-Out, "Asegurador de Calidad", etc. | Estandarización estricta a los **7 actores canónicos de TB-09**: `Solicitante`, `Analista de Requerimientos / Gestor`, `Arquitecto / Especialista Técnico`, `Comité de Control de Cambios (CCB)`, `Administrador de Configuración / Bibliotecario`, `Ingeniero de Software / Desarrollador`, `Equipo de Calidad / Testing`. | **RESUELTO** |
+| **AUD-02** | Secuencia Check-Out (DG-DSEQ-10) | Se modelaba al desarrollador como actor ejecutor del Check-Out y se referenciaba la transición desde Maestra. | Se asignó la ejecución al `Administrador de Configuración / Bibliotecario` (TB-10), modelando la transición canónica `Biblioteca de Soporte` $\rightarrow$ `Biblioteca de Trabajo` con adquisición de bloqueo `sync_lock` (ACTIVE). | **RESUELTO** |
+| **AUD-03** | Secuencia Check-In (DG-DSEQ-12) | Se citaba erróneamente RN-08 para integridad y se omitían las dos etapas de entrega SCM. | Se asignó al Bibliotecario; se corrigió la regla de integridad a `RNF-03 / RF-17` (SHA-256); y se documentaron nítidamente las dos variantes: **Variante A** (Trabajo $\rightarrow$ Soporte para QA) y **Variante B** (Soporte $\rightarrow$ Maestra tras doble conformidad RN-09). | **RESUELTO** |
+| **AUD-04** | Delimitación CU-12 vs CU-20 | CU-20 duplicaba la copia de archivos desde Soporte a Maestra. | Se delimitó que CU-12 ejecuta la promoción física a Maestra, mientras que CU-20 formaliza la agrupación lógica en `baseline_item`, asigna la etiqueta `mayor.menor.parche` (`RN-02`) y congela la Línea Base. | **RESUELTO** |
+| **AUD-05** | Secuencia Rollback (DG-DSEQ-21) | Se asignaba la reversión hacia Maestra, pudiendo alterar la línea base congelada. | Se corrigió el destino: el rollback purga exclusivamente los artefactos defectuosos en la `Biblioteca de Trabajo` (`RN-08`), libera el bloqueo en `sync_lock` y deja la Biblioteca Maestra intacta. | **RESUELTO** |
+| **AUD-06** | Autorización Menor (DG-DSEQ-30) | Se modelaba una aprobación unipersonal genérica. | Se implementó el **modelo de doble llave operativa compartida** (`RN-01`, `RN-05`), requiriendo que `Analista de Requerimientos / Gestor` y `Arquitecto / Especialista Técnico` registren individualmente su conformidad en la tabla `change_authorization`. | **RESUELTO** |
+| **AUD-07** | Esquema de Datos (DG-D03) | Faltaba la tabla `change_authorization` y se citaba RN-08 en el hash de versión. | Se incorporó la entidad `change_authorization` con restricción única por rol, se corrigió la referencia de checksum a `RNF-03, RF-17`, y se agregó `storage_status` a `ecs_version`. | **RESUELTO** |
+| **AUD-08** | Custodia de Archivos vs BD | El protocolo dependía de un commit transaccional antes de promover el archivo físico. | Se formalizó el protocolo con estado intermedio `PENDING_STORAGE`, transferencia física y posterior confirmación a `COMMITTED`, blindado por operaciones compensatorias y `ReconciliationWorker`. | **RESUELTO** |
+| **AUD-09** | Parámetros de Seguridad | Se presentaba Argon2id como un método de cifrado en reposo. | Se precisó formalmente que Argon2id es una función de derivación de claves / hashing para contraseñas (RFC 9106), y que el cifrado en reposo de respaldos se ejecuta con **AES-256-GCM**. | **RESUELTO** |
+| **AUD-10** | Catálogo de API REST | Endpoint de subsanación usaba `/subsample` y se mezclaban nombres de casos de uso. | Se renombró a `/api/v1/rfcs/{id}/rectification` (`rectifyRfc`), se actualizaron los nombres de los 31 CU a la denominación canónica de TB-10 y se emitió `API-DRAFT-v0.2`. | **RESUELTO** |
+| **AUD-11** | Trazabilidad en ADRs | Existían citas cruzadas imprecisas a RN-08 y atributos no funcionales. | Se sanearon integralmente los archivos `ADR-001`, `ADR-003`, `ADR-005`, `ADR-006`, `ADR-008`, `ADR-009`, `ADR-010` y `README.md`. | **RESUELTO** |
 
 > [!IMPORTANT]
 > **DICTAMEN FORMAL DE ESTADO**:  
-> El presente documento se declara formalmente como **FD05 — SAD DE DISEÑO v0.1 (BORRADOR CONTROLADO)**.  
-> No se congela todavía como Baseline de Diseño v1.0. La congelación como Baseline formal se efectuará una vez que el equipo y la cátedra validen exhaustivamente los contratos de datos, las firmas de API y las secuencias de interacción técnica.
+> El presente documento se declara formalmente como **FD05 — SAD DE DISEÑO v0.2 (BORRADOR CONTROLADO)**.  
+> Se certifica la ausencia de observaciones críticas o mayores de coherencia con las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los ADRs aprobados (ADR-001 a ADR-010).  
+> **No se congela todavía como Baseline de Diseño v1.0**, manteniéndose como borrador controlado para sustentar el desarrollo del Modelo UWE de Navegación y Presentación.

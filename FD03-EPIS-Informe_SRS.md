@@ -120,6 +120,7 @@ Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de E
 
 
 ### 6.2.2. Diagrama de Clases 114
+## 6.3. Matrices de Trazabilidad SCM 116
 
 Conclusiones 115 Bibliografía 117
 
@@ -172,7 +173,80 @@ Para el análisis, especificación y construcción del sistema TraceFlow SCM, el
 Dirección de Proyecto y Gobernanza SCM: Liderada por Joan Cristian Medina Quispe, responsable de la coordinación general del ciclo de vida del software, modelado de procesos de control de cambios (RFC/ECN), definición de políticas de bibliotecas (Trabajo, Soporte y Maestra) y arquitectura de seguridad basada en roles (RBAC). Ingeniería de Backend y Servicios de Integración: A cargo de Renzo Antonio Antayhua Mamani, responsable del desarrollo de la lógica de negocio centralizada, microservicios para el motor de versionamiento, algoritmos de validación de integridad criptográfica (SHA-256) y mecanismos de bloqueo de concurrencia para evitar sobreescrituras en la Biblioteca de Trabajo.
 
 
-![Página 7 - diagrama o elemento visual del documento original](assets/page-007.png)
+**Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>TraceFlow SCM - Organigrama del Equipo C-SharkTeam y Entorno Cliente</b>
+
+package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
+    class "Joan Cristian Medina Quispe" as JCM {
+        + Dirección de Proyecto y Gobernanza SCM
+        --
+        * Coordinación del ciclo de vida
+        * Modelado de procesos (RFC/ECN)
+        * Políticas de bibliotecas y RBAC
+    }
+
+    class "Renzo Antonio Antayhua Mamani" as RAA {
+        + Ingeniería de Backend e Integración
+        --
+        * Lógica de negocio centralizada
+        * Motor de versionamiento
+        * Integridad criptográfica (SHA-256)
+        * Bloqueos de sincronización
+    }
+
+    class "Renzo Fernando Loyola Vilca Choque" as RFL {
+        + Ingeniería de Frontend y UX
+        --
+        * Interfaz web responsiva
+        * Tableros de trazabilidad
+        * Consolas para el CCB
+        * Formularios de RFC y subsanación
+    }
+
+    class "Augusto Joaquin Rivera Muñoz" as AJR {
+        + QA, Auditoría y Persistencia
+        --
+        * Modelado relacional y esquemas
+        * Registro de auditoría
+        * Suite de pruebas unitarias y de integración
+    }
+
+    JCM --> RAA : Coordina lógica SCM
+    JCM --> RFL : Coordina interfaces y UX
+    JCM --> AJR : Coordina aseguramiento de calidad
+}
+
+package "Entorno Cliente / Beneficiario (ÉXODO S.A.C.)" as CLIENT {
+    class "Jefes de Proyecto y Administradores SCM" as ADM {
+        * Supervisión de proyectos aislados
+        * Custodia de Bibliotecas Maestras
+    }
+
+    class "Comité de Control de Cambios (CCB)" as CCB {
+        * Evaluación colegiada de RFC
+        * Emisión de Órdenes de Cambio (ECN/ECO)
+    }
+
+    class "Consultores y Desarrolladores de Software" as DEV_CLI {
+        * Ejecución de Check-Out / Check-In
+        * Implementación de modificaciones
+    }
+
+    ADM --> CCB : Consulta decisiones
+    CCB --> DEV_CLI : Emite orden de cambio
+}
+
+DEV ..> CLIENT : Provee plataforma TraceFlow SCM
+@enduml
+```
 
 
 <!-- Página 8 del PDF original -->
@@ -370,15 +444,16 @@ El análisis financiero se calculó para un horizonte de evaluación a 5 años (
 <!-- Página 14 del PDF original -->
 
 
+**Tabla TB-02: Indicadores Financieros de Viabilidad Económica**
+
 | Indicador Financiero | Valor Proyectado | Interpretación Técnica / Financiera |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Inversión Inicial (CAPEX) | S/. 5,475.00 | Cubre 500 horas de desarrollo (Joan Medina y Renzo Antayhua a razón de S/. 9.00/hr), depreciación de equipos (3.5 meses), conectividad, dominio web e imprevistos. |
 | Costo Operativo Anual (OPEX) | S/. 1,140.00 | Mantenimiento de infraestructura PaaS (Render/Supabase), renovación de dominio, soporte preventivo y materiales de difusión. |
-| Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida. |
+| Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida (COK 12.00%). |
 | Tasa Interna de Retorno (TIR) | 68.20% | Supera ampliamente el COK referencial (12.00%), otorgando un margen de seguridad amplio frente a variaciones de costos. |
 | Relación Beneficio / Costo (B/C) | 1.97 | Por cada sol invertido en el ciclo del proyecto, se generarán S/. 1.97 en beneficios y ahorros valorizados para la facultad y los estudiantes. |
-| Periodo de Recuperación (Payback) | 1 año y 9.7 meses | La inversión inicial se recuperará plenamente durante el transcurso del segundo año de operación |
-
+| Periodo de Recuperación (Payback) | 1 año y 9.7 meses | La inversión inicial se recuperará plenamente durante el transcurso del segundo año de operación. |
 3. Viabilidad Operativa
 
 Apoyo Institucional: existe respaldo de la Gerencia de Proyectos de ÉXODO S.A.C. para formalizar el control de sus activos digitales.
@@ -431,6 +506,8 @@ facilita el trabajo colaborativo a distancia entre los equipos de ÉXODO S.A.C. 
 
 5. Viabilidad Ambiental
 
+<!-- PENDIENTE DE VALIDACION: La Viabilidad Ambiental duplica literalmente los cuatro puntos de la Viabilidad Social. Pendiente de redacción técnica diferenciada enfocada en métricas energéticas y de centros de datos en la nube. -->
+
 1. Optimización de Recursos de Hardware: la centralización del desarrollo en
 
 repositorios institucionales evita la necesidad de adquirir nuevo hardware, extendiendo la vida útil de los equipos actuales.
@@ -475,14 +552,15 @@ sobreescritura de archivos al trabajar varios consultores en un mismo proyecto.
 
 **Cuadro de Necesidades Identificadas**
 
-| Área | Problema detectado | Requerimiento del Sistema |
-| --- | --- | --- |
+**Tabla TB-03: Cuadro de Necesidades Identificadas**
+
+| Área | Problema Detectado | Requerimiento del Sistema |
+| :--- | :--- | :--- |
 | Código | Pérdida de fuentes | Repositorio centralizado y seguro. |
 | Cambios | Modificaciones arbitrarias | Flujo de aprobación (Solicitudes de Cambio). |
 | Versiones | Confusión sobre la versión vigente | Etiquetado de Líneas Base (Baselines). |
 | Auditoría | No se identifica al responsable de una falla | Registro de auditoría y trazabilidad total. |
 | Entregas | Entregas al cliente sin validación previa | Aprobación formal antes de la liberación. |
-
 Nota: Elaboración Propia
 
 
@@ -500,7 +578,75 @@ El proceso actual es empírico y desorganizado, pues el código reside en equipo
 Nota: Elaboración Propia
 
 
-![Página 18 - diagrama o elemento visual del documento original](assets/page-018.png)
+**Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ActivityMaxWidth 220
+skinparam conditionStyle inside
+
+title <b>ÉXODO S.A.C. - Proceso Actual Empírico de Modificación (AS-IS)</b>
+
+|Consultor / Desarrollador|
+start
+:Identificar necesidad o requerimiento
+arbitrario de cambio;
+
+:Modificar código directamente
+en equipo personal local;
+
+:Nombrar archivos o carpetas
+de forma arbitraria
+(ej. "Proyecto_Final_v2");
+
+:Enviar archivos alterados
+por medios informales
+(correo electrónico, chat, USB);
+
+|Entorno de Integración / Servidor|
+:Recibir archivos divergentes
+sin control de versiones centralizado;
+
+if (¿Trabajo concurrente de varios consultores?) then (Sí)
+    :Sobreescribir archivos
+    y generar pérdida de avances;
+    note right
+        Conflicto de concurrencia:
+        no existen bloqueos de sincronización.
+    end note
+else (No)
+    :Integrar copia directamente;
+endif
+
+:Desplegar a producción del cliente
+sin validación previa de QA
+ni pruebas formales;
+
+|Entorno de Producción del Cliente|
+if (¿Se presenta fallo en producción?) then (Sí)
+    :Detectar incidente crítico;
+    
+    :Intentar identificar versión
+    previa o autor del cambio;
+    
+    note right
+        Fallo crítico:
+        No existen líneas base
+        ni registro de auditoría.
+        No es posible ejecutar Rollback inmediato.
+    end note
+    
+    :Retrabajo forzado y demora en servicio;
+    stop
+else (No)
+    :Operación inestable sin baseline;
+    stop
+endif
+@enduml
+```
 
 
 <!-- Página 19 del PDF original -->
@@ -514,16 +660,356 @@ El proceso propuesto formaliza el ciclo de vida completo de una Solicitud de Cam
 <!-- Página 20 del PDF original -->
 
 
-**Diagrama de Actividades del Proceso Propuesto**
+**Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE)**
+
+![TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración](assets/proceso_gestion_cambios.png)
+
+#### Código PlantUML del Diagrama
+
+```plantuml
+@startuml
+title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración</b>
+
+' =========================================================
+' CONFIGURACIÓN GENERAL
+' =========================================================
+
+skinparam ActivityMaxWidth 220
+skinparam ranksep 22
+skinparam nodesep 18
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+' =========================================================
+' ACTORES / SWIMLANES
+' =========================================================
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#E8F8F5|Arquitecto / Especialista Técnico|
+|#FEF9E7|Comité de Control de Cambios (CCB)|
+|#F5EEF8|Administrador de Configuración / Bibliotecario|
+|#EAEDED|Ingeniero de Software / Desarrollador|
+|#FDEDEC|Equipo de Calidad / Testing|
+
+' =========================================================
+' FASE 1 - REGISTRO Y CLASIFICACIÓN
+' =========================================================
+
+|Solicitante|
+
+start
+
+:<color:white><b>FASE 1\nRegistro y Clasificación de la RFC</b></color>; <<#34495E>>
+
+:Identificar necesidad de cambio;
+
+:Registrar Solicitud de Cambio (RFC)
+indicando descripción, justificación,
+prioridad y ECS afectado;
+
+note left
+<b>RFC</b>
+- Descripción del cambio
+- Justificación
+- Prioridad
+- ECS afectado
+- Fecha
+end note
 
 
-![Página 20 - diagrama o elemento visual del documento original](assets/page-020.png)
+|Analista de Requerimientos / Gestor|
+
+:Recepcionar y revisar
+la Solicitud de Cambio;
+
+if (¿Información completa?) then (Sí)
+
+    :Clasificar tipo y criticidad
+    de la solicitud;
+
+else (No)
+
+    :Registrar observaciones;
+
+    |Solicitante|
+
+    :Subsanar información
+    de la RFC;
+
+    |Analista de Requerimientos / Gestor|
+
+    :Revisar nuevamente
+    la solicitud;
+
+endif
 
 
-<!-- Página 21 del PDF original -->
+' =========================================================
+' FASE 2 - ANÁLISIS TÉCNICO
+' =========================================================
+
+|Arquitecto / Especialista Técnico|
+
+:<color:white><b>FASE 2\nAnálisis Técnico</b></color>; <<#34495E>>
+
+:Analizar impacto del cambio;
+
+note right
+<b>Análisis de Impacto</b>
+- Arquitectura
+- Dependencias
+- Esfuerzo
+- Costo
+- Tiempo
+- Riesgos
+end note
+
+:Generar Informe Técnico
+de Impacto;
 
 
-![Página 21 - diagrama o elemento visual del documento original](assets/page-021.png)
+' =========================================================
+' FASE 3 - DECISIÓN DEL CCB
+' =========================================================
+
+|Comité de Control de Cambios (CCB)|
+
+:<color:white><b>FASE 3\nEvaluación y Decisión del CCB</b></color>; <<#34495E>>
+
+:Evaluar Informe Técnico
+y Solicitud de Cambio;
+
+if (¿Técnicamente viable?) then (Sí)
+
+    if (¿Cambio aprobado por el CCB?) then (Sí)
+
+        :Aprobar RFC;
+
+        :Emitir Orden de Cambio
+        (ECN / ECO);
+
+    else (No)
+
+        :Registrar
+        Rechazo Administrativo;
+
+        |Solicitante|
+
+        :Recibir notificación
+        de rechazo administrativo;
+
+        stop
+
+    endif
+
+else (No)
+
+    :Registrar
+    Rechazo Técnico;
+
+    |Solicitante|
+
+    :Recibir notificación
+    de rechazo técnico;
+
+    stop
+
+endif
+
+
+' =========================================================
+' FASE 4 - CHECK-OUT E IMPLEMENTACIÓN
+' =========================================================
+
+|Administrador de Configuración / Bibliotecario|
+
+:<color:white><b>FASE 4\nCheck-Out e Implementación</b></color>; <<#34495E>>
+
+:Efectuar Check-Out del ECS
+desde la Biblioteca de Soporte
+hacia la Biblioteca de Trabajo;
+
+:Aplicar bloqueo de sincronización
+sobre el ECS;
+
+note right
+El ECS permanece bloqueado
+hasta completar Check-In
+o ejecutar Rollback.
+end note
+
+
+|Ingeniero de Software / Desarrollador|
+
+:Recibir Orden de Cambio
+y ECS autorizado;
+
+:Implementar modificación
+sobre el ECS en la
+Biblioteca de Trabajo;
+
+:Ejecutar pruebas
+unitarias locales;
+
+if (¿Pruebas unitarias conformes?) then (Sí)
+
+    :Entregar ECS modificado
+    para validación QA;
+
+else (No)
+
+    :Corregir defectos
+    detectados;
+
+    :Reejecutar
+    pruebas unitarias;
+
+endif
+
+
+' =========================================================
+' FASE 5 - QA
+' =========================================================
+
+|Equipo de Calidad / Testing|
+
+:<color:white><b>FASE 5\nValidación y Certificación QA</b></color>; <<#34495E>>
+
+:Ejecutar pruebas
+de integración;
+
+:Ejecutar validación
+funcional;
+
+if (¿Cambio conforme?) then (Sí)
+
+    :Emitir Certificación
+    de Conformidad;
+
+else (No)
+
+    :Registrar No Conformidades
+    y hallazgos;
+
+    |Ingeniero de Software / Desarrollador|
+
+    :Corregir defectos
+    identificados;
+
+    |Equipo de Calidad / Testing|
+
+    :Ejecutar re-testeo;
+
+    if (¿Re-testeo superado?) then (Sí)
+
+        :Emitir Certificación
+        de Conformidad;
+
+    else (No)
+
+        |Administrador de Configuración / Bibliotecario|
+
+        :Ejecutar Rollback
+        del ECS;
+
+        :Restaurar estado previo
+        del ECS en la
+        Biblioteca de Trabajo;
+
+        :Liberar bloqueo
+        de sincronización;
+
+        :Cancelar Orden de Cambio;
+
+        |Solicitante|
+
+        :Recibir notificación de
+        Cancelación por
+        Fallo No Subsanado;
+
+        stop
+
+    endif
+
+endif
+
+
+' =========================================================
+' FASE 6 - CHECK-IN Y LÍNEA BASE
+' =========================================================
+
+|Administrador de Configuración / Bibliotecario|
+
+:<color:white><b>FASE 6\nCheck-In y Línea Base</b></color>; <<#34495E>>
+
+:Efectuar Check-In
+del ECS certificado;
+
+:Integrar ECS verificado
+a la Biblioteca
+Maestra / Soporte;
+
+:Registrar nueva versión;
+
+:Crear y congelar
+nueva Línea Base;
+
+:Liberar bloqueo
+de sincronización;
+
+:Actualizar inventario
+de Elementos de Configuración;
+
+
+' =========================================================
+' FASE 7 - CIERRE
+' =========================================================
+
+|Comité de Control de Cambios (CCB)|
+
+:<color:white><b>FASE 7\nCierre Formal</b></color>; <<#34495E>>
+
+:Registrar cierre formal
+del cambio;
+
+:Actualizar trazabilidad
+RFC - ECN/ECO - ECS - Línea Base;
+
+
+|Solicitante|
+
+:Recibir notificación
+de implementación exitosa;
+
+:Cambio Cerrado - Implementado;
+
+stop
+
+@enduml
+```
 
 
 <!-- Página 22 del PDF original -->
@@ -537,21 +1023,16 @@ A continuación se detalla el cuadro de Requerimientos Funcionales (RF-01 a RF-1
 
 **Tabla: Cuadro de Requerimientos Funcionales**
 
+**Tabla TB-04: Cuadro de Requerimientos Funcionales (RF-01 a RF-18)**
+
 | ID | Requerimiento Funcional | Descripción | Prioridad |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | RF-01 | Gestión de Usuarios y Roles | El sistema debe permitir registrar usuarios y asignar los roles del flujo de cambios (Solicitante, Analista de Requerimientos/Gestor, Arquitecto/Especialista Técnico, CCB, Administrador de Configuración/Bibliotecario, Ingeniero de Software/Desarrollador, Equipo de Calidad/Testing), restringiendo las acciones disponibles según el rol. | Alta |
 | RF-02 | Gestión de Proyectos | El sistema debe permitir crear y administrar múltiples proyectos de clientes de ÉXODO S.A.C. de forma aislada entre sí. | Alta |
 | RF-03 | Identificación de ECS | El sistema debe permitir registrar y clasificar los Elementos de Configuración (código, documentos, esquemas de BD) de cada proyecto. | Alta |
 | RF-04 | Registro de Solicitudes de Cambio (RFC) | El sistema debe permitir al Solicitante registrar una Solicitud de Cambio indicando descripción, justificación, prioridad, ECS afectado y fecha, y permitir su subsanación cuando la información esté incompleta. | Alta |
 | RF-05 | Clasificación y Análisis de Impacto | El sistema debe permitir al Analista de Requerimientos clasificar el tipo y criticidad de la solicitud, y al Arquitecto/Especialista Técnico registrar el análisis de impacto (arquitectura, esfuerzo, costo, tiempo y riesgos) en un Informe Técnico de Impacto. | Alta |
 | RF-06 | Evaluación y Aprobación por el CCB | El sistema debe permitir al Comité de Control de Cambios evaluar la viabilidad técnica de una solicitud, aprobarla o rechazarla, y registrar las causales de no aprobación cuando corresponda. | Alta |
-
-
-<!-- Página 23 del PDF original -->
-
-
-| ID | Requerimiento Funcional | Descripción | Prioridad |
-| --- | --- | --- | --- |
 | RF-07 | Gestión de Órdenes de Cambio | El sistema debe permitir generar la Orden de Cambio (ECN/ECO) una vez aprobada una solicitud por el CCB, y actualizar el plan de gestión del proyecto asociado. | Media |
 | RF-08 | Gestión de Bibliotecas de Software | El sistema debe administrar al menos tres bibliotecas por proyecto (Biblioteca de Trabajo, Biblioteca de Soporte y Biblioteca Maestra), permitiendo mover un ECS entre ellas mediante operaciones de Check-Out y Check-In. | Alta |
 | RF-09 | Control de Versiones y Bloqueos de Sincronización | El sistema debe registrar cada Check-in/Check-out de un ECS con autor, fecha y descripción del cambio, y aplicar/liberar bloqueos de sincronización que impidan la edición concurrente del mismo ECS en la Biblioteca de Trabajo. | Alta |
@@ -565,18 +1046,16 @@ A continuación se detalla el cuadro de Requerimientos Funcionales (RF-01 a RF-1
 | RF-17 | Auditoría e Integridad | El sistema debe registrar las acciones críticas de los usuarios en cada etapa del flujo y validar la integridad de los artefactos mediante checksums (SHA-256). | Alta |
 | RF-18 | Generación de Reportes | El sistema debe permitir generar reportes de estado del flujo de cambios, inventario de ECS y actas de cambios, con posibilidad de exportación. | Media |
 
-
-<!-- Página 24 del PDF original -->
-
-
 ## 5.2. Cuadro de Requerimientos No funcionales
 
 El siguiente cuadro presenta los Requerimientos No Funcionales (RNF-01 a RNF-09) que establecen los atributos de calidad exigidos a TraceFlow SCM, tales como seguridad, disponibilidad, integridad, usabilidad, escalabilidad, rendimiento, compatibilidad, mantenibilidad y respaldo. Estos requerimientos condicionan las decisiones de arquitectura y diseño técnico que se adoptarán en las siguientes fases del proyecto, y se derivan directamente de los objetivos de negocio y de diseño planteados por ÉXODO S.A.C.
 
 **Tabla: Cuadro de Requerimientos No Funcionales**
 
+**Tabla TB-05: Cuadro de Requerimientos No Funcionales (RNF-01 a RNF-09)**
+
 | ID | Atributo de Calidad | Descripción | Prioridad |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | RNF-01 | Seguridad | El sistema debe utilizar protocolos de transferencia segura (HTTPS/SSH) y control de acceso basado en roles (RBAC). | Alta |
 | RNF-02 | Disponibilidad | El sistema debe garantizar un tiempo de actividad (uptime) del 99.9% durante los periodos críticos de proyecto. | Alta |
 | RNF-03 | Integridad | El sistema debe verificar la integridad de los artefactos almacenados mediante checksums (SHA-256). | Alta |
@@ -586,7 +1065,6 @@ El siguiente cuadro presenta los Requerimientos No Funcionales (RNF-01 a RNF-09)
 | RNF-07 | Compatibilidad | El sistema debe ser compatible con entornos de desarrollo de uso común (Visual Studio Code, IntelliJ IDEA, Android Studio). | Alta |
 | RNF-08 | Mantenibilidad | La arquitectura debe permitir actualizaciones y parches sin requerir la detención total del servicio. | Media |
 | RNF-09 | Respaldo | El sistema debe programar copias de seguridad automáticas diarias del repositorio central. | Alta |
-
 Nota: Elaboración Propia
 
 
@@ -599,20 +1077,17 @@ Las Reglas de Negocio (RN-01 a RN-09) formalizan las políticas y restricciones 
 
 **Cuadro de las Reglas de Negocio**
 
-| ID | Nombre de la Regla | Descripción | Autoridad | Situación Actual |
-| --- | --- | --- | --- | --- |
+**Tabla TB-06: Cuadro de Reglas de Negocio (RN-01 a RN-09)**
+
+<!-- PENDIENTE DE VALIDACION: La autoridad asignada a RN-03 en el SRS original es Analista de Requerimientos / Gestor, pero la operación de Check-In con ECN es ejecutada operativamente por el Administrador de Configuración / Bibliotecario. -->
+
+| ID | Nombre de la Regla | Descripción | Autoridad | Situación Actual (Problemática) |
+| :--- | :--- | :--- | :--- | :--- |
 | RN-01 | Aprobación Obligatoria de Integración | Ningún ECS puede integrarse a la Biblioteca Maestra/Soporte de un proyecto sin la revisión y aprobación de una Solicitud de Cambio por el CCB. | Comité de Control de Cambios (CCB) | Se integraban cambios directamente sin revisión previa. |
 | RN-02 | Identificación Unívoca de Versiones | Toda línea base establecida tras un Check-In a la Biblioteca Maestra debe estar identificada con un estándar de versionamiento (mayor.menor.parche). | Administrador de Configuración / Bibliotecario | Se usaban nombres de carpetas y archivos comprimidos con nombres arbitrarios. |
-| RN-03 | Trazabilidad de Cambios | Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO) previamente emitida. | Analista de Requerimientos / Gestor | No existía registro de quién ni por qué se modificaba el código. |
+| RN-03 | Trazabilidad de Cambios | Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO) previamente emitida. | Analista de Requerimientos / Gestor *(ver nota en Inconsistencias)* | No existía registro de quién ni por qué se modificaba el código. |
 | RN-04 | Restricción de Bibliotecas Congeladas | Un ECS almacenado en la Biblioteca Maestra no puede modificarse directamente; cualquier corrección exige un nuevo ciclo completo de RFC, Check-Out y Check-In. | Administrador de Configuración / Bibliotecario | Los consultores editaban directamente los archivos entregados al cliente. |
 | RN-05 | Evaluación Técnica Obligatoria | Ninguna Solicitud de Cambio puede pasar a evaluación del CCB sin contar previamente con un Informe Técnico de Impacto elaborado por el Arquitecto/Especialista Técnico. | Arquitecto / Especialista Técnico | Los cambios se aprobaban sin un análisis técnico documentado. |
-
-
-<!-- Página 26 del PDF original -->
-
-
-| ID | Nombre de la Regla | Descripción | Autoridad | Situación Actual |
-| --- | --- | --- | --- | --- |
 | RN-06 | Bloqueo de Sincronización Obligatorio | Todo ECS que ingresa a la Biblioteca de Trabajo mediante Check-Out debe quedar bloqueado para otros usuarios hasta su Check-In o rollback. | Administrador de Configuración / Bibliotecario | Varios consultores editaban el mismo archivo de forma simultánea, generando sobreescrituras. |
 | RN-07 | Diferenciación de Resultados de Cierre | Toda Solicitud de Cambio debe cerrarse con uno de tres resultados formales y mutuamente excluyentes: Rechazo Técnico (inviabilidad detectada por el CCB), Rechazo Administrativo (decisión del CCB pese a viabilidad técnica) o Cancelación por Fallo No Subsanado (re-test fallido tras corrección). | Comité de Control de Cambios (CCB) / Administrador de Configuración | No existía distinción entre los motivos de cierre de un cambio no exitoso. |
 | RN-08 | Reversión Obligatoria ante Fallo No Subsanado | Si el re-test posterior a una corrección no es superado exitosamente, el Administrador de Configuración debe ejecutar un rollback del ECS en la Biblioteca de Trabajo antes de cancelar la Orden de Cambio. | Administrador de Configuración / Bibliotecario | El código con errores permanecía en el entorno de trabajo sin reversión formal. |
@@ -626,84 +1101,110 @@ En concordancia con el flujo de gestión de cambios adoptado por TraceFlow
 
 **SCM, toda Solicitud de Cambio transita por los siguientes estados principales:**
 
-- Registrado: la solicitud fue creada por el Solicitante y recepcionada por
+**Tabla TB-07: Estados Oficiales del Ciclo de Vida de una RFC**
 
-el Analista de Requerimientos.
+| N.º | Nombre del Estado | Actor / Responsable Principal | Tipo de Estado | Descripción y Criterio de Transición |
+| :---: | :--- | :--- | :--- | :--- |
+| 1 | **Registrado** | Solicitante / Analista de Requerimientos | Inicial | La solicitud fue creada por el Solicitante y recepcionada por el Analista de Requerimientos. |
+| 2 | **En Subsanación** | Solicitante | Intermedio (Bucle) | La información de la solicitud está incompleta y se encuentra en espera de datos adicionales subsanados. |
+| 3 | **Clasificado** | Analista de Requerimientos / Gestor | Intermedio | El Analista de Requerimientos validó la información completa y definió el tipo y la criticidad del cambio. |
+| 4 | **En Análisis Técnico** | Arquitecto / Especialista Técnico | Intermedio | El Arquitecto está elaborando el Informe Técnico de Impacto (arquitectura, dependencias, esfuerzo, costo, tiempo, riesgos). |
+| 5 | **En Evaluación CCB** | Comité de Control de Cambios (CCB) | Intermedio | El Comité de Control de Cambios está evaluando la viabilidad técnica y decidiendo la aprobación del cambio. |
+| 6 | **Rechazado (Técnico)** | Comité de Control de Cambios (CCB) | Terminal | El CCB determinó que el cambio no es técnicamente viable. Se notifica al Solicitante y el trámite finaliza. |
+| 7 | **Rechazado (Administrativo)** | Comité de Control de Cambios (CCB) | Terminal | El CCB decidió no aprobar el cambio por razones de gestión, alcance o costo, pese a ser técnicamente viable. Se notifica al Solicitante y finaliza. |
+| 8 | **Aprobado – Orden Emitida** | Comité de Control de Cambios (CCB) | Intermedio | El CCB aprobó la RFC y emitió la Orden de Cambio (ECN/ECO), autorizando la transferencia del ECS hacia la Biblioteca de Trabajo. |
+| 9 | **En Implementación** | Ingeniero de Software / Desarrollador | Intermedio | El Desarrollador recibió el ECS bajo Check-Out con bloqueo activo y ejecuta las modificaciones y pruebas unitarias locales. |
+| 10 | **En Validación QA** | Equipo de Calidad / Testing | Intermedio | El Equipo de Calidad está ejecutando pruebas de integración y validación funcional sobre el ECS modificado. |
+| 11 | **En Corrección** | Ingeniero de Software / Desarrollador | Intermedio (Bucle) | QA detectó no conformidades y el cambio se encuentra en ciclo de corrección de defectos y re-testeo. |
+| 12 | **Cancelado (Fallo No Subsanado)** | Administrador de Configuración / Bibliotecario | Terminal | El re-testeo no fue superado tras los reintentos permitidos; el Administrador ejecuta rollback del ECS en la Biblioteca de Trabajo y cancela la Orden de Cambio. |
+| 13 | **Cerrado – Implementado** | Administrador de Configuración / CCB | Terminal | El ECS certificado completó Check-In en la Biblioteca Maestra, se congeló una nueva Línea Base, se liberó el bloqueo y se formalizó el cierre exitoso. |
 
-- En Subsanación: la información de la solicitud está incompleta y se
+**Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC**
 
-encuentra en espera de datos adicionales.
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
 
-- Clasificado: el Analista de Requerimientos definió el tipo y la criticidad
+title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC</b>
 
-del cambio.
+[*] --> Registrado : Solicitante registra RFC
 
+state Registrado {
+    Registrado : Esperando revisión inicial
+}
 
-<!-- Página 27 del PDF original -->
+Registrado --> EnSubsanacion : Analista detecta datos incompletos
+EnSubsanacion --> Registrado : Solicitante remite información subsanada
 
+Registrado --> Clasificado : Analista valida información completa
+Clasificado --> EnAnalisisTecnico : Asignado a Arquitecto
 
-- En Análisis Técnico: el Arquitecto/Especialista Técnico está elaborando
+state EnAnalisisTecnico {
+    EnAnalisisTecnico : Elaborando Informe Técnico de Impacto
+}
 
-el Informe Técnico de Impacto.
+EnAnalisisTecnico --> EnEvaluacionCCB : Informe Técnico remitido al CCB
 
-- En Evaluación CCB: el Comité de Control de Cambios está evaluando la
+state EnEvaluacionCCB {
+    state "Evaluando Viabilidad" as S_EVAL
+    state "Decisión Colegiada" as S_DEC
+    [*] --> S_EVAL
+    S_EVAL --> S_DEC : Dictamen técnico emitido
+}
 
-viabilidad y aprobación del cambio.
+EnEvaluacionCCB --> RechazadoTecnico : CCB dictamina inviabilidad técnica
+EnEvaluacionCCB --> RechazadoAdministrativo : CCB decide no aprobar por gestión
 
-- Rechazado (Técnico): el CCB determinó que el cambio no es
+RechazadoTecnico --> [*] : Cierre formal y notificación al Solicitante
+RechazadoAdministrativo --> [*] : Cierre formal y notificación al Solicitante
 
-técnicamente viable.
+EnEvaluacionCCB --> AprobadoOrdenEmitida : CCB aprueba y emite ECN/ECO
 
-- Rechazado (Administrativo): el CCB decidió no aprobar el cambio pese
+AprobadoOrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out\ny aplica bloqueo de sincronización
 
-a ser técnicamente viable.
+state EnImplementacion {
+    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo\ny corre pruebas unitarias locales
+}
 
-- Aprobado – Orden Emitida: se emitió la Orden de Cambio (ECN/ECO) y
+EnImplementacion --> EnValidacionQA : Pruebas unitarias aprobadas;\nremitido a QA
 
-el ECS fue trasladado a la Biblioteca de Trabajo.
+state EnValidacionQA {
+    EnValidacionQA : QA ejecuta pruebas de integración\ny funcionales
+}
 
-- En Implementación: el Ingeniero de Software está desarrollando el
+EnValidacionQA --> EnCorreccion : QA detecta defectos (No Conformidad)
 
-cambio sobre el ECS.
+state EnCorreccion {
+    EnCorreccion : Desarrollador corrige defectos reportados
+}
 
-- En Validación QA: el Equipo de Calidad está ejecutando pruebas de
+EnCorreccion --> EnValidacionQA : Desarrollador entrega corrección;\nse ejecuta re-testeo
 
-integración y validación funcional.
+EnCorreccion --> CanceladoFalloNoSubsanado : Reintentos de re-test agotados;\nAdministrador ejecuta Rollback en Trabajo
 
-- En Corrección: se detectaron no conformidades y el cambio está en ciclo
+CanceladoFalloNoSubsanado --> [*] : Cierre formal por cancelación
 
-de corrección y re-testeo.
+EnValidacionQA --> CerradoImplementado : QA emite Certificación de Conformidad;\nAdministrador hace Check-In a Maestra,\ncongela Línea Base y libera bloqueo
 
-- Cancelado (Fallo No Subsanado): el re-test no fue superado y se ejecutó
-
-rollback sobre el ECS.
-
-- Cerrado – Implementado: el ECS certificado fue integrado a la
-
-Biblioteca Maestra, se estableció una nueva línea base y el cambio quedó cerrado formalmente.
-
-
-<!-- Página 28 del PDF original -->
-
+CerradoImplementado --> [*] : Cierre formal exitoso
+@enduml
+```
 
 # 6. Fase de Desarrollo
 
 El ciclo de vida del proyecto TraceFlow SCM adopta la metodología UWE (UML-Based Web Engineering), orientada a aplicaciones web adaptativas, ejecutándose en un periodo intensivo de 15.5 semanas (108 días calendario) correspondiente al semestre académico 2026-II (del 29 de agosto al 14 de diciembre de 2026). Se estructura en 5 fases secuenciales e iterativas que cubren desde el análisis de requisitos hasta el despliegue en la nube y la prueba piloto con los equipos de ÉXODO S.A.C. El desglose de fases organiza el avance técnico del equipo de TraceFlow SCM, articulando el modelado conceptual (RFC, ECS, bibliotecas y líneas base) y la arquitectura en la etapa inicial para respaldar la implementación del motor de control de cambios en Node.js/TypeScript y de la interfaz web en React, culminando con la validación de usabilidad (SUS) y una prueba piloto sobre un proyecto real de la cartera de clientes de ÉXODO S.A.C.
 
-| Fase | Duración | Periodo | Enfoque UWE | Entregables principales |
-| --- | --- | --- | --- | --- |
-| 1. Análisis de Requisitos y Modelado Conceptual | 3 semanas | 29 ago – 18 sep 2026 | Modelo Conceptual (clases de dominio, casos de uso) | SRS, escenarios de caso de uso, modelo lógico, diagrama de clases preliminar |
-| 2. Diseño (Navegación, Presentación y Arquitectura) | 3.5 semanas | 19 sep – 9 oct 2026 | Modelo de Navegación y de Presentación | SAD, diagramas de secuencia, prototipos de interfaz, modelo de navegación web |
-| 3. Implementación | 5 semanas | 10 oct – 13 nov 2026 | Construcción del sistema | Módulos de RFC, ECS/bibliotecas, líneas base, auditoría; repositorio versionado |
+**Tabla TB-08: Fases del Ciclo de Vida del Desarrollo (Metodología UWE)**
 
-
-<!-- Página 29 del PDF original -->
-
-
-| Fase | Duración | Periodo | Enfoque UWE | Entregables principales |
-| --- | --- | --- | --- | --- |
-| 4. Pruebas y Validación | 2.5 semanas | 14 nov – 30 nov 2026 | Verificación funcional y de usabilidad | Casos de prueba ejecutados, informe de defectos, evaluación de usabilidad (SUS) |
-| 5. Despliegue Cloud y Prueba Piloto | 1.5 semanas | 1 dic – 14 dic 2026 | Despliegue e implantación | Ambiente productivo desplegado, informe de prueba piloto, acta de cierre |
+| Fase | Duración | Periodo | Enfoque UWE | Entregables Principales |
+| :--- | :--- | :--- | :--- | :--- |
+| 1. Análisis de Requisitos y Modelado Conceptual | 3 semanas | 29 ago – 18 sep 2026 | Modelo Conceptual (clases de dominio, casos de uso) | SRS, escenarios de caso de uso, modelo lógico, diagrama de clases preliminar. |
+| 2. Diseño (Navegación, Presentación y Arquitectura) | 3.5 semanas | 19 sep – 9 oct 2026 | Modelo de Navegación y de Presentación | SAD, diagramas de secuencia, prototipos de interfaz, modelo de navegación web. |
+| 3. Implementación | 5 semanas | 10 oct – 13 nov 2026 | Construcción del sistema | Módulos de RFC, ECS/bibliotecas, líneas base, auditoría; repositorio versionado. |
+| 4. Pruebas y Validación | 2.5 semanas | 14 nov – 30 nov 2026 | Verificación funcional y de usabilidad | Casos de prueba ejecutados, informe de defectos, evaluación de usabilidad (SUS). |
+| 5. Despliegue Cloud y Prueba Piloto | 1.5 semanas | 1 dic – 14 dic 2026 | Despliegue e implantación | Ambiente productivo desplegado, informe de prueba piloto, acta de cierre. |
 
 Nota: Elaboración Propia Cada fase conserva un carácter iterativo respecto de la anterior: los hallazgos obtenidos durante la Implementación pueden retroalimentar ajustes menores al Modelo Conceptual o al Modelo de Navegación, y los defectos detectados en la fase de Pruebas y Validación son corregidos antes de avanzar al Despliegue Cloud y Prueba Piloto, replicando así el ciclo formal de control de cambios (RFC → análisis de impacto → aprobación → implementación → validación QA → liberación) que el propio sistema TraceFlow SCM está diseñado para gestionar.
 
@@ -717,17 +1218,19 @@ El siguiente cuadro describe los siete perfiles de usuario (PU-01 a PU-07) que i
 
 **Tabla: Matriz de Perfiles y Roles de Usuario del Sistema**
 
-| ID | Tipo de Usuario | Descripción | Nivel Técnico | Funciones en el Sistema |
-| --- | --- | --- | --- | --- |
-| PU-01 | Solicitante | Persona (interna o del cliente) que identifica una necesidad de cambio y origina el trámite mediante un RFC. | Básico | Registrar Solicitudes de Cambio (RFC), subsanar información observada, consultar el estado y recibir notificaciones de cierre o rechazo. |
-| PU-02 | Analista de Requerimientos / Gestor | Responsable de la recepción, validación formal y clasificación inicial de las solicitudes de cambio. | Avanzado | Registrar y validar RFC, solicitar subsanación de datos, clasificar tipo y criticidad, registrar causales de no aprobación, actualizar el plan de gestión del proyecto. |
-| PU-03 | Arquitecto / Especialista Técnico | Responsable del análisis de impacto técnico de los cambios propuestos. | Experto | Realizar análisis de impacto en arquitectura y dependencias, estimar esfuerzo/costo/tiempo, generar el Informe Técnico de Impacto. |
-| PU-04 | Comité de Control de Cambios (CCB) | Grupo de decisión que evalúa la viabilidad técnica y aprueba o rechaza formalmente los cambios. | Avanzado | Evaluar el informe técnico, aprobar o rechazar solicitudes, emitir Órdenes de Cambio (ECN/ECO). |
-| PU-05 | Administrador de Configuració n / Bibliotecario | Responsable de administrar las bibliotecas (Trabajo, Soporte, Maestra), los bloqueos y las líneas base. | Experto | Ejecutar Check-Out/Check-In entre bibliotecas, aplicar y liberar bloqueos de sincronización, ejecutar rollback, establecer líneas base y registrar el cierre formal del cambio. |
-| PU-06 | Ingeniero de Software / Desarrollador | Consultor que implementa técnicamente el cambio aprobado sobre el ECS. | Medio | Implementar el cambio, ejecutar pruebas unitarias locales, corregir defectos reportados por QA. |
-| PU-07 | Equipo de Calidad / Testing | Responsable de validar funcional y técnicamente el cambio antes de su liberación. | Medio | Ejecutar pruebas de integración y validación funcional, certificar conformidad, reportar no conformidades, re-testear correcciones. |
+**Tabla TB-09: Matriz de Perfiles y Roles de Usuario del Sistema (PU-01 a PU-07)**
 
-Nota: Elaboración Propia La delimitación de perfiles asegura una adecuada segregación de funciones, donde el mentoreado resuelve dudas temáticas, el mentor gestiona y dicta las
+| ID | Tipo de Usuario / Actor | Descripción | Nivel Técnico | Funciones en el Sistema TraceFlow SCM |
+| :--- | :--- | :--- | :--- | :--- |
+| PU-01 | Solicitante | Persona (interna o del cliente) que identifica una necesidad de cambio y origina el trámite mediante un RFC. | Básico | Registrar Solicitudes de Cambio (RFC), subsanar información observada, consultar el estado de tickets/solicitudes y recibir notificaciones de cierre o rechazo. |
+| PU-02 | Analista de Requerimientos / Gestor | Responsable de la recepción, validación formal y clasificación inicial de las solicitudes de cambio. | Avanzado | Registrar y validar RFC, solicitar subsanación de datos, clasificar tipo y criticidad, registrar causales de no aprobación, actualizar el plan de gestión del proyecto y derivar incidencias a RFC. |
+| PU-03 | Arquitecto / Especialista Técnico | Responsable del análisis de impacto técnico de los cambios propuestos. | Experto | Realizar análisis de impacto en arquitectura y dependencias, estimar esfuerzo/costo/tiempo, generar el Informe Técnico de Impacto y registrar/clasificar nuevos ECS. |
+| PU-04 | Comité de Control de Cambios (CCB) | Grupo colegiado de decisión que evalúa la viabilidad técnica y aprueba o rechaza formalmente los cambios. | Avanzado | Evaluar el informe técnico y solicitudes, aprobar o rechazar RFC, emitir Órdenes de Cambio (ECN/ECO), auditar acciones del sistema y formalizar cierres. |
+| PU-05 | Administrador de Configuración / Bibliotecario | Responsable de administrar las bibliotecas (Trabajo, Soporte, Maestra), los bloqueos y las líneas base. | Experto | Ejecutar Check-Out/Check-In entre bibliotecas, aplicar y liberar bloqueos de sincronización, ejecutar rollback, establecer y congelar líneas base, validar integridad (SHA-256) y generar reportes. |
+| PU-06 | Ingeniero de Software / Desarrollador | Consultor técnico que implementa el cambio aprobado sobre el ECS en la Biblioteca de Trabajo. | Medio | Recibir Orden de Cambio y ECS autorizado, implementar modificaciones, ejecutar pruebas unitarias locales y corregir defectos reportados por QA. |
+| PU-07 | Equipo de Calidad / Testing | Responsable de validar funcional y técnicamente el cambio antes de su integración a la Biblioteca Maestra. | Medio | Ejecutar pruebas de integración y validación funcional, emitir Certificación de Conformidad, reportar no conformidades y hallazgos, y re-testear correcciones. |
+Nota: Elaboración Propia <!-- PENDIENTE DE VALIDACION: El siguiente texto sobre tutorías universitarias ("mentoreado", "mentor", "servicio tutorial") no corresponde a TraceFlow SCM y está pendiente de sustitución formal por la descripción de segregación de funciones entre los 7 roles canónicos. -->
+La delimitación de perfiles asegura una adecuada segregación de funciones, donde el mentoreado resuelve dudas temáticas, el mentor gestiona y dicta las
 
 
 <!-- Página 31 del PDF original -->
@@ -740,18 +1243,77 @@ clases acumulando horas, y la administración supervisa la calidad del servicio 
 El sistema se organiza en ocho paquetes principales: Gobernanza y Seguridad, Gestión de Proyectos, Gestión de Configuración (ECS), Gestión de Bibliotecas (Trabajo, Soporte y Maestra), Control de Cambios, Soporte e Incidencias, Trazabilidad y Auditoría, y Reportes. El paquete de Gestión de Bibliotecas administra los ECS y es orquestado por Control de Cambios mediante las operaciones de Check-Out y Check-In descritas en el flujo de gestión de cambios; los paquetes de negocio dependen de Gobernanza y Seguridad para la autenticación y el control de acceso, mientras que Trazabilidad y Auditoría recibe eventos desde Control de Cambios y desde la Gestión de Configuración
 
 
-![Página 31 - diagrama o elemento visual del documento original](assets/page-031.png)
+**Diagrama DG-04: Diagrama de Paquetes Arquitecturales**
 
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
 
-<!-- Página 32 del PDF original -->
+title <b>TraceFlow SCM - Diagrama de Paquetes Arquitecturales</b>
 
+package "Gobernanza y Seguridad" as PKG_GOB {
+    class "Autenticación y RBAC" as MOD_RBAC
+    class "Administración de Usuarios" as MOD_USER
+}
 
-**Diagrama de Paquetes Arquitecturales - Sistema TraceFlow SCM**
+package "Gestión de Proyectos" as PKG_PROJ {
+    class "Aislamiento de Proyectos" as MOD_PROJ
+    class "Asignación de Responsables" as MOD_RESP
+}
 
-Nota: Elaboración Propia
+package "Gestión de Configuración" as PKG_ECS {
+    class "Catálogo de ECS" as MOD_ECS
+    class "Identificación y Tipado" as MOD_TYPE
+}
 
+package "Gestión de Bibliotecas" as PKG_LIB {
+    class "Biblioteca de Trabajo" as LIB_WRK
+    class "Biblioteca de Soporte" as LIB_SUP
+    class "Biblioteca Maestra" as LIB_MST
+    class "Bloqueos de Sincronización" as MOD_LOCK
+}
 
-![Página 32 - diagrama o elemento visual del documento original](assets/page-032.png)
+package "Control de Cambios" as PKG_CHG {
+    class "Gestión de RFC" as MOD_RFC
+    class "Análisis de Impacto" as MOD_IMP
+    class "Evaluación CCB y ECN/ECO" as MOD_CCB
+    class "Orquestación Check-Out / Check-In" as MOD_ORQ
+}
+
+package "Soporte e Incidencias" as PKG_SUPP {
+    class "Tickets de Incidencias" as MOD_TCK
+    class "Derivación a RFC" as MOD_DERIV
+}
+
+package "Trazabilidad y Auditoría" as PKG_AUD {
+    class "Registro de Auditoría" as MOD_LOG
+    class "Verificación Criptográfica (SHA-256)" as MOD_SHA
+    class "Matriz de Trazabilidad RFC-ECN-ECS" as MOD_TRAC
+}
+
+package "Reportes" as PKG_REP {
+    class "Generador de Reportes e Inventarios" as MOD_RPT
+}
+
+' Relaciones de dependencia descritas en la sección 6.1.1 del SRS
+PKG_PROJ ..> PKG_GOB : <<use>> Seguridad
+PKG_ECS ..> PKG_GOB : <<use>> Seguridad
+PKG_CHG ..> PKG_GOB : <<use>> Seguridad
+
+PKG_LIB ..> PKG_ECS : administra ECS
+PKG_CHG ..> PKG_LIB : orquesta Check-Out / Check-In
+
+PKG_SUPP ..> PKG_CHG : deriva incidencia a RFC
+PKG_AUD <.. PKG_CHG : emite eventos de cambio
+PKG_AUD <.. PKG_ECS : emite eventos de configuración
+
+PKG_REP ..> PKG_AUD : consulta historial
+PKG_REP ..> PKG_LIB : consulta inventario
+@enduml
+```
 
 
 <!-- Página 33 del PDF original -->
@@ -766,48 +1328,321 @@ Se identifican los siete roles definidos en el flujo de gestión de cambios de T
 Nota: Elaboración Propia
 
 
-![Página 33 - diagrama o elemento visual del documento original](assets/page-033.png)
+**Diagrama DG-05: Diagrama General de Casos de Uso**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Diagrama General de Casos de Uso</b>
+
+' =========================================================
+' ACTORES CANÓNICOS
+' =========================================================
+actor "Solicitante" as ACT_SOL
+actor "Analista de Requerimientos / Gestor" as ACT_ANA
+actor "Arquitecto / Especialista Técnico" as ACT_ARQ
+actor "Comité de Control de Cambios (CCB)" as ACT_CCB
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+actor "Ingeniero de Software / Desarrollador" as ACT_DEV
+actor "Equipo de Calidad / Testing" as ACT_QA
+
+' =========================================================
+' PAQUETES FUNCIONALES
+' =========================================================
+rectangle "TraceFlow SCM" {
+    package "Gestión de Usuarios y Proyectos" {
+        usecase "CU-01: Gestionar usuarios y roles" as UC01
+        usecase "CU-02: Crear y administrar proyectos" as UC02
+        usecase "CU-03: Consultar proyecto" as UC03
+    }
+
+    package "Registro y Evaluación de la RFC" {
+        usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
+        usecase "CU-05: Validar y clasificar la solicitud" as UC05
+        usecase "CU-06: Realizar análisis de impacto técnico" as UC06
+        usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
+        usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
+    }
+
+    package "Gestión de ECS y Bibliotecas" {
+        usecase "CU-09: Registrar ECS" as UC09
+        usecase "CU-10: Efectuar Check-Out (Soporte → Trabajo)" as UC10
+        usecase "CU-11: Aplicar bloqueo de sincronización" as UC11
+        usecase "CU-12: Efectuar Check-In (Trabajo → Maestra/Soporte)" as UC12
+        usecase "CU-13: Consultar historial de versiones" as UC13
+    }
+
+    package "Implementación y Validación" {
+        usecase "CU-14: Implementar cambio en el ECS" as UC14
+        usecase "CU-15: Ejecutar pruebas unitarias locales" as UC15
+        usecase "CU-16: Ejecutar pruebas de integración" as UC16
+        usecase "CU-17: Certificar conformidad del cambio" as UC17
+        usecase "CU-18: Reportar no conformidad" as UC18
+        usecase "CU-19: Reevaluar y re-testear" as UC19
+    }
+
+    package "Líneas Base y Rollback" {
+        usecase "CU-20: Crear y congelar línea base" as UC20
+        usecase "CU-21: Ejecutar rollback en Biblioteca de Trabajo" as UC21
+        usecase "CU-22: Cancelar Orden de Cambio" as UC22
+    }
+
+    package "Incidencias, Trazabilidad y Reportes" {
+        usecase "CU-23: Registrar incidencia" as UC23
+        usecase "CU-24: Consultar estado de ticket" as UC24
+        usecase "CU-25: Derivar incidencia a RFC" as UC25
+        usecase "CU-26: Validar integridad (checksum)" as UC26
+        usecase "CU-27: Auditar acciones del sistema" as UC27
+        usecase "CU-28: Generar reportes de estado" as UC28
+    }
+}
+
+' Asociaciones Principales
+ACT_ADM --> UC01
+ACT_ANA --> UC02
+ACT_ANA --> UC03
+
+ACT_SOL --> UC04
+ACT_ANA --> UC05
+ACT_ARQ --> UC06
+ACT_CCB --> UC07
+ACT_CCB --> UC08
+
+ACT_ARQ --> UC09
+ACT_ADM --> UC10
+ACT_ADM --> UC11
+ACT_ADM --> UC12
+ACT_ADM --> UC13
+
+ACT_DEV --> UC14
+ACT_DEV --> UC15
+ACT_QA --> UC16
+ACT_QA --> UC17
+ACT_QA --> UC18
+ACT_QA --> UC19
+
+ACT_ADM --> UC20
+ACT_ADM --> UC21
+ACT_ADM --> UC22
+
+ACT_SOL --> UC23
+ACT_SOL --> UC24
+ACT_ANA --> UC25
+ACT_ADM --> UC26
+ACT_CCB --> UC27
+ACT_ADM --> UC28
+@enduml
+```
 
 
 <!-- Página 34 del PDF original -->
 
 
-**Diagrama de Administración de Usuarios y Proyectos**
+**Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos**
 
-Nota: Elaboración Propia
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
 
-**Diagrama de Gestión de Incidencias y Solicitudes de Cambio (RFC) - Sistema**
+title <b>TraceFlow SCM - Casos de Uso: Administración de Usuarios y Proyectos</b>
 
-TraceFlow SCM Nota: Elaboración Propia
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+actor "Analista de Requerimientos / Gestor" as ACT_ANA
+actor "Usuarios del sistema" as ACT_USR
 
+rectangle "Módulo de Usuarios y Proyectos" {
+    usecase "CU-01: Gestionar usuarios y roles" as UC01
+    usecase "CU-02: Crear y administrar proyectos" as UC02
+    usecase "CU-03: Consultar proyecto" as UC03
 
-![Página 34 - diagrama o elemento visual del documento original](assets/page-034.png)
+    usecase "Asignar permisos RBAC" as UC_RBAC
+    usecase "Aislar datos de cliente" as UC_ISOLATE
+}
 
+ACT_ADM --> UC01
+UC01 ..> UC_RBAC : <<include>>
 
-<!-- Página 35 del PDF original -->
+ACT_ANA --> UC02
+ACT_ANA --> UC03
+ACT_USR --> UC03
 
+UC02 ..> UC_ISOLATE : <<include>>
+UC02 ..> ACT_ADM : <<secundario>>
+@enduml
+```
 
-**Diagrama de SCM Core (Gestión de ECS, Bibliotecas y Líneas Base) - Sistema**
+**Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias**
 
-TraceFlow SCM Nota: Elaboración Propia
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
 
-**Diagrama de Implementación y Validación de la Calidad - Sistema TraceFlow**
+title <b>TraceFlow SCM - Casos de Uso: Registro y Evaluación de RFC e Incidencias</b>
 
-SCM Nota: Elaboración Propia
+actor "Solicitante" as ACT_SOL
+actor "Analista de Requerimientos / Gestor" as ACT_ANA
+actor "Arquitecto / Especialista Técnico" as ACT_ARQ
+actor "Comité de Control de Cambios (CCB)" as ACT_CCB
 
+rectangle "Gestión de Solicitudes e Incidencias" {
+    usecase "CU-23: Registrar incidencia" as UC23
+    usecase "CU-24: Consultar estado de ticket" as UC24
+    usecase "CU-25: Derivar incidencia a RFC" as UC25
 
-<!-- Página 36 del PDF original -->
+    usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
+    usecase "CU-05: Validar y clasificar la solicitud" as UC05
+    usecase "CU-06: Realizar análisis de impacto técnico" as UC06
+    usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
+    usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
 
+    usecase "Subsanar información de RFC" as UC_SUBSANAR
+}
 
-**Diagrama de Trazabilidad, Auditoría e Integridad - Sistema TraceFlow SCM**
+ACT_SOL --> UC23
+ACT_SOL --> UC24
+ACT_ANA --> UC25
 
-Nota: Elaboración Propia
+UC25 ..> UC04 : <<triggers>>
+
+ACT_SOL --> UC04
+ACT_ANA --> UC05
+UC05 ..> UC_SUBSANAR : <<extend>> (datos incompletos)
+ACT_SOL --> UC_SUBSANAR
+
+ACT_ARQ --> UC06
+ACT_CCB --> UC07
+ACT_CCB --> UC08
+
+UC07 ..> UC08 : <<include>> (si aprueba)
+@enduml
+```
+
+**Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)</b>
+
+actor "Arquitecto / Especialista Técnico" as ACT_ARQ
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+
+rectangle "Núcleo de Configuración (SCM Core)" {
+    usecase "CU-09: Registrar ECS" as UC09
+    usecase "CU-10: Efectuar Check-Out (Soporte → Trabajo)" as UC10
+    usecase "CU-11: Aplicar bloqueo de sincronización" as UC11
+    usecase "CU-12: Efectuar Check-In (Trabajo → Maestra/Soporte)" as UC12
+    usecase "CU-13: Consultar historial de versiones" as UC13
+    usecase "CU-20: Crear y congelar línea base" as UC20
+    usecase "CU-21: Ejecutar rollback en Biblioteca de Trabajo" as UC21
+    usecase "CU-22: Cancelar Orden de Cambio" as UC22
+}
+
+ACT_ARQ --> UC09
+ACT_ADM --> UC10
+ACT_ADM --> UC11
+ACT_ADM --> UC12
+ACT_ADM --> UC13
+ACT_ADM --> UC20
+ACT_ADM --> UC21
+ACT_ADM --> UC22
+
+UC10 ..> UC11 : <<include>> (impone bloqueo)
+UC12 ..> UC20 : <<triggers>> (tras certificación)
+UC21 ..> UC22 : <<include>> (si re-test falla)
+@enduml
+```
+
+**Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad</b>
+
+actor "Ingeniero de Software / Desarrollador" as ACT_DEV
+actor "Equipo de Calidad / Testing" as ACT_QA
+
+rectangle "Módulo de Implementación y QA" {
+    usecase "CU-14: Implementar cambio en el ECS" as UC14
+    usecase "CU-15: Ejecutar pruebas unitarias locales" as UC15
+    usecase "CU-16: Ejecutar pruebas de integración" as UC16
+    usecase "CU-17: Certificar conformidad del cambio" as UC17
+    usecase "CU-18: Reportar no conformidad" as UC18
+    usecase "CU-19: Reevaluar y re-testear" as UC19
+}
+
+ACT_DEV --> UC14
+ACT_DEV --> UC15
+UC14 ..> UC15 : <<include>>
+
+ACT_QA --> UC16
+ACT_QA --> UC17
+ACT_QA --> UC18
+ACT_QA --> UC19
+
+UC16 ..> UC17 : <<extend>> (si conforme)
+UC16 ..> UC18 : <<extend>> (si defectos)
+UC18 ..> UC19 : <<triggers>> (tras corrección)
+ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
+@enduml
+```
+
+**Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Trazabilidad, Auditoría e Integridad</b>
+
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+actor "Comité de Control de Cambios (CCB)" as ACT_CCB
+
+rectangle "Trazabilidad, Auditoría y Reportes" {
+    usecase "CU-26: Validar integridad (checksum SHA-256)" as UC26
+    usecase "CU-27: Auditar acciones del sistema" as UC27
+    usecase "CU-28: Generar reportes de estado" as UC28
+
+    usecase "Verificar hash del ECS" as UC_HASH
+    usecase "Exportar acta de cambios" as UC_EXP
+}
+
+ACT_ADM --> UC26
+ACT_CCB --> UC27
+ACT_ADM --> UC28
+
+UC26 ..> UC_HASH : <<include>>
+UC28 ..> UC_EXP : <<extend>>
+@enduml
+```
 
 ### 6.1.3. Escenarios de Caso de Uso (narrativa)
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS01 |
+| Código | CU-01 (CUS01) |
 | Nombre | Gestionar usuarios y roles |
 | Tipo | Secundario, administrativo |
 | Requerimiento asociado | RF-01 – Gestión de Usuarios y Roles |
@@ -855,7 +1690,7 @@ históricas.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS02 |
+| Código | CU-02 (CUS02) |
 | Nombre | Crear y administrar proyectos |
 | Tipo | Primario, administrativo |
 | Requerimiento asociado | RF-02 – Gestión de Proyectos |
@@ -903,7 +1738,7 @@ cambios. mantiene disponible el historial de consulta.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS03 |
+| Código | CU-03 (CUS03) |
 | Nombre | Consultar proyecto |
 | Tipo | Secundario, consulta |
 | Requerimiento asociado | RF-02 – Gestión de Proyectos |
@@ -950,7 +1785,7 @@ consulta.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS04 |
+| Código | CU-04 (CUS04) |
 | Nombre | Registrar Solicitud de Cambio (RFC) |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-04 – Registro de Solicitudes de Cambio (RFC) |
@@ -996,7 +1831,7 @@ cambios. Resultado esperado La RFC queda registrada con estado “Registrado” 
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS05 |
+| Código | CU-05 (CUS05) |
 | Nombre | Validar y clasificar la solicitud |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-04, RF-05 – Registro, Clasificación y Análisis de Impacto |
@@ -1044,7 +1879,7 @@ validación.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS06 |
+| Código | CU-06 (CUS06) |
 | Nombre | Realizar análisis de impacto técnico |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-05 – Clasificación y Análisis de Impacto |
@@ -1089,7 +1924,7 @@ complementar el análisis. FA02 Se identifica El Arquitecto El sistema impacto s
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS07 |
+| Código | CU-07 (CUS07) |
 | Nombre | Evaluar viabilidad y aprobar/rechazar |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-06 – Evaluación y Aprobación por el CCB |
@@ -1136,7 +1971,7 @@ complementar el análisis. FA02 Se identifica El Arquitecto El sistema impacto s
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS08 |
+| Código | CU-08 (CUS08) |
 | Nombre | Emitir Orden de Cambio (ECN/ECO) |
 
 
@@ -1192,7 +2027,7 @@ Campo Descripción
 <!-- Página 53 del PDF original -->
 
 
-| Código | CUS09 |
+| Código | CU-09 (CUS09) |
 | --- | --- |
 | Nombre | Registrar ECS |
 | Tipo | Primario, esencial |
@@ -1243,7 +2078,7 @@ Campo Descripción
 <!-- Página 55 del PDF original -->
 
 
-| Código | CUS10 |
+| Código | CU-10 (CUS10) |
 | --- | --- |
 | Nombre | Efectuar Check-Out (Soporte → Trabajo) |
 | Tipo | Primario, esencial |
@@ -1294,7 +2129,7 @@ Biblioteca de Soporte. revisar su ubicación actual.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS11 |
+| Código | CU-11 (CUS11) |
 | Nombre | Aplicar bloqueo de sincronización |
 | Tipo | Incluido, esencial |
 | Requerimiento asociado | RF-09 – Control de Versiones y Bloqueos de Sincronización |
@@ -1343,7 +2178,7 @@ E03 No se puede registrar El sistema revierte la el bloqueo. operación y mantie
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS12 |
+| Código | CU-12 (CUS12) |
 | Nombre | Efectuar Check-In (Trabajo → Maestra/Soporte) |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-08, RF-09 – Gestión de Bibliotecas y Control de Versiones |
@@ -1389,7 +2224,7 @@ Código Evento de excepción Respuesta del sistema E01 El ECS no posee El sistem
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS13 |
+| Código | CU-13 (CUS13) |
 | Nombre | Consultar historial de versiones |
 | Tipo | Secundario, consulta |
 | Requerimiento asociado | RF-09, RF-16 – Control de Versiones y Trazabilidad |
@@ -1436,7 +2271,7 @@ Código Evento de excepción Respuesta del sistema
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS14 |
+| Código | CU-14 (CUS14) |
 | Nombre | Implementar cambio en el ECS |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-07, RF-09 – Orden de Cambio y Control de Versiones |
@@ -1484,7 +2319,7 @@ anterior. alterar la versión de trabajo vigente.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS15 |
+| Código | CU-15 (CUS15) |
 | Nombre | Ejecutar pruebas unitarias locales |
 | Tipo | Secundario, validación |
 | Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
@@ -1531,7 +2366,7 @@ historial de intentos. FA02 Se incorporan El Desarrollador El sistema pruebas ad
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS16 |
+| Código | CU-16 (CUS16) |
 | Nombre | Ejecutar pruebas de integración |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
@@ -1577,7 +2412,7 @@ las pruebas. detectados. hacia el reporte de no conformidad. FA02 Se requiere re
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS17 |
+| Código | CU-17 (CUS17) |
 | Nombre | Certificar conformidad del cambio |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
@@ -1624,7 +2459,7 @@ FA01 QA desea revisar Consulta el detalle El sistema evidencia adicional de las 
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS18 |
+| Código | CU-18 (CUS18) |
 | Nombre | Reportar no conformidad |
 | Tipo | Alternativo, esencial |
 | Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
@@ -1669,7 +2504,9 @@ FA01 QA desea revisar Consulta el detalle El sistema evidencia adicional de las 
 | E02 | La prueba relacionada no existe o pertenece a otra versión. | El sistema rechaza la asociación y solicita seleccionar el registro correcto. |
 | E03 | La no conformidad ya fue cerrada. | El sistema impide modificar su resultado y solicita registrar un nuevo hallazgo si corresponde. |
 
-Campo Descripción Código CUS19
+| Campo | Descripción |
+| --- | --- |
+| Código | CU-19 (CUS19) |
 
 
 <!-- Página 74 del PDF original -->
@@ -1717,13 +2554,16 @@ certificación de conformidad del cambio.
 | E02 | La versión a re-testear no corresponde a la corrección registrada. | El sistema bloquea la ejecución y solicita seleccionar la versión correcta. |
 | E03 | No pueden registrarse los resultados del re-test. | El sistema mantiene la no conformidad abierta y permite reintentar el registro. |
 
-Campo Descripción Código CUS20
+| Campo | Descripción |
+| --- | --- |
+| Código | CU-20 (CUS20) |
 
 
 <!-- Página 76 del PDF original -->
 
 
 | Nombre | Crear y congelar línea base |
+<!-- PENDIENTE DE VALIDACION: RF-14 exige formalizar el cierre e informar al Solicitante para implementación exitosa. En el SRS original RF-14 solo está asociado a CU-22 (cancelación). Se requiere validar si CU-20 o un caso de uso independiente formaliza el cierre exitoso. -->
 | --- | --- |
 | Tipo | Primario, esencial |
 | Requerimiento asociado | RF-13 – Gestión de Líneas Base |
@@ -1773,7 +2613,7 @@ Campo Descripción
 <!-- Página 78 del PDF original -->
 
 
-| Código | CUS21 |
+| Código | CU-21 (CUS21) |
 | --- | --- |
 | Nombre | Ejecutar rollback en Biblioteca de Trabajo |
 | Tipo | Contingencia, esencial |
@@ -1826,7 +2666,7 @@ E03 El rollback es El sistema no habilita interrumpido antes de la cancelación 
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS22 |
+| Código | CU-22 (CUS22) |
 | Nombre | Cancelar Orden de Cambio |
 | Tipo | Contingencia, esencial |
 | Requerimiento asociado | RF-12, RF-14 – Rollback, Cancelación y Cierre Formal |
@@ -1872,7 +2712,7 @@ encuentra cerrada o repetir la operación. cancelada. E03 No se puede notificar 
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS23 |
+| Código | CU-23 (CUS23) |
 | Nombre | Registrar incidencia |
 | Tipo | Primario, soporte |
 | Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
@@ -1918,7 +2758,7 @@ Código Evento de excepción Respuesta del sistema E01 No se ingresa una El sist
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS24 |
+| Código | CU-24 (CUS24) |
 | Nombre | Consultar estado de ticket |
 | Tipo | Secundario, consulta |
 | Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
@@ -1964,7 +2804,7 @@ consulta. E03 El historial del ticket El sistema muestra el no puede recuperarse
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS25 |
+| Código | CU-25 (CUS25) |
 | Nombre | Derivar incidencia a RFC |
 | Tipo | Alternativo, esencial |
 | Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
@@ -2010,7 +2850,7 @@ encuentra cerrada. derivación hasta que corresponda reabrirla. E03 Falta identi
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS26 |
+| Código | CU-26 (CUS26) |
 | Nombre | Validar integridad (checksum) |
 | Tipo | Secundario, control |
 | Requerimiento asociado | RF-17, RNF-03 – Auditoría e Integridad |
@@ -2057,7 +2897,7 @@ integridad cuando los valores no coinciden.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS27 |
+| Código | CU-27 (CUS27) |
 | Nombre | Auditar acciones del sistema |
 | Tipo | Secundario, control |
 | Requerimiento asociado | RF-16, RF-17 – Trazabilidad de Configuración y Auditoría |
@@ -2105,7 +2945,7 @@ resultado en auditoría.
 
 | Campo | Descripción |
 | --- | --- |
-| Código | CUS28 |
+| Código | CU-28 (CUS28) |
 | Nombre | Generar reportes de estado |
 | Tipo | Secundario, reporte |
 | Requerimiento asociado | RF-18 – Generación de Reportes |
@@ -2158,7 +2998,10 @@ periodo. estados requeridos. registradas, aprobadas, rechazadas, canceladas y ce
 ## 6.2. Modelo Lógico
 
 
-![Página 95 - diagrama o elemento visual del documento original](assets/page-095.png)
+**Diagrama DG-13: Modelo Lógico de la Arquitectura TraceFlow SCM**
+
+<!-- PENDIENTE DE RECONSTRUCCION: DG-13 Modelo Lógico Arquitectural (assets/page-095.png). Pendiente de validación de arquitectura de despliegue cloud con el equipo técnico. -->
+
 
 
 <!-- Página 96 del PDF original -->
@@ -2166,256 +3009,1009 @@ periodo. estados requeridos. registradas, aprobadas, rechazadas, canceladas y ce
 
 ### 6.2.1. Diagrama de Secuencia
 
-**Diagrama de secuencia del caso de uso CUS01: Gestionar usuarios y roles**
-
-Fuente: Elaboración propia.
-
-
-![Página 96 - diagrama o elemento visual del documento original](assets/page-096.png)
-
-
-<!-- Página 97 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS02: Crear y administrar proyectos**
-
-Fuente: Elaboración propia.
-
-
-![Página 97 - diagrama o elemento visual del documento original](assets/page-097.png)
-
-
-<!-- Página 98 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS04: Registrar Solicitud de Cambio**
-
-(RFC) Fuente: Elaboración propia.
-
-
-![Página 98 - diagrama o elemento visual del documento original](assets/page-098.png)
-
-
-<!-- Página 99 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS05: Validar y clasificar la solicitud**
-
-Fuente: Elaboración propia.
-
-
-![Página 99 - diagrama o elemento visual del documento original](assets/page-099.png)
-
-
-<!-- Página 100 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS06: Realizar análisis de impacto**
-
-técnico Fuente: Elaboración propia.
-
-
-![Página 100 - diagrama o elemento visual del documento original](assets/page-100.png)
-
-
-<!-- Página 101 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS07: Evaluar viabilidad y**
-
-aprobar/rechazar Fuente: Elaboración propia.
-
-
-![Página 101 - diagrama o elemento visual del documento original](assets/page-101.png)
-
-
-<!-- Página 102 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS08: Emitir Orden de Cambio**
-
-(ECN/ECO) Fuente: Elaboración propia.
-
-
-![Página 102 - diagrama o elemento visual del documento original](assets/page-102.png)
-
-
-<!-- Página 103 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS09: Registrar Elemento de**
-
-Configuración (ECS) Fuente: Elaboración propia.
-
-
-![Página 103 - diagrama o elemento visual del documento original](assets/page-103.png)
-
-
-<!-- Página 104 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS10: Efectuar Check-Out de**
-
-elementos de configuración Fuente: Elaboración propia.
-
-**Diagrama de secuencia del CUS11: Aplicar bloqueo de sincronización**
-
-Fuente: Elaboración propia.
-
-
-![Página 104 - diagrama o elemento visual del documento original](assets/page-104.png)
-
-
-<!-- Página 105 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS12: Efectuar Check-In de elementos**
-
-de configuración Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS13: Consultar historial de versiones**
-
-Fuente: Elaboración propia.
-
-
-![Página 105 - diagrama o elemento visual del documento original](assets/page-105.png)
-
-
-<!-- Página 106 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS14: Implementar cambio en el**
-
-Elemento de Configuración (ECS) Fuente: Elaboración propia.
-
-
-![Página 106 - diagrama o elemento visual del documento original](assets/page-106.png)
-
-
-<!-- Página 107 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS15: Ejecutar pruebas unitarias**
-
-locales Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS16: Ejecutar pruebas de integración**
-
-Fuente: Elaboración propia.
-
-
-![Página 107 - diagrama o elemento visual del documento original](assets/page-107.png)
-
-
-<!-- Página 108 del PDF original -->
-
-
-**Diagrama de secuencia caso de uso CUS17: Certificar conformidad del cambio**
-
-Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS18: Reportar no conformidad**
-
-Fuente: Elaboración propia.
-
-
-![Página 108 - diagrama o elemento visual del documento original](assets/page-108.png)
-
-
-<!-- Página 109 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS19: Reevaluar y re-testear**
-
-Fuente: Elaboración propia.
-
-
-![Página 109 - diagrama o elemento visual del documento original](assets/page-109.png)
-
-
-<!-- Página 110 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS20: Crear y congelar línea base**
-
-Fuente: Elaboración propia.
-
-**Diagrama de secuencia del CUS21: Ejecutar rollback en Biblioteca de Trabajo**
-
-Fuente: Elaboración propia.
-
-
-![Página 110 - diagrama o elemento visual del documento original](assets/page-110.png)
-
-
-<!-- Página 111 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS22: Cancelar Orden de Cambio**
-
-Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS23: Registrar incidencia**
-
-Fuente: Elaboración propia.
-
-
-![Página 111 - diagrama o elemento visual del documento original](assets/page-111.png)
-
-
-<!-- Página 112 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS24: Consultar estado de ticket**
-
-Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS25: Derivar incidencia a RFC**
-
-Fuente: Elaboración propia.
-
-
-![Página 112 - diagrama o elemento visual del documento original](assets/page-112.png)
-
-
-<!-- Página 113 del PDF original -->
-
-
-**Diagrama de secuencia del CUS26: Validar integridad mediante checksum**
-
-Fuente: Elaboración propia.
-
-**Diagrama de secuencia del caso de uso CUS27: Auditar acciones del sistema**
-
-Fuente: Elaboración propia.
-
-
-![Página 113 - diagrama o elemento visual del documento original](assets/page-113.png)
-
-
-<!-- Página 114 del PDF original -->
-
-
-**Diagrama de secuencia del caso de uso CUS28: Generar reportes de estado**
-
-Nota: Elaboración Propia
-
-
-![Página 114 - diagrama o elemento visual del documento original](assets/page-114.png)
-
-
-<!-- Página 115 del PDF original -->
-
+A continuación se presentan los diagramas de secuencia del modelo lógico de TraceFlow SCM, correspondientes a los escenarios de caso de uso detallados en la sección 6.1.3 y catalogados en `TB-11`:
+
+**Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-01: Gestionar usuarios y roles (CU-01)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Gestión Usuarios" as UI
+control "Controlador Usuarios" as CTRL
+entity "Servicio RBAC" as SRV
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona opción gestionar usuarios y roles
+UI -> CTRL : obtenerListaUsuarios()
+CTRL -> DB : findUsuariosYRoles()
+DB --> CTRL : listaUsuarios
+CTRL --> UI : renderUsuarios()
+
+ACT -> UI : Ingresa datos del nuevo usuario y rol
+UI -> CTRL : registrarUsuario(datos, rol)
+CTRL -> SRV : validarDatosYPermisos(datos, rol)
+SRV --> CTRL : validacionExitosa
+CTRL -> DB : insertUsuarioConRol(datos, rol)
+DB --> CTRL : confirmacionRegistro
+CTRL -> DB : registrarAuditoria("REGISTRO_USUARIO", adminId)
+CTRL --> UI : notificarExito()
+UI --> ACT : Muestra confirmación de registro
+@enduml
+```
+
+**Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-02: Crear y administrar proyectos (CU-02)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+boundary "UI Proyectos" as UI
+control "Controlador Proyectos" as CTRL
+entity "Servicio Aislamiento SCM" as SRV
+database "BD TraceFlow" as DB
+
+ACT -> UI : Solicita registrar nuevo proyecto
+UI -> CTRL : iniciarFormularioProyecto()
+CTRL --> UI : mostrarFormulario()
+
+ACT -> UI : Ingresa datos, cliente y responsables
+UI -> CTRL : crearProyecto(datosProyecto)
+CTRL -> SRV : inicializarEspacioAislado(datosProyecto.nombre)
+SRV --> CTRL : espacioAisladoCreado
+CTRL -> DB : insertProyecto(datosProyecto)
+DB --> CTRL : proyectoId
+CTRL -> DB : inicializarEstructuraBibliotecas(proyectoId)
+CTRL -> DB : registrarAuditoria("CREACION_PROYECTO", analistaId)
+CTRL --> UI : notificarProyectoCreado()
+UI --> ACT : Muestra confirmación y proyecto activo
+@enduml
+```
+
+**Diagrama DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)**
+
+<!-- PENDIENTE DE RECONSTRUCCION: DG-SEQ-03 Diagrama de secuencia omitido en el documento SRS original (sección 6.2.1). Pendiente de aprobación técnica si requiere diagrama o se exceptúa formalmente. -->
+
+**Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+actor "Solicitante" as ACT
+boundary "UI Solicitudes RFC" as UI
+control "Controlador RFC" as CTRL
+entity "Servicio Validación RFC" as SRV
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona registrar nueva RFC
+UI -> CTRL : obtenerListaECSDisponibles(proyectoId)
+CTRL -> DB : findECSByProyecto(proyectoId)
+DB --> CTRL : listaECS
+CTRL --> UI : renderFormularioRFC(listaECS)
+
+ACT -> UI : Ingresa descripción, justificación, prioridad y ECS
+UI -> CTRL : registrarRFC(datosRFC)
+CTRL -> SRV : validarCamposObligatorios(datosRFC)
+SRV --> CTRL : camposConformes
+CTRL -> DB : insertRFC(datosRFC, estado="Registrado")
+DB --> CTRL : rfcId
+CTRL -> DB : registrarAuditoria("REGISTRO_RFC", solicitanteId)
+CTRL --> UI : confirmarRegistro(rfcId)
+UI --> ACT : Muestra código de RFC generado
+@enduml
+```
+
+**Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-05: Validar y clasificar la solicitud (CU-05)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+boundary "UI Gestión RFC" as UI
+control "Controlador RFC" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Consulta bandeja de RFC en estado "Registrado"
+UI -> CTRL : getRFCsPendientesRevision()
+CTRL -> DB : findRFCsByEstado("Registrado")
+DB --> CTRL : listaRFCs
+CTRL --> UI : renderBandeja(listaRFCs)
+
+ACT -> UI : Selecciona RFC y valida completitud de datos
+alt Información completa
+    ACT -> UI : Asigna tipo de cambio y criticidad
+    UI -> CTRL : clasificarRFC(rfcId, tipo, criticidad)
+    CTRL -> DB : updateRFC(rfcId, estado="Clasificado", tipo, criticidad)
+    CTRL --> UI : notificarClasificacionExitosa()
+    UI --> ACT : Muestra estado "Clasificado"
+else Información incompleta (Observada)
+    ACT -> UI : Registra observaciones y solicita subsanación
+    UI -> CTRL : observarRFC(rfcId, observaciones)
+    CTRL -> DB : updateRFC(rfcId, estado="En Subsanación", observaciones)
+    CTRL --> UI : notificarEnvioSubsanacion()
+    UI --> ACT : Muestra estado "En Subsanación"
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)</b>
+
+actor "Arquitecto / Especialista Técnico" as ACT
+boundary "UI Análisis Técnico" as UI
+control "Controlador Impacto" as CTRL
+entity "Servicio Dependencias ECS" as SRV
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona RFC clasificada para análisis
+UI -> CTRL : getDetalleRFCYDependencias(rfcId)
+CTRL -> SRV : calcularImpactoArquitectura(rfcId)
+SRV -> DB : findDependenciasECS(ecsId)
+DB --> SRV : grafoDependencias
+SRV --> CTRL : reporteDependencias
+CTRL --> UI : mostrarDatosAnalisis(reporteDependencias)
+
+ACT -> UI : Registra esfuerzo, costo, tiempo, riesgos y dictamen técnico
+UI -> CTRL : guardarInformeImpacto(rfcId, informeData)
+CTRL -> DB : insertInformeTecnicoImpacto(informeData)
+CTRL -> DB : updateRFC(rfcId, estado="En Análisis Técnico" -> "En Evaluación CCB")
+CTRL --> UI : notificarInformeEmitido()
+UI --> ACT : Muestra confirmación de informe remitido al CCB
+@enduml
+```
+
+**Diagrama DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)</b>
+
+actor "Comité de Control de Cambios (CCB)" as ACT
+boundary "Consola CCB" as UI
+control "Controlador CCB" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Consulta solicitudes en estado "En Evaluación CCB"
+UI -> CTRL : getSolicitudesEvaluacion()
+CTRL -> DB : findRFCsConInformeImpacto()
+DB --> CTRL : listaSolicitudes
+CTRL --> UI : renderBandejaCCB(listaSolicitudes)
+
+ACT -> UI : Evalúa viabilidad técnica y dictamen
+alt Cambio No Viable Técnicamente
+    ACT -> UI : Registra causal de rechazo técnico
+    UI -> CTRL : rechazarRFCTecnico(rfcId, causales)
+    CTRL -> DB : updateRFC(rfcId, estado="Rechazado (Técnico)", causales)
+    CTRL --> UI : notificarRechazoTecnico()
+else Cambio Viable pero Rechazado por Gestión
+    ACT -> UI : Registra causal de rechazo administrativo
+    UI -> CTRL : rechazarRFCAdministrativo(rfcId, causales)
+    CTRL -> DB : updateRFC(rfcId, estado="Rechazado (Administrativo)", causales)
+    CTRL --> UI : notificarRechazoAdministrativo()
+else Cambio Aprobado
+    ACT -> UI : Emite aprobación de la Solicitud de Cambio
+    UI -> CTRL : aprobarRFC(rfcId)
+    CTRL -> DB : updateRFC(rfcId, estado="Aprobado - Orden Emitida")
+    CTRL --> UI : habilitarEmisionOrdenCambio()
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
+
+actor "Comité de Control de Cambios (CCB)" as ACT
+boundary "Consola CCB" as UI
+control "Controlador Ordenes" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona RFC aprobada y solicita emisión de ECN
+UI -> CTRL : prepararECN(rfcId)
+CTRL -> DB : getDatosRFCYAprobacion(rfcId)
+DB --> CTRL : datosRFC
+CTRL --> UI : renderFormularioECN(datosRFC)
+
+ACT -> UI : Asigna Desarrollador responsable y fechas límite
+UI -> CTRL : emitirECN(ecnData)
+CTRL -> DB : insertOrdenCambio(ecnData)
+DB --> CTRL : ecnId
+CTRL -> DB : vincularRFCconECN(rfcId, ecnId)
+CTRL -> DB : registrarAuditoria("EMISION_ECN", ccbId)
+CTRL --> UI : confirmarEmision(ecnId)
+UI --> ACT : Muestra ECN emitida formalmente
+@enduml
+```
+
+**Diagrama DG-SEQ-09: Registrar ECS (CU-09)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-09: Registrar ECS (CU-09)</b>
+
+actor "Arquitecto / Especialista Técnico" as ACT
+boundary "UI Gestión ECS" as UI
+control "Controlador ECS" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona registrar nuevo Elemento de Configuración
+UI -> CTRL : getProyectosYTiposECS()
+CTRL -> DB : findTiposECS()
+DB --> CTRL : tiposECS
+CTRL --> UI : renderFormularioECS(tiposECS)
+
+ACT -> UI : Ingresa nombre, tipo (código/doc/bd), proyecto y ruta
+UI -> CTRL : registrarECS(datosECS)
+CTRL -> DB : insertECS(datosECS, estado="Identificado")
+DB --> CTRL : ecsId
+CTRL -> DB : inicializarHistorialVersiones(ecsId, version="1.0.0")
+CTRL --> UI : notificarRegistroExitoso(ecsId)
+UI --> ACT : Muestra confirmación de ECS catalogado
+@enduml
+```
+
+**Diagrama DG-SEQ-10: Efectuar Check-Out y bloqueo (CU-10)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-10: Efectuar Check-Out y aplicar bloqueo (CU-10)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Gestión Bibliotecas" as UI
+control "Controlador Bibliotecas" as CTRL
+entity "Servicio Bloqueos SCM" as SRV
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona ECN autorizada y solicita Check-Out del ECS
+UI -> CTRL : ejecutarCheckOut(ecnId, ecsId)
+CTRL -> SRV : verificarDisponibilidadBloqueo(ecsId)
+alt ECS ya se encuentra bloqueado
+    SRV --> CTRL : error("ECS bloqueado por otro usuario")
+    CTRL --> UI : mostrarErrorBloqueoActivo()
+    UI --> ACT : Informa que el ECS está en edición concurrente
+else ECS disponible
+    SRV -> DB : insertBloqueoSincronizacion(ecsId, ecnId, devId)
+    CTRL -> DB : transferirECS(ecsId, "Biblioteca Soporte", "Biblioteca Trabajo")
+    CTRL -> DB : updateEstadoRFC(rfcId, "En Implementación")
+    CTRL -> DB : registrarAuditoria("CHECK_OUT", ecsId, adminId)
+    CTRL --> UI : confirmarCheckOutExitoso()
+    UI --> ACT : Muestra ECS transferido con bloqueo activo
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Bloqueos SCM" as UI
+control "Controlador Bloqueos" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Consulta estado de bloqueos del ECS
+UI -> CTRL : getEstadoBloqueo(ecsId)
+CTRL -> DB : findBloqueoByECS(ecsId)
+DB --> CTRL : estadoBloqueo
+CTRL --> UI : mostrarDetalleBloqueo(estadoBloqueo)
+
+ACT -> UI : Confirma imposición / verificación de bloqueo
+UI -> CTRL : aplicarBloqueo(ecsId, motivo)
+CTRL -> DB : updateBloqueo(ecsId, estado="ACTIVO", motivo)
+CTRL -> DB : registrarAuditoria("BLOQUEO_APLICADO", ecsId)
+CTRL --> UI : notificarBloqueoActivo()
+UI --> ACT : Muestra bloqueo activo en Biblioteca de Trabajo
+@enduml
+```
+
+**Diagrama DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Gestión Bibliotecas" as UI
+control "Controlador Bibliotecas" as CTRL
+entity "Servicio Certificación QA" as SRV_QA
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona ECS certificado para Check-In
+UI -> CTRL : solicitarCheckIn(ecsId, ecnId, mensajeVersion)
+CTRL -> SRV_QA : verificarCertificacionConformidad(ecnId)
+SRV_QA -> DB : findCertificacionByECN(ecnId)
+DB --> SRV_QA : certificacionValida
+SRV_QA --> CTRL : autorizacionConforme
+
+CTRL -> DB : transferirECS(ecsId, "Biblioteca Trabajo", "Biblioteca Maestra")
+CTRL -> DB : releaseBloqueoSincronizacion(ecsId)
+CTRL -> DB : insertVersionHistorial(ecsId, mensajeVersion)
+CTRL -> DB : registrarAuditoria("CHECK_IN_MAESTRA", ecsId, adminId)
+CTRL --> UI : notificarCheckInCompletado()
+UI --> ACT : Muestra ECS integrado y bloqueo liberado
+@enduml
+```
+
+**Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-13: Consultar historial de versiones (CU-13)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Trazabilidad Versiones" as UI
+control "Controlador Historial" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona ECS y solicita ver historial
+UI -> CTRL : getHistorialVersiones(ecsId)
+CTRL -> DB : findVersionesByECS(ecsId)
+DB --> CTRL : listaVersionesConHashYAutor
+CTRL --> UI : renderHistorial(listaVersiones)
+
+ACT -> UI : Selecciona versión específica para comparar
+UI -> CTRL : compararVersiones(versionA, versionB)
+CTRL -> DB : getDiffEntreVersiones(versionA, versionB)
+DB --> CTRL : diffData
+CTRL --> UI : renderComparador(diffData)
+UI --> ACT : Muestra diferencias y trazabilidad de cambios
+@enduml
+```
+
+**Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-14: Implementar cambio en el ECS (CU-14)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+boundary "UI Espacio de Trabajo" as UI
+control "Controlador Trabajo" as CTRL
+database "Biblioteca de Trabajo" as LIB_WRK
+
+ACT -> UI : Accede al ECS autorizado bajo Check-Out
+UI -> CTRL : obtenerCopiaTrabajo(ecsId, ecnId)
+CTRL -> LIB_WRK : getArchivoECS(ecsId)
+LIB_WRK --> CTRL : archivoFuente
+CTRL --> UI : cargarEntornoEdicion(archivoFuente)
+
+ACT -> UI : Realiza modificaciones requeridas por la ECN
+ACT -> UI : Guarda avances intermedios
+UI -> CTRL : guardarCambiosEnTrabajo(ecsId, contenidoModificado)
+CTRL -> LIB_WRK : updateArchivoTrabajo(ecsId, contenidoModificado)
+LIB_WRK --> CTRL : guardadoExitoso
+CTRL --> UI : notificarGuardado()
+UI --> ACT : Confirma actualización local en Biblioteca de Trabajo
+@enduml
+```
+
+**Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+boundary "UI Pruebas Locales" as UI
+control "Runner Pruebas Unitarias" as RUNNER
+database "Biblioteca de Trabajo" as LIB_WRK
+
+ACT -> UI : Solicita ejecución de suite unitaria local
+UI -> RUNNER : ejecutarPruebasUnitarias(ecsId)
+RUNNER -> LIB_WRK : cargarModuloModificado(ecsId)
+RUNNER -> RUNNER : ejecutarTests()
+RUNNER --> UI : reporteResultados(testsPasados, fallos)
+
+alt Pruebas aprobadas (100% éxito)
+    UI --> ACT : Muestra resultado conforme; habilita entrega a QA
+else Pruebas con fallos
+    UI --> ACT : Muestra fallos y líneas con errores para corrección
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-16: Ejecutar pruebas de integración (CU-16)</b>
+
+actor "Equipo de Calidad / Testing" as ACT
+boundary "UI Calidad y Pruebas" as UI
+control "Controlador QA" as CTRL
+database "Biblioteca de Soporte" as LIB_SUP
+
+ACT -> UI : Selecciona cambio entregado para validación
+UI -> CTRL : iniciarValidacionIntegracion(ecnId)
+CTRL -> LIB_SUP : desplegarEntornoPruebas(ecnId)
+CTRL -> CTRL : ejecutarBateriaIntegracionYFuncional()
+CTRL --> UI : reporteQA(casosPrueba, conformidades, noConformidades)
+UI --> ACT : Visualiza matriz de resultados de pruebas
+@enduml
+```
+
+**Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-17: Certificar conformidad del cambio (CU-17)</b>
+
+actor "Equipo de Calidad / Testing" as ACT
+boundary "UI Calidad y Pruebas" as UI
+control "Controlador QA" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Confirma aprobación de todas las pruebas QA
+UI -> CTRL : certificarCambio(ecnId, actaPruebas)
+CTRL -> DB : insertCertificacionConformidad(ecnId, actaPruebas, qaId)
+CTRL -> DB : updateEstadoRFC(rfcId, "En Validación QA" -> "Certificado")
+CTRL -> DB : registrarAuditoria("CERTIFICACION_CONFORMIDAD", ecnId)
+CTRL --> UI : notificarCertificacionExitosa()
+UI --> ACT : Muestra Certificado de Conformidad emitido
+@enduml
+```
+
+<!-- PENDIENTE DE VALIDACION: El mensaje updateEstadoRFC(..., 'Certificado') utiliza un estado que no pertenece a la máquina de estados de la RFC de la sección 5.3. -->
+
+**Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-18: Reportar no conformidad (CU-18)</b>
+
+actor "Equipo de Calidad / Testing" as ACT
+boundary "UI Hallazgos QA" as UI
+control "Controlador Hallazgos" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Registra defectos encontrados en validación
+UI -> CTRL : reportarNoConformidad(ecnId, hallazgos, severidad)
+CTRL -> DB : insertNoConformidad(ecnId, hallazgos, severidad)
+CTRL -> DB : updateEstadoRFC(rfcId, "En Corrección")
+CTRL -> DB : notificarDesarrollador(ecnId, hallazgos)
+CTRL --> UI : confirmarRegistroNoConformidad()
+UI --> ACT : Muestra no conformidad registrada y asignada
+@enduml
+```
+
+**Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-19: Reevaluar y re-testear (CU-19)</b>
+
+actor "Equipo de Calidad / Testing" as ACT
+boundary "UI Re-testeo QA" as UI
+control "Controlador ReTest" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona corrección entregada por Desarrollador
+UI -> CTRL : iniciarReTest(noConformidadId)
+CTRL -> CTRL : ejecutarPruebasAfectadas()
+
+alt Defecto corregido satisfactoriamente
+    CTRL -> DB : updateNoConformidad(id, estado="SUBSANADA")
+    CTRL --> UI : habilitarCertificacion()
+    UI --> ACT : Muestra prueba superada
+else Defecto persiste y se agotaron reintentos
+    CTRL -> DB : updateNoConformidad(id, estado="FALLO_PERSISTENTE")
+    CTRL -> DB : dispararAlertaRollback(ecnId)
+    CTRL --> UI : notificarDerivacionRollback()
+    UI --> ACT : Muestra alerta de fallo no subsanado
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-20: Crear y congelar línea base (CU-20)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Líneas Base" as UI
+control "Controlador Líneas Base" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona ECS certificado en Biblioteca Maestra
+UI -> CTRL : solicitarCreacionLineaBase(proyectoId, ecsId)
+CTRL --> UI : mostrarFormularioLineaBase()
+
+ACT -> UI : Ingresa versión (mayor.menor.parche) y descripción
+UI -> CTRL : congelarLineaBase(proyectoId, version, ecsLista)
+CTRL -> DB : validarFormatoVersion(version)
+CTRL -> DB : insertLineaBase(proyectoId, version, estado="CONGELADA")
+DB --> CTRL : lineaBaseId
+CTRL -> DB : vincularECSaLineaBase(lineaBaseId, ecsLista)
+CTRL -> DB : registrarAuditoria("LINEA_BASE_CONGELADA", lineaBaseId, adminId)
+CTRL --> UI : confirmarLineaBaseCongelada()
+UI --> ACT : Muestra nueva Línea Base registrada y protegida
+@enduml
+```
+
+**Diagrama DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Gestión Rollback" as UI
+control "Controlador Rollback" as CTRL
+database "Biblioteca de Trabajo" as LIB_WRK
+database "Biblioteca de Soporte" as LIB_SUP
+database "BD TraceFlow" as DB
+
+ACT -> UI : Confirma ejecución de Rollback por fallo persistente
+UI -> CTRL : ejecutarRollbackTrabajo(ecsId, ecnId)
+CTRL -> LIB_SUP : getCopiaOriginalPrevia(ecsId)
+LIB_SUP --> CTRL : archivoOriginal
+CTRL -> LIB_WRK : sobreescribirConOriginal(ecsId, archivoOriginal)
+LIB_WRK --> CTRL : restauradoExitoso
+
+CTRL -> DB : releaseBloqueoSincronizacion(ecsId)
+CTRL -> DB : registrarAuditoria("ROLLBACK_TRABAJO", ecsId, ecnId)
+CTRL --> UI : notificarRollbackCompletado()
+UI --> ACT : Muestra estado previo restaurado y bloqueo liberado
+@enduml
+```
+
+**Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-22: Cancelar Orden de Cambio (CU-22)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Cancelación SCM" as UI
+control "Controlador Cierre" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona ECN tras ejecución de Rollback
+UI -> CTRL : cancelarOrdenCambio(ecnId, causa="Fallo No Subsanado")
+CTRL -> DB : updateECN(ecnId, estado="CANCELADA")
+CTRL -> DB : updateRFC(rfcId, estado="Cancelado (Fallo No Subsanado)")
+CTRL -> DB : notificarSolicitante(rfcId, "Cancelado por Fallo No Subsanado")
+CTRL -> DB : registrarAuditoria("CANCELACION_ECN", ecnId)
+CTRL --> UI : confirmarCancelacionFormal()
+UI --> ACT : Muestra ECN cancelada y trámite cerrado
+@enduml
+```
+
+**Diagrama DG-SEQ-23: Registrar incidencia (CU-23)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-23: Registrar incidencia (CU-23)</b>
+
+actor "Solicitante" as ACT
+boundary "UI Mesa de Ayuda" as UI
+control "Controlador Tickets" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Ingresa al portal de soporte y selecciona nueva incidencia
+UI -> CTRL : getProyectosDisponibles()
+CTRL -> DB : findProyectosCliente(solicitanteId)
+DB --> CTRL : listaProyectos
+CTRL --> UI : mostrarFormularioTicket(listaProyectos)
+
+ACT -> UI : Ingresa título, descripción de falla y severidad
+UI -> CTRL : crearTicket(ticketData)
+CTRL -> DB : insertTicketIncidencia(ticketData, estado="Abierto")
+DB --> CTRL : ticketId
+CTRL --> UI : notificarTicketCreado(ticketId)
+UI --> ACT : Muestra confirmación con número de ticket
+@enduml
+```
+
+**Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-24: Consultar estado de ticket (CU-24)</b>
+
+actor "Solicitante" as ACT
+boundary "UI Mesa de Ayuda" as UI
+control "Controlador Tickets" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Ingresa número de ticket o consulta historial
+UI -> CTRL : getEstadoTicket(ticketId)
+CTRL -> DB : findTicketById(ticketId)
+DB --> CTRL : ticketDetalleYHistorial
+CTRL --> UI : renderEstadoTicket(ticketDetalleYHistorial)
+UI --> ACT : Muestra estado actual, respuestas y RFC asociada
+@enduml
+```
+
+**Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-25: Derivar incidencia a RFC (CU-25)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+boundary "UI Soporte / Analista" as UI
+control "Controlador Incidencias" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Evalúa ticket de incidencia abierto
+UI -> CTRL : analizarTicket(ticketId)
+CTRL --> UI : mostrarDatosTicket()
+
+ACT -> UI : Selecciona opción "Derivar a Solicitud de Cambio"
+UI -> CTRL : derivarTicketARFC(ticketId, datosRFC)
+CTRL -> DB : insertRFC(datosRFC, origen="TICKET", ticketId)
+DB --> CTRL : rfcId
+CTRL -> DB : updateTicket(ticketId, estado="Derivado", rfcId)
+CTRL -> DB : registrarAuditoria("DERIVACION_INCIDENCIA_A_RFC", ticketId, rfcId)
+CTRL --> UI : notificarDerivacionExitosa(rfcId)
+UI --> ACT : Muestra RFC generada vinculada al ticket
+@enduml
+```
+
+**Diagrama DG-SEQ-26: Validar integridad SHA-256 (CU-26)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-26: Validar integridad mediante checksum SHA-256 (CU-26)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Auditoría SCM" as UI
+control "Controlador Integridad" as CTRL
+entity "Motor Criptográfico" as HASH
+database "Repositorio ECS" as REPO
+database "BD TraceFlow" as DB
+
+ACT -> UI : Solicita verificación de integridad de un ECS
+UI -> CTRL : validarChecksum(ecsId, version)
+CTRL -> REPO : leerArchivo(ecsId, version)
+REPO --> CTRL : streamBytes
+CTRL -> HASH : calcularSHA256(streamBytes)
+HASH --> CTRL : hashCalculado
+
+CTRL -> DB : getChecksumRegistrado(ecsId, version)
+DB --> CTRL : hashAlmacenado
+
+alt Hash idéntico
+    CTRL --> UI : reporteIntegridad("INTEGRO", hashCalculado)
+    UI --> ACT : Muestra verificación exitosa
+else Hash divergente
+    CTRL -> DB : registrarAlertaSeguridad("INTEGRIDAD_COMPROMETIDA", ecsId)
+    CTRL --> UI : reporteIntegridad("ALTERADO", hashCalculado, hashAlmacenado)
+    UI --> ACT : Alerta de corrupción o alteración no autorizada
+end
+@enduml
+```
+
+**Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-27: Auditar acciones del sistema (CU-27)</b>
+
+actor "Comité de Control de Cambios (CCB)" as ACT
+boundary "UI Auditoría" as UI
+control "Controlador Auditoría" as CTRL
+database "BD TraceFlow (Logs)" as DB
+
+ACT -> UI : Define filtros de auditoría (fechas, usuario, ECS, acción)
+UI -> CTRL : consultarLogsAuditoria(filtros)
+CTRL -> DB : findLogsAudit(filtros)
+DB --> CTRL : registrosAuditoria
+CTRL --> UI : renderResultadosAuditoria(registrosAuditoria)
+
+ACT -> UI : Solicita exportación de pista de auditoría
+UI -> CTRL : exportarPistaAuditoria(filtros)
+CTRL --> UI : archivoDescarga (PDF/CSV)
+UI --> ACT : Entrega reporte formal de auditoría
+@enduml
+```
+
+**Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)**
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-28: Generar reportes de estado (CU-28)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+boundary "UI Reportes" as UI
+control "Controlador Reportes" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Selecciona tipo de reporte (inventario ECS, estado RFC, actas)
+UI -> CTRL : generarReporte(tipoReporte, proyectoId)
+CTRL -> DB : consolidarDatosReporte(tipoReporte, proyectoId)
+DB --> CTRL : datosConsolidados
+CTRL -> CTRL : compilarDocumentoReporte(datosConsolidados)
+CTRL --> UI : mostrarVistaPreviaReporte()
+UI --> ACT : Presenta vista previa y botón de descarga
+@enduml
+```
 
 ### 6.2.2. Diagrama de Clases
 
 Nota: Elaboración Propia
 
-![Página 115 - diagrama de clases del documento original](assets/page-115.png)
+**Diagrama DG-12: Diagrama de Clases del Dominio TraceFlow SCM**
+
+<!-- PENDIENTE DE RECONSTRUCCION: DG-12 Diagrama de Clases del Dominio TraceFlow SCM (assets/page-115.png). Pendiente de especificación formal de atributos y métodos de clases con los responsables de Backend y QA. -->
+
 
 
 <!-- Página 116 del PDF original -->
 
+
+
+## 6.3. Matrices de Trazabilidad SCM
+
+En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENTATION_RULES.md, a continuación se presentan las matrices de trazabilidad oficiales del proyecto TraceFlow SCM extraídas de la fuente oficial docs/TABLES.md, garantizando la relación bidireccional entre requerimientos, reglas de negocio, casos de uso y actores responsables:
+
+# TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso
+
+**Estado:** APROBADO  
+**Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3  
+
+| ID RF | Nombre del Requerimiento Funcional | Casos de Uso que lo Instrumentan (Código Oficial / Original) | Sustento Documental (Campo Requerimiento Asociado en CU) |
+| :--- | :--- | :--- | :--- |
+| RF-01 | Gestión de Usuarios y Roles | CU-01 (CUS01) | Explícito en CUS01 |
+| RF-02 | Gestión de Proyectos | CU-02 (CUS02), CU-03 (CUS03) | Explícito en CUS02 y CUS03 |
+| RF-03 | Identificación de ECS | CU-09 (CUS09) | Explícito en CUS09 |
+| RF-04 | Registro de Solicitudes de Cambio (RFC) | CU-04 (CUS04), CU-05 (CUS05) | Explícito en CUS04 y CUS05 |
+| RF-05 | Clasificación y Análisis de Impacto | CU-05 (CUS05), CU-06 (CUS06) | Explícito en CUS05 y CUS06 |
+| RF-06 | Evaluación y Aprobación por el CCB | CU-07 (CUS07) | Explícito en CUS07 |
+| RF-07 | Gestión de Órdenes de Cambio | CU-08 (CUS08), CU-14 (CUS14) | Explícito en CUS08 y CUS14 |
+| RF-08 | Gestión de Bibliotecas de Software | CU-10 (CUS10), CU-12 (CUS12) | Explícito en CUS10 y CUS12 |
+| RF-09 | Control de Versiones y Bloqueos de Sincronización | CU-10 (CUS10), CU-11 (CUS11), CU-12 (CUS12), CU-13 (CUS13), CU-14 (CUS14) | Explícito en CUS10, CUS11, CUS12, CUS13 y CUS14 |
+| RF-10 | Gestión de Pruebas y Certificación de Conformidad | CU-15 (CUS15), CU-16 (CUS16), CU-17 (CUS17), CU-18 (CUS18) | Explícito en CUS15, CUS16, CUS17 y CUS18 |
+| RF-11 | Reevaluación y Re-testeo | CU-19 (CUS19) | Explícito en CUS19 |
+| RF-12 | Rollback y Cancelación de Órdenes de Cambio | CU-21 (CUS21), CU-22 (CUS22) | Explícito en CUS21 y CUS22 |
+| RF-13 | Gestión de Líneas Base | CU-20 (CUS20) | Explícito en CUS20 |
+| RF-14 | Cierre Formal del Cambio y Notificaciones | CU-22 (CUS22) | Explícito en CUS22 *(ver PENDIENTE DE VALIDACIÓN para cierre exitoso)* |
+| RF-15 | Gestión de Incidencias y Soporte | CU-23 (CUS23), CU-24 (CUS24), CU-25 (CUS25) | Explícito en CUS23, CUS24 y CUS25 |
+| RF-16 | Trazabilidad de Configuración | CU-13 (CUS13), CU-27 (CUS27) | Explícito en CUS13 y CUS27 |
+| RF-17 | Auditoría e Integridad | CU-26 (CUS26), CU-27 (CUS27) | Explícito en CUS26 y CUS27 |
+| RF-18 | Generación de Reportes | CU-28 (CUS28) | Explícito en CUS28 |
+
+---
+
+# TB-13 — Matriz de Trazabilidad: Reglas de Negocio vs Casos de Uso
+
+**Estado:** REVISION  
+**Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3  
+
+> [!NOTE]
+> Las relaciones directas se sustentan en los flujos principales, alternativos y de excepción de cada caso de uso. Las relaciones marcadas como `PENDIENTE DE VALIDACION` representan implicaciones operativas derivadas que requieren confirmación colegiada del CCB.
+
+| ID RN | Regla de Negocio | Autoridad Responsable | Casos de Uso Directamente Vinculados | Casos de Uso con Afectación Operativa Directa | Estado de Trazabilidad |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| RN-01 | Aprobación Obligatoria de Integración | Comité de Control de Cambios (CCB) | CU-07 (Evaluar viabilidad y aprobar/rechazar), CU-12 (Check-In) | CU-08 (Emitir ECN/ECO) | APROBADO |
+| RN-02 | Identificación Unívoca de Versiones | Administrador de Configuración / Bibliotecario | CU-20 (Crear y congelar línea base), CU-12 (Check-In) | CU-13 (Consultar historial de versiones) | APROBADO |
+| RN-03 | Trazabilidad de Cambios | Analista de Requerimientos / Gestor *(ver Inconsistencias)* | CU-08 (Emitir ECN/ECO), CU-12 (Check-In), CU-14 (Implementar cambio) | CU-27 (Auditar acciones) | APROBADO |
+| RN-04 | Restricción de Bibliotecas Congeladas | Administrador de Configuración / Bibliotecario | CU-04 (Registrar RFC), CU-10 (Check-Out), CU-12 (Check-In), CU-20 (Línea Base) | CU-09 (Registrar ECS) | APROBADO |
+| RN-05 | Evaluación Técnica Obligatoria | Arquitecto / Especialista Técnico | CU-06 (Análisis de impacto técnico), CU-07 (Evaluar viabilidad) | CU-05 (Validar y clasificar solicitud) | APROBADO |
+| RN-06 | Bloqueo de Sincronización Obligatorio | Administrador de Configuración / Bibliotecario | CU-10 (Check-Out), CU-11 (Aplicar bloqueo), CU-12 (Check-In), CU-21 (Rollback) | CU-14 (Implementar cambio en ECS) | APROBADO |
+| RN-07 | Diferenciación de Resultados de Cierre | Comité de Control de Cambios (CCB) / Administrador | CU-07 (Evaluar viabilidad: Rechazo Técnico/Admin), CU-22 (Cancelar Orden de Cambio) | CU-20 (Línea base para cierre exitoso: PENDIENTE DE VALIDACION) | REVISION |
+| RN-08 | Reversión Obligatoria ante Fallo No Subsanado | Administrador de Configuración / Bibliotecario | CU-19 (Reevaluar y re-testear), CU-21 (Rollback en Trabajo), CU-22 (Cancelar Orden) | CU-18 (Reportar no conformidad) | APROBADO |
+| RN-09 | Validación de QA Previa al Check-In a Biblioteca Maestra | Equipo de Calidad / Testing | CU-16 (Pruebas de integración), CU-17 (Certificar conformidad), CU-12 (Check-In) | CU-18 (Reportar no conformidad) | APROBADO |
+
+---
+
+# TB-14 — Matriz General de Trazabilidad SCM
+
+**Estado:** REVISION  
+**Fuente:** Consolidada a partir de `TB-03`, `TB-04`, `TB-06`, `TB-09` y `TB-10`  
+
+| Necesidad Detectada (TB-03) | Requerimiento Funcional (TB-04) | Regla de Negocio Asociada (TB-06) | Casos de Uso Instrumentadores (TB-10) | Actor / Rol Responsable Principal (TB-09) |
+| :--- | :--- | :--- | :--- | :--- |
+| Pérdida de fuentes (Código disperso sin control) | RF-02 (Gestión de Proyectos)<br>RF-03 (Identificación de ECS)<br>RF-08 (Gestión de Bibliotecas) | RN-04 (Restricción de Bibliotecas Congeladas)<br>RN-06 (Bloqueo de Sincronización) | CU-02, CU-03, CU-09, CU-10, CU-12 | Administrador de Configuración / Bibliotecario<br>Arquitecto / Especialista Técnico |
+| Modificaciones arbitrarias (Cambios informales) | RF-04 (Registro de RFC)<br>RF-05 (Clasificación e Impacto)<br>RF-06 (Evaluación por CCB)<br>RF-07 (Gestión de ECN/ECO) | RN-01 (Aprobación Obligatoria)<br>RN-05 (Evaluación Técnica Obligatoria)<br>RN-07 (Diferenciación de Cierre) | CU-04, CU-05, CU-06, CU-07, CU-08, CU-14 | Solicitante<br>Analista de Requerimientos<br>Arquitecto<br>Comité de Control de Cambios (CCB) |
+| Confusión sobre la versión vigente (Sin baselines) | RF-09 (Control de Versiones / Bloqueos)<br>RF-13 (Gestión de Líneas Base) | RN-02 (Identificación Unívoca de Versiones)<br>RN-04 (Restricción de Bibliotecas Congeladas) | CU-10, CU-11, CU-12, CU-13, CU-20 | Administrador de Configuración / Bibliotecario |
+| No se identifica al responsable de una falla | RF-01 (Usuarios y Roles RBAC)<br>RF-16 (Trazabilidad de Configuración)<br>RF-17 (Auditoría e Integridad) | RN-03 (Trazabilidad de Cambios) | CU-01, CU-13, CU-26, CU-27 | Administrador de Configuración<br>Comité de Control de Cambios (CCB) |
+| Entregas al cliente sin validación previa | RF-10 (Gestión de Pruebas y Certificación)<br>RF-11 (Reevaluación y Re-test)<br>RF-12 (Rollback y Cancelación)<br>RF-14 (Cierre Formal del Cambio) | RN-08 (Reversión ante Fallo No Subsanado)<br>RN-09 (Validación de QA previa a Maestra) | CU-15, CU-16, CU-17, CU-18, CU-19, CU-21, CU-22 | Equipo de Calidad / Testing<br>Ingeniero de Software / Desarrollador<br>Administrador de Configuración |
+| Gestión de fallas de clientes hacia cambios | RF-15 (Gestión de Incidencias y Soporte) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para incidencias en SRS) | CU-23, CU-24, CU-25 | Solicitante<br>Analista de Requerimientos / Gestor |
+| Transparencia y reportería de gestión | RF-18 (Generación de Reportes) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para reportes en SRS) | CU-28 | Administrador de Configuración / Bibliotecario |
+
+---
+
+## Inconsistencias Detectadas
+
+Las siguientes inconsistencias y discrepancias fueron identificadas durante la extracción minuciosa del documento consolidado `FD03-EPIS-Informe_SRS.md`. No fueron corregidas silenciosamente y se registran aquí para su tratamiento y decisión formal:
+
+### 1. Inconsistencia de Contexto en Perfiles de Usuario
+- **Elemento:** Párrafo explicativo posterior a la tabla de perfiles de usuario.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Líneas 1070 a 1076, Págs. 30-31).
+- **Descripción:** El texto menciona literalmente: *"...donde el mentoreado resuelve dudas temáticas, el mentor gestiona y dicta las clases acumulando horas, y la administración supervisa la calidad del servicio tutorial y formaliza las certificaciones."* Estos términos corresponden a un sistema de tutorías universitarias y no guardan ninguna relación funcional con el proyecto TraceFlow SCM.
+- **Impacto:** Confusión conceptual severa en la documentación de perfiles de usuario y RBAC.
+- **Recomendación de Revisión:** Sustituir dicho párrafo por una justificación técnica alineada a la segregación de responsabilidades entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
+
+### 2. Discrepancia en la Convención de Nomenclatura de Casos de Uso
+- **Elemento:** Identificadores de casos de uso.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Págs. 35-94) y 6.2.1 (Págs. 95-114).
+- **Descripción:** El SRS utiliza el código `CUS01` a `CUS28` (sin guion), mientras que `docs/DOCUMENTATION_RULES.md` establece como convención oficial mandatoria el formato `CU-XX`.
+- **Impacto:** Ambigüedad en la referencia cruzada entre diagramas, matrices y especificaciones de casos de uso.
+- **Recomendación de Revisión:** Adoptar `CU-XX` como identificador canónico en `TABLES.md` y `DIAGRAMS.md`, manteniendo `CUSXX` en una columna de compatibilidad transitoria hasta que el SRS consolidado sea refactorizado.
+
+### 3. Omisión del Diagrama de Secuencia para CUS03 (Consultar proyecto)
+- **Elemento:** Diagramas de secuencia del modelo lógico.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
+- **Descripción:** Existen diagramas de secuencia documentados para CUS01, CUS02 y luego salta directamente a CUS04. El caso de uso CUS03 ("Consultar proyecto") no cuenta con diagrama de secuencia en el documento original.
+- **Impacto:** Laguna de cobertura en el modelado dinámico de las interacciones del sistema.
+- **Recomendación de Revisión:** Evaluar si se debe formular el diagrama `DG-SEQ-03` para la consulta de proyectos o si se declara formalmente exceptuado por tratarse de una consulta sincrónica estándar de lectura.
+
+### 4. Malformación de Sintaxis Markdown en Encabezados de CUS19 y CUS20
+- **Elemento:** Tablas narrativas de CUS19 y CUS20.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Líneas 2012 y 2060, Págs. 74 y 76).
+- **Descripción:** Por efecto de la conversión desde PDF, los metadatos iniciales de CUS19 y CUS20 quedaron renderizados como texto corrido (`Campo Descripción Código CUS19` y `Campo Descripción Código CUS20`) antes de los saltos de página, en lugar de conservar la cabecera tabular `| Campo | Descripción |`.
+- **Impacto:** Dificultad para el parseo automatizado de los escenarios de casos de uso.
+- **Recomendación de Revisión:** Corregir la sintaxis Markdown en el SRS consolidado asegurando la estructura tabular estándar en todos los 28 casos de uso.
+
+### 5. Autoridad de la Regla de Negocio RN-03 (Trazabilidad de Cambios)
+- **Elemento:** Campo *Autoridad* en la tabla de Reglas de Negocio.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Línea 946, Pág. 25).
+- **Descripción:** La tabla asigna la autoridad de la regla RN-03 al *"Analista de Requerimientos / Gestor"*, a pesar de que el texto de la regla establece que *"Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO)"*, siendo el Check-In una función estrictamente técnica y operativa del *Administrador de Configuración / Bibliotecario*.
+- **Impacto:** Atribución incorrecta de responsabilidades de cumplimiento en la biblioteca de software.
+- **Recomendación de Revisión:** Modificar la autoridad de RN-03 a *"Administrador de Configuración / Bibliotecario"* o declararla compartida con el Analista de Requerimientos (quien verifica la existencia de la ECN).
+
+### 6. Duplicidad Literal entre Viabilidad Social y Viabilidad Ambiental
+- **Elemento:** Secciones de Viabilidad Social y Ambiental.
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Líneas 414-450, Págs. 16-17).
+- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental (*Optimización de Recursos de Hardware*, *Reducción de la Huella de Carbono Digital*, *Digitalización y Cero Papel*, *Promoción del Trabajo Remoto*) son una réplica exacta palabra por palabra de los cuatro numerales de la Viabilidad Social.
+- **Impacto:** Redundancia que reduce el rigor técnico de la evaluación de viabilidad del sistema.
+- **Recomendación de Revisión:** Reescribir la Viabilidad Ambiental enfocándose en métricas energéticas de servidores, centros de datos en la nube y consumo de red.
+
+### 7. Cobertura del Cierre Exitoso en la Matriz RF-14
+- **Elemento:** Requerimiento RF-14 (Cierre Formal del Cambio y Notificaciones).
+- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 5.1 y 6.1.3.
+- **Descripción:** En la narrativa de los casos de uso, el RF-14 solo aparece referenciado de manera explícita en el caso de uso CUS22 ("Cancelar Orden de Cambio"), correspondiente a cierres no exitosos o cancelaciones. El cierre formal por implementación exitosa ocurre dentro de CUS20 ("Crear y congelar línea base") o de manera complementaria en el flujo de gestión de cambios sin un caso de uso denominado exclusivamente "Cerrar cambio implementado".
+- **Impacto:** Asimetría en la trazabilidad formal del cierre exitoso frente a los cierres por rechazo o cancelación.
+- **Recomendación de Revisión:** Documentar explícitamente en el caso de uso CUS20 la asociación complementaria a RF-14 o crear un caso de uso específico para el cierre administrativo exitoso por parte del CCB.
 
 # Conclusiones
 

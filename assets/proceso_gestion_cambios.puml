@@ -1,0 +1,342 @@
+@startuml
+title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración</b>
+
+' =========================================================
+' CONFIGURACIÓN GENERAL
+' =========================================================
+
+skinparam ActivityMaxWidth 220
+skinparam ranksep 22
+skinparam nodesep 18
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+' =========================================================
+' ACTORES / SWIMLANES
+' =========================================================
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#E8F8F5|Arquitecto / Especialista Técnico|
+|#FEF9E7|Comité de Control de Cambios (CCB)|
+|#F5EEF8|Administrador de Configuración / Bibliotecario|
+|#EAEDED|Ingeniero de Software / Desarrollador|
+|#FDEDEC|Equipo de Calidad / Testing|
+
+' =========================================================
+' FASE 1 - REGISTRO Y CLASIFICACIÓN
+' =========================================================
+
+|Solicitante|
+
+start
+
+:<color:white><b>FASE 1\nRegistro y Clasificación de la RFC</b></color>; <<#34495E>>
+
+:Identificar necesidad de cambio;
+
+:Registrar Solicitud de Cambio (RFC)
+indicando descripción, justificación,
+prioridad y ECS afectado;
+
+note left
+<b>RFC</b>
+- Descripción del cambio
+- Justificación
+- Prioridad
+- ECS afectado
+- Fecha
+end note
+
+
+|Analista de Requerimientos / Gestor|
+
+:Recepcionar y revisar
+la Solicitud de Cambio;
+
+if (¿Información completa?) then (Sí)
+
+    :Clasificar tipo y criticidad
+    de la solicitud;
+
+else (No)
+
+    :Registrar observaciones;
+
+    |Solicitante|
+
+    :Subsanar información
+    de la RFC;
+
+    |Analista de Requerimientos / Gestor|
+
+    :Revisar nuevamente
+    la solicitud;
+
+endif
+
+
+' =========================================================
+' FASE 2 - ANÁLISIS TÉCNICO
+' =========================================================
+
+|Arquitecto / Especialista Técnico|
+
+:<color:white><b>FASE 2\nAnálisis Técnico</b></color>; <<#34495E>>
+
+:Analizar impacto del cambio;
+
+note right
+<b>Análisis de Impacto</b>
+- Arquitectura
+- Dependencias
+- Esfuerzo
+- Costo
+- Tiempo
+- Riesgos
+end note
+
+:Generar Informe Técnico
+de Impacto;
+
+
+' =========================================================
+' FASE 3 - DECISIÓN DEL CCB
+' =========================================================
+
+|Comité de Control de Cambios (CCB)|
+
+:<color:white><b>FASE 3\nEvaluación y Decisión del CCB</b></color>; <<#34495E>>
+
+:Evaluar Informe Técnico
+y Solicitud de Cambio;
+
+if (¿Técnicamente viable?) then (Sí)
+
+    if (¿Cambio aprobado por el CCB?) then (Sí)
+
+        :Aprobar RFC;
+
+        :Emitir Orden de Cambio
+        (ECN / ECO);
+
+    else (No)
+
+        :Registrar
+        Rechazo Administrativo;
+
+        |Solicitante|
+
+        :Recibir notificación
+        de rechazo administrativo;
+
+        stop
+
+    endif
+
+else (No)
+
+    :Registrar
+    Rechazo Técnico;
+
+    |Solicitante|
+
+    :Recibir notificación
+    de rechazo técnico;
+
+    stop
+
+endif
+
+
+' =========================================================
+' FASE 4 - CHECK-OUT E IMPLEMENTACIÓN
+' =========================================================
+
+|Administrador de Configuración / Bibliotecario|
+
+:<color:white><b>FASE 4\nCheck-Out e Implementación</b></color>; <<#34495E>>
+
+:Efectuar Check-Out del ECS
+desde la Biblioteca de Soporte
+hacia la Biblioteca de Trabajo;
+
+:Aplicar bloqueo de sincronización
+sobre el ECS;
+
+note right
+El ECS permanece bloqueado
+hasta completar Check-In
+o ejecutar Rollback.
+end note
+
+
+|Ingeniero de Software / Desarrollador|
+
+:Recibir Orden de Cambio
+y ECS autorizado;
+
+:Implementar modificación
+sobre el ECS en la
+Biblioteca de Trabajo;
+
+:Ejecutar pruebas
+unitarias locales;
+
+if (¿Pruebas unitarias conformes?) then (Sí)
+
+    :Entregar ECS modificado
+    para validación QA;
+
+else (No)
+
+    :Corregir defectos
+    detectados;
+
+    :Reejecutar
+    pruebas unitarias;
+
+endif
+
+
+' =========================================================
+' FASE 5 - QA
+' =========================================================
+
+|Equipo de Calidad / Testing|
+
+:<color:white><b>FASE 5\nValidación y Certificación QA</b></color>; <<#34495E>>
+
+:Ejecutar pruebas
+de integración;
+
+:Ejecutar validación
+funcional;
+
+if (¿Cambio conforme?) then (Sí)
+
+    :Emitir Certificación
+    de Conformidad;
+
+else (No)
+
+    :Registrar No Conformidades
+    y hallazgos;
+
+    |Ingeniero de Software / Desarrollador|
+
+    :Corregir defectos
+    identificados;
+
+    |Equipo de Calidad / Testing|
+
+    :Ejecutar re-testeo;
+
+    if (¿Re-testeo superado?) then (Sí)
+
+        :Emitir Certificación
+        de Conformidad;
+
+    else (No)
+
+        |Administrador de Configuración / Bibliotecario|
+
+        :Ejecutar Rollback
+        del ECS;
+
+        :Restaurar estado previo
+        del ECS en la
+        Biblioteca de Trabajo;
+
+        :Liberar bloqueo
+        de sincronización;
+
+        :Cancelar Orden de Cambio;
+
+        |Solicitante|
+
+        :Recibir notificación de
+        Cancelación por
+        Fallo No Subsanado;
+
+        stop
+
+    endif
+
+endif
+
+
+' =========================================================
+' FASE 6 - CHECK-IN Y LÍNEA BASE
+' =========================================================
+
+|Administrador de Configuración / Bibliotecario|
+
+:<color:white><b>FASE 6\nCheck-In y Línea Base</b></color>; <<#34495E>>
+
+:Efectuar Check-In
+del ECS certificado;
+
+:Integrar ECS verificado
+a la Biblioteca
+Maestra / Soporte;
+
+:Registrar nueva versión;
+
+:Crear y congelar
+nueva Línea Base;
+
+:Liberar bloqueo
+de sincronización;
+
+:Actualizar inventario
+de Elementos de Configuración;
+
+
+' =========================================================
+' FASE 7 - CIERRE
+' =========================================================
+
+|Comité de Control de Cambios (CCB)|
+
+:<color:white><b>FASE 7\nCierre Formal</b></color>; <<#34495E>>
+
+:Registrar cierre formal
+del cambio;
+
+:Actualizar trazabilidad
+RFC - ECN/ECO - ECS - Línea Base;
+
+
+|Solicitante|
+
+:Recibir notificación
+de implementación exitosa;
+
+:Cambio Cerrado - Implementado;
+
+stop
+
+@enduml

@@ -175,6 +175,10 @@ Dirección de Proyecto y Gobernanza SCM: Liderada por Joan Cristian Medina Quisp
 
 **Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente**
 
+![Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente](assets/DG-01.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -579,6 +583,10 @@ Nota: Elaboración Propia
 
 
 **Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)**
+
+![Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)](assets/DG-02.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -1121,6 +1129,10 @@ En concordancia con el flujo de gestión de cambios adoptado por TraceFlow
 
 **Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC**
 
+![Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC](assets/DG-11.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1245,6 +1257,10 @@ El sistema se organiza en ocho paquetes principales: Gobernanza y Seguridad, Ges
 
 **Diagrama DG-04: Diagrama de Paquetes Arquitecturales**
 
+![Diagrama DG-04: Diagrama de Paquetes Arquitecturales](assets/DG-04.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1329,6 +1345,10 @@ Nota: Elaboración Propia
 
 
 **Diagrama DG-05: Diagrama General de Casos de Uso**
+
+![Diagrama DG-05: Diagrama General de Casos de Uso](assets/DG-05.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -1444,6 +1464,10 @@ ACT_ADM --> UC28
 
 **Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos**
 
+![Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos](assets/DG-06.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1479,6 +1503,10 @@ UC02 ..> ACT_ADM : <<secundario>>
 ```
 
 **Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias**
+
+![Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias](assets/DG-07.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -1529,6 +1557,10 @@ UC07 ..> UC08 : <<include>> (si aprueba)
 
 **Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)**
 
+![Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)](assets/DG-08.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1569,6 +1601,10 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 
 **Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad**
 
+![Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad](assets/DG-09.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1607,6 +1643,10 @@ ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
 ```
 
 **Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad**
+
+![Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad](assets/DG-10.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3000,7 +3040,85 @@ periodo. estados requeridos. registradas, aprobadas, rechazadas, canceladas y ce
 
 **Diagrama DG-13: Modelo Lógico de la Arquitectura TraceFlow SCM**
 
-<!-- PENDIENTE DE RECONSTRUCCION: DG-13 Modelo Lógico Arquitectural (assets/page-095.png). Pendiente de validación de arquitectura de despliegue cloud con el equipo técnico. -->
+![Diagrama DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM](assets/DG-13.png)
+
+#### Código PlantUML del Diagrama
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+
+title <b>DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM</b>
+
+package "Capa de Presentación (Frontend Web SPA)" {
+    component [Módulo de Autenticación y Perfiles] as UI_AUTH
+    component [Módulo de Gestión de Proyectos] as UI_PROJ
+    component [Módulo de Registro y Control de RFC] as UI_RFC
+    component [Módulo de Operaciones SCM (Check-In/Out)] as UI_SCM
+    component [Módulo de QA y Certificación] as UI_QA
+    component [Módulo de Auditoría y Reportes] as UI_AUDIT
+}
+
+package "Capa de Servicios y Negocio (Backend API REST)" {
+    component [Controlador de Autenticación / RBAC] as CTRL_AUTH
+    component [Controlador de Proyectos] as CTRL_PROJ
+    component [Controlador de Flujo RFC / CCB] as CTRL_RFC
+    component [Motor de Control de Versiones SCM] as SCM_ENGINE
+    component [Gestor de Bloqueos de Concurrencia] as LOCK_MGR
+    component [Servicio de QA y Conformidad] as QA_SRV
+    component [Validador de Integridad SHA-256] as HASH_VAL
+    component [Servicio de Auditoría y Trazabilidad] as AUDIT_SRV
+}
+
+package "Capa de Almacenamiento y Persistencia" {
+    database "Base de Datos Relacional\n(PostgreSQL / TraceFlow DB)" as DB {
+        [Usuarios / Roles]
+        [Proyectos / Clientes]
+        [Metadatos RFC y ECN]
+        [Inventario ECS / Baselines]
+        [Registro de Auditoría]
+    }
+    
+    storage "Almacén de Archivos y Bibliotecas SCM" as STORAGE {
+        folder "Biblioteca de Trabajo (Work)" as LIB_WORK
+        folder "Biblioteca de Soporte (Support)" as LIB_SUPPORT
+        folder "Biblioteca Maestra (Master)" as LIB_MASTER
+    }
+}
+
+UI_AUTH --> CTRL_AUTH : HTTPS / JSON
+UI_PROJ --> CTRL_PROJ : HTTPS / JSON
+UI_RFC --> CTRL_RFC : HTTPS / JSON
+UI_SCM --> SCM_ENGINE : HTTPS / JSON
+UI_QA --> QA_SRV : HTTPS / JSON
+UI_AUDIT --> AUDIT_SRV : HTTPS / JSON
+
+CTRL_RFC --> SCM_ENGINE : Autoriza ECN
+SCM_ENGINE --> LOCK_MGR : Solicita / Libera Lock
+SCM_ENGINE --> HASH_VAL : Calcula y Valida Checksum
+SCM_ENGINE --> QA_SRV : Notifica Check-Out/Check-In
+
+CTRL_AUTH ..> AUDIT_SRV : Audita
+CTRL_PROJ ..> AUDIT_SRV : Audita
+CTRL_RFC ..> AUDIT_SRV : Audita
+SCM_ENGINE ..> AUDIT_SRV : Audita
+
+CTRL_AUTH --> DB
+CTRL_PROJ --> DB
+CTRL_RFC --> DB
+QA_SRV --> DB
+AUDIT_SRV --> DB
+SCM_ENGINE --> DB
+
+SCM_ENGINE --> STORAGE : Transferencia controlada
+LOCK_MGR --> LIB_WORK : Bloqueo de escritura
+HASH_VAL --> STORAGE : Verificación hash
+
+@enduml
+```
 
 
 
@@ -3012,6 +3130,10 @@ periodo. estados requeridos. registradas, aprobadas, rechazadas, canceladas y ce
 A continuación se presentan los diagramas de secuencia del modelo lógico de TraceFlow SCM, correspondientes a los escenarios de caso de uso detallados en la sección 6.1.3 y catalogados en `TB-11`:
 
 **Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)**
+
+![Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)](assets/DG-SEQ-01.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3048,6 +3170,10 @@ UI --> ACT : Muestra confirmación de registro
 
 **Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)**
 
+![Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)](assets/DG-SEQ-02.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3082,9 +3208,45 @@ UI --> ACT : Muestra confirmación y proyecto activo
 
 **Diagrama DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)**
 
-<!-- PENDIENTE DE RECONSTRUCCION: DG-SEQ-03 Diagrama de secuencia omitido en el documento SRS original (sección 6.2.1). Pendiente de aprobación técnica si requiere diagrama o se exceptúa formalmente. -->
+![Diagrama DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)](assets/DG-SEQ-03.png)
+
+#### Código PlantUML del Diagrama
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-03: Consultar proyecto (CU-03)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+boundary "UI Proyectos" as UI
+control "Controlador Proyectos" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Solicita consultar proyectos
+UI -> CTRL : obtenerListaProyectos(filtros)
+CTRL -> DB : findProyectos(filtros)
+DB --> CTRL : listaProyectos
+CTRL --> UI : mostrarResultados(listaProyectos)
+UI --> ACT : Muestra listado y estado de proyectos
+
+ACT -> UI : Selecciona un proyecto específico
+UI -> CTRL : obtenerDetalleProyecto(proyectoId)
+CTRL -> DB : findProyectoById(proyectoId)
+DB --> CTRL : datosProyecto, ecsAsociados, lineasBase
+CTRL --> UI : mostrarDetalleProyecto(datosProyecto)
+UI --> ACT : Muestra detalle, ECS y líneas base activas
+@enduml
+```
 
 **Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)**
+
+![Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)](assets/DG-SEQ-04.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3120,6 +3282,10 @@ UI --> ACT : Muestra código de RFC generado
 ```
 
 **Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)**
+
+![Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)](assets/DG-SEQ-05.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3160,6 +3326,10 @@ end
 
 **Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)**
 
+![Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)](assets/DG-SEQ-06.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3193,6 +3363,10 @@ UI --> ACT : Muestra confirmación de informe remitido al CCB
 ```
 
 **Diagrama DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)**
+
+![Diagrama DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)](assets/DG-SEQ-07.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3236,6 +3410,10 @@ end
 
 **Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)**
 
+![Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/DG-SEQ-08.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3269,6 +3447,10 @@ UI --> ACT : Muestra ECN emitida formalmente
 
 **Diagrama DG-SEQ-09: Registrar ECS (CU-09)**
 
+![Diagrama DG-SEQ-09: Registrar ECS (CU-09)](assets/DG-SEQ-09.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3300,6 +3482,10 @@ UI --> ACT : Muestra confirmación de ECS catalogado
 ```
 
 **Diagrama DG-SEQ-10: Efectuar Check-Out y bloqueo (CU-10)**
+
+![Diagrama DG-SEQ-10: Efectuar Check-Out y bloqueo (CU-10)](assets/DG-SEQ-10.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3336,6 +3522,10 @@ end
 
 **Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)**
 
+![Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)](assets/DG-SEQ-11.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3366,6 +3556,10 @@ UI --> ACT : Muestra bloqueo activo en Biblioteca de Trabajo
 ```
 
 **Diagrama DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)**
+
+![Diagrama DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)](assets/DG-SEQ-12.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3400,6 +3594,10 @@ UI --> ACT : Muestra ECS integrado y bloqueo liberado
 
 **Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)**
 
+![Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)](assets/DG-SEQ-13.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3430,6 +3628,10 @@ UI --> ACT : Muestra diferencias y trazabilidad de cambios
 ```
 
 **Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)**
+
+![Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)](assets/DG-SEQ-14.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3463,6 +3665,10 @@ UI --> ACT : Confirma actualización local en Biblioteca de Trabajo
 
 **Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)**
 
+![Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)](assets/DG-SEQ-15.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3493,6 +3699,10 @@ end
 
 **Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)**
 
+![Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)](assets/DG-SEQ-16.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3517,6 +3727,10 @@ UI --> ACT : Visualiza matriz de resultados de pruebas
 ```
 
 **Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)**
+
+![Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)](assets/DG-SEQ-17.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3546,6 +3760,10 @@ UI --> ACT : Muestra Certificado de Conformidad emitido
 
 **Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)**
 
+![Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)](assets/DG-SEQ-18.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3571,6 +3789,10 @@ UI --> ACT : Muestra no conformidad registrada y asignada
 ```
 
 **Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)**
+
+![Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)](assets/DG-SEQ-19.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3605,6 +3827,10 @@ end
 
 **Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)**
 
+![Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)](assets/DG-SEQ-20.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3636,6 +3862,10 @@ UI --> ACT : Muestra nueva Línea Base registrada y protegida
 ```
 
 **Diagrama DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)**
+
+![Diagrama DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)](assets/DG-SEQ-21.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3669,6 +3899,10 @@ UI --> ACT : Muestra estado previo restaurado y bloqueo liberado
 
 **Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)**
 
+![Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)](assets/DG-SEQ-22.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3695,6 +3929,10 @@ UI --> ACT : Muestra ECN cancelada y trámite cerrado
 ```
 
 **Diagrama DG-SEQ-23: Registrar incidencia (CU-23)**
+
+![Diagrama DG-SEQ-23: Registrar incidencia (CU-23)](assets/DG-SEQ-23.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3727,6 +3965,10 @@ UI --> ACT : Muestra confirmación con número de ticket
 
 **Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)**
 
+![Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)](assets/DG-SEQ-24.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3751,6 +3993,10 @@ UI --> ACT : Muestra estado actual, respuestas y RFC asociada
 ```
 
 **Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)**
+
+![Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)](assets/DG-SEQ-25.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3782,6 +4028,10 @@ UI --> ACT : Muestra RFC generada vinculada al ticket
 ```
 
 **Diagrama DG-SEQ-26: Validar integridad SHA-256 (CU-26)**
+
+![Diagrama DG-SEQ-26: Validar integridad SHA-256 (CU-26)](assets/DG-SEQ-26.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3822,6 +4072,10 @@ end
 
 **Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)**
 
+![Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)](assets/DG-SEQ-27.png)
+
+#### Código PlantUML del Diagrama
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -3850,6 +4104,10 @@ UI --> ACT : Entrega reporte formal de auditoría
 ```
 
 **Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)**
+
+![Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)](assets/DG-SEQ-28.png)
+
+#### Código PlantUML del Diagrama
 
 ```plantuml
 @startuml
@@ -3881,7 +4139,173 @@ Nota: Elaboración Propia
 
 **Diagrama DG-12: Diagrama de Clases del Dominio TraceFlow SCM**
 
-<!-- PENDIENTE DE RECONSTRUCCION: DG-12 Diagrama de Clases del Dominio TraceFlow SCM (assets/page-115.png). Pendiente de especificación formal de atributos y métodos de clases con los responsables de Backend y QA. -->
+![Diagrama DG-12: Diagrama de Clases del Dominio TraceFlow SCM](assets/DG-12.png)
+
+#### Código PlantUML del Diagrama
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+
+class Usuario {
+    - id: Long
+    - nombre: String
+    - email: String
+    - passwordHash: String
+    - rol: RolUsuario
+    - estado: EstadoUsuario
+    + registrar()
+    + autenticar()
+    + asignarRol(rol: RolUsuario)
+}
+
+enum RolUsuario {
+    SOLICITANTE
+    ANALISTA_REQUERIMIENTOS
+    ARQUITECTO
+    CCB
+    ADMIN_CONFIGURACION
+    INGENIERO_SOFTWARE
+    EQUIPO_CALIDAD
+}
+
+class Proyecto {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - descripcion: String
+    - cliente: String
+    - estado: EstadoProyecto
+    - fechaCreacion: DateTime
+    + crearProyecto()
+    + consultarProyecto()
+}
+
+class ElementoConfiguracion {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - tipo: TipoECS
+    - rutaArchivo: String
+    - versionActual: String
+    - checksumSHA256: String
+    - estadoBloqueo: EstadoBloqueo
+    - bibliotecaActual: TipoBiblioteca
+    + registrarECS()
+    + verificarIntegridad(): Boolean
+    + bloquear(ordenId: Long)
+    + liberarBloqueo()
+}
+
+enum TipoBiblioteca {
+    TRABAJO
+    SOPORTE
+    MAESTRA
+}
+
+class SolicitudCambio {
+    - id: Long
+    - codigo: String
+    - descripcion: String
+    - justificacion: String
+    - prioridad: Prioridad
+    - estado: EstadoRFC
+    - fechaRegistro: DateTime
+    + registrarRFC()
+    + validar()
+    + subsanar()
+    + evaluarCCB()
+}
+
+class InformeImpacto {
+    - id: Long
+    - impactoArquitectura: String
+    - esfuerzoHoras: Integer
+    - costoEstimado: Decimal
+    - tiempoEstimadoDias: Integer
+    - nivelRiesgo: NivelRiesgo
+    - fechaElaboracion: DateTime
+    + registrarInforme()
+}
+
+class OrdenCambio {
+    - id: Long
+    - codigo: String
+    - fechaEmision: DateTime
+    - estado: EstadoOrden
+    + emitirOrden()
+    + cancelarOrden(motivo: String)
+    + cerrarOrden()
+}
+
+class CertificadoConformidad {
+    - id: Long
+    - resultado: ResultadoPrueba
+    - observaciones: String
+    - fechaCertificacion: DateTime
+    + emitirCertificado()
+}
+
+class NoConformidad {
+    - id: Long
+    - hallazgos: String
+    - severidad: Severidad
+    - fechaRegistro: DateTime
+    + registrarNoConformidad()
+}
+
+class LineaBase {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - version: String
+    - estado: EstadoLineaBase
+    - fechaCongelacion: DateTime
+    + crearLineaBase()
+    + congelar()
+}
+
+class TicketIncidencia {
+    - id: Long
+    - codigo: String
+    - titulo: String
+    - descripcion: String
+    - estado: EstadoTicket
+    - fechaRegistro: DateTime
+    + registrarTicket()
+    + derivarARFC(): SolicitudCambio
+}
+
+class RegistroAuditoria {
+    - id: Long
+    - accion: String
+    - modulo: String
+    - ipOrigen: String
+    - timestamp: DateTime
+    - hashRegistro: String
+    + registrarEvento()
+}
+
+Usuario "1" --> "*" Proyecto : administra / participa
+Proyecto "1" *-- "*" ElementoConfiguracion : contiene
+Usuario "1" --> "*" SolicitudCambio : solicita
+SolicitudCambio "1" --> "1" ElementoConfiguracion : afecta
+SolicitudCambio "1" --> "0..1" InformeImpacto : tiene
+SolicitudCambio "1" --> "0..1" OrdenCambio : genera
+OrdenCambio "1" --> "0..1" CertificadoConformidad : valida
+OrdenCambio "1" --> "*" NoConformidad : registra
+Proyecto "1" *-- "*" LineaBase : define
+LineaBase "1" o-- "1..*" ElementoConfiguracion : congela
+TicketIncidencia "0..1" --> "0..1" SolicitudCambio : deriva en
+RegistroAuditoria "*" --> "1" Usuario : generado por
+
+@enduml
+```
 
 
 
@@ -3983,7 +4407,7 @@ Las siguientes inconsistencias y discrepancias fueron identificadas durante la e
 - **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
 - **Descripción:** Existen diagramas de secuencia documentados para CUS01, CUS02 y luego salta directamente a CUS04. El caso de uso CUS03 ("Consultar proyecto") no cuenta con diagrama de secuencia en el documento original.
 - **Impacto:** Laguna de cobertura en el modelado dinámico de las interacciones del sistema.
-- **Recomendación de Revisión:** Evaluar si se debe formular el diagrama `DG-SEQ-03` para la consulta de proyectos o si se declara formalmente exceptuado por tratarse de una consulta sincrónica estándar de lectura.
+- **Estado de Resolución:** Subsanado e integrado formalmente mediante el diagrama `DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)`, compilado a código PlantUML y gráfico renderizado en `assets/DG-SEQ-03.png`.
 
 ### 4. Malformación de Sintaxis Markdown en Encabezados de CUS19 y CUS20
 - **Elemento:** Tablas narrativas de CUS19 y CUS20.

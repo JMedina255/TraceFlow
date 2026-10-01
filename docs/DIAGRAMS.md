@@ -63,9 +63,9 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-SEQ-26](#dg-seq-26--validar-integridad-sha-256-cu-26) | Secuencia: Validar integridad SHA-256 (CU-26) | Secuencia | APROBADO | 1.0 |
 | [DG-SEQ-27](#dg-seq-27--auditar-acciones-del-sistema-cu-27) | Secuencia: Auditar acciones del sistema (CU-27) | Secuencia | APROBADO | 1.0 |
 | [DG-SEQ-28](#dg-seq-28--generar-reportes-de-estado-cu-28) | Secuencia: Generar reportes de estado (CU-28) | Secuencia | APROBADO | 1.0 |
-| *DG-SEQ-03* | Secuencia: Consultar proyecto (CU-03) | Secuencia | PENDIENTE | - |
-| *DG-12* | Diagrama de Clases del Dominio TraceFlow SCM | Clases | PENDIENTE | - |
-| *DG-13* | Modelo Lógico Arquitectural | Componentes | PENDIENTE | - |
+| [DG-SEQ-03](#dg-seq-03--secuencia-consultar-proyecto-cu-03) | Secuencia: Consultar proyecto (CU-03) | Secuencia | APROBADO | 1.0 |
+| [DG-12](#dg-12--diagrama-de-clases-del-dominio-traceflow-scm) | Diagrama de Clases del Dominio TraceFlow SCM | Clases | APROBADO | 1.0 |
+| [DG-13](#dg-13--modelo-lógico-de-la-arquitectura-traceflow-scm) | Modelo Lógico de la Arquitectura TraceFlow SCM | Componentes | APROBADO | 1.0 |
 
 ---
 
@@ -80,6 +80,8 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 **RN relacionadas:** N/A  
 **CU relacionados:** CU-01  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 2.4 (Págs. 7-8)  
+
+![DG-01](../assets/DG-01.png)
 
 ```plantuml
 @startuml
@@ -168,6 +170,8 @@ DEV ..> CLIENT : Provee plataforma TraceFlow SCM
 **CU relacionados:** N/A  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 3.6 (Pág. 17) y Sección 4.1 (Pág. 17)  
 
+![DG-02](../assets/DG-02.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -249,6 +253,8 @@ endif
 **RN relacionadas:** RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-08, RN-09  
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y `assets/proceso_gestion_cambios.puml`  
+
+![DG-03](../assets/DG-03.png)
 
 ```plantuml
 @startuml
@@ -542,6 +548,8 @@ stop
 **CU relacionados:** CU-01 a CU-28  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32)  
 
+![DG-04](../assets/DG-04.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -625,6 +633,8 @@ PKG_REP ..> PKG_LIB : consulta inventario
 **RN relacionadas:** RN-01 a RN-09  
 **CU relacionados:** CU-01 a CU-28  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33) y `TB-10`  
+
+![DG-05](../assets/DG-05.png)
 
 ```plantuml
 @startuml
@@ -748,6 +758,8 @@ ACT_ADM --> UC28
 **CU relacionados:** CU-01, CU-02, CU-03  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)  
 
+![DG-06](../assets/DG-06.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -795,6 +807,8 @@ UC02 ..> ACT_ADM : <<secundario>>
 **RN relacionadas:** RN-01, RN-05, RN-07  
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)  
+
+![DG-07](../assets/DG-07.png)
 
 ```plantuml
 @startuml
@@ -857,6 +871,8 @@ UC07 ..> UC08 : <<include>> (si aprueba)
 **CU relacionados:** CU-09, CU-10, CU-11, CU-12, CU-13, CU-20, CU-21, CU-22  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)  
 
+![DG-08](../assets/DG-08.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -909,6 +925,8 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 **CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)  
 
+![DG-09](../assets/DG-09.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -960,6 +978,8 @@ ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
 **CU relacionados:** CU-26, CU-27, CU-28  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 36)  
 
+![DG-10](../assets/DG-10.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1003,6 +1023,8 @@ UC28 ..> UC_EXP : <<extend>>
 **RN relacionadas:** RN-01, RN-05, RN-07, RN-08, RN-09  
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-14, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27) y `TB-07`  
+
+![DG-11](../assets/DG-11.png)
 
 ```plantuml
 @startuml
@@ -1077,6 +1099,268 @@ CerradoImplementado --> [*] : Cierre formal exitoso
 
 ---
 
+---
+
+# DG-12 — Diagrama de Clases del Dominio TraceFlow SCM
+
+**ID:** DG-12 | **Tipo:** Clases | **Estado:** APROBADO | **Versión:** 1.0  
+**RF:** RF-01 a RF-18 | **RN:** RN-01 a RN-09 | **CU:** CU-01 a CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2
+
+![DG-12](../assets/DG-12.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+
+class Usuario {
+    - id: Long
+    - nombre: String
+    - email: String
+    - passwordHash: String
+    - rol: RolUsuario
+    - estado: EstadoUsuario
+    + registrar()
+    + autenticar()
+    + asignarRol(rol: RolUsuario)
+}
+
+enum RolUsuario {
+    SOLICITANTE
+    ANALISTA_REQUERIMIENTOS
+    ARQUITECTO
+    CCB
+    ADMIN_CONFIGURACION
+    INGENIERO_SOFTWARE
+    EQUIPO_CALIDAD
+}
+
+class Proyecto {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - descripcion: String
+    - cliente: String
+    - estado: EstadoProyecto
+    - fechaCreacion: DateTime
+    + crearProyecto()
+    + consultarProyecto()
+}
+
+class ElementoConfiguracion {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - tipo: TipoECS
+    - rutaArchivo: String
+    - versionActual: String
+    - checksumSHA256: String
+    - estadoBloqueo: EstadoBloqueo
+    - bibliotecaActual: TipoBiblioteca
+    + registrarECS()
+    + verificarIntegridad(): Boolean
+    + bloquear(ordenId: Long)
+    + liberarBloqueo()
+}
+
+enum TipoBiblioteca {
+    TRABAJO
+    SOPORTE
+    MAESTRA
+}
+
+class SolicitudCambio {
+    - id: Long
+    - codigo: String
+    - descripcion: String
+    - justificacion: String
+    - prioridad: Prioridad
+    - estado: EstadoRFC
+    - fechaRegistro: DateTime
+    + registrarRFC()
+    + validar()
+    + subsanar()
+    + evaluarCCB()
+}
+
+class InformeImpacto {
+    - id: Long
+    - impactoArquitectura: String
+    - esfuerzoHoras: Integer
+    - costoEstimado: Decimal
+    - tiempoEstimadoDias: Integer
+    - nivelRiesgo: NivelRiesgo
+    - fechaElaboracion: DateTime
+    + registrarInforme()
+}
+
+class OrdenCambio {
+    - id: Long
+    - codigo: String
+    - fechaEmision: DateTime
+    - estado: EstadoOrden
+    + emitirOrden()
+    + cancelarOrden(motivo: String)
+    + cerrarOrden()
+}
+
+class CertificadoConformidad {
+    - id: Long
+    - resultado: ResultadoPrueba
+    - observaciones: String
+    - fechaCertificacion: DateTime
+    + emitirCertificado()
+}
+
+class NoConformidad {
+    - id: Long
+    - hallazgos: String
+    - severidad: Severidad
+    - fechaRegistro: DateTime
+    + registrarNoConformidad()
+}
+
+class LineaBase {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - version: String
+    - estado: EstadoLineaBase
+    - fechaCongelacion: DateTime
+    + crearLineaBase()
+    + congelar()
+}
+
+class TicketIncidencia {
+    - id: Long
+    - codigo: String
+    - titulo: String
+    - descripcion: String
+    - estado: EstadoTicket
+    - fechaRegistro: DateTime
+    + registrarTicket()
+    + derivarARFC(): SolicitudCambio
+}
+
+class RegistroAuditoria {
+    - id: Long
+    - accion: String
+    - modulo: String
+    - ipOrigen: String
+    - timestamp: DateTime
+    - hashRegistro: String
+    + registrarEvento()
+}
+
+Usuario "1" --> "*" Proyecto : administra / participa
+Proyecto "1" *-- "*" ElementoConfiguracion : contiene
+Usuario "1" --> "*" SolicitudCambio : solicita
+SolicitudCambio "1" --> "1" ElementoConfiguracion : afecta
+SolicitudCambio "1" --> "0..1" InformeImpacto : tiene
+SolicitudCambio "1" --> "0..1" OrdenCambio : genera
+OrdenCambio "1" --> "0..1" CertificadoConformidad : valida
+OrdenCambio "1" --> "*" NoConformidad : registra
+Proyecto "1" *-- "*" LineaBase : define
+LineaBase "1" o-- "1..*" ElementoConfiguracion : congela
+TicketIncidencia "0..1" --> "0..1" SolicitudCambio : deriva en
+RegistroAuditoria "*" --> "1" Usuario : generado por
+
+@enduml
+```
+
+---
+
+---
+
+# DG-13 — Modelo Lógico de la Arquitectura TraceFlow SCM
+
+**ID:** DG-13 | **Tipo:** Componentes / Arquitectura | **Estado:** APROBADO | **Versión:** 1.0  
+**RF:** RNF-01 a RNF-09 | **RN:** RN-01 a RN-09 | **CU:** Todos | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2
+
+![DG-13](../assets/DG-13.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+
+title <b>DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM</b>
+
+package "Capa de Presentación (Frontend Web SPA)" {
+    component [Módulo de Autenticación y Perfiles] as UI_AUTH
+    component [Módulo de Gestión de Proyectos] as UI_PROJ
+    component [Módulo de Registro y Control de RFC] as UI_RFC
+    component [Módulo de Operaciones SCM (Check-In/Out)] as UI_SCM
+    component [Módulo de QA y Certificación] as UI_QA
+    component [Módulo de Auditoría y Reportes] as UI_AUDIT
+}
+
+package "Capa de Servicios y Negocio (Backend API REST)" {
+    component [Controlador de Autenticación / RBAC] as CTRL_AUTH
+    component [Controlador de Proyectos] as CTRL_PROJ
+    component [Controlador de Flujo RFC / CCB] as CTRL_RFC
+    component [Motor de Control de Versiones SCM] as SCM_ENGINE
+    component [Gestor de Bloqueos de Concurrencia] as LOCK_MGR
+    component [Servicio de QA y Conformidad] as QA_SRV
+    component [Validador de Integridad SHA-256] as HASH_VAL
+    component [Servicio de Auditoría y Trazabilidad] as AUDIT_SRV
+}
+
+package "Capa de Almacenamiento y Persistencia" {
+    database "Base de Datos Relacional\n(PostgreSQL / TraceFlow DB)" as DB {
+        [Usuarios / Roles]
+        [Proyectos / Clientes]
+        [Metadatos RFC y ECN]
+        [Inventario ECS / Baselines]
+        [Registro de Auditoría]
+    }
+    
+    storage "Almacén de Archivos y Bibliotecas SCM" as STORAGE {
+        folder "Biblioteca de Trabajo (Work)" as LIB_WORK
+        folder "Biblioteca de Soporte (Support)" as LIB_SUPPORT
+        folder "Biblioteca Maestra (Master)" as LIB_MASTER
+    }
+}
+
+UI_AUTH --> CTRL_AUTH : HTTPS / JSON
+UI_PROJ --> CTRL_PROJ : HTTPS / JSON
+UI_RFC --> CTRL_RFC : HTTPS / JSON
+UI_SCM --> SCM_ENGINE : HTTPS / JSON
+UI_QA --> QA_SRV : HTTPS / JSON
+UI_AUDIT --> AUDIT_SRV : HTTPS / JSON
+
+CTRL_RFC --> SCM_ENGINE : Autoriza ECN
+SCM_ENGINE --> LOCK_MGR : Solicita / Libera Lock
+SCM_ENGINE --> HASH_VAL : Calcula y Valida Checksum
+SCM_ENGINE --> QA_SRV : Notifica Check-Out/Check-In
+
+CTRL_AUTH ..> AUDIT_SRV : Audita
+CTRL_PROJ ..> AUDIT_SRV : Audita
+CTRL_RFC ..> AUDIT_SRV : Audita
+SCM_ENGINE ..> AUDIT_SRV : Audita
+
+CTRL_AUTH --> DB
+CTRL_PROJ --> DB
+CTRL_RFC --> DB
+QA_SRV --> DB
+AUDIT_SRV --> DB
+SCM_ENGINE --> DB
+
+SCM_ENGINE --> STORAGE : Transferencia controlada
+LOCK_MGR --> LIB_WORK : Bloqueo de escritura
+HASH_VAL --> STORAGE : Verificación hash
+
+@enduml
+```
+
+---
+
 # Diagramas de Secuencia del Modelo Lógico
 
 Los diagramas de secuencia modelan la interacción temporal y sincrónica entre los actores y los componentes del sistema (Frontend, Controlador, Servicios de Lógica de Negocio y Persistencia/SCM Core) conforme a los escenarios de caso de uso detallados en la Sección 6.1.3 y catalogados en `TB-11`.
@@ -1086,6 +1370,8 @@ Los diagramas de secuencia modelan la interacción temporal y sincrónica entre 
 ### DG-SEQ-01 — Gestionar usuarios y roles (CU-01)
 **ID:** DG-SEQ-01 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-01 | **RN:** N/A | **CU:** CU-01 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 96)
+
+![DG-SEQ-01](../assets/DG-SEQ-01.png)
 
 ```plantuml
 @startuml
@@ -1126,6 +1412,8 @@ UI --> ACT : Muestra confirmación de registro
 **ID:** DG-SEQ-02 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-02 | **RN:** N/A | **CU:** CU-02 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 97)
 
+![DG-SEQ-02](../assets/DG-SEQ-02.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1160,9 +1448,49 @@ UI --> ACT : Muestra confirmación y proyecto activo
 
 ---
 
+---
+
+### DG-SEQ-03 — Secuencia: Consultar proyecto (CU-03)
+**ID:** DG-SEQ-03 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
+**RF:** RF-02 | **RN:** N/A | **CU:** CU-03 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (CU-03) y 6.2.1
+
+![DG-SEQ-03](../assets/DG-SEQ-03.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+autonumber
+
+title <b>DG-SEQ-03: Consultar proyecto (CU-03)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+boundary "UI Proyectos" as UI
+control "Controlador Proyectos" as CTRL
+database "BD TraceFlow" as DB
+
+ACT -> UI : Solicita consultar proyectos
+UI -> CTRL : obtenerListaProyectos(filtros)
+CTRL -> DB : findProyectos(filtros)
+DB --> CTRL : listaProyectos
+CTRL --> UI : mostrarResultados(listaProyectos)
+UI --> ACT : Muestra listado y estado de proyectos
+
+ACT -> UI : Selecciona un proyecto específico
+UI -> CTRL : obtenerDetalleProyecto(proyectoId)
+CTRL -> DB : findProyectoById(proyectoId)
+DB --> CTRL : datosProyecto, ecsAsociados, lineasBase
+CTRL --> UI : mostrarDetalleProyecto(datosProyecto)
+UI --> ACT : Muestra detalle, ECS y líneas base activas
+@enduml
+```
+
 ### DG-SEQ-04 — Registrar Solicitud de Cambio (RFC) (CU-04)
 **ID:** DG-SEQ-04 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-04 | **RN:** RN-04 | **CU:** CU-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 98)
+
+![DG-SEQ-04](../assets/DG-SEQ-04.png)
 
 ```plantuml
 @startuml
@@ -1202,6 +1530,8 @@ UI --> ACT : Muestra código de RFC generado
 ### DG-SEQ-05 — Validar y clasificar la solicitud (CU-05)
 **ID:** DG-SEQ-05 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-04, RF-05 | **RN:** RN-05 | **CU:** CU-05 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 99)
+
+![DG-SEQ-05](../assets/DG-SEQ-05.png)
 
 ```plantuml
 @startuml
@@ -1246,6 +1576,8 @@ end
 **ID:** DG-SEQ-06 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-05 | **RN:** RN-05 | **CU:** CU-06 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 100)
 
+![DG-SEQ-06](../assets/DG-SEQ-06.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1283,6 +1615,8 @@ UI --> ACT : Muestra confirmación de informe remitido al CCB
 ### DG-SEQ-07 — Evaluar viabilidad y aprobación por el CCB (CU-07)
 **ID:** DG-SEQ-07 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-06 | **RN:** RN-01, RN-05, RN-07 | **CU:** CU-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 101)
+
+![DG-SEQ-07](../assets/DG-SEQ-07.png)
 
 ```plantuml
 @startuml
@@ -1330,6 +1664,8 @@ end
 **ID:** DG-SEQ-08 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-07 | **RN:** RN-01, RN-03 | **CU:** CU-08 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 102)
 
+![DG-SEQ-08](../assets/DG-SEQ-08.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1367,6 +1703,8 @@ UI --> ACT : Muestra ECN emitida formalmente
 **ID:** DG-SEQ-09 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-03 | **RN:** RN-02 | **CU:** CU-09 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 103)
 
+![DG-SEQ-09](../assets/DG-SEQ-09.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1402,6 +1740,8 @@ UI --> ACT : Muestra confirmación de ECS catalogado
 ### DG-SEQ-10 — Efectuar Check-Out y bloqueo (CU-10)
 **ID:** DG-SEQ-10 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-08, RF-09 | **RN:** RN-04, RN-06 | **CU:** CU-10 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 104)
+
+![DG-SEQ-10](../assets/DG-SEQ-10.png)
 
 ```plantuml
 @startuml
@@ -1442,6 +1782,8 @@ end
 **ID:** DG-SEQ-11 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-09 | **RN:** RN-06 | **CU:** CU-11 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 104)
 
+![DG-SEQ-11](../assets/DG-SEQ-11.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1476,6 +1818,8 @@ UI --> ACT : Muestra bloqueo activo en Biblioteca de Trabajo
 ### DG-SEQ-12 — Efectuar Check-In a Biblioteca Maestra (CU-12)
 **ID:** DG-SEQ-12 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-08, RF-09 | **RN:** RN-01, RN-03, RN-09 | **CU:** CU-12 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 105)
+
+![DG-SEQ-12](../assets/DG-SEQ-12.png)
 
 ```plantuml
 @startuml
@@ -1514,6 +1858,8 @@ UI --> ACT : Muestra ECS integrado y bloqueo liberado
 **ID:** DG-SEQ-13 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-09, RF-16 | **RN:** RN-02, RN-03 | **CU:** CU-13 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 105)
 
+![DG-SEQ-13](../assets/DG-SEQ-13.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1548,6 +1894,8 @@ UI --> ACT : Muestra diferencias y trazabilidad de cambios
 ### DG-SEQ-14 — Implementar cambio en el ECS (CU-14)
 **ID:** DG-SEQ-14 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-07, RF-09 | **RN:** RN-06 | **CU:** CU-14 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 106)
+
+![DG-SEQ-14](../assets/DG-SEQ-14.png)
 
 ```plantuml
 @startuml
@@ -1585,6 +1933,8 @@ UI --> ACT : Confirma actualización local en Biblioteca de Trabajo
 **ID:** DG-SEQ-15 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-10 | **RN:** N/A | **CU:** CU-15 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 107)
 
+![DG-SEQ-15](../assets/DG-SEQ-15.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1619,6 +1969,8 @@ end
 **ID:** DG-SEQ-16 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-10 | **RN:** RN-09 | **CU:** CU-16 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 107)
 
+![DG-SEQ-16](../assets/DG-SEQ-16.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1647,6 +1999,8 @@ UI --> ACT : Visualiza matriz de resultados de pruebas
 ### DG-SEQ-17 — Certificar conformidad del cambio (CU-17)
 **ID:** DG-SEQ-17 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-10 | **RN:** RN-09 | **CU:** CU-17 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 108)
+
+![DG-SEQ-17](../assets/DG-SEQ-17.png)
 
 ```plantuml
 @startuml
@@ -1678,6 +2032,8 @@ UI --> ACT : Muestra Certificado de Conformidad emitido
 **ID:** DG-SEQ-18 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-10 | **RN:** RN-08 | **CU:** CU-18 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 108)
 
+![DG-SEQ-18](../assets/DG-SEQ-18.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1707,6 +2063,8 @@ UI --> ACT : Muestra no conformidad registrada y asignada
 ### DG-SEQ-19 — Reevaluar y re-testear (CU-19)
 **ID:** DG-SEQ-19 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-11 | **RN:** RN-08 | **CU:** CU-19 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 109)
+
+![DG-SEQ-19](../assets/DG-SEQ-19.png)
 
 ```plantuml
 @startuml
@@ -1745,6 +2103,8 @@ end
 **ID:** DG-SEQ-20 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-13 | **RN:** RN-02, RN-04 | **CU:** CU-20 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 110)
 
+![DG-SEQ-20](../assets/DG-SEQ-20.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1780,6 +2140,8 @@ UI --> ACT : Muestra nueva Línea Base registrada y protegida
 ### DG-SEQ-21 — Ejecutar rollback en Biblioteca de Trabajo (CU-21)
 **ID:** DG-SEQ-21 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-12 | **RN:** RN-06, RN-08 | **CU:** CU-21 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 110)
+
+![DG-SEQ-21](../assets/DG-SEQ-21.png)
 
 ```plantuml
 @startuml
@@ -1817,6 +2179,8 @@ UI --> ACT : Muestra estado previo restaurado y bloqueo liberado
 **ID:** DG-SEQ-22 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-12, RF-14 | **RN:** RN-07, RN-08 | **CU:** CU-22 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 111)
 
+![DG-SEQ-22](../assets/DG-SEQ-22.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1847,6 +2211,8 @@ UI --> ACT : Muestra ECN cancelada y trámite cerrado
 ### DG-SEQ-23 — Registrar incidencia (CU-23)
 **ID:** DG-SEQ-23 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-15 | **RN:** N/A | **CU:** CU-23 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 111)
+
+![DG-SEQ-23](../assets/DG-SEQ-23.png)
 
 ```plantuml
 @startuml
@@ -1883,6 +2249,8 @@ UI --> ACT : Muestra confirmación con número de ticket
 **ID:** DG-SEQ-24 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-15 | **RN:** N/A | **CU:** CU-24 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 112)
 
+![DG-SEQ-24](../assets/DG-SEQ-24.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -1911,6 +2279,8 @@ UI --> ACT : Muestra estado actual, respuestas y RFC asociada
 ### DG-SEQ-25 — Derivar incidencia a RFC (CU-25)
 **ID:** DG-SEQ-25 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-15 | **RN:** N/A | **CU:** CU-25 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 112)
+
+![DG-SEQ-25](../assets/DG-SEQ-25.png)
 
 ```plantuml
 @startuml
@@ -1946,6 +2316,8 @@ UI --> ACT : Muestra RFC generada vinculada al ticket
 ### DG-SEQ-26 — Validar integridad SHA-256 (CU-26)
 **ID:** DG-SEQ-26 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-17, RNF-03 | **RN:** N/A | **CU:** CU-26 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 113)
+
+![DG-SEQ-26](../assets/DG-SEQ-26.png)
 
 ```plantuml
 @startuml
@@ -1990,6 +2362,8 @@ end
 **ID:** DG-SEQ-27 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-16, RF-17 | **RN:** RN-03 | **CU:** CU-27 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 113)
 
+![DG-SEQ-27](../assets/DG-SEQ-27.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -2023,6 +2397,8 @@ UI --> ACT : Entrega reporte formal de auditoría
 **ID:** DG-SEQ-28 | **Tipo:** Secuencia | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-18 | **RN:** N/A | **CU:** CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Pág. 114)
 
+![DG-SEQ-28](../assets/DG-SEQ-28.png)
+
 ```plantuml
 @startuml
 skinparam shadowing false
@@ -2049,9 +2425,9 @@ UI --> ACT : Presenta vista previa y botón de descarga
 
 ---
 
-## Diagramas Pendientes de Reconstrucción
+## Estado de Reconstrucción de Diagramas Omitidos
 
-Los siguientes diagramas identificados en el documento consolidado `FD03-EPIS-Informe_SRS.md` no cuentan con suficiente especificación formal en el texto para ser reconstruidos con rigor sin inventar detalles técnicos. Quedan registrados como **PENDIENTE DE RECONSTRUCCION**:
+Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad técnica basada en los requerimientos, reglas de negocio y casos de uso aprobados en `TABLES.md`:
 
 ### DG-SEQ-03 — Diagrama de Secuencia del Caso de Uso CU-03 (Consultar proyecto)
 - **ID:** DG-SEQ-03  

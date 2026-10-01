@@ -241,7 +241,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | DG-SEQ-01 | CUS01 (CU-01) | Gestionar usuarios y roles | Administrador de Configuración / Bibliotecario | Pág. 96 | Presente (assets/page-096.png) |
 | DG-SEQ-02 | CUS02 (CU-02) | Crear y administrar proyectos | Analista de Requerimientos / Gestor | Pág. 97 | Presente (assets/page-097.png) |
-| *DG-SEQ-03* | *CUS03 (CU-03)* | *Consultar proyecto* | *Analista de Requerimientos / Gestor* | *N/A* | **NO EXISTE EN SRS** *(Ver Inconsistencias)* |
+| DG-SEQ-03 | CUS03 (CU-03) | Consultar proyecto | Analista de Requerimientos / Gestor | Pág. 97b | Presente (assets/DG-SEQ-03.png) |
 | DG-SEQ-04 | CUS04 (CU-04) | Registrar Solicitud de Cambio (RFC) | Solicitante | Pág. 98 | Presente (assets/page-098.png) |
 | DG-SEQ-05 | CUS05 (CU-05) | Validar y clasificar la solicitud | Analista de Requerimientos / Gestor | Pág. 99 | Presente (assets/page-099.png) |
 | DG-SEQ-06 | CUS06 (CU-06) | Realizar análisis de impacto técnico | Arquitecto / Especialista Técnico | Pág. 100 | Presente (assets/page-100.png) |

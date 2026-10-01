@@ -190,15 +190,16 @@ title <b>TraceFlow SCM - Organigrama del Equipo C-SharkTeam y Entorno Cliente</b
 
 package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
     class "Joan Cristian Medina Quispe" as JCM {
-        + Dirección de Proyecto y Gobernanza SCM
+        + Dirección, Análisis y Gobernanza SCM
         --
         * Coordinación del ciclo de vida
+        * Análisis de requerimientos y SSOT
         * Modelado de procesos (RFC/ECN)
         * Políticas de bibliotecas y RBAC
     }
 
     class "Renzo Antonio Antayhua Mamani" as RAA {
-        + Ingeniería de Backend e Integración
+        + Backend y Mecanismos SCM
         --
         * Lógica de negocio centralizada
         * Motor de versionamiento
@@ -207,20 +208,22 @@ package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
     }
 
     class "Renzo Fernando Loyola Vilca Choque" as RFL {
-        + Ingeniería de Frontend y UX
+        + Frontend, UX y Mockups
         --
         * Interfaz web responsiva
+        * Navegación y diseño de mockups
         * Tableros de trazabilidad
         * Consolas para el CCB
         * Formularios de RFC y subsanación
     }
 
     class "Augusto Joaquin Rivera Muñoz" as AJR {
-        + QA, Auditoría y Persistencia
+        + QA, Persistencia y Validación
         --
-        * Modelado relacional y esquemas
-        * Registro de auditoría
-        * Suite de pruebas unitarias y de integración
+        * Modelado relacional y persistencia
+        * Registro y módulo de auditoría
+        * Suite de pruebas unitarias/integración
+        * Validación técnica de entregables
     }
 
     JCM --> RAA : Coordina lógica SCM
@@ -452,7 +455,7 @@ El análisis financiero se calculó para un horizonte de evaluación a 5 años (
 
 | Indicador Financiero | Valor Proyectado | Interpretación Técnica / Financiera |
 | :--- | :--- | :--- |
-| Inversión Inicial (CAPEX) | S/. 5,475.00 | Cubre 500 horas de desarrollo (Joan Medina y Renzo Antayhua a razón de S/. 9.00/hr), depreciación de equipos (3.5 meses), conectividad, dominio web e imprevistos. |
+| Inversión Inicial (CAPEX) | S/. 5,475.00 | Cubre 500 horas de desarrollo agregadas para el equipo C-SharkTeam (Joan Medina, Renzo Antayhua, Renzo Loyola y Augusto Rivera a razón referencial de S/. 9.00/hr; **PENDIENTE DE VALIDACIÓN DE ESFUERZO** individual), depreciación de equipos (3.5 meses), conectividad, dominio web e imprevistos. |
 | Costo Operativo Anual (OPEX) | S/. 1,140.00 | Mantenimiento de infraestructura PaaS (Render/Supabase), renovación de dominio, soporte preventivo y materiales de difusión. |
 | Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida (COK 12.00%). |
 | Tasa Interna de Retorno (TIR) | 68.20% | Supera ampliamente el COK referencial (12.00%), otorgando un margen de seguridad amplio frente a variaciones de costos. |

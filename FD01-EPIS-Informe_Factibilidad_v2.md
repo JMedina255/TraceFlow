@@ -170,7 +170,7 @@ Para erradicar la sobreescritura accidental, el sistema ejecuta un **bloqueo de 
 
 ### 5. Escalabilidad, Capacidad Técnica y Dependencias
 - *Escalabilidad:* El diseño relacional soporta más de 50 proyectos simultáneos de clientes de forma aislada sin degradación funcional (`RNF-05`).
-- *Capacidad del Equipo C-SharkTeam:* Los cuatro integrantes poseen competencias técnicas demostradas en desarrollo backend, frontend, arquitectura relacional y control de calidad.
+- *Capacidad del Equipo C-SharkTeam:* Los cuatro integrantes poseen competencias técnicas demostradas en sus áreas de especialidad (`DG-01`): Joan Cristian Medina Quispe (coordinación, análisis, documentación, gobernanza SCM y modelado), Renzo Antonio Antayhua Mamani (backend, lógica de negocio, integración y mecanismos SCM), Renzo Fernando Loyola Vilca Choque (frontend, UX, navegación y construcción de interfaces/mockups) y Augusto Joaquin Rivera Muñoz (QA, pruebas, persistencia, auditoría y validación).
 - *Dependencias Tecnológicas:* El sistema depende exclusivamente de componentes de software de amplio soporte industrial, reduciendo el riesgo de obsolescencia.
 
 ### Clasificación de Tecnologías:
@@ -195,7 +195,7 @@ La tabla a continuación resume los conceptos de inversión inicial identificado
 
 | Concepto | Cantidad | Costo unitario (S/.) | Costo total (S/.) | Sustento / Observación |
 | :--- | :---: | :---: | :---: | :--- |
-| **Esfuerzo de Desarrollo (Mano de obra)** | 500 horas | S/. 9.00 | S/. 4,500.00 | **PENDIENTE DE VALIDACIÓN:** Solo costea a 2 desarrolladores (Joan Medina y Renzo Antayhua). Omite las horas de Renzo Loyola (Frontend) y Augusto Rivera (QA), subvaluando el costo real en más del 50%. |
+| **Esfuerzo de Desarrollo (Mano de obra)** | 500 horas | S/. 9.00 | S/. 4,500.00 | **PENDIENTE DE VALIDACIÓN DE ESFUERZO:** La cifra agregada de 500 horas consolidada en el SRS preliminar solo costea nominalmente a 2 desarrolladores (Joan Medina y Renzo Antayhua), omitiendo el esfuerzo de Renzo Loyola (Frontend) y Augusto Rivera (QA). No se deben inventar horas individuales sin una medición corporativa auditada. |
 | **Depreciación de Equipos de Cómputo** | 3.5 meses | S/. 100.00 / mes | S/. 350.00 | Estimación sobre 4 equipos a razón de S/. 25.00 mensuales por equipo durante el periodo académico. |
 | **Conectividad a Internet de Alta Velocidad** | 3.5 meses | S/. 100.00 / mes | S/. 350.00 | Costo compartido proporcional de servicios de telecomunicaciones para el equipo de desarrollo. |
 | **Adquisición de Dominio Web** | 1 año | S/. 75.00 | S/. 75.00 | Cotización referencial de mercado para registro de dominio institucional (`.com` / `.pe`). |

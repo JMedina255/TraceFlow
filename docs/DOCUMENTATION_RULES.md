@@ -3,6 +3,7 @@
 > **Sistema de Gestión de Configuración de Software - TraceFlow SCM**  
 > **Repositorio:** `TraceFlow`  
 > **Documento de Reglas de Gobernanza Documental**  
+> **Equipo de Desarrollo:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)  
 > **Versión:** 1.0  
 > **Fecha de Entrada en Vigencia:** 2026-09-30  
 > **Estado:** APROBADO  

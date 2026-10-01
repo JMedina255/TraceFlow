@@ -94,15 +94,16 @@ title <b>TraceFlow SCM - Organigrama del Equipo C-SharkTeam y Entorno Cliente</b
 
 package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
     class "Joan Cristian Medina Quispe" as JCM {
-        + Dirección de Proyecto y Gobernanza SCM
+        + Dirección, Análisis y Gobernanza SCM
         --
         * Coordinación del ciclo de vida
+        * Análisis de requerimientos y SSOT
         * Modelado de procesos (RFC/ECN)
         * Políticas de bibliotecas y RBAC
     }
 
     class "Renzo Antonio Antayhua Mamani" as RAA {
-        + Ingeniería de Backend e Integración
+        + Backend y Mecanismos SCM
         --
         * Lógica de negocio centralizada
         * Motor de versionamiento
@@ -111,20 +112,22 @@ package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
     }
 
     class "Renzo Fernando Loyola Vilca Choque" as RFL {
-        + Ingeniería de Frontend y UX
+        + Frontend, UX y Mockups
         --
         * Interfaz web responsiva
+        * Navegación y diseño de mockups
         * Tableros de trazabilidad
         * Consolas para el CCB
         * Formularios de RFC y subsanación
     }
 
     class "Augusto Joaquin Rivera Muñoz" as AJR {
-        + QA, Auditoría y Persistencia
+        + QA, Persistencia y Validación
         --
-        * Modelado relacional y esquemas
-        * Registro de auditoría
-        * Suite de pruebas unitarias y de integración
+        * Modelado relacional y persistencia
+        * Registro y módulo de auditoría
+        * Suite de pruebas unitarias/integración
+        * Validación técnica de entregables
     }
 
     JCM --> RAA : Coordina lógica SCM

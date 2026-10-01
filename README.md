@@ -169,10 +169,10 @@ Proyecto desarrollado bajo la asesoría académica del **Dr. Ricardo Eduardo Val
 
 | Integrante | Código Estudiantil | Rol Técnico y Responsabilidades |
 | :--- | :---: | :--- |
-| **Joan Cristian Medina Quispe** | 2022074255 | **Dirección de Proyecto y Gobernanza SCM:** Coordinación general del ciclo de vida, modelado de procesos (RFC/ECN), políticas de bibliotecas y seguridad RBAC. |
-| **Renzo Antonio Antayhua Mamani** | 2022073504 | **Ingeniería de Backend y Servicios de Integración:** Lógica de negocio centralizada, microservicios del motor de versionamiento, bloqueos de concurrencia y validación SHA-256. |
-| **Renzo Fernando Loyola Vilca Choque** | 2021072615 | **Ingeniería de Frontend y Experiencia de Usuario:** Diseño de interfaces interactivas, tableros de control de RFC/ECN, vistas de auditoría y módulos de autogestión de usuarios. |
-| **Augusto Joaquin Rivera Muñoz** | 2022073505 | **Arquitectura de Software y Aseguramiento de Calidad (QA):** Definición de la arquitectura técnica en capas, diseño de suites de pruebas de integración, automatización y certificación de entregables. |
+| **Joan Cristian Medina Quispe** | 2022074255 | **Dirección de Proyecto, Análisis, Documentación y Gobernanza SCM:** Coordinación general del ciclo de vida, análisis de requerimientos, documentación técnica bajo SSOT, modelado de procesos (RFC/ECN), políticas de bibliotecas y seguridad RBAC. |
+| **Renzo Antonio Antayhua Mamani** | 2022073504 | **Ingeniería de Backend, Lógica de Negocio y Mecanismos SCM:** Lógica de negocio centralizada, microservicios del motor de versionamiento, bloqueos de concurrencia y validación criptográfica SHA-256. |
+| **Renzo Fernando Loyola Vilca Choque** | 2021072615 | **Ingeniería de Frontend, Experiencia de Usuario (UX) y Mockups:** Diseño de interfaces interactivas, navegación web, construcción de prototipos/mockups, tableros de control de RFC/ECN y vistas de autogestión. |
+| **Augusto Joaquin Rivera Muñoz** | 2022073505 | **QA, Pruebas, Persistencia, Auditoría y Validación:** Modelado y diseño de persistencia relacional, bitácoras de auditoría, suites de pruebas unitarias y de integración, automatización y validación de entregables. |
 
 ---
 

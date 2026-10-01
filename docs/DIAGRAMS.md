@@ -125,6 +125,19 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-UWE-NAV-06](#dg-uwe-nav-06--navegación-uwe-perfil-administrador-de-configuración--bibliotecario-pu-05) | Navegación UWE: Perfil Administrador de Configuración / Bibliotecario (PU-05) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 | [DG-UWE-NAV-07](#dg-uwe-nav-07--navegación-uwe-perfil-ingeniero-de-software--desarrollador-pu-06) | Navegación UWE: Perfil Ingeniero de Software / Desarrollador (PU-06) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 | [DG-UWE-NAV-08](#dg-uwe-nav-08--navegación-uwe-perfil-equipo-de-calidad--testing-pu-07) | Navegación UWE: Perfil Equipo de Calidad / Testing (PU-07) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-01](#dg-uwe-pres-01--estructura-general-de-presentación-shell-global) | Estructura General de Presentación (Shell Global) | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-02](#dg-uwe-pres-02--presentación-de-acceso-y-autenticación) | Presentación de Acceso y Autenticación | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-03](#dg-uwe-pres-03--dashboard-adaptativo-por-rol-canónico) | Dashboard Adaptativo por Rol Canónico | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-04](#dg-uwe-pres-04--detalle-y-expediente-360-de-rfc) | Detalle y Expediente 360° de RFC | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-05](#dg-uwe-pres-05--registro-y-subsanación-de-rfc) | Registro y Subsanación de RFC | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-06](#dg-uwe-pres-06--panel-de-deliberación-ccb) | Panel de Deliberación CCB | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-07](#dg-uwe-pres-07--autorización-delegada-de-cambio-menor-doble-llave) | Autorización Delegada de Cambio Menor (Doble Llave) | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-08](#dg-uwe-pres-08--detalle-de-ecs-y-estructura-de-bibliotecas-scm) | Detalle de ECS y Estructura de Bibliotecas SCM | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-09](#dg-uwe-pres-09--operaciones-scm-check-out-y-check-in) | Operaciones SCM (Check-Out y Check-In) | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-10](#dg-uwe-pres-10--consola-qa-y-gestión-de-no-conformidades) | Consola QA y Gestión de No Conformidades | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-11](#dg-uwe-pres-11--centro-de-suscripción-de-acta-uat) | Centro de Suscripción de Acta UAT | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-12](#dg-uwe-pres-12--gestión-de-línea-base-y-rollback-scm) | Gestión de Línea Base y Rollback SCM | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-PRES-13](#dg-uwe-pres-13--auditoría-inmutable-y-reportes-scm) | Auditoría Inmutable y Reportes SCM | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 
 ---
 
@@ -6101,15 +6114,15 @@ skinparam class {
 class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
 class "NAV-02: Dashboard del Desarrollador\n(Mis Órdenes en Ejecución)" as NAV02 <<navClass>>
 
-class "NAV-12: Mis Órdenes Asignadas (ECN)" as NAV12 <<index>>
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO - CU-08, CU-14)" as NAV12 <<navClass>>
 class "NAV-15: Mi Espacio de Trabajo\n(Biblioteca de Trabajo - CU-14)" as NAV15 <<navClass>>
 class "NAV-18: Historial de Versiones ECS\n(CU-13)" as NAV18 <<index>>
-class "NAV-20: Bandeja de No Conformidades QA\n(CU-18, CU-19)" as NAV20 <<navClass>>
+class "NAV-20: Consola de No Conformidades\n(Vista Consulta de Defectos - CU-19)" as NAV20 <<navClass>>
 
 NAV01 -down-> NAV02 : Login exitoso
 
-NAV02 -down-> NAV12 : Ver Órdenes ECN
-NAV02 -down-> NAV20 : Defectos Asignados
+NAV02 -down-> NAV12 : [Widget Tareas Asignadas]\nSeleccionar ECN en Desarrollo
+NAV02 -down-> NAV20 : [Widget Alertas de Defectos]\nConsultar Defectos de la ECN
 
 NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Código Fuente
 NAV15 -down-> NAV18 : Comparar con versión estable
@@ -6149,18 +6162,950 @@ skinparam class {
 class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
 class "NAV-02: Dashboard de QA\n(Órdenes Pendientes de Certificación)" as NAV02 <<navClass>>
 
-class "NAV-12: Órdenes en Pruebas (ECN)" as NAV12 <<index>>
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO en Pruebas)" as NAV12 <<navClass>>
 class "NAV-19: Consola de Validación QA\n(Pruebas de Integración - CU-16)" as NAV19 <<navClass>>
-class "NAV-20: Formulario de No Conformidad\n(CU-18)" as NAV20 <<process>>
+class "NAV-20: Consola de No Conformidades\n(Vista Registro de Defectos - CU-18)" as NAV20 <<process>>
 
 NAV01 -down-> NAV02 : Login exitoso
 
-NAV02 -down-> NAV12 : Órdenes para Testing (Estado = EN_PRUEBAS)
-NAV12 -right-> NAV19 : Ejecutar Validación Técnica
+NAV02 -down-> NAV12 : [Widget Testing Pendiente]\nSeleccionar ECN en Pruebas
+NAV12 -right-> NAV19 : Ejecutar Validación Técnica sobre Soporte
 
 NAV19 ..> NAV20 : [Prueba Fallida]\nReportar No Conformidad (CU-18)
-NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Pasa a EN_ACEPTACION)
-NAV20 ..> NAV19 : Reevaluar y re-testear (CU-19)
+NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Habilita EN_ACEPTACION / UAT)
+NAV20 ..> NAV19 : Reevaluar y re-testear tras corrección (CU-19)
+
+@enduml
+```
+---
+
+# DG-UWE-PRES-01 — Estructura General de Presentación (Shell Global)
+
+**ID:** DG-UWE-PRES-01 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-01 a NAV-28, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.3
+
+![DG-UWE-PRES-01](../assets/DG-UWE-PRES-01.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-01: Estructura General de Presentación — Shell Global</b>
+
+skinparam class {
+    BackgroundColor<<shell>> #EDF2F7
+    BorderColor<<shell>> #4A5568
+    BackgroundColor<<header>> #EBF8FF
+    BorderColor<<header>> #3182CE
+    BackgroundColor<<sidebar>> #F7FAFC
+    BorderColor<<sidebar>> #CBD5E0
+    BackgroundColor<<workarea>> #FFFFFF
+    BorderColor<<workarea>> #2B6CB0
+    BackgroundColor<<element>> #FFFFFF
+    BorderColor<<element>> #A0AEC0
+}
+
+class "AppShell Container" as Shell <<shell>> {
+    +viewport: FullWindow
+    +theme: Corporate SCADA/IT
+}
+
+class "TopHeaderBar (Cabecera Global)" as TopHeader <<header>> {
+    +brandLogo: TraceFlow SCM
+    +activeProjectSelector: Dropdown
+    +notificationCenter: Badge + Dropdown
+    +userProfileChip: Avatar + Name
+    +activeRoleIndicator: RoleBadge
+    +logoutButton: ActionButton
+}
+
+class "RoleBasedSidebar (Barra Lateral Adaptativa)" as Sidebar <<sidebar>> {
+    +menuDashboard: NavLink
+    +menuProjects: NavLink (MOD-02)
+    +menuRFC: NavLink (MOD-04)
+    +menuECN: NavLink (MOD-04)
+    +menuConfigItems: NavLink (MOD-03)
+    +menuVersionControl: NavLink (MOD-05)
+    +menuQualityQA: NavLink (MOD-06)
+    +menuBaselines: NavLink (MOD-07)
+    +menuIncidents: NavLink (MOD-08)
+    +menuAuditLogs: NavLink (MOD-09)
+    +menuReports: NavLink (MOD-09)
+    +menuAdminIAM: NavLink (MOD-01)
+}
+
+class "MainWorkArea (Área Principal de Trabajo)" as WorkArea <<workarea>> {
+    +breadcrumbTrail: NavBreadcrumb
+    +viewHeader: HeaderRegion
+    +contentViewport: DynamicContainer (Inyección de PRES)
+    +contextualActionBar: ActionRegion
+}
+
+class "ViewHeaderRegion" as ViewHeader <<element>> {
+    +viewTitle: TypographyH1
+    +statusBadge: RFC/ECN StateBadge (TB-07)
+    +identifierTag: CodeTag (e.g. RFC-2026-0012)
+    +primaryActionSlot: ActionButtonList
+}
+
+class "ContentViewport" as ContentViewport <<element>> {
+    +renderedPattern: PRES-01..10
+}
+
+class "ContextualActionBar" as ContextualBar <<element>> {
+    +backButton: ActionButton
+    +cancelButton: ActionButton
+    +stateTransitionButtons: RoleStateActionList
+}
+
+Shell *-- TopHeader : Superior fijo
+Shell *-- Sidebar : Izquierda adaptativo
+Shell *-- WorkArea : Región central dinámica
+
+WorkArea *-- ViewHeader : Superior de vista
+WorkArea *-- ContentViewport : Cuerpo principal
+WorkArea *-- ContextualBar : Inferior contextual
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-02 — Presentación de Acceso y Autenticación
+
+**ID:** DG-UWE-PRES-02 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-01, PRES-01, ADR-006, MOD-01 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.1
+
+![DG-UWE-PRES-02](../assets/DG-UWE-PRES-02.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-02: Presentación de Acceso y Autenticación (NAV-01 / PRES-01)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F7FAFC
+    BorderColor<<container>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #3182CE
+    BackgroundColor<<input>> #FFFFFF
+    BorderColor<<input>> #CBD5E0
+    BackgroundColor<<button>> #3182CE
+    FontColor<<button>> #FFFFFF
+    BackgroundColor<<alert>> #FFF5F5
+    BorderColor<<alert>> #E53E3E
+}
+
+class "LoginViewport (Pantalla Completa)" as Viewport <<container>> {
+    +background: Neutral/Corporate
+}
+
+class "LoginCardContainer" as Card <<form>> {
+    +appLogo: Image (TraceFlow SCM)
+    +systemTitle: Text ("Sistema de Gestión de Configuración de Software")
+    +institutionLabel: Text ("ÉXODO S.A.C. — Entorno Institucional")
+}
+
+class "CredentialsForm (Formulario de Acceso)" as Form <<form>> {
+    +inputUsername: TextInput ("Usuario / Correo Institucional")
+    +inputPassword: PasswordInput ("Contraseña")
+    +btnSubmit: ActionButton ("Iniciar Sesión")
+}
+
+class "FeedbackRegion (Mensajes y Estado)" as Feedback <<alert>> {
+    +validationErrorMessage: InlineText (HTTP 400)
+    +unauthorizedAlert: BannerText ("Credenciales inválidas / Sesión expirada - HTTP 401")
+    +loadingSpinner: ProgressIndicator
+}
+
+note bottom of Form
+  <b>Decisión de Presentación sobre Selección de Rol:</b>
+  La baseline no contempla selección manual de rol en el login.
+  El sistema autentica al usuario y carga su rol canónico principal.
+  Si el usuario posee múltiples roles asignados en BD, el Header
+  mostrará un selector de contexto de rol como decisión de presentación.
+end note
+
+Viewport *-- Card
+Card *-- Form
+Card *-- Feedback
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-03 — Dashboard Adaptativo por Rol Canónico
+
+**ID:** DG-UWE-PRES-03 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-02, PRES-02, TB-09, MOD-01 a MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.2
+
+![DG-UWE-PRES-03](../assets/DG-UWE-PRES-03.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-03: Dashboard Adaptativo por Rol Canónico (NAV-02 / PRES-02)</b>
+
+skinparam class {
+    BackgroundColor<<dashboard>> #F7FAFC
+    BorderColor<<dashboard>> #2B6CB0
+    BackgroundColor<<widget>> #FFFFFF
+    BorderColor<<widget>> #3182CE
+    BackgroundColor<<kpi>> #EBF8FF
+    BorderColor<<kpi>> #63B3ED
+    BackgroundColor<<feed>> #FFFFFF
+    BorderColor<<feed>> #CBD5E0
+}
+
+class "DashboardContainer (NAV-02)" as Dashboard <<dashboard>> {
+    +activeProjectBanner: Text + Selector ("Proyecto Activo: Sistema Bancario Core")
+    +userGreeting: Text ("Bienvenido, [Nombre] | Rol: [Rol Canónico]")
+}
+
+class "MetricKPIPanel (Panel de Indicadores)" as Metrics <<kpi>> {
+    +cardPendingTasks: NumberMetric ("Tareas Pendientes de Acción")
+    +cardActiveRFCs: NumberMetric ("Solicitudes en Trámite")
+    +cardActiveLocks: NumberMetric ("Bloqueos Exclusivos (sync_lock)")
+    +cardPendingBaselines: NumberMetric ("Líneas Base en Preparación")
+}
+
+class "ActionItemsList (Bandeja de Tareas Prioritarias)" as Tasks <<widget>> {
+    +taskListTable: Table
+    -- Fuentes por Rol --
+    * Solicitante: RFCs por subsanar (CU-04.1) y Actas UAT pendientes (CU-29)
+    * Gestor: RFCs por clasificar (CU-05) y Cambios Menores (CU-30)
+    * Arquitecto: Evaluaciones de Impacto pendientes (CU-06)
+    * CCB: Sesiones de deliberación convocadas (CU-07)
+    * Bibliotecario: Solicitudes de Check-Out/In y Líneas Base (CU-10, 20)
+    * Desarrollador: ECNs en implementación asignadas (CU-14, 15)
+    * QA: Órdenes en pruebas y re-testeos pendientes (CU-16, 19)
+}
+
+class "QuickAccessPanel (Accesos Directos Autorizados)" as QuickNav <<widget>> {
+    +btnNewRFC: Button ("+ Nueva Solicitud (RFC)")
+    +btnExplorerECS: Button ("Explorar Bibliotecas")
+    +btnIncidentTicket: Button ("Mesa de Incidencias")
+}
+
+class "RecentActivityFeed (Historial Reciente del Proyecto)" as ActivityFeed <<feed>> {
+    +timelineEntries: List (Transiciones recientes de RFC, Check-Ins certificados)
+}
+
+Dashboard *-- Metrics
+Dashboard *-- Tasks
+Dashboard *-- QuickNav
+Dashboard *-- ActivityFeed
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-04 — Detalle y Expediente 360° de RFC
+
+**ID:** DG-UWE-PRES-04 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-06, PRES-04, CU-04 a CU-08, CU-30, TB-07, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.4
+
+![DG-UWE-PRES-04](../assets/DG-UWE-PRES-04.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-04: Detalle y Expediente 360° de RFC (NAV-06 / PRES-04)</b>
+
+skinparam class {
+    BackgroundColor<<record>> #F7FAFC
+    BorderColor<<record>> #2B6CB0
+    BackgroundColor<<tab>> #FFFFFF
+    BorderColor<<tab>> #3182CE
+    BackgroundColor<<action>> #FFF5F5
+    BorderColor<<action>> #E53E3E
+}
+
+class "RFCRecordContainer (NAV-06)" as Container <<record>> {
+    +headerCode: TypographyH1 ("RFC-2026-0042")
+    +projectNameTag: Badge ("Proyecto: Pasarela de Pagos")
+    +officialStateBadge: StateBadge ("Estado: EN_EVALUACION - TB-07")
+    +requesterInfo: Chip ("Solicitante: Juan Pérez")
+    +creationDate: Text ("Fecha: 2026-10-01 10:30")
+}
+
+class "ProgressiveTabNavigation (Pestañas según Avance)" as Tabs <<tab>> {
+    +tab1_Summary: "1. Resumen y Justificación"
+    +tab2_AffectedECS: "2. ECS Afectados"
+    +tab3_TechnicalImpact: "3. Informe de Impacto Técnico"
+    +tab4_CCBorMinorDecision: "4. Dictamen / Autorización"
+    +tab5_ChangeOrder: "5. Orden de Cambio (ECN/ECO)"
+    +tab6_QualityQA: "6. Aseguramiento de Calidad"
+    +tab7_UATAcceptance: "7. Aceptación de Usuario (UAT)"
+    +tab8_TimelineAudit: "8. Trazabilidad e Historial"
+}
+
+class "ActiveTabContentRegion" as TabContent <<tab>> {
+    +renderedDetails: EmbeddedView (Según pestaña seleccionada)
+    -- Regla de Visibilidad --
+    Las pestañas 3 a 7 se habilitan conforme la RFC transiciona
+    por los estados oficiales de TB-07 (visibilidad progresiva).
+}
+
+class "ContextualActionsDrawer (Acciones por Actor + Estado)" as Actions <<action>> {
+    -- Matriz de Botones Habilitados --
+    * Solicitante + OBSERVADA: Botón "Subsanar Observaciones" (NAV-08)
+    * Gestor + REGISTRADA: Botón "Validar y Clasificar" (CU-05)
+    * Arquitecto + EN_ANALISIS_TECNICO: Botón "Emitir Informe de Impacto" (NAV-09)
+    * CCB + EN_DELIBERACION (Mayor): Botón "Acceder a Deliberación CCB" (NAV-10)
+    * Gestor/Arq + EVALUADA (Menor): Botón "Autorizar Cambio Menor" (NAV-11)
+    * Gestor + AUTORIZADA: Botón "Emitir Orden ECN" (NAV-12)
+    * Solicitante + CERTIFICADA: Botón "Suscribir Acta UAT" (NAV-21)
+}
+
+Container *-- Tabs
+Container *-- TabContent
+Container *-- Actions
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-05 — Registro y Subsanación de RFC
+
+**ID:** DG-UWE-PRES-05 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-07, NAV-08, PRES-05, PRES-06, CU-04, CU-04.1, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.5
+
+![DG-UWE-PRES-05](../assets/DG-UWE-PRES-05.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-05: Registro y Subsanación de RFC (NAV-07, NAV-08 / PRES-06, PRES-05)</b>
+
+skinparam class {
+    BackgroundColor<<wizard>> #F7FAFC
+    BorderColor<<wizard>> #3182CE
+    BackgroundColor<<step>> #FFFFFF
+    BorderColor<<step>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #63B3ED
+    BackgroundColor<<buttons>> #EDF2F7
+    BorderColor<<buttons>> #CBD5E0
+}
+
+class "RFCFormContainer" as Container <<wizard>> {
+    +formTitle: Text ("Registro de Solicitud de Cambio (RFC)")
+    +stepProgressBar: ProgressBar (Paso actual / Total)
+}
+
+package "Paso 1: Información General" as Step1 <<step>> {
+    class "GeneralInfoGroup" as G1 <<form>> {
+        +selectProject: ProjectSelector (Mandatorio)
+        +inputTitle: TextInput (Mandatorio, máx 120 caracteres)
+        +selectPriority: PriorityDropdown (Baja, Media, Alta, Urgente)
+        +selectCategory: ChangeCategoryDropdown (Correctivo, Adaptativo, Perfectivo)
+    }
+}
+
+package "Paso 2: Justificación y Descripción" as Step2 <<step>> {
+    class "DescriptionGroup" as G2 <<form>> {
+        +inputProblemDescription: TextArea (Mandatorio, descripción detallada)
+        +inputBusinessJustification: TextArea (Mandatorio, justificación y valor)
+        +inputProposedSolution: TextArea (Opcional, propuesta técnica sugerida)
+    }
+}
+
+package "Paso 3: ECS y Evidencias" as Step3 <<step>> {
+    class "ArtifactsGroup" as G3 <<form>> {
+        +multiSelectECS: ECSSelectorList (Sugeridos para intervención)
+        +fileUploader: AttachmentUploader (PDFs, capturas, logs de error)
+    }
+}
+
+package "Paso 4: Confirmación y Envío" as Step4 <<step>> {
+    class "ReviewSummaryGroup" as G4 <<form>> {
+        +summaryPreview: ReadOnlySummaryCard
+        +termsAcknowledgment: Checkbox ("Declaro que los datos son verídicos")
+    }
+}
+
+class "WizardNavigationControls" as Controls <<buttons>> {
+    +btnPrevious: ActionButton ("< Anterior")
+    +btnNext: ActionButton ("Siguiente >")
+    +btnSaveDraft: ActionButton ("Guardar Borrador")
+    +btnSubmit: PrimaryActionButton ("Enviar RFC (Pasa a REGISTRADA)")
+}
+
+note bottom of Container
+  <b>Reutilización para Subsanación (NAV-08):</b>
+  Cuando el Solicitante subsana observaciones (CU-04.1):
+  1. Carga los 4 pasos pre-poblados con los datos originales.
+  2. Resalta en rojo los campos con observaciones del Gestor.
+  3. Muestra panel superior con el Dictamen de Observación formal.
+  4. Botón final: "Re-enviar Solicitud Subsanada".
+end note
+
+Container *-- Step1
+Container *-- Step2
+Container *-- Step3
+Container *-- Step4
+Container *-- Controls
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-06 — Panel de Deliberación CCB
+
+**ID:** DG-UWE-PRES-06 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-10, PRES-07, CU-07, RN-01, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.A
+
+![DG-UWE-PRES-06](../assets/DG-UWE-PRES-06.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-06: Panel de Deliberación CCB (NAV-10 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<panel>> #FAF5FF
+    BorderColor<<panel>> #6B46C1
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #9F7AEA
+    BackgroundColor<<vote>> #FFFFFF
+    BorderColor<<vote>> #D69E2E
+}
+
+class "CCBDeliberationContainer (NAV-10)" as CCB <<panel>> {
+    +sessionHeader: Text ("Comité de Control de Cambios — Sesión de Deliberación")
+    +rfcSummaryBanner: RFCReferenceCard (Código, Proyecto, Solicitante)
+}
+
+class "TechnicalImpactAssessmentView" as ImpactView <<section>> {
+    +architectureEvaluation: MarkdownViewer (Dictamen del Arquitecto - RN-05)
+    +affectedItemsList: List (ECS intervenidos y dependencias cruzadas)
+    +tripleConstraintGrid: Grid (Alcance: Alto | Tiempo estimado: 15d | Costo estimado)
+    +riskAssessment: RiskMatrix (Riesgo Técnico / Operacional)
+}
+
+class "MemberVotingPanel (Registro Individual de Votos)" as VotePanel <<vote>> {
+    +currentUserRoleBadge: Badge ("Miembro Votante: Dr. Valcarcel / CCB")
+    +radioVoteDecision: RadioGroup (APROBAR / RECHAZAR / ABSTENCIÓN)
+    +inputVoteJustification: TextArea (Fundamentación obligatoria del voto)
+    +btnSubmitVote: ActionButton ("Registrar Mi Voto")
+}
+
+class "VotingTallyRegion (Conteo y Registro de Votos Emitidos)" as Tally <<section>> {
+    +votesRecordedTable: Table (Miembro, Rol, Decisión, Fecha/Hora, Fundamento)
+    +statusResolutionBanner: Banner ("En espera de resolución formal")
+}
+
+class "FormalResolutionClosure" as Resolution <<section>> {
+    +inputResolutionObservations: TextArea ("Observaciones del Acta de Sesión")
+    +btnIssueApprovalResolution: PrimaryButton ("Emitir Resolución: APROBADA (CU-08)")
+    +btnIssueRejectionResolution: DangerButton ("Emitir Resolución: RECHAZADA")
+}
+
+note bottom of CCB
+  <b>Saneamiento Normativo:</b>
+  Se eliminan términos no regulados como "quórum" o "mayoría calificada".
+  El panel registra deliberación, votación individual fundamentada
+  y emisión de resolución colegiada formal (aprobación/rechazo).
+end note
+
+CCB *-- ImpactView
+CCB *-- VotePanel
+CCB *-- Tally
+CCB *-- Resolution
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-07 — Autorización Delegada de Cambio Menor (Doble Llave)
+
+**ID:** DG-UWE-PRES-07 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-11, PRES-07, CU-30, RN-01, RN-05, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.B
+
+![DG-UWE-PRES-07](../assets/DG-UWE-PRES-07.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-07: Autorización Delegada de Cambio Menor — Doble Llave (NAV-11 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F0FFF4
+    BorderColor<<container>> #276749
+    BackgroundColor<<keycard>> #FFFFFF
+    BorderColor<<keycard>> #38A169
+    BackgroundColor<<final>> #FFFFFF
+    BorderColor<<final>> #2F855A
+}
+
+class "MinorChangeAuthContainer (NAV-11)" as Container <<container>> {
+    +rfcHeader: RFCReferenceCard ("RFC-2026-0055 | Clasificación: CAMBIO MENOR")
+    +impactSummaryText: Text ("Impacto técnico acotado a 1 ECS. No altera arquitectura.")
+}
+
+class "KeyCard1_Architect (Llave 1: Evaluación Técnica)" as Key1 <<keycard>> {
+    +actorLabel: Text ("Arquitecto / Especialista Técnico (RN-05)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +technicalComments: TextArea ("Dictamen de Viabilidad e Impacto")
+    +btnApproveTechnical: Button ("Aprobar Viabilidad Técnica")
+    +btnRejectTechnical: Button ("Rechazar Viabilidad Técnica")
+}
+
+class "KeyCard2_Manager (Llave 2: Visto Bueno de Gestión)" as Key2 <<keycard>> {
+    +actorLabel: Text ("Analista de Requerimientos / Gestor (RN-01)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +managementComments: TextArea ("Evaluación de Planificación, Plazos y Recursos")
+    +btnApproveManagement: Button ("Aprobar Visto Bueno de Gestión")
+    +btnRejectManagement: Button ("Rechazar Visto Bueno de Gestión")
+}
+
+class "FinalAuthorizationState" as FinalState <<final>> {
+    +authorizationBanner: StateBanner
+    -- Regla de Negocio Transaccional --
+    * Si Key1 = APROBADA Y Key2 = APROBADA:
+      Estado final: **AUTORIZADA** (Habilita emisión de ECN en NAV-12)
+    * Si cualquiera = RECHAZADA:
+      Estado final: **RECHAZADA**
+    * Si alguna = PENDIENTE:
+      Estado final: **EN_EVALUACION**
+}
+
+Container *-- Key1
+Container *-- Key2
+Container *-- FinalState
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-08 — Detalle de ECS y Estructura de Bibliotecas SCM
+
+**ID:** DG-UWE-PRES-08 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-14, NAV-15, PRES-08, CU-09, CU-14, CU-26, RN-02, RN-06, MOD-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.7
+
+![DG-UWE-PRES-08](../assets/DG-UWE-PRES-08.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-08: Detalle de ECS y Estructura de Bibliotecas SCM (NAV-14, 15 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<view>> #FFF5F5
+    BorderColor<<view>> #C53030
+    BackgroundColor<<library>> #FFFFFF
+    BorderColor<<library>> #E53E3E
+    BackgroundColor<<detail>> #FFFFFF
+    BorderColor<<detail>> #4A5568
+}
+
+class "SCMLibrariesExplorer (NAV-15)" as Explorer <<view>> {
+    +projectFilter: ProjectDropdown
+    +searchBar: SearchInput
+}
+
+package "Estructura de las 3 Bibliotecas SCM" as Libs <<library>> {
+    class "Biblioteca de Trabajo (Sandbox)" as LibTrabajo <<library>> {
+        +scope: "Espacio volátil por desarrollador"
+        +isolation: "Copia local de implementación"
+        +itemsListed: Table (ECS en desarrollo activo)
+    }
+
+    class "Biblioteca de Soporte (Staging / QA)" as LibSoporte <<library>> {
+        +scope: "Espacio compartido de pruebas"
+        +stability: "Versiones entregadas para testing"
+        +itemsListed: Table (ECS pendientes de QA / UAT)
+    }
+
+    class "Biblioteca Maestra (Golden Store)" as LibMaestra <<library>> {
+        +scope: "Custodia definitiva inmutable"
+        +stability: "Versiones certificadas en Líneas Base (RN-02)"
+        +itemsListed: Table (ECS congelados y liberados)
+    }
+}
+
+class "ECSDetailCard (Ficha Técnica NAV-14)" as ECSCard <<detail>> {
+    +ecsIdentifier: Text ("ECS-CORE-001 (auth-service.ts)")
+    +ecsCategory: Badge ("Código Fuente Backend")
+    +currentVersion: Badge ("v2.1.0")
+    +currentLibraryBadge: Badge ("Biblioteca de Soporte")
+    +checksumSHA256: CodeTag ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    +lockStatus: LockBadge ("BLOQUEADO (sync_lock: ACTIVE) por PU-06 Dev")
+    +associatedECN: Link ("ECN-2026-0015")
+    +btnViewHistory: ActionButton ("Ver Historial y Diffs (NAV-18)")
+}
+
+Explorer *-- Libs
+Explorer *-- ECSCard
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-09 — Operaciones SCM (Check-Out y Check-In)
+
+**ID:** DG-UWE-PRES-09 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-16, NAV-17, PRES-08, CU-10, CU-11, CU-12, RN-06, RNF-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.8
+
+![DG-UWE-PRES-09](../assets/DG-UWE-PRES-09.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-09: Operaciones SCM — Check-Out y Check-In (NAV-16, 17 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<dialog>> #FFFFFF
+    BorderColor<<dialog>> #2B6CB0
+    BackgroundColor<<field>> #F7FAFC
+    BorderColor<<field>> #CBD5E0
+    BackgroundColor<<action>> #3182CE
+    FontColor<<action>> #FFFFFF
+}
+
+class "CheckOutModal (NAV-16 / CU-10, CU-11)" as CheckOutDialog <<dialog>> {
+    +modalTitle: Text ("Extracción de Copia de Trabajo (Check-Out)")
+    +ecsTargetInfo: ECSReferenceCard (ID, Nombre, Versión origen en Soporte)
+    +assignedDeveloper: UserSelector (Ingeniero de Software PU-06)
+    +authorizedECN: ECNSelector (Orden de Cambio aprobada)
+    +lockOptionCheckbox: Checkbox ("Aplicar Bloqueo Exclusivo de Sincronización - RN-06 [OBLIGATORIO]")
+    +btnExecuteCheckOut: ActionButton ("Confirmar Check-Out y Bloquear")
+    -- Efecto Transaccional --
+    * Copia física a /storage/trabajo/{devId}/{ecsId}
+    * Inserción de sync_lock (ACTIVE) en PostgreSQL
+}
+
+class "CheckInModal (NAV-17 / CU-12)" as CheckInDialog <<dialog>> {
+    +modalTitle: Text ("Depósito y Promoción de Artefacto (Check-In)")
+    +targetOperationSelector: RadioGroup
+    -- Opciones de Promoción --
+    * **Check-In A (Técnico)**: Trabajo $
+ightarrow$ Soporte (Tras pruebas unitarias CU-15)
+    * **Check-In B (Definitivo)**: Soporte $
+ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
+    +fileUploadInput: FileInput (Selección del archivo modificado)
+    +clientComputedHash: CodeTag ("SHA-256 Calculado en Navegador")
+    +serverVerifiedHash: CodeTag ("SHA-256 Verificado por Backend")
+    +versionIncrementType: RadioGroup (Parche / Menor / Mayor - RN-02)
+    +changeLogNotes: TextArea ("Notas de la versión implementada")
+    +releaseLockCheckbox: Checkbox ("Liberar sync_lock tras Check-In exitoso [Marcado]")
+    +btnExecuteCheckIn: ActionButton ("Completar Check-In y Verificar SHA-256")
+}
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-10 — Consola QA y Gestión de No Conformidades
+
+**ID:** DG-UWE-PRES-10 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-19, NAV-20, PRES-05, PRES-08, CU-16, CU-17, CU-18, CU-19, RN-09, SoD Dinámico, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.9
+
+![DG-UWE-PRES-10](../assets/DG-UWE-PRES-10.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-10: Consola QA y Gestión de No Conformidades (NAV-19, 20 / PRES-08, 05)</b>
+
+skinparam class {
+    BackgroundColor<<qa>> #FFFFF0
+    BorderColor<<qa>> #B7791F
+    BackgroundColor<<panel>> #FFFFFF
+    BorderColor<<panel>> #D69E2E
+    BackgroundColor<<action>> #FFFFFF
+    BorderColor<<action>> #E53E3E
+}
+
+class "QAConsoleContainer (NAV-19 / CU-16, 17, 19)" as QAContainer <<qa>> {
+    +ecnUnderTestingBanner: ECNHeaderCard ("ECN-2026-0018 | Versión en Biblioteca de Soporte")
+    +soDComplianceBadge: SecurityBadge ("SoD Verificado: Evaluador QA independiente de PU-06")
+}
+
+class "IntegrationTestSuitePanel" as TestPanel <<panel>> {
+    +suiteExecutionTable: Table
+    -- Columnas de Suite --
+    * ID Prueba | Caso de Prueba | Tipo (Integración / Regresión) | Resultado (PASS / FAIL) | Duración
+    +btnExecuteIntegrationSuite: ActionButton ("Ejecutar Suite Automatizada")
+    +logViewerRegion: LogConsole (Salida estructurada de ejecución)
+}
+
+class "NonConformityFormView (NAV-20 / CU-18)" as NCView <<panel>> {
+    +defectTitleInput: TextInput ("Título del defecto o no conformidad")
+    +severityDropdown: Dropdown (Crítico, Mayor, Menor)
+    +stepsToReproduceText: TextArea ("Pasos detallados para reproducir")
+    +expectedVsActualText: TextArea ("Comportamiento esperado vs obtenido")
+    +evidenceAttachment: FileUpload (Capturas, logs, stack traces)
+    +btnSubmitNonConformity: ActionButton ("Reportar No Conformidad (ECN pasa a RE-TEST)")
+}
+
+class "QACertificationDecisionBar" as DecisionBar <<action>> {
+    +btnReportDefect: DangerButton ("Reportar No Conformidad (CU-18)")
+    +btnCertifyConformity: PrimaryButton ("Certificar Conformidad QA con SoD (CU-17)")
+    -- Efecto de Certificación --
+    * Valida que no existan no conformidades abiertas
+    * Emite qa_certification en BD
+    * Habilita suscripción de Acta UAT por el Solicitante (NAV-21)
+}
+
+QAContainer *-- TestPanel
+QAContainer *-- NCView
+QAContainer *-- DecisionBar
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-11 — Centro de Suscripción de Acta UAT
+
+**ID:** DG-UWE-PRES-11 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-21, PRES-07, CU-29, RN-09, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.10
+
+![DG-UWE-PRES-11](../assets/DG-UWE-PRES-11.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-11: Centro de Suscripción de Acta UAT (NAV-21 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<uat>> #F0FFF4
+    BorderColor<<uat>> #22543D
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #38A169
+    BackgroundColor<<auth>> #FFFFFF
+    BorderColor<<auth>> #276749
+}
+
+class "UATAcceptanceContainer (NAV-21)" as UAT <<uat>> {
+    +rfcReferenceHeader: Text ("Acta de Aceptación de Usuario — RFC-2026-0042")
+    +ecnReferenceTag: Text ("Orden de Cambio Implementada: ECN-2026-0018")
+}
+
+class "PreconditionValidationBadge" as Precond <<section>> {
+    +qaConformityStatus: StatusCard
+    -- Regla de Validación Inviolable (RN-09) --
+    * Muestra: "Certificación QA Conforme Verificada [VÁLIDA]"
+    * Si QA NO ha certificado: Formulario bloqueado con alerta
+      "No es posible suscribir UAT sin certificación conforme previa de QA."
+}
+
+class "FunctionalVerificationChecklist" as Checklist <<section>> {
+    +functionalCriteriaTable: Table
+    -- Criterios de Aceptación Evaluados --
+    * Requerimiento original cumplido según especificación
+    * Casos de uso de usuario final verificados satisfactoriamente
+    * No se introdujeron regresiones en la interfaz funcional
+}
+
+class "UserDecisionAndSignaturePanel" as Signature <<auth>> {
+    +observationsInput: TextArea ("Observaciones del Solicitante / Usuario Final")
+    +radioAcceptanceDecision: RadioGroup (ACEPTADA CONFORME / RECHAZADA)
+    +signatureConfirmationCheck: Checkbox ("Suscribo formalmente en calidad de Solicitante autorizador")
+    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Maestra / CU-20)")
+    +btnSubmitUATRechazo: DangerButton ("Rechazar Aceptación (Deriva a Corrección/Rollback)")
+}
+
+UAT *-- Precond
+UAT *-- Checklist
+UAT *-- Signature
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-12 — Gestión de Línea Base y Rollback SCM
+
+**ID:** DG-UWE-PRES-12 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-22, NAV-23, PRES-08, CU-20, CU-21, RN-02, RN-08, MOD-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.11
+
+![DG-UWE-PRES-12](../assets/DG-UWE-PRES-12.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-12: Gestión de Línea Base y Rollback SCM (NAV-22, 23 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<base>> #EBF8FF
+    BorderColor<<base>> #2B6CB0
+    BackgroundColor<<baseline>> #FFFFFF
+    BorderColor<<baseline>> #3182CE
+    BackgroundColor<<rollback>> #FFF5F5
+    BorderColor<<rollback>> #E53E3E
+}
+
+class "SCMGovernanceContainer" as Gov <<base>> {
+    +actorIndicator: Text ("Operador: Administrador de Configuración / Bibliotecario (PU-05)")
+    +activeProjectHeader: Text ("Proyecto: TraceFlow SCM Core")
+}
+
+package "Zona A: Congelamiento de Línea Base (NAV-22 / CU-20)" as BaselineZone <<baseline>> {
+    class "BaselineCreationPanel" as B1 <<baseline>> {
+        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0 (Nomenclatura RN-02)")
+        +selectECSInMaster: MultiSelectList ("Seleccionar Versiones Certificadas en Maestra")
+        +baselineDescription: TextArea ("Alcance y Justificación de la Línea Base")
+        +preconditionIndicator: Badge ("Doble Conformidad (QA Conforme + Acta UAT) Verificada")
+        +btnFreezeBaseline: PrimaryButton ("Congelar Línea Base Inmutable")
+    }
+
+    class "FrozenBaselinesCatalog" as B2 <<baseline>> {
+        +baselinesTable: Table (Etiqueta, Fecha de Congelamiento, N° ECS, Checksum Manifiesto, Estado)
+        +btnDownloadManifest: LinkButton ("Descargar Manifiesto Criptográfico SHA-256")
+    }
+}
+
+package "Zona B: Consola de Rollback de Copia de Trabajo (NAV-23 / CU-21)" as RollbackZone <<rollback>> {
+    class "RollbackExecutionModal" as R1 <<rollback>> {
+        +warningBanner: AlertBanner ("ACCION CRITICA: Purga de Copia de Trabajo")
+        +selectActiveECN: Dropdown ("Seleccionar ECN en Conflicto / Cancelada")
+        +affectedWorkSpaceItem: ReadOnlyField ("ECS en /storage/trabajo/{devId}/{ecsId}")
+        +rollbackReasonInput: TextArea ("Motivo Técnico del Rollback (RN-08)")
+        +confirmSafetyCheckbox: Checkbox ("Entiendo que los cambios en Trabajo se descartarán")
+        +btnExecuteWorkRollback: DangerButton ("Ejecutar Rollback en Trabajo y Liberar Lock")
+        -- Restricción Arquitectónica Inviolable --
+        * El rollback purga EXCLUSIVAMENTE la Biblioteca de Trabajo
+        * NO altera, no elimina ni modifica versiones históricas en Biblioteca Maestra
+        * Libera el sync_lock asociado en PostgreSQL
+    }
+}
+
+Gov *-- BaselineZone
+Gov *-- RollbackZone
+
+@enduml
+```
+
+---
+
+# DG-UWE-PRES-13 — Auditoría Inmutable y Reportes SCM
+
+**ID:** DG-UWE-PRES-13 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** NAV-26, NAV-27, PRES-03, PRES-10, CU-27, CU-28, RF-16, RF-17, RF-18, RNF-01, RNF-03, MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.13
+
+![DG-UWE-PRES-13](../assets/DG-UWE-PRES-13.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-13: Auditoría Inmutable y Reportes SCM (NAV-26, 27 / PRES-03, 10)</b>
+
+skinparam class {
+    BackgroundColor<<audit>> #F7FAFC
+    BorderColor<<audit>> #4A5568
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #718096
+    BackgroundColor<<report>> #FFFFFF
+    BorderColor<<report>> #3182CE
+}
+
+class "GovernanceInspectionContainer" as Gov <<audit>> {
+    +projectHeader: Text ("Inspección y Gobernanza SCM")
+}
+
+package "Consola de Auditoría Forense (NAV-26 / CU-27, RNF-03)" as AuditZone <<section>> {
+    class "AuditFilterBar" as AF <<section>> {
+        +actorFilter: Dropdown (Todos los usuarios)
+        +operationFilter: Dropdown (CHECK_OUT, CHECK_IN, LB_FREEZE, etc.)
+        +dateRangePicker: DateRange
+        +btnVerifyChainIntegrity: ActionButton ("Verificar Cadena SHA-256")
+    }
+
+    class "AppendOnlyLogTable" as AT <<section>> {
+        +logTable: Table
+        -- Columnas de Auditoría --
+        * Timestamp (ISO 8601) | Actor | Rol | Operación | Entidad | ECN | SHA-256 Previo | SHA-256 Hash | Estado
+    }
+
+    class "CryptographicVerificationModal" as AVM <<section>> {
+        +integrityResultBanner: SuccessBanner ("Cadena Criptográfica Verificada: 1,420 registros íntegros")
+        +mismatchAlert: DangerBanner ("ALERTA: Corrupción o alteración detectada en registro #ID")
+    }
+}
+
+package "Generador Paramétrico de Reportes (NAV-27 / CU-28, RF-18)" as ReportZone <<report>> {
+    class "ReportParametersForm" as RF <<report>> {
+        +selectReportType: Dropdown
+        -- Reportes Normativos Soportados por RF-18 --
+        * 1. Reporte de Estado de Configuración (CSAR)
+        * 2. Matriz de Trazabilidad Requerimientos vs ECS
+        * 3. Registro Histórico de Cambios por Proyecto
+        +scopeFilter: ProjectDropdown
+        +periodFilter: DateRange
+        +formatSelector: RadioGroup (PDF Ejecutivo / CSV de Datos)
+        +btnGenerateReport: PrimaryButton ("Generar Reporte Oficial")
+    }
+
+    class "ReportPreviewAndDownloadArea" as RD <<report>> {
+        +previewContainer: DocumentViewer (Vista previa preliminar de datos)
+        +btnDownloadFile: DownloadButton ("Descargar Archivo Generado")
+    }
+}
+
+Gov *-- AuditZone
+Gov *-- ReportZone
 
 @enduml
 ```

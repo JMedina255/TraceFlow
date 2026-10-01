@@ -1,9 +1,9 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 > **Documento de Arquitectura de Software (SAD) — Fase de Diseño**  
-> **Versión:** 0.2 (Borrador de Diseño Controlado — Saneamiento Técnico de Secuencias y Trazabilidad)  
+> **Versión:** 0.3 (Borrador de Diseño Controlado — Modelos UWE de Navegación y Presentación)  
 > **Fecha:** Octubre 2026  
-> **Estado:** BORRADOR DE DISEÑO v0.2 (En proceso de revisión — No congelado como Baseline)  
+> **Estado:** BORRADOR DE DISEÑO v0.3 (En proceso de revisión — No congelado como Baseline)  
 > **Repositorio Oficial:** `TraceFlow`  
 > **Organización Cliente:** ÉXODO S.A.C.  
 > **Equipo de Desarrollo:** C-SharkTeam  
@@ -29,8 +29,8 @@
       - LOYOLA VILCA CHOQUE, Renzo Fernando  (2021072615)
       - RIVERA MUÑOZ, Augusto Joaquin        (2022073505)
 
-                               TACNA — PERÚ
-                                   2026
+                                TACNA — PERÚ
+                                    2026
 ========================================================================================
 ```
 
@@ -42,6 +42,7 @@
 | :---: | :--- | :--- | :--- | :---: | :--- |
 | **0.1** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | Emisión inicial del SAD de Diseño (Borrador Controlado v0.1) a partir de las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los registros de decisión aprobados (ADR-001 a ADR-010). |
 | **0.2** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Auditoría y Saneamiento Técnico Integral**: Corrección de actores canónicos en secuencias técnicas (DG-DSEQ-10, 12, 17, 20, 21, 30); delimitación de Check-In (CU-12) vs Línea Base (CU-20); incorporación de autorización compartida para CU-30; precisión del flujo de rollback (CU-21 en Biblioteca de Trabajo); saneamiento de erratas de reglas de negocio (RN-08, RN-05, RN-04); aclaración de seguridad (Argon2id como KDF); desacoplamiento de transacciones DB+Storage con estados intermedios y compensación; y acotamiento de RNF-06. |
+| **0.3** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Incorporación de Modelos UWE de Navegación y Presentación**: Formalización de 28 nodos navegacionales (`NAV-01` a `NAV-28`), 8 diagramas de navegación (`DG-UWE-NAV-01` a `08`), 10 patrones de presentación (`PRES-01` a `PRES-10`), 13 diagramas de presentación (`DG-UWE-PRES-01` a `13`), catálogo de 19 pantallas (`SCREEN-01` a `19`), matrices de trazabilidad y accesibilidad/responsive. Saneamiento de semántica de NAV-20, clasificación de NAV-12 y orígenes de CU-20/21. |
 
 ---
 
@@ -112,15 +113,31 @@
     - 16.1 Trazabilidad Componente -> ADR -> MOD -> RF -> RNF -> RN -> CU
 17. [Decisiones Pendientes para la Baseline de Implementación](#17-decisiones-pendientes-para-la-baseline-de-implementación)
 18. [Auditoría SAD de Diseño v0.2](#18-auditoría-sad-de-diseño-v02)
+19. [Modelo UWE de Navegación](#19-modelo-uwe-de-navegación)
+    - 19.1 Principios del Modelo de Navegación UWE
+    - 19.2 Catálogo de Nodos Navegacionales y Tipología de Vistas
+    - 19.3 Modelo General de Navegación (DG-UWE-NAV-01)
+    - 19.4 Modelos de Navegación por Actor Canónico (DG-UWE-NAV-02 a 08)
+    - 19.5 Navegación Condicionada por Estados del Ciclo de Vida (TB-07)
+    - 19.6 Control de Acceso Navegacional vs Seguridad Backend (RBAC/SoD)
+    - 19.7 Matriz de Cobertura y Trazabilidad (CU ↔ Navegación ↔ API ↔ Módulos)
+20. [Modelo UWE de Presentación](#20-modelo-uwe-de-presentación)
+    - 20.1 Principios del Modelo UWE de Presentación
+    - 20.2 Catálogo de Patrones de Presentación (PRES-01 a PRES-10)
+    - 20.3 Shell Global de la Aplicación (DG-UWE-PRES-01)
+    - 20.4 Presentación de Procesos SCM y Vistas Críticas (DG-UWE-PRES-02 a 13)
+    - 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-19)
+    - 20.6 Matriz de Trazabilidad Cruzada (NAV ↔ PRES ↔ SCREEN ↔ CU)
+    - 20.7 Diseño Adaptativo (Responsive) y Accesibilidad
 
 ---
 
 # 1. Introducción
 
 ## 1.1 Propósito
-El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.2)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces y despliegue del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
+El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.3)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces, despliegue, navegación e interacción visual del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
 
-Esta versión **v0.2** subsana exhaustivamente las inconsistencias detectadas en la versión preliminar v0.1 respecto a la asignación de actores canónicos, correspondencia de bibliotecas SCM, trazabilidad de reglas de negocio y desacoplamiento de operaciones de almacenamiento físico frente a la base de datos relacional.
+Esta versión **v0.3** incorpora de forma exhaustiva los **Modelos UWE de Navegación (Sección 19)** y **Presentación (Sección 20)**, formalizando los 28 nodos navegacionales (`NAV-01` a `NAV-28`), 8 diagramas de navegación (`DG-UWE-NAV-01` a `08`), 10 patrones de presentación (`PRES-01` a `PRES-10`), 13 diagramas de presentación (`DG-UWE-PRES-01` a `13`), catálogo de 19 pantallas (`SCREEN-01` a `19`) y el saneamiento riguroso de la semántica de `NAV-20`, la clasificación de `NAV-12` y los puntos de origen del Bibliotecario para `CU-20` y `CU-21`.
 
 ## 1.2 Alcance
 El alcance de este documento abarca la especificación técnica completa de los 9 módulos de software de TraceFlow SCM:
@@ -2184,7 +2201,7 @@ Se formalizan **28 Nodos Navegacionales Canónicos (`NAV-01` a `NAV-28`)** deriv
 
 | NAV-ID | Nombre del Nodo | Actor(es) Canónico(s) Autorizado(s) | CU Gobernados | Módulo | Tipo de Vista Preliminar | Propósito en el Espacio Navegable |
 | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
-| **NAV-01** | Inicio de Sesión | Todos (Público / Entrada) | Autenticación | MOD-01 | Formulario Centrado | Autenticación de credenciales, selección de rol y emisión de cookie de sesión `HttpOnly`. |
+| **NAV-01** | Inicio de Sesión | Todos (Público / Entrada) | Autenticación | MOD-01 | Formulario Centrado | Autenticación de credenciales institucionales y emisión de cookie de sesión opaca `HttpOnly`. |
 | **NAV-02** | Dashboard General | Todos (Personalizado por Rol) | Múltiples | MOD-01..09 | Dashboard / Resumen | Panel principal con métricas, alertas activas y bandeja de tareas pendientes según el rol autenticado. |
 | **NAV-03** | Índice de Proyectos | Gestor, CCB, Bibliotecario | CU-02 | MOD-02 | Lista / Tabla Filtrable | Directorio general de proyectos de software bajo custodia SCM. Permite búsqueda y creación. |
 | **NAV-04** | Detalle de Proyecto | Gestor, CCB, Bibliotecario, Arquitecto | CU-02, CU-03 | MOD-02 | Detalle con Pestañas | Ficha integral del proyecto: datos generales, catálogo de ECS asociados, líneas base y miembros. |
@@ -2203,7 +2220,7 @@ Se formalizan **28 Nodos Navegacionales Canónicos (`NAV-01` a `NAV-28`)** deriv
 | **NAV-17** | Consola de Check-In | Administrador / Bibliotecario | CU-12 | MOD-05 | Formulario Multipart | Carga de artefacto modificado, verificación de hash SHA-256 (`RNF-03`) y promoción a Soporte o Maestra. |
 | **NAV-18** | Historial de Versiones y Diffs | Bibliotecario, Gestor, Dev, Arquitecto | CU-13 | MOD-05 | Línea de Tiempo / Diff | Visor cronológico inmutable de versiones de un ECS con comparador visual de cambios y metadata de orden. |
 | **NAV-19** | Consola de Validación QA | Equipo de Calidad / Testing | CU-16, CU-17, CU-19 | MOD-06 | Tablero de Ejecución | Registro de pruebas de integración y emisión de la Certificación de Conformidad técnica (con SoD). |
-| **NAV-20** | Registro de No Conformidades | Equipo de Calidad / Testing | CU-18 | MOD-06 | Formulario de Incidencias | Notificación formal de defectos detectados durante las pruebas, retornando el flujo a re-testeo. |
+| **NAV-20** | Consola / Formulario de No Conformidades | QA (Registro) / Desarrollador (Consulta) | CU-18, CU-19 | MOD-06 | Formulario / Vista de Defectos | Notificación y trazabilidad formal de defectos detectados en pruebas. Permisos diferenciados: QA registra/emite (`CU-18`), Desarrollador consulta defectos asignados a su ECN para corrección (`CU-14, CU-19`). |
 | **NAV-21** | Consola de Aceptación UAT | Solicitante (Usuario Final) | CU-29 | MOD-06 | Acta Formal de Usuario | Evaluación final en entorno controlado y suscripción del Acta de Aceptación del Usuario (`RN-09`). |
 | **NAV-22** | Consola de Líneas Base | Administrador / Bibliotecario | CU-20 | MOD-07 | Catálogo / Congelador | Agrupación y congelamiento formal de versiones de ECS en Biblioteca Maestra con nomenclatura `RN-02`. |
 | **NAV-23** | Consola de Rollback | Administrador / Bibliotecario | CU-21 | MOD-07 | Modal de Reversión | Reversión de emergencia ante fallo insubsanable: purga la Biblioteca de Trabajo y libera el bloqueo (`RN-08`). |
@@ -2654,22 +2671,22 @@ skinparam class {
 }
 
 class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
-class "NAV-02: Dashboard del Desarrollador\n(Mis Órdenes en Ejecución)" as NAV02 <<navClass>>
+class "NAV-02: Dashboard del Desarrollador\n(Tareas y Órdenes Asignadas)" as NAV02 <<navClass>>
 
-class "NAV-12: Mis Órdenes Asignadas (ECN)" as NAV12 <<index>>
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO - CU-08, CU-14)" as NAV12 <<navClass>>
 class "NAV-15: Mi Espacio de Trabajo\n(Biblioteca de Trabajo - CU-14)" as NAV15 <<navClass>>
 class "NAV-18: Historial de Versiones ECS\n(CU-13)" as NAV18 <<index>>
-class "NAV-20: Bandeja de No Conformidades QA\n(CU-18, CU-19)" as NAV20 <<navClass>>
+class "NAV-20: Consola de No Conformidades\n(Vista Consulta de Defectos - CU-19)" as NAV20 <<navClass>>
 
 NAV01 -down-> NAV02 : Login exitoso
 
-NAV02 -down-> NAV12 : Ver Órdenes ECN
-NAV02 -down-> NAV20 : Defectos Asignados
+NAV02 -down-> NAV12 : [Widget Tareas Asignadas]\nSeleccionar ECN en Desarrollo
+NAV02 -down-> NAV20 : [Widget Alertas de Defectos]\nConsultar Defectos de la ECN
 
-NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Código Fuente
+NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Archivo en Trabajo
 NAV15 -down-> NAV18 : Comparar con versión estable
 NAV15 ..> NAV15 : [Acción Contextual: Registrar Pruebas Unitarias CU-15]
-NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
+NAV20 ..> NAV15 : Subsanar defecto y preparar versión corregida
 
 @enduml
 ```
@@ -2703,18 +2720,18 @@ skinparam class {
 class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
 class "NAV-02: Dashboard de QA\n(Órdenes Pendientes de Certificación)" as NAV02 <<navClass>>
 
-class "NAV-12: Órdenes en Pruebas (ECN)" as NAV12 <<index>>
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO en Pruebas)" as NAV12 <<navClass>>
 class "NAV-19: Consola de Validación QA\n(Pruebas de Integración - CU-16)" as NAV19 <<navClass>>
-class "NAV-20: Formulario de No Conformidad\n(CU-18)" as NAV20 <<process>>
+class "NAV-20: Consola de No Conformidades\n(Vista Registro de Defectos - CU-18)" as NAV20 <<process>>
 
 NAV01 -down-> NAV02 : Login exitoso
 
-NAV02 -down-> NAV12 : Órdenes para Testing (Estado = EN_PRUEBAS)
-NAV12 -right-> NAV19 : Ejecutar Validación Técnica
+NAV02 -down-> NAV12 : [Widget Testing Pendiente]\nSeleccionar ECN en Pruebas
+NAV12 -right-> NAV19 : Ejecutar Validación Técnica sobre Soporte
 
 NAV19 ..> NAV20 : [Prueba Fallida]\nReportar No Conformidad (CU-18)
-NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Pasa a EN_ACEPTACION)
-NAV20 ..> NAV19 : Reevaluar y re-testear (CU-19)
+NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Habilita EN_ACEPTACION / UAT)
+NAV20 ..> NAV19 : Reevaluar y re-testear tras corrección (CU-19)
 
 @enduml
 ```
@@ -2731,7 +2748,7 @@ La navegación y habilitación de acciones en TraceFlow SCM depende estrictament
 | **2. En Subsanación** | Solicitante | Subsanar observaciones de solicitud | `NAV-06` | `NAV-08` | Solicitante subsana datos observados (`CU-04.1`). Retorna a revisión. |
 | **3. Clasificada** | Arquitecto / Especialista Técnico | Iniciar análisis técnico de impacto | `NAV-05` | `NAV-06` $\rightarrow$ `NAV-09` | Superó filtro inicial; admitida para evaluación técnica (`CU-06`). |
 | **4. En Análisis Técnico** | Arquitecto / Especialista Técnico | Registrar Informe Técnico de Impacto | `NAV-06` | `NAV-09` | Evalúa arquitectura, dependencias y Triple Restricción (`RN-05`). |
-| **5. En Evaluación (Mayor)** | Comité de Control de Cambios (CCB) | Deliberar y emitir dictamen colegiado | `NAV-06` | `NAV-10` | Votación colegiada con quórum y mayoría calificada (`CU-07, RN-01`). |
+| **5. En Evaluación (Mayor)** | Comité de Control de Cambios (CCB) | Deliberar y emitir dictamen colegiado | `NAV-06` | `NAV-10` | Deliberación colegiada, registro formal de votos individuales y resolución colegiada (aprobación/rechazo) (`CU-07, RN-01`). |
 | **5. En Evaluación (Menor)** | Gestor Y Arquitecto (Doble Llave) | Autorizar cambio menor por vía delegada| `NAV-06` | `NAV-11` | Exige concurrencia de ambos vistos buenos (`CU-30, RN-01, RN-05`). |
 | **6. Autorizada** | CCB / Analista de Requerimientos | Formalizar y emitir Orden de Cambio | `NAV-06` | `NAV-12` | Habilita asignación de desarrollador y emisión de ECN (`CU-08`). |
 | **7. Orden Emitida** | Administrador de Configuración | Ejecutar Check-Out con bloqueo activo | `NAV-12` | `NAV-16` | Adquiere `sync_lock` (ACTIVE) y copia ECS a Trabajo (`CU-10, RN-06`). |
@@ -2740,7 +2757,7 @@ La navegación y habilitación de acciones en TraceFlow SCM depende estrictament
 | **9. En Pruebas** | Equipo de Calidad / Testing | Ejecutar integración y certificar QA | `NAV-12` | `NAV-19` | Valida pruebas. Si aprueba, emite conformidad técnica con SoD (`CU-17`). |
 | **9. En Pruebas (Fallo)** | Equipo de Calidad / Testing | Reportar no conformidad técnica | `NAV-19` | `NAV-20` | Registra defectos para corrección por el desarrollador (`CU-18, CU-19`). |
 | **10. En Aceptación** | Solicitante (Usuario Final) | Suscribir Acta de Aceptación UAT | `NAV-06` | `NAV-21` | Valida en entorno controlado previo a la liberación (`CU-29, RN-09`). |
-| **10. En Aceptación (Fin)** | Administrador de Configuración | Check-In Definitivo (Soporte $\rightarrow$ Maestra)| `NAV-21` | `NAV-17` $\rightarrow$ `NAV-22`| Exige Doble Conformidad (QA+UAT). Congela Línea Base (`CU-12, CU-20`). |
+| **10. En Aceptación (Fin)** | Administrador de Configuración | Check-In Definitivo (Soporte $\rightarrow$ Maestra) y Congelamiento | `NAV-04` / `NAV-12` | `NAV-17` $\rightarrow$ `NAV-22`| Exige Doble Conformidad previa (QA Conforme + Acta UAT). Congela Línea Base (`CU-12, CU-20`). |
 | **11. Desestimada** | Analista de Requerimientos / Gestor | Cierre formal por inviabilidad inicial | `NAV-06` | Terminal | Solicitud improcedente o plazo de subsanación vencido (`CU-05, RN-07`). |
 | **12. Rechazada** | CCB / Autoridad Delegada | Cierre formal por dictamen negativo | `NAV-10` / `NAV-11` | Terminal | Rechazo técnico o de gestión fundamentado (`CU-07, CU-30, RN-07`). |
 | **13. Cancelada** | Administrador de Configuración | Rollback y cancelación de orden | `NAV-23` | Terminal | Fallo no subsanado en re-test o rechazo UAT; purga Trabajo (`CU-21, RN-08`). |
@@ -2787,8 +2804,8 @@ A continuación se demuestra la **cobertura del 100% de los 31 Casos de Uso del 
 | **CU-17** | Certificar conformidad del cambio | Equipo de Calidad / Testing | `NAV-19` | Clic "Certificar QA" | `NAV-19` | Certificado de Conformidad emitido (con SoD)| `/api/v1/change-orders/{id}/qa-certification` | MOD-06 |
 | **CU-18** | Reportar no conformidad | Equipo de Calidad / Testing | `NAV-19` | Clic "Reportar Defecto"|`NAV-20` | No conformidad registrada y ECN en corrección| `/api/v1/change-orders/{id}/non-conformity`| MOD-06 |
 | **CU-19** | Reevaluar y re-testear | Equipo de Calidad / Testing | `NAV-20` | Clic "Re-testear" | `NAV-19` | Re-testeo ejecutado y actualizado | `/api/v1/change-orders/{id}/retest` | MOD-06 |
-| **CU-20** | Crear y congelar línea base | Administrador / Bibliotecario | `NAV-04` / `NAV-21` | Clic "Congelar LB" | `NAV-22` | Línea base inmutable congelada (`RN-02`) | `/api/v1/projects/{id}/baselines` | MOD-07 |
-| **CU-21** | Ejecutar rollback en Biblioteca Trabajo | Administrador / Bibliotecario | `NAV-19` / `NAV-21` | Clic "Rollback" | `NAV-23` | Copia de Trabajo purgada y lock liberado | `/api/v1/change-orders/{id}/rollback` | MOD-07 |
+| **CU-20** | Crear y congelar línea base | Administrador / Bibliotecario | `NAV-04` / `NAV-02` | Clic "Congelar LB" | `NAV-22` | Línea base inmutable congelada (`RN-02`) (requiere QA+UAT previo) | `/api/v1/projects/{id}/baselines` | MOD-07 |
+| **CU-21** | Ejecutar rollback en Biblioteca Trabajo | Administrador / Bibliotecario | `NAV-04` / `NAV-12` / `NAV-02` | Clic "Rollback" | `NAV-23` | Copia de Trabajo purgada y lock liberado (ante fallo QA/UAT o cancelación) | `/api/v1/change-orders/{id}/rollback` | MOD-07 |
 | **CU-22** | Cancelar Orden de Cambio | Administrador / Bibliotecario | `NAV-23` | Clic "Cancelar ECN" | `NAV-12` | Orden cancelada y expediente formalizado | `/api/v1/change-orders/{id}/cancel` | MOD-04 |
 | **CU-23** | Registrar incidencia | Solicitante | `NAV-02` / `NAV-24` | Clic "Nuevo Ticket" | `NAV-24` (Modal)| Ticket de incidencia registrado | `/api/v1/projects/{id}/incidents` | MOD-08 |
 | **CU-24** | Consultar estado de ticket | Solicitante, Gestor | `NAV-24` | Selecciona ticket | `NAV-25` | Ficha técnica de estado de incidencia | `/api/v1/incidents/{id}` | MOD-08 |
@@ -2798,3 +2815,1116 @@ A continuación se demuestra la **cobertura del 100% de los 31 Casos de Uso del 
 | **CU-28** | Generar reportes de estado | Bibliotecario, CCB, Gestor | `NAV-02` | Accede a Reportes | `NAV-27` | Reporte SCM exportado en PDF/CSV | `/api/v1/reports/status` | MOD-09 |
 | **CU-29** | Validar aceptación del usuario (UAT)| Solicitante (Usuario Final) | `NAV-06` | Clic "Evaluar UAT" | `NAV-21` | Acta de Aceptación suscrita formalmente | `/api/v1/change-orders/{id}/uat-acceptance`| MOD-06 |
 | **CU-30** | Autorizar Cambio Menor (Vía Delegada)| Gestor Y Arquitecto (Doble Llave) | `NAV-06` | Clic "Autorizar Menor"| `NAV-11` | Visto bueno registrado; autoriza si ambos aprueban| `/api/v1/rfcs/{id}/authorizations` | MOD-04 |
+
+---
+
+# 20. Modelo UWE de Presentación
+
+El **Modelo UWE de Presentación (UML-based Web Engineering — Presentation Model)** de TraceFlow SCM formaliza la estructura visual, compositiva y ergonómica de los espacios navegacionales definidos en la Sección 19. Este modelo establece **cómo se organiza, presenta e interactúa visualmente la información** en la interfaz de usuario, garantizando trazabilidad rigurosa, ergonomía de ingeniería de software y cumplimiento de las directrices arquitectónicas de la fase de diseño.
+
+---
+
+## 20.1 Principios del Modelo UWE de Presentación
+
+El diseño de presentación se rige por los siguientes principios metodológicos:
+
+### 1. Distinción Conceptual Canónica
+$$\mathbf{Caso\ de\ Uso\ (CU)} 
+eq \mathbf{Espacio\ Navegacional\ (NAV)} 
+eq \mathbf{Estructura\ de\ Presentacicute{o}n\ (PRES)} 
+eq \mathbf{Pantalla\ Fcute{\imath}sica\ (SCREEN)}$$
+
+- **Caso de Uso (CU)**: Interacción funcional de negocio transaccional completa (SRS de Análisis).
+- **Nodo Navegacional (NAV)**: Unidad lógica direccionable en el grafo de navegación del usuario (Sección 19).
+- **Patrón / Estructura de Presentación (PRES)**: Disposición compositiva abstracta de contenedores visuales, formularios, tablas, widgets y áreas de decisión (`<<presentationClass>>`).
+- **Pantalla Concreta (SCREEN)**: Agrupación física coherente de uno o más nodos navegacionales que comparten un contexto de pantalla unificado en el navegador web del usuario.
+
+### 2. Agnosticismo Tecnológico de Implementación
+El modelo de presentación **no impone todavía código React, selectores CSS, clases utilitarias de Tailwind, dimensiones exactas en píxeles ni iconografía fija**. Su propósito arquitectónico es definir:
+- Jerarquías de contención (`<<presentationGroup>>`).
+- Tipos de componentes visuales de interacción (`<<text>>`, `<<form>>`, `<<anchor>>`, `<<button>>`, `<<collection>>`).
+- Flujo visual y distribución de regiones de trabajo.
+- Reglas de visibilidad y habilitación contextual por actor y estado.
+
+### 3. Ergonomía para Gestión de Configuración de Software
+La interfaz está optimizada para la operación profesional en ingeniería de software:
+- **Visibilidad Permanente de Contexto**: El proyecto activo, el rol del actor y el estado del expediente se encuentran siempre accesibles.
+- **Prevención Proactiva de Errores**: Deshabilitación contextual con mensajes explicativos claros para acciones no permitidas por estado o Segregación de Funciones (SoD).
+- **Densidad de Información Apropiada**: Uso de tablas estructuradas, vistas split-screen para comparación de versiones y paneles con pestañas que evitan la saturación visual.
+
+---
+
+## 20.2 Catálogo de Patrones de Presentación (PRES-01 a PRES-10)
+
+Para garantizar consistencia visual y reutilización arquitectónica, se definen **10 Patrones de Presentación Reutilizables**:
+
+| PRES-ID | Denominación del Patrón | Estereotipo UWE | Nodos NAV que lo Implementan | Actores Autorizados | Propósito Estructural y Composición |
+| :---: | :--- | :---: | :---: | :--- | :--- |
+| **`PRES-01`** | **Acceso y Autenticación** | `<<presentationClass>>` | `NAV-01` | Todos (Público) | Formulario centrado para captura de credenciales institucionales, validación y feedback de autenticación. |
+| **`PRES-02`** | **Dashboard Adaptativo por Rol** | `<<presentationClass>>` | `NAV-02` | Todos (Adaptado por Rol) | Panel modular con widgets métricos, tareas asignadas, accesos directos y feed de actividad reciente. |
+| **`PRES-03`** | **Índice / Listado Filtrable** | `<<presentationGroup>>` | `NAV-03, NAV-05, NAV-13, NAV-24, NAV-26, NAV-27` | Según perfil | Barra de búsqueda, panel de filtros multifactor, tabla de datos paginada con estados visuales y menú de acciones. |
+| **`PRES-04`** | **Detalle 360° con Pestañas** | `<<presentationGroup>>` | `NAV-04, NAV-06, NAV-12, NAV-14, NAV-25` | Todos | Encabezado informativo, línea de estado, selector de pestañas progresivas y barra lateral/inferior de acciones. |
+| **`PRES-05`** | **Formulario Estructurado / Edición** | `<<form>>` | `NAV-08, NAV-09, NAV-20` | Según caso de uso | Agrupaciones lógicas de campos con validación en tiempo real, carga de evidencias y confirmación transaccional. |
+| **`PRES-06`** | **Wizard Multipaso Asistido** | `<<presentationGroup>>` | `NAV-07` | Solicitante | Proceso secuencial con barra de progreso, validación por etapas, previsualización de resumen y envío formal. |
+| **`PRES-07`** | **Panel de Decisión y Deliberación** | `<<presentationGroup>>` | `NAV-10, NAV-11, NAV-21` | CCB, Gestor, Arq, Solicitante | Vista comparativa de impacto, panel de votación / visto bueno y registro formal de resolución colegiada o acta. |
+| **`PRES-08`** | **Consola Operativa SCM y QA** | `<<presentationGroup>>` | `NAV-15, NAV-16, NAV-17, NAV-19, NAV-22, NAV-23` | Bibliotecario, Dev, QA | Panel de control de artefactos, selector de bibliotecas, indicadores de bloqueo (`sync_lock`) y ejecución de pruebas. |
+| **`PRES-09`** | **Visor Cronológico y Split-Screen Diff** | `<<presentationGroup>>` | `NAV-18` | Gestor, Arq, Dev, QA, Biblio | Árbol cronológico de versiones y visor de diferencias lado a lado (diff viewer) con resaltado sintáctico. |
+| **`PRES-10`** | **Generador Paramétrico de Reportes** | `<<form>>` | `NAV-27` | CCB, Gestor, Bibliotecario | Selector de tipo de reporte normativo (RF-18), filtros de período y entidad, previsualización y exportación. |
+
+---
+
+## 20.3 Shell Global de la Aplicación (DG-UWE-PRES-01)
+
+El **Shell Global** define el marco estructural envolvente de toda la SPA de TraceFlow SCM. Todas las pantallas autenticadas se alojan dentro de este contenedor compartido, garantizando coherencia de interacción y ergonomía de navegación:
+
+![DG-UWE-PRES-01](../assets/DG-UWE-PRES-01.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-01: Estructura General de Presentación — Shell Global</b>
+
+skinparam class {
+    BackgroundColor<<shell>> #EDF2F7
+    BorderColor<<shell>> #4A5568
+    BackgroundColor<<header>> #EBF8FF
+    BorderColor<<header>> #3182CE
+    BackgroundColor<<sidebar>> #F7FAFC
+    BorderColor<<sidebar>> #CBD5E0
+    BackgroundColor<<workarea>> #FFFFFF
+    BorderColor<<workarea>> #2B6CB0
+    BackgroundColor<<element>> #FFFFFF
+    BorderColor<<element>> #A0AEC0
+}
+
+class "AppShell Container" as Shell <<shell>> {
+    +viewport: FullWindow
+    +theme: Corporate SCADA/IT
+}
+
+class "TopHeaderBar (Cabecera Global)" as TopHeader <<header>> {
+    +brandLogo: TraceFlow SCM
+    +activeProjectSelector: Dropdown
+    +notificationCenter: Badge + Dropdown
+    +userProfileChip: Avatar + Name
+    +activeRoleIndicator: RoleBadge
+    +logoutButton: ActionButton
+}
+
+class "RoleBasedSidebar (Barra Lateral Adaptativa)" as Sidebar <<sidebar>> {
+    +menuDashboard: NavLink
+    +menuProjects: NavLink (MOD-02)
+    +menuRFC: NavLink (MOD-04)
+    +menuECN: NavLink (MOD-04)
+    +menuConfigItems: NavLink (MOD-03)
+    +menuVersionControl: NavLink (MOD-05)
+    +menuQualityQA: NavLink (MOD-06)
+    +menuBaselines: NavLink (MOD-07)
+    +menuIncidents: NavLink (MOD-08)
+    +menuAuditLogs: NavLink (MOD-09)
+    +menuReports: NavLink (MOD-09)
+    +menuAdminIAM: NavLink (MOD-01)
+}
+
+class "MainWorkArea (Área Principal de Trabajo)" as WorkArea <<workarea>> {
+    +breadcrumbTrail: NavBreadcrumb
+    +viewHeader: HeaderRegion
+    +contentViewport: DynamicContainer (Inyección de PRES)
+    +contextualActionBar: ActionRegion
+}
+
+class "ViewHeaderRegion" as ViewHeader <<element>> {
+    +viewTitle: TypographyH1
+    +statusBadge: RFC/ECN StateBadge (TB-07)
+    +identifierTag: CodeTag (e.g. RFC-2026-0012)
+    +primaryActionSlot: ActionButtonList
+}
+
+class "ContentViewport" as ContentViewport <<element>> {
+    +renderedPattern: PRES-01..10
+}
+
+class "ContextualActionBar" as ContextualBar <<element>> {
+    +backButton: ActionButton
+    +cancelButton: ActionButton
+    +stateTransitionButtons: RoleStateActionList
+}
+
+Shell *-- TopHeader : Superior fijo
+Shell *-- Sidebar : Izquierda adaptativo
+Shell *-- WorkArea : Región central dinámica
+
+WorkArea *-- ViewHeader : Superior de vista
+WorkArea *-- ContentViewport : Cuerpo principal
+WorkArea *-- ContextualBar : Inferior contextual
+
+@enduml
+```
+
+---
+
+## 20.4 Presentación de Procesos SCM y Vistas Críticas
+
+A continuación se especifica la composición visual interna de los procesos centrales de TraceFlow SCM mediante diagramas de presentación PlantUML:
+
+### 20.4.1 Acceso y Autenticación (DG-UWE-PRES-02)
+Derivado del nodo `NAV-01` bajo el patrón `PRES-01`. Representa la ventana de acceso inicial centrada:
+
+![DG-UWE-PRES-02](../assets/DG-UWE-PRES-02.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-02: Presentación de Acceso y Autenticación (NAV-01 / PRES-01)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F7FAFC
+    BorderColor<<container>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #3182CE
+    BackgroundColor<<input>> #FFFFFF
+    BorderColor<<input>> #CBD5E0
+    BackgroundColor<<button>> #3182CE
+    FontColor<<button>> #FFFFFF
+    BackgroundColor<<alert>> #FFF5F5
+    BorderColor<<alert>> #E53E3E
+}
+
+class "LoginViewport (Pantalla Completa)" as Viewport <<container>> {
+    +background: Neutral/Corporate
+}
+
+class "LoginCardContainer" as Card <<form>> {
+    +appLogo: Image (TraceFlow SCM)
+    +systemTitle: Text ("Sistema de Gestión de Configuración de Software")
+    +institutionLabel: Text ("ÉXODO S.A.C. — Entorno Institucional")
+}
+
+class "CredentialsForm (Formulario de Acceso)" as Form <<form>> {
+    +inputUsername: TextInput ("Usuario / Correo Institucional")
+    +inputPassword: PasswordInput ("Contraseña")
+    +btnSubmit: ActionButton ("Iniciar Sesión")
+}
+
+class "FeedbackRegion (Mensajes y Estado)" as Feedback <<alert>> {
+    +validationErrorMessage: InlineText (HTTP 400)
+    +unauthorizedAlert: BannerText ("Credenciales inválidas / Sesión expirada - HTTP 401")
+    +loadingSpinner: ProgressIndicator
+}
+
+note bottom of Form
+  <b>Decisión de Presentación sobre Selección de Rol:</b>
+  La baseline no contempla selección manual de rol en el login.
+  El sistema autentica al usuario y carga su rol canónico principal.
+  Si el usuario posee múltiples roles asignados en BD, el Header
+  mostrará un selector de contexto de rol como decisión de presentación.
+end note
+
+Viewport *-- Card
+Card *-- Form
+Card *-- Feedback
+
+@enduml
+```
+
+---
+
+### 20.4.2 Dashboard Adaptativo por Rol (DG-UWE-PRES-03)
+Derivado del nodo `NAV-02` bajo el patrón `PRES-02`. Adapta sus regiones informativas y tarjetas de acción al rol canónico autenticado:
+
+![DG-UWE-PRES-03](../assets/DG-UWE-PRES-03.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-03: Dashboard Adaptativo por Rol Canónico (NAV-02 / PRES-02)</b>
+
+skinparam class {
+    BackgroundColor<<dashboard>> #F7FAFC
+    BorderColor<<dashboard>> #2B6CB0
+    BackgroundColor<<widget>> #FFFFFF
+    BorderColor<<widget>> #3182CE
+    BackgroundColor<<kpi>> #EBF8FF
+    BorderColor<<kpi>> #63B3ED
+    BackgroundColor<<feed>> #FFFFFF
+    BorderColor<<feed>> #CBD5E0
+}
+
+class "DashboardContainer (NAV-02)" as Dashboard <<dashboard>> {
+    +activeProjectBanner: Text + Selector ("Proyecto Activo: Sistema Bancario Core")
+    +userGreeting: Text ("Bienvenido, [Nombre] | Rol: [Rol Canónico]")
+}
+
+class "MetricKPIPanel (Panel de Indicadores)" as Metrics <<kpi>> {
+    +cardPendingTasks: NumberMetric ("Tareas Pendientes de Acción")
+    +cardActiveRFCs: NumberMetric ("Solicitudes en Trámite")
+    +cardActiveLocks: NumberMetric ("Bloqueos Exclusivos (sync_lock)")
+    +cardPendingBaselines: NumberMetric ("Líneas Base en Preparación")
+}
+
+class "ActionItemsList (Bandeja de Tareas Prioritarias)" as Tasks <<widget>> {
+    +taskListTable: Table
+    -- Fuentes por Rol --
+    * Solicitante: RFCs por subsanar (CU-04.1) y Actas UAT pendientes (CU-29)
+    * Gestor: RFCs por clasificar (CU-05) y Cambios Menores (CU-30)
+    * Arquitecto: Evaluaciones de Impacto pendientes (CU-06)
+    * CCB: Sesiones de deliberación convocadas (CU-07)
+    * Bibliotecario: Solicitudes de Check-Out/In y Líneas Base (CU-10, 20)
+    * Desarrollador: ECNs en implementación asignadas (CU-14, 15)
+    * QA: Órdenes en pruebas y re-testeos pendientes (CU-16, 19)
+}
+
+class "QuickAccessPanel (Accesos Directos Autorizados)" as QuickNav <<widget>> {
+    +btnNewRFC: Button ("+ Nueva Solicitud (RFC)")
+    +btnExplorerECS: Button ("Explorar Bibliotecas")
+    +btnIncidentTicket: Button ("Mesa de Incidencias")
+}
+
+class "RecentActivityFeed (Historial Reciente del Proyecto)" as ActivityFeed <<feed>> {
+    +timelineEntries: List (Transiciones recientes de RFC, Check-Ins certificados)
+}
+
+Dashboard *-- Metrics
+Dashboard *-- Tasks
+Dashboard *-- QuickNav
+Dashboard *-- ActivityFeed
+
+@enduml
+```
+
+---
+
+### 20.4.3 Índices y Listados Filtrables
+Los listados del sistema implementan el patrón `PRES-03` (`<<presentationGroup>>`), asegurando ordenamiento, filtrado por columnas y acciones contextuales por rol:
+
+| NAV-ID | Entidad Listada | Columnas Esenciales de la Tabla | Filtros Disponibles | Acciones Contextuales Autorizadas |
+| :---: | :--- | :--- | :--- | :--- |
+| **`NAV-03`** | Directorio de Proyectos | Código, Nombre, Líder de Proyecto, ECS Totales, Baselines Congeladas, Estado. | Búsqueda por nombre/código, filtro por estado activo/archivado. | Clic en fila $
+ightarrow$ Ver Ficha (`NAV-04`); Botón "+ Nuevo Proyecto" (`CU-02`, Gestor/Bibliotecario). |
+| **`NAV-05`** | Bandeja de Solicitudes (RFC) | Código RFC, Proyecto, Título, Solicitante, Estado (14 estados TB-07), Prioridad, Fecha. | Filtro por Estado, Proyecto, Prioridad, Rango de fechas, Búsqueda de texto libre. | Clic en fila $
+ightarrow$ Ver Expediente 360° (`NAV-06`); Botón "+ Nueva RFC" (`CU-04`, Solicitante). |
+| **`NAV-13`** | Catálogo de ECS | Identificador ECS, Nombre, Tipo (Código/Doc/Binario), Proyecto, Versión Vigente, Biblioteca Actual, Lock. | Filtro por Biblioteca (Trabajo/Soporte/Maestra), Tipo de ECS, Estado del Lock. | Clic en fila $
+ightarrow$ Ficha Técnica (`NAV-14`); Botón "+ Registrar ECS" (`CU-09`, Arquitecto/Bibliotecario). |
+| **`NAV-18`** | Historial de Versiones | Versión (`RN-02`), Checksum SHA-256, Fecha/Hora, Autor del Check-In, ECN Vinculada, Biblioteca. | Filtro por autor, rango de fechas, biblioteca destino. | Comparar con Versión Previa (Diff); Ver Manifiesto; Descargar copia certificada. |
+| **`NAV-24`** | Mesa de Incidencias | N° Ticket, Proyecto, Título, Severidad, Estado (Abierta/En Análisis/Derivada/Cerrada), Solicitante, Fecha. | Filtro por Severidad, Estado, Proyecto. | Clic en fila $
+ightarrow$ Ficha de Incidencia (`NAV-25`); Botón "+ Nueva Incidencia" (`CU-23`, Solicitante). |
+| **`NAV-26`** | Auditoría Forense | ID Log, Marca Temporal (ISO 8601), Actor, Rol Canónico, Operación, Entidad Afectada, Hash SHA-256 Encadenado. | Filtro por Actor, Tipo de Operación, Entidad, Rango de tiempo; Verificador de Integridad. | Inspeccionar Carga JSON del Evento; Verificar Cadena Criptográfica SHA-256 (`CU-27`). |
+| **`NAV-27`** | Generador de Reportes SCM | Código Reporte, Denominación Normativa (RF-18), Frecuencia, Última Generación, Formatos Disponibles. | Filtro por Módulo SCM, Tipo de Auditoría. | Configurar Parámetros y Generar Reporte (`CU-28`); Descargar archivo emitido. |
+| **`NAV-28`** | Usuarios y Roles | ID Usuario, Nombre Completo, Email Institucional, Rol Canónico Asignado, Estado, Último Acceso. | Filtro por Rol Canónico, Estado de Cuenta (Activa/Inactiva). | Editar Privilegios / Reasignar Rol (`CU-01`, Bibliotecario); Desactivar Acceso. |
+
+---
+
+### 20.4.4 Detalle y Expediente 360° de Solicitud de Cambio (DG-UWE-PRES-04)
+Derivado del nodo `NAV-06` bajo el patrón `PRES-04`. Constituye el expediente unificado de seguimiento del ciclo de vida de la RFC:
+
+![DG-UWE-PRES-04](../assets/DG-UWE-PRES-04.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-04: Detalle y Expediente 360° de RFC (NAV-06 / PRES-04)</b>
+
+skinparam class {
+    BackgroundColor<<record>> #F7FAFC
+    BorderColor<<record>> #2B6CB0
+    BackgroundColor<<tab>> #FFFFFF
+    BorderColor<<tab>> #3182CE
+    BackgroundColor<<action>> #FFF5F5
+    BorderColor<<action>> #E53E3E
+}
+
+class "RFCRecordContainer (NAV-06)" as Container <<record>> {
+    +headerCode: TypographyH1 ("RFC-2026-0042")
+    +projectNameTag: Badge ("Proyecto: Pasarela de Pagos")
+    +officialStateBadge: StateBadge ("Estado: EN_EVALUACION - TB-07")
+    +requesterInfo: Chip ("Solicitante: Juan Pérez")
+    +creationDate: Text ("Fecha: 2026-10-01 10:30")
+}
+
+class "ProgressiveTabNavigation (Pestañas según Avance)" as Tabs <<tab>> {
+    +tab1_Summary: "1. Resumen y Justificación"
+    +tab2_AffectedECS: "2. ECS Afectados"
+    +tab3_TechnicalImpact: "3. Informe de Impacto Técnico"
+    +tab4_CCBorMinorDecision: "4. Dictamen / Autorización"
+    +tab5_ChangeOrder: "5. Orden de Cambio (ECN/ECO)"
+    +tab6_QualityQA: "6. Aseguramiento de Calidad"
+    +tab7_UATAcceptance: "7. Aceptación de Usuario (UAT)"
+    +tab8_TimelineAudit: "8. Trazabilidad e Historial"
+}
+
+class "ActiveTabContentRegion" as TabContent <<tab>> {
+    +renderedDetails: EmbeddedView (Según pestaña seleccionada)
+    -- Regla de Visibilidad --
+    Las pestañas 3 a 7 se habilitan conforme la RFC transiciona
+    por los estados oficiales de TB-07 (visibilidad progresiva).
+}
+
+class "ContextualActionsDrawer (Acciones por Actor + Estado)" as Actions <<action>> {
+    -- Matriz de Botones Habilitados --
+    * Solicitante + OBSERVADA: Botón "Subsanar Observaciones" (NAV-08)
+    * Gestor + REGISTRADA: Botón "Validar y Clasificar" (CU-05)
+    * Arquitecto + EN_ANALISIS_TECNICO: Botón "Emitir Informe de Impacto" (NAV-09)
+    * CCB + EN_DELIBERACION (Mayor): Botón "Acceder a Deliberación CCB" (NAV-10)
+    * Gestor/Arq + EVALUADA (Menor): Botón "Autorizar Cambio Menor" (NAV-11)
+    * Gestor + AUTORIZADA: Botón "Emitir Orden ECN" (NAV-12)
+    * Solicitante + CERTIFICADA: Botón "Suscribir Acta UAT" (NAV-21)
+}
+
+Container *-- Tabs
+Container *-- TabContent
+Container *-- Actions
+
+@enduml
+```
+
+---
+
+### 20.4.5 Registro y Subsanación de Solicitudes de Cambio (DG-UWE-PRES-05)
+Derivado de los nodos `NAV-07` y `NAV-08` bajo los patrones `PRES-06` (Wizard Multipaso) y `PRES-05` (Formulario Correctivo):
+
+![DG-UWE-PRES-05](../assets/DG-UWE-PRES-05.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-05: Registro y Subsanación de RFC (NAV-07, NAV-08 / PRES-06, PRES-05)</b>
+
+skinparam class {
+    BackgroundColor<<wizard>> #F7FAFC
+    BorderColor<<wizard>> #3182CE
+    BackgroundColor<<step>> #FFFFFF
+    BorderColor<<step>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #63B3ED
+    BackgroundColor<<buttons>> #EDF2F7
+    BorderColor<<buttons>> #CBD5E0
+}
+
+class "RFCFormContainer" as Container <<wizard>> {
+    +formTitle: Text ("Registro de Solicitud de Cambio (RFC)")
+    +stepProgressBar: ProgressBar (Paso actual / Total)
+}
+
+package "Paso 1: Información General" as Step1 <<step>> {
+    class "GeneralInfoGroup" as G1 <<form>> {
+        +selectProject: ProjectSelector (Mandatorio)
+        +inputTitle: TextInput (Mandatorio, máx 120 caracteres)
+        +selectPriority: PriorityDropdown (Baja, Media, Alta, Urgente)
+        +selectCategory: ChangeCategoryDropdown (Correctivo, Adaptativo, Perfectivo)
+    }
+}
+
+package "Paso 2: Justificación y Descripción" as Step2 <<step>> {
+    class "DescriptionGroup" as G2 <<form>> {
+        +inputProblemDescription: TextArea (Mandatorio, descripción detallada)
+        +inputBusinessJustification: TextArea (Mandatorio, justificación y valor)
+        +inputProposedSolution: TextArea (Opcional, propuesta técnica sugerida)
+    }
+}
+
+package "Paso 3: ECS y Evidencias" as Step3 <<step>> {
+    class "ArtifactsGroup" as G3 <<form>> {
+        +multiSelectECS: ECSSelectorList (Sugeridos para intervención)
+        +fileUploader: AttachmentUploader (PDFs, capturas, logs de error)
+    }
+}
+
+package "Paso 4: Confirmación y Envío" as Step4 <<step>> {
+    class "ReviewSummaryGroup" as G4 <<form>> {
+        +summaryPreview: ReadOnlySummaryCard
+        +termsAcknowledgment: Checkbox ("Declaro que los datos son verídicos")
+    }
+}
+
+class "WizardNavigationControls" as Controls <<buttons>> {
+    +btnPrevious: ActionButton ("< Anterior")
+    +btnNext: ActionButton ("Siguiente >")
+    +btnSaveDraft: ActionButton ("Guardar Borrador")
+    +btnSubmit: PrimaryActionButton ("Enviar RFC (Pasa a REGISTRADA)")
+}
+
+note bottom of Container
+  <b>Reutilización para Subsanación (NAV-08):</b>
+  Cuando el Solicitante subsana observaciones (CU-04.1):
+  1. Carga los 4 pasos pre-poblados con los datos originales.
+  2. Resalta en rojo los campos con observaciones del Gestor.
+  3. Muestra panel superior con el Dictamen de Observación formal.
+  4. Botón final: "Re-enviar Solicitud Subsanada".
+end note
+
+Container *-- Step1
+Container *-- Step2
+Container *-- Step3
+Container *-- Step4
+Container *-- Controls
+
+@enduml
+```
+
+---
+
+### 20.4.6 Deliberación CCB y Autorización Delegada de Cambio Menor
+
+Se establecen patrones de presentación diferenciados para las dos vías decisionales del sistema:
+
+#### A. Sala de Deliberación CCB (DG-UWE-PRES-06)
+Derivado de `NAV-10` bajo el patrón `PRES-07`. Modela la consola de deliberación y votación colegiada para Cambios Mayores (`CU-07`):
+
+![DG-UWE-PRES-06](../assets/DG-UWE-PRES-06.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-06: Panel de Deliberación CCB (NAV-10 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<panel>> #FAF5FF
+    BorderColor<<panel>> #6B46C1
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #9F7AEA
+    BackgroundColor<<vote>> #FFFFFF
+    BorderColor<<vote>> #D69E2E
+}
+
+class "CCBDeliberationContainer (NAV-10)" as CCB <<panel>> {
+    +sessionHeader: Text ("Comité de Control de Cambios — Sesión de Deliberación")
+    +rfcSummaryBanner: RFCReferenceCard (Código, Proyecto, Solicitante)
+}
+
+class "TechnicalImpactAssessmentView" as ImpactView <<section>> {
+    +architectureEvaluation: MarkdownViewer (Dictamen del Arquitecto - RN-05)
+    +affectedItemsList: List (ECS intervenidos y dependencias cruzadas)
+    +tripleConstraintGrid: Grid (Alcance: Alto | Tiempo estimado: 15d | Costo estimado)
+    +riskAssessment: RiskMatrix (Riesgo Técnico / Operacional)
+}
+
+class "MemberVotingPanel (Registro Individual de Votos)" as VotePanel <<vote>> {
+    +currentUserRoleBadge: Badge ("Miembro Votante: Dr. Valcarcel / CCB")
+    +radioVoteDecision: RadioGroup (APROBAR / RECHAZAR / ABSTENCIÓN)
+    +inputVoteJustification: TextArea (Fundamentación obligatoria del voto)
+    +btnSubmitVote: ActionButton ("Registrar Mi Voto")
+}
+
+class "VotingTallyRegion (Conteo y Registro de Votos Emitidos)" as Tally <<section>> {
+    +votesRecordedTable: Table (Miembro, Rol, Decisión, Fecha/Hora, Fundamento)
+    +statusResolutionBanner: Banner ("En espera de resolución formal")
+}
+
+class "FormalResolutionClosure" as Resolution <<section>> {
+    +inputResolutionObservations: TextArea ("Observaciones del Acta de Sesión")
+    +btnIssueApprovalResolution: PrimaryButton ("Emitir Resolución: APROBADA (CU-08)")
+    +btnIssueRejectionResolution: DangerButton ("Emitir Resolución: RECHAZADA")
+}
+
+note bottom of CCB
+  <b>Saneamiento Normativo:</b>
+  Se eliminan términos no regulados como "quórum" o "mayoría calificada".
+  El panel registra deliberación, votación individual fundamentada
+  y emisión de resolución colegiada formal (aprobación/rechazo).
+end note
+
+CCB *-- ImpactView
+CCB *-- VotePanel
+CCB *-- Tally
+CCB *-- Resolution
+
+@enduml
+```
+
+#### B. Autorización Delegada de Cambio Menor (DG-UWE-PRES-07)
+Derivado de `NAV-11` bajo el patrón `PRES-07`. Modela el mecanismo de **Doble Llave Operativa** (`CU-30`, `RN-01`, `RN-05`):
+
+![DG-UWE-PRES-07](../assets/DG-UWE-PRES-07.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-07: Autorización Delegada de Cambio Menor — Doble Llave (NAV-11 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F0FFF4
+    BorderColor<<container>> #276749
+    BackgroundColor<<keycard>> #FFFFFF
+    BorderColor<<keycard>> #38A169
+    BackgroundColor<<final>> #FFFFFF
+    BorderColor<<final>> #2F855A
+}
+
+class "MinorChangeAuthContainer (NAV-11)" as Container <<container>> {
+    +rfcHeader: RFCReferenceCard ("RFC-2026-0055 | Clasificación: CAMBIO MENOR")
+    +impactSummaryText: Text ("Impacto técnico acotado a 1 ECS. No altera arquitectura.")
+}
+
+class "KeyCard1_Architect (Llave 1: Evaluación Técnica)" as Key1 <<keycard>> {
+    +actorLabel: Text ("Arquitecto / Especialista Técnico (RN-05)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +technicalComments: TextArea ("Dictamen de Viabilidad e Impacto")
+    +btnApproveTechnical: Button ("Aprobar Viabilidad Técnica")
+    +btnRejectTechnical: Button ("Rechazar Viabilidad Técnica")
+}
+
+class "KeyCard2_Manager (Llave 2: Visto Bueno de Gestión)" as Key2 <<keycard>> {
+    +actorLabel: Text ("Analista de Requerimientos / Gestor (RN-01)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +managementComments: TextArea ("Evaluación de Planificación, Plazos y Recursos")
+    +btnApproveManagement: Button ("Aprobar Visto Bueno de Gestión")
+    +btnRejectManagement: Button ("Rechazar Visto Bueno de Gestión")
+}
+
+class "FinalAuthorizationState" as FinalState <<final>> {
+    +authorizationBanner: StateBanner
+    -- Regla de Negocio Transaccional --
+    * Si Key1 = APROBADA Y Key2 = APROBADA:
+      Estado final: **AUTORIZADA** (Habilita emisión de ECN en NAV-12)
+    * Si cualquiera = RECHAZADA:
+      Estado final: **RECHAZADA**
+    * Si alguna = PENDIENTE:
+      Estado final: **EN_EVALUACION**
+}
+
+Container *-- Key1
+Container *-- Key2
+Container *-- FinalState
+
+@enduml
+```
+
+---
+
+### 20.4.7 Catálogo de ECS y Estructura de Bibliotecas (DG-UWE-PRES-08)
+Derivado de `NAV-14` y `NAV-15` bajo el patrón `PRES-08`. Estructura visualmente la custodia física entre las 3 bibliotecas:
+
+![DG-UWE-PRES-08](../assets/DG-UWE-PRES-08.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-08: Detalle de ECS y Estructura de Bibliotecas SCM (NAV-14, 15 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<view>> #FFF5F5
+    BorderColor<<view>> #C53030
+    BackgroundColor<<library>> #FFFFFF
+    BorderColor<<library>> #E53E3E
+    BackgroundColor<<detail>> #FFFFFF
+    BorderColor<<detail>> #4A5568
+}
+
+class "SCMLibrariesExplorer (NAV-15)" as Explorer <<view>> {
+    +projectFilter: ProjectDropdown
+    +searchBar: SearchInput
+}
+
+package "Estructura de las 3 Bibliotecas SCM" as Libs <<library>> {
+    class "Biblioteca de Trabajo (Sandbox)" as LibTrabajo <<library>> {
+        +scope: "Espacio volátil por desarrollador"
+        +isolation: "Copia local de implementación"
+        +itemsListed: Table (ECS en desarrollo activo)
+    }
+
+    class "Biblioteca de Soporte (Staging / QA)" as LibSoporte <<library>> {
+        +scope: "Espacio compartido de pruebas"
+        +stability: "Versiones entregadas para testing"
+        +itemsListed: Table (ECS pendientes de QA / UAT)
+    }
+
+    class "Biblioteca Maestra (Golden Store)" as LibMaestra <<library>> {
+        +scope: "Custodia definitiva inmutable"
+        +stability: "Versiones certificadas en Líneas Base (RN-02)"
+        +itemsListed: Table (ECS congelados y liberados)
+    }
+}
+
+class "ECSDetailCard (Ficha Técnica NAV-14)" as ECSCard <<detail>> {
+    +ecsIdentifier: Text ("ECS-CORE-001 (auth-service.ts)")
+    +ecsCategory: Badge ("Código Fuente Backend")
+    +currentVersion: Badge ("v2.1.0")
+    +currentLibraryBadge: Badge ("Biblioteca de Soporte")
+    +checksumSHA256: CodeTag ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    +lockStatus: LockBadge ("BLOQUEADO (sync_lock: ACTIVE) por PU-06 Dev")
+    +associatedECN: Link ("ECN-2026-0015")
+    +btnViewHistory: ActionButton ("Ver Historial y Diffs (NAV-18)")
+}
+
+Explorer *-- Libs
+Explorer *-- ECSCard
+
+@enduml
+```
+
+---
+
+### 20.4.8 Operaciones SCM: Check-Out y Check-In (DG-UWE-PRES-09)
+Derivado de `NAV-16` y `NAV-17` bajo el patrón `PRES-08`. Modela las transferencias entre bibliotecas y el control de bloqueos:
+
+![DG-UWE-PRES-09](../assets/DG-UWE-PRES-09.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-09: Operaciones SCM — Check-Out y Check-In (NAV-16, 17 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<dialog>> #FFFFFF
+    BorderColor<<dialog>> #2B6CB0
+    BackgroundColor<<field>> #F7FAFC
+    BorderColor<<field>> #CBD5E0
+    BackgroundColor<<action>> #3182CE
+    FontColor<<action>> #FFFFFF
+}
+
+class "CheckOutModal (NAV-16 / CU-10, CU-11)" as CheckOutDialog <<dialog>> {
+    +modalTitle: Text ("Extracción de Copia de Trabajo (Check-Out)")
+    +ecsTargetInfo: ECSReferenceCard (ID, Nombre, Versión origen en Soporte)
+    +assignedDeveloper: UserSelector (Ingeniero de Software PU-06)
+    +authorizedECN: ECNSelector (Orden de Cambio aprobada)
+    +lockOptionCheckbox: Checkbox ("Aplicar Bloqueo Exclusivo de Sincronización - RN-06 [OBLIGATORIO]")
+    +btnExecuteCheckOut: ActionButton ("Confirmar Check-Out y Bloquear")
+    -- Efecto Transaccional --
+    * Copia física a /storage/trabajo/{devId}/{ecsId}
+    * Inserción de sync_lock (ACTIVE) en PostgreSQL
+}
+
+class "CheckInModal (NAV-17 / CU-12)" as CheckInDialog <<dialog>> {
+    +modalTitle: Text ("Depósito y Promoción de Artefacto (Check-In)")
+    +targetOperationSelector: RadioGroup
+    -- Opciones de Promoción --
+    * **Check-In A (Técnico)**: Trabajo $
+ightarrow$ Soporte (Tras pruebas unitarias CU-15)
+    * **Check-In B (Definitivo)**: Soporte $
+ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
+    +fileUploadInput: FileInput (Selección del archivo modificado)
+    +clientComputedHash: CodeTag ("SHA-256 Calculado en Navegador")
+    +serverVerifiedHash: CodeTag ("SHA-256 Verificado por Backend")
+    +versionIncrementType: RadioGroup (Parche / Menor / Mayor - RN-02)
+    +changeLogNotes: TextArea ("Notas de la versión implementada")
+    +releaseLockCheckbox: Checkbox ("Liberar sync_lock tras Check-In exitoso [Marcado]")
+    +btnExecuteCheckIn: ActionButton ("Completar Check-In y Verificar SHA-256")
+}
+
+@enduml
+```
+
+---
+
+### 20.4.9 Consola de Validación QA y No Conformidades (DG-UWE-PRES-10)
+Derivado de `NAV-19` y `NAV-20` bajo el patrón `PRES-08` y `PRES-05`. Cubre los casos de uso `CU-16`, `CU-17`, `CU-18` y `CU-19`:
+
+![DG-UWE-PRES-10](../assets/DG-UWE-PRES-10.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-10: Consola QA y Gestión de No Conformidades (NAV-19, 20 / PRES-08, 05)</b>
+
+skinparam class {
+    BackgroundColor<<qa>> #FFFFF0
+    BorderColor<<qa>> #B7791F
+    BackgroundColor<<panel>> #FFFFFF
+    BorderColor<<panel>> #D69E2E
+    BackgroundColor<<action>> #FFFFFF
+    BorderColor<<action>> #E53E3E
+}
+
+class "QAConsoleContainer (NAV-19 / CU-16, 17, 19)" as QAContainer <<qa>> {
+    +ecnUnderTestingBanner: ECNHeaderCard ("ECN-2026-0018 | Versión en Biblioteca de Soporte")
+    +soDComplianceBadge: SecurityBadge ("SoD Verificado: Evaluador QA independiente de PU-06")
+}
+
+class "IntegrationTestSuitePanel" as TestPanel <<panel>> {
+    +suiteExecutionTable: Table
+    -- Columnas de Suite --
+    * ID Prueba | Caso de Prueba | Tipo (Integración / Regresión) | Resultado (PASS / FAIL) | Duración
+    +btnExecuteIntegrationSuite: ActionButton ("Ejecutar Suite Automatizada")
+    +logViewerRegion: LogConsole (Salida estructurada de ejecución)
+}
+
+class "NonConformityFormView (NAV-20 / CU-18)" as NCView <<panel>> {
+    +defectTitleInput: TextInput ("Título del defecto o no conformidad")
+    +severityDropdown: Dropdown (Crítico, Mayor, Menor)
+    +stepsToReproduceText: TextArea ("Pasos detallados para reproducir")
+    +expectedVsActualText: TextArea ("Comportamiento esperado vs obtenido")
+    +evidenceAttachment: FileUpload (Capturas, logs, stack traces)
+    +btnSubmitNonConformity: ActionButton ("Reportar No Conformidad (ECN pasa a RE-TEST)")
+}
+
+class "QACertificationDecisionBar" as DecisionBar <<action>> {
+    +btnReportDefect: DangerButton ("Reportar No Conformidad (CU-18)")
+    +btnCertifyConformity: PrimaryButton ("Certificar Conformidad QA con SoD (CU-17)")
+    -- Efecto de Certificación --
+    * Valida que no existan no conformidades abiertas
+    * Emite qa_certification en BD
+    * Habilita suscripción de Acta UAT por el Solicitante (NAV-21)
+}
+
+QAContainer *-- TestPanel
+QAContainer *-- NCView
+QAContainer *-- DecisionBar
+
+@enduml
+```
+
+---
+
+### 20.4.10 Suscripción de Acta de Aceptación UAT (DG-UWE-PRES-11)
+Derivado de `NAV-21` bajo el patrón `PRES-07`. Modela la suscripción del acta por el Solicitante (`CU-29`, `RN-09`):
+
+![DG-UWE-PRES-11](../assets/DG-UWE-PRES-11.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-11: Centro de Suscripción de Acta UAT (NAV-21 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<uat>> #F0FFF4
+    BorderColor<<uat>> #22543D
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #38A169
+    BackgroundColor<<auth>> #FFFFFF
+    BorderColor<<auth>> #276749
+}
+
+class "UATAcceptanceContainer (NAV-21)" as UAT <<uat>> {
+    +rfcReferenceHeader: Text ("Acta de Aceptación de Usuario — RFC-2026-0042")
+    +ecnReferenceTag: Text ("Orden de Cambio Implementada: ECN-2026-0018")
+}
+
+class "PreconditionValidationBadge" as Precond <<section>> {
+    +qaConformityStatus: StatusCard
+    -- Regla de Validación Inviolable (RN-09) --
+    * Muestra: "Certificación QA Conforme Verificada [VÁLIDA]"
+    * Si QA NO ha certificado: Formulario bloqueado con alerta
+      "No es posible suscribir UAT sin certificación conforme previa de QA."
+}
+
+class "FunctionalVerificationChecklist" as Checklist <<section>> {
+    +functionalCriteriaTable: Table
+    -- Criterios de Aceptación Evaluados --
+    * Requerimiento original cumplido según especificación
+    * Casos de uso de usuario final verificados satisfactoriamente
+    * No se introdujeron regresiones en la interfaz funcional
+}
+
+class "UserDecisionAndSignaturePanel" as Signature <<auth>> {
+    +observationsInput: TextArea ("Observaciones del Solicitante / Usuario Final")
+    +radioAcceptanceDecision: RadioGroup (ACEPTADA CONFORME / RECHAZADA)
+    +signatureConfirmationCheck: Checkbox ("Suscribo formalmente en calidad de Solicitante autorizador")
+    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Maestra / CU-20)")
+    +btnSubmitUATRechazo: DangerButton ("Rechazar Aceptación (Deriva a Corrección/Rollback)")
+}
+
+UAT *-- Precond
+UAT *-- Checklist
+UAT *-- Signature
+
+@enduml
+```
+
+---
+
+### 20.4.11 Gestión de Líneas Base y Reversión en Trabajo (DG-UWE-PRES-12)
+Derivado de `NAV-22` y `NAV-23` bajo el patrón `PRES-08`. Separa visual y operativamente el congelamiento de líneas base de la reversión de copias de trabajo:
+
+![DG-UWE-PRES-12](../assets/DG-UWE-PRES-12.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-12: Gestión de Línea Base y Rollback SCM (NAV-22, 23 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<base>> #EBF8FF
+    BorderColor<<base>> #2B6CB0
+    BackgroundColor<<baseline>> #FFFFFF
+    BorderColor<<baseline>> #3182CE
+    BackgroundColor<<rollback>> #FFF5F5
+    BorderColor<<rollback>> #E53E3E
+}
+
+class "SCMGovernanceContainer" as Gov <<base>> {
+    +actorIndicator: Text ("Operador: Administrador de Configuración / Bibliotecario (PU-05)")
+    +activeProjectHeader: Text ("Proyecto: TraceFlow SCM Core")
+}
+
+package "Zona A: Congelamiento de Línea Base (NAV-22 / CU-20)" as BaselineZone <<baseline>> {
+    class "BaselineCreationPanel" as B1 <<baseline>> {
+        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0 (Nomenclatura RN-02)")
+        +selectECSInMaster: MultiSelectList ("Seleccionar Versiones Certificadas en Maestra")
+        +baselineDescription: TextArea ("Alcance y Justificación de la Línea Base")
+        +preconditionIndicator: Badge ("Doble Conformidad (QA Conforme + Acta UAT) Verificada")
+        +btnFreezeBaseline: PrimaryButton ("Congelar Línea Base Inmutable")
+    }
+
+    class "FrozenBaselinesCatalog" as B2 <<baseline>> {
+        +baselinesTable: Table (Etiqueta, Fecha de Congelamiento, N° ECS, Checksum Manifiesto, Estado)
+        +btnDownloadManifest: LinkButton ("Descargar Manifiesto Criptográfico SHA-256")
+    }
+}
+
+package "Zona B: Consola de Rollback de Copia de Trabajo (NAV-23 / CU-21)" as RollbackZone <<rollback>> {
+    class "RollbackExecutionModal" as R1 <<rollback>> {
+        +warningBanner: AlertBanner ("ACCION CRITICA: Purga de Copia de Trabajo")
+        +selectActiveECN: Dropdown ("Seleccionar ECN en Conflicto / Cancelada")
+        +affectedWorkSpaceItem: ReadOnlyField ("ECS en /storage/trabajo/{devId}/{ecsId}")
+        +rollbackReasonInput: TextArea ("Motivo Técnico del Rollback (RN-08)")
+        +confirmSafetyCheckbox: Checkbox ("Entiendo que los cambios en Trabajo se descartarán")
+        +btnExecuteWorkRollback: DangerButton ("Ejecutar Rollback en Trabajo y Liberar Lock")
+        -- Restricción Arquitectónica Inviolable --
+        * El rollback purga EXCLUSIVAMENTE la Biblioteca de Trabajo
+        * NO altera, no elimina ni modifica versiones históricas en Biblioteca Maestra
+        * Libera el sync_lock asociado en PostgreSQL
+    }
+}
+
+Gov *-- BaselineZone
+Gov *-- RollbackZone
+
+@enduml
+```
+
+---
+
+### 20.4.12 Mesa de Incidencias y Enlace a Solicitudes de Cambio
+Los nodos `NAV-24` (Bandeja de Incidencias) y `NAV-25` (Detalle de Incidencia) implementan los patrones `PRES-03` y `PRES-04`:
+- **Bandeja de Tickets (`NAV-24`)**: Lista filtrable de reportes de error, tickets de soporte y fallas operativas registradas por el Solicitante (`CU-23`). Permite búsqueda por severidad, fecha y estado.
+- **Expediente de Incidencia (`NAV-25`)**: Ficha detallada con logs adjuntos, historial de diagnóstico y estado (`ABIERTA`, `EN_ANALISIS`, `RESUELTA`, `DERIVADA`).
+- **Acción Asistida "Derivar a RFC" (`CU-25`)**: Disponible para el Analista de Requerimientos / Gestor. Al activarse, transiciona el ticket a estado `DERIVADA` y redirige al usuario al Wizard de Registro de RFC (`NAV-07`), pre-llenando automáticamente el título, proyecto, justificación técnica y referencias de la incidencia. No se crea ningún flujo técnico paralelo ni alternativo al ciclo oficial de la RFC.
+
+---
+
+### 20.4.13 Auditoría Inmutable y Generador de Reportes SCM (DG-UWE-PRES-13)
+Derivado de `NAV-26` y `NAV-27` bajo los patrones `PRES-03` y `PRES-10`. Garantiza cumplimiento de `RNF-01`, `RNF-03`, `RF-16`, `RF-17` y `RF-18`:
+
+![DG-UWE-PRES-13](../assets/DG-UWE-PRES-13.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-13: Auditoría Inmutable y Reportes SCM (NAV-26, 27 / PRES-03, 10)</b>
+
+skinparam class {
+    BackgroundColor<<audit>> #F7FAFC
+    BorderColor<<audit>> #4A5568
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #718096
+    BackgroundColor<<report>> #FFFFFF
+    BorderColor<<report>> #3182CE
+}
+
+class "GovernanceInspectionContainer" as Gov <<audit>> {
+    +projectHeader: Text ("Inspección y Gobernanza SCM")
+}
+
+package "Consola de Auditoría Forense (NAV-26 / CU-27, RNF-03)" as AuditZone <<section>> {
+    class "AuditFilterBar" as AF <<section>> {
+        +actorFilter: Dropdown (Todos los usuarios)
+        +operationFilter: Dropdown (CHECK_OUT, CHECK_IN, LB_FREEZE, etc.)
+        +dateRangePicker: DateRange
+        +btnVerifyChainIntegrity: ActionButton ("Verificar Cadena SHA-256")
+    }
+
+    class "AppendOnlyLogTable" as AT <<section>> {
+        +logTable: Table
+        -- Columnas de Auditoría --
+        * Timestamp (ISO 8601) | Actor | Rol | Operación | Entidad | ECN | SHA-256 Previo | SHA-256 Hash | Estado
+    }
+
+    class "CryptographicVerificationModal" as AVM <<section>> {
+        +integrityResultBanner: SuccessBanner ("Cadena Criptográfica Verificada: 1,420 registros íntegros")
+        +mismatchAlert: DangerBanner ("ALERTA: Corrupción o alteración detectada en registro #ID")
+    }
+}
+
+package "Generador Paramétrico de Reportes (NAV-27 / CU-28, RF-18)" as ReportZone <<report>> {
+    class "ReportParametersForm" as RF <<report>> {
+        +selectReportType: Dropdown
+        -- Reportes Normativos Soportados por RF-18 --
+        * 1. Reporte de Estado de Configuración (CSAR)
+        * 2. Matriz de Trazabilidad Requerimientos vs ECS
+        * 3. Registro Histórico de Cambios por Proyecto
+        +scopeFilter: ProjectDropdown
+        +periodFilter: DateRange
+        +formatSelector: RadioGroup (PDF Ejecutivo / CSV de Datos)
+        +btnGenerateReport: PrimaryButton ("Generar Reporte Oficial")
+    }
+
+    class "ReportPreviewAndDownloadArea" as RD <<report>> {
+        +previewContainer: DocumentViewer (Vista previa preliminar de datos)
+        +btnDownloadFile: DownloadButton ("Descargar Archivo Generado")
+    }
+}
+
+Gov *-- AuditZone
+Gov *-- ReportZone
+
+@enduml
+```
+
+---
+
+### 20.4.14 Estados Transversales de Feedback y Manejo de Errores UI
+
+La interfaz de usuario implementa un sistema transversal de estados de retroalimentación para comunicar al usuario la situación operativa en todo momento:
+
+| Estado Visual | Código / Condición | Patrón de Presentación | Comportamiento en Pantalla y Acción Sugerida |
+| :--- | :--- | :--- | :--- |
+| **`Loading`** | Petición asíncrona activa | Skeleton Screen / Spinner | Muestra estructuras fantasma en tablas y tarjetas para reducir latencia percibida. Bloquea botones de envío para evitar peticiones duplicadas. |
+| **`Empty`** | Colección sin registros | Ilustración + Empty State | Informa la ausencia de datos con mensaje explicativo y botón contextual de acción primaria (e.g. "Aún no hay RFCs registradas. + Crear primera RFC"). |
+| **`Success`** | 200 OK / 201 Created | Banner / Toast Verde | Notificación temporal no obstructiva con código de transacción persistido (e.g. "RFC-2026-0042 registrada exitosamente"). |
+| **`Warning`** | Riesgo de descarte | Diálogo de Confirmación | Alerta modal antes de abandonar formularios con datos editados no guardados o al cancelar órdenes. |
+| **`Validation Error`** | HTTP 400 Bad Request | Mensajes Inline Rojos | Resaltado de inputs infractores con texto explicativo inmediato bajo el campo (e.g. "La justificación debe contener al menos 30 caracteres"). |
+| **`Unauthorized`** | HTTP 401 Unauthorized | Modal de Re-autenticación | Sesión expirada por timeout de 15 minutos (ADR-006). Solicita contraseña para renovar token o redirige limpiamente a `NAV-01`. |
+| **`Forbidden / SoD`** | HTTP 403 Forbidden | Banner de Segregación | Alerta de violación de SoD o privilegios insuficientes (e.g. "Acción bloqueada: El autor de la implementación no puede certificar calidad sobre su propio cambio"). |
+| **`Conflict / Lock`** | HTTP 409 Conflict | Modal de Bloqueo Activo | Informa que el ECS se encuentra bloqueado por otro usuario con detalle: "Bloqueado por dev_juan desde 2026-10-01 11:00 bajo ECN-0012". |
+| **`Server Error`** | HTTP 500 Server Error | Pantalla de Error Técnico | Presenta mensaje de disculpa corporativo y código de rastreo (Trace ID) para diagnóstico por el equipo de soporte. |
+
+---
+
+## 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-19)
+
+Aplicando el principio fundamental de que **Pantalla $
+eq$ Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentación se sintetizan en **19 Pantallas Físicas Cohesivas**:
+
+| SCREEN-ID | Nombre de Pantalla | Nodos NAV Consolidados | Patrón(es) PRES | Actor(es) Canónico(s) | Casos de Uso Gobernados |
+| :---: | :--- | :---: | :---: | :--- | :--- |
+| **`SCREEN-01`** | **Portal de Acceso (Login)** | `NAV-01` | `PRES-01` | Todos los Actores | Autenticación institucional |
+| **`SCREEN-02`** | **Dashboard General Adaptativo** | `NAV-02` | `PRES-02` | Todos (Vistas por Rol) | Múltiples (Resumen y Tareas) |
+| **`SCREEN-03`** | **Directorio General de Proyectos** | `NAV-03` | `PRES-03` | Gestor, CCB, Bibliotecario | `CU-02` |
+| **`SCREEN-04`** | **Ficha Integral de Proyecto** | `NAV-04` | `PRES-04` | Gestor, CCB, Bibliotecario, Arq | `CU-02, CU-03` |
+| **`SCREEN-05`** | **Bandeja de Solicitudes (RFC)** | `NAV-05` | `PRES-03` | Todos (Filtrado SoD) | `CU-04..08, CU-30` |
+| **`SCREEN-06`** | **Expediente 360° de RFC** | `NAV-06` | `PRES-04, PRES-07` | Todos (Controles por Rol) | `CU-04..08, CU-30` |
+| **`SCREEN-07`** | **Portal de Captura y Edición de RFC** | `NAV-07, NAV-08` | `PRES-06, PRES-05` | Solicitante | `CU-04, CU-04.1` |
+| **`SCREEN-08`** | **Consola de Evaluación de Impacto** | `NAV-09` | `PRES-05` | Arquitecto / Especialista | `CU-06` |
+| **`SCREEN-09`** | **Sala de Deliberación CCB** | `NAV-10` | `PRES-07` | Miembros del CCB | `CU-07` |
+| **`SCREEN-10`** | **Consola de Autorización de Cambio Menor** | `NAV-11` | `PRES-07` | Gestor y Arquitecto | `CU-30` |
+| **`SCREEN-11`** | **Ficha de Orden de Cambio (ECN/ECO)** | `NAV-12` | `PRES-04` | CCB, Gestor, Biblio, Dev, QA | `CU-08, CU-22` |
+| **`SCREEN-12`** | **Explorador de ECS y Bibliotecas SCM** | `NAV-13, NAV-14, NAV-15`| `PRES-03, PRES-04, PRES-08`| Bibliotecario, Dev, Arq, QA | `CU-09, CU-14, CU-26` |
+| **`SCREEN-13`** | **Consola de Operaciones SCM (Check-Out/In)**| `NAV-16, NAV-17` | `PRES-08` | Bibliotecario, Desarrollador | `CU-10, CU-11, CU-12` |
+| **`SCREEN-14`** | **Visor de Historial y Comparador Diff** | `NAV-18` | `PRES-09` | Todos los roles técnicos | `CU-13` |
+| **`SCREEN-15`** | **Consola de Validación QA y No Conformidades**| `NAV-19, NAV-20` | `PRES-08, PRES-05` | Equipo de Calidad, Dev | `CU-16, CU-17, CU-18, CU-19` |
+| **`SCREEN-16`** | **Centro de Suscripción de Acta UAT** | `NAV-21` | `PRES-07` | Solicitante (Usuario Final) | `CU-29` |
+| **`SCREEN-17`** | **Gestor de Líneas Base y Rollback SCM** | `NAV-22, NAV-23` | `PRES-08` | Administrador / Bibliotecario | `CU-20, CU-21` |
+| **`SCREEN-18`** | **Mesa de Entrada y Ficha de Incidencias** | `NAV-24, NAV-25` | `PRES-03, PRES-04` | Solicitante, Gestor | `CU-23, CU-24, CU-25` |
+| **`SCREEN-19`** | **Consola de Gobernanza, Auditoría e IAM** | `NAV-26, NAV-27, NAV-28`| `PRES-03, PRES-10, PRES-05`| Administrador, CCB, Gestor | `CU-01, CU-27, CU-28` |
+
+---
+
+## 20.6 Matriz de Trazabilidad Cruzada (NAV ↔ PRES ↔ SCREEN ↔ CU)
+
+La siguiente matriz certifica la cobertura integral y bidireccional entre el espacio de navegación, las estructuras de presentación, las pantallas concretas y los 31 Casos de Uso canónicos:
+
+| NAV-ID | Nombre del Nodo Navegacional | PRES-ID | SCREEN-ID | Actor Canónico Principal | Caso(s) de Uso Gobernados |
+| :---: | :--- | :---: | :---: | :--- | :---: |
+| **`NAV-01`** | Inicio de Sesión | `PRES-01` | `SCREEN-01` | Todos los Actores | Autenticación de Acceso |
+| **`NAV-02`** | Dashboard General | `PRES-02` | `SCREEN-02` | Todos (Adaptado por Rol) | Múltiples (Resumen Operativo) |
+| **`NAV-03`** | Índice de Proyectos | `PRES-03` | `SCREEN-03` | Gestor, CCB, Bibliotecario | `CU-02` |
+| **`NAV-04`** | Detalle de Proyecto | `PRES-04` | `SCREEN-04` | Gestor, CCB, Bibliotecario, Arq | `CU-02, CU-03` |
+| **`NAV-05`** | Bandeja de Solicitudes (RFC) | `PRES-03` | `SCREEN-05` | Todos (Filtrado SoD) | `CU-04..08, CU-30` |
+| **`NAV-06`** | Detalle de RFC (Expediente 360°) | `PRES-04` | `SCREEN-06` | Todos (Controles por Rol) | `CU-04..08, CU-30` |
+| **`NAV-07`** | Formulario de Registro de RFC | `PRES-06` | `SCREEN-07` | Solicitante | `CU-04` |
+| **`NAV-08`** | Subsanación de RFC | `PRES-05` | `SCREEN-07` | Solicitante | `CU-04.1` |
+| **`NAV-09`** | Análisis de Impacto Técnico | `PRES-05` | `SCREEN-08` | Arquitecto / Especialista Técnico | `CU-06` |
+| **`NAV-10`** | Consola de Deliberación CCB | `PRES-07` | `SCREEN-09` | Comité de Control de Cambios | `CU-07` |
+| **`NAV-11`** | Autorización de Cambio Menor | `PRES-07` | `SCREEN-10` | Gestor Y Arquitecto (Doble Llave) | `CU-30` |
+| **`NAV-12`** | Orden de Cambio (ECN/ECO) | `PRES-04` | `SCREEN-11` | CCB, Gestor, Biblio, Dev, QA | `CU-08, CU-22` |
+| **`NAV-13`** | Catálogo de ECS | `PRES-03` | `SCREEN-12` | Arquitecto, Bibliotecario, Gestor | `CU-09` |
+| **`NAV-14`** | Detalle de ECS | `PRES-04` | `SCREEN-12` | Arquitecto, Bibliotecario, Dev, QA | `CU-09, CU-26` |
+| **`NAV-15`** | Explorador de Bibliotecas | `PRES-08` | `SCREEN-12` | Bibliotecario, Desarrollador | `CU-08, CU-14` |
+| **`NAV-16`** | Consola de Check-Out | `PRES-08` | `SCREEN-13` | Administrador / Bibliotecario | `CU-10, CU-11` |
+| **`NAV-17`** | Consola de Check-In | `PRES-08` | `SCREEN-13` | Administrador / Bibliotecario | `CU-12` |
+| **`NAV-18`** | Historial de Versiones y Diffs | `PRES-09` | `SCREEN-14` | Bibliotecario, Gestor, Dev, Arq | `CU-13` |
+| **`NAV-19`** | Consola de Validación QA | `PRES-08` | `SCREEN-15` | Equipo de Calidad / Testing | `CU-16, CU-17, CU-19` |
+| **`NAV-20`** | Consola / Formulario de No Conformidades| `PRES-05` | `SCREEN-15` | QA (Registro) / Dev (Consulta) | `CU-18, CU-19` |
+| **`NAV-21`** | Consola de Aceptación UAT | `PRES-07` | `SCREEN-16` | Solicitante (Usuario Final) | `CU-29` |
+| **`NAV-22`** | Consola de Líneas Base | `PRES-08` | `SCREEN-17` | Administrador / Bibliotecario | `CU-20` |
+| **`NAV-23`** | Consola de Rollback | `PRES-08` | `SCREEN-17` | Administrador / Bibliotecario | `CU-21` |
+| **`NAV-24`** | Bandeja de Incidencias | `PRES-03` | `SCREEN-18` | Solicitante, Gestor | `CU-23, CU-24` |
+| **`NAV-25`** | Detalle de Incidencia | `PRES-04` | `SCREEN-18` | Solicitante, Gestor | `CU-24, CU-25` |
+| **`NAV-26`** | Visor de Auditoría Forense | `PRES-03` | `SCREEN-19` | CCB, Administrador / Bibliotecario | `CU-27` |
+| **`NAV-27`** | Generador de Reportes SCM | `PRES-10` | `SCREEN-19` | Bibliotecario, CCB, Gestor | `CU-28` |
+| **`NAV-28`** | Administración de Usuarios y Roles | `PRES-05` | `SCREEN-19` | Administrador / Bibliotecario | `CU-01` |
+
+---
+
+## 20.7 Diseño Adaptativo (Responsive) y Accesibilidad
+
+### 1. Directrices de Diseño Adaptativo por Dispositivo
+TraceFlow SCM es un sistema web corporativo enfocado en entornos de ingeniería de software y control de configuración. El comportamiento visual se categoriza en tres niveles de dispositivo:
+
+- **Desktop (Prioridad Principal — Pantallas $\ge 1280	ext{ px}$)**:
+  - Entorno de trabajo exhaustivo: Vista completa del Shell con Sidebar persistente.
+  - Tablas de datos con todas las columnas visibles y filtros avanzados expandidos.
+  - Visor Split-Screen para diffs lado a lado (`PRES-09`) y consolas operativas complejas (`PRES-08`).
+  - Múltiples paneles simultáneos para deliberación CCB y validación QA.
+- **Tablet (Pantallas entre $768	ext{ px}$ y $1279	ext{ px}$)**:
+  - Sidebar colapsable en menú lateral (Drawer / Hamburguesa).
+  - Vistas de detalle (`PRES-04`) adaptadas a pestañas con scroll horizontal.
+  - Tablas con priorización de columnas esenciales y selector de columnas secundarias.
+  - Apta para consultas gerenciales, revisión de solicitudes RFC, deliberación CCB y suscripción de actas UAT.
+- **Mobile (Pantallas $< 768	ext{ px}$)**:
+  - Vista compacta de lectura y seguimiento: Navegación inferior o menú modal.
+  - Tablas de índices transformadas en tarjetas apiladas verticales (Cards).
+  - Formularios en flujo de columna simple.
+  - Deshabilitación intencional de operaciones de alta densidad técnica (e.g. comparador de diffs split-screen redirige a visor unificado o recomienda desktop).
+  - Orientada a consulta de estado, notificaciones de alerta y registro rápido de incidencias (`CU-23`).
+
+### 2. Principios de Accesibilidad (Alineamiento con Buenas Prácticas WCAG)
+Como decisión de diseño orientada a la calidad y ergonomía, el sistema adopta directrices de accesibilidad sin comprometer la alta densidad informacional requerida:
+- **Jerarquía Visual Clara**: Estructura semántica estricta de encabezados (`H1` para títulos de pantalla, `H2` para secciones, `H3` para grupos).
+- **Etiquetas y Placeholders Persistentes**: Todo control de formulario dispone de un elemento `<label>` visible y permanente, no dependiente exclusivamente de textos de marcador de posición (placeholders).
+- **Navegación Completa por Teclado**: Todo botón, enlace, input y pestaña es alcanzable mediante secuencia lógica `Tab`, con indicador de foco visualmente contrastado.
+- **Independencia Cromática**: Los estados de la RFC, alertas y badges de resultado nunca dependen únicamente del color; se acompañan siempre de texto explícito e iconos distintivos (e.g. verde + checkmark + texto "APROBADA", rojo + cruz + texto "RECHAZADA").
+- **Contraste de Contenido**: Las combinaciones cromáticas de texto sobre fondo aseguran legibilidad óptima para jornadas laborales prolongadas.

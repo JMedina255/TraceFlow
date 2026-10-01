@@ -98,8 +98,8 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-AO-28](#dg-ao-28-análisis-de-objetos-generar-reportes-de-estado-cu-28) | Análisis de Objetos: Generar reportes de estado (CU-28) | Análisis (BCE) | APROBADO | 1.0 |
 | [DG-AO-29](#dg-ao-29-análisis-de-objetos-validar-aceptaci-n-del-cambio-por-el-usuario-uat-cu-29) | Análisis de Objetos: Validar aceptación del cambio por el usuario (UAT) (CU-29) | Análisis (BCE) | APROBADO | 1.0 |
 | [DG-AO-30](#dg-ao-30-análisis-de-objetos-autorizar-cambio-menor-cu-30) | Análisis de Objetos: Autorizar Cambio Menor (CU-30) | Análisis (BCE) | APROBADO | 1.0 |
-| [DG-12](#dg-12--diagrama-de-clases-del-dominio-traceflow-scm) | Diagrama de Clases del Dominio TraceFlow SCM | Clases | APROBADO | 1.0 |
-| [DG-13](#dg-13--modelo-lógico-de-la-arquitectura-traceflow-scm) | Modelo Lógico de la Arquitectura TraceFlow SCM | Componentes | APROBADO | 1.0 |
+| [DG-12](#dg-12--modelo-conceptual-del-dominio-traceflow-scm) | Modelo Conceptual del Dominio TraceFlow SCM | Clases Conceptuales (Análisis) | APROBADO | 2.0 |
+| [DG-13](#dg-13--modelo-lógico-de-la-arquitectura-traceflow-scm) | Modelo Lógico de la Arquitectura TraceFlow SCM | Componentes / Arquitectura Física | PENDIENTE (SAD) | 1.0 |
 
 ---
 
@@ -1430,7 +1430,7 @@ RegistroAuditoria "*" --> "1" Usuario : generado por
 
 # DG-13 — Modelo Lógico de la Arquitectura TraceFlow SCM
 
-**ID:** DG-13 | **Tipo:** Componentes / Arquitectura | **Estado:** APROBADO | **Versión:** 1.0  
+**ID:** DG-13 | **Tipo:** Componentes / Arquitectura Física | **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD) | **Versión:** 1.0  
 **RF:** RNF-01 a RNF-09 | **RN:** RN-01 a RN-09 | **CU:** Todos | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2
 
 ![DG-13](../assets/DG-13.png)
@@ -4021,22 +4021,206 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 - **Fuente:** Reconstruido formalmente en `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 y `docs/DIAGRAMS.md`.  
 - **Resolución:** Reconstruido y formalizado a nivel de análisis conceptual (1:1 frente a CU-03) con correspondencia estricta de 6 pasos.
 
-### DG-12 — Diagrama de Clases del Dominio TraceFlow SCM
+### DG-12 — Modelo Conceptual del Dominio TraceFlow SCM
 - **ID:** DG-12  
-- **Nombre:** Diagrama de Clases del Dominio TraceFlow SCM  
-- **Tipo:** Clases  
-- **Estado:** PENDIENTE DE RECONSTRUCCION  
+- **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM  
+- **Tipo:** Clases Conceptuales (Fase de Análisis)  
+- **Estado:** APROBADO — MODELO CONCEPTUAL DE ANÁLISIS  
 - **RF relacionados:** RF-01 a RF-18  
 - **RN relacionadas:** RN-01 a RN-09  
-- **CU relacionados:** CU-01 a CU-28  
-- **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2 (Pág. 115, `assets/page-115.png`).  
-- **Motivo de Pendiente:** El archivo gráfico original `page-115.png` no fue conservado en el repositorio y la sección 6.2.2 no contiene tablas de atributos, visibilidad ni firmas de métodos de las clases (`Usuario`, `Rol`, `Proyecto`, `ECS`, `RFC`, `ECN`, `InformeImpacto`, `LineaBase`, `BloqueoSincronizacion`, etc.). Reconstruirlo en este punto implicaría inventar contratos de clases. Se requiere validar las firmas definitivas con los responsables de Backend (Renzo Antayhua) y QA (Augusto Rivera).
+- **CU relacionados:** CU-01 a CU-30 y CU-04.1  
+- **Fuente:** Derivado formalmente de los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`) en `docs/DIAGRAMS.md` y `FD03-EPIS-Informe_SRS.md`, Sección 6.2.3.  
+- **Resolución Técnica:** Reconstruido a nivel conceptual puro según `docs/DOCUMENTATION_RULES.md` Sección 8: sin tipos técnicos de datos (`Long`, `String`), sin firmas de métodos de implementación, sin claves foráneas ni dependencias de frameworks/ORM. Modela exclusivamente los conceptos esenciales del negocio SCM, sus atributos semánticos, multiplicidades y asociaciones reales.
 
-### DG-13 — Modelo Lógico Arquitectural
+```plantuml
+@startuml DG-12
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title <b>DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)</b>
+
+package "Gobernanza y Seguridad" {
+    class Usuario {
+        codigo
+        nombreCompleto
+        correoElectronico
+        estado
+    }
+    class Rol {
+        nombreRol
+        descripcion
+    }
+    class Permiso {
+        codigoPermiso
+        accionPermitida
+    }
+}
+
+package "Gestión de Proyectos" {
+    class Proyecto {
+        codigoProyecto
+        nombre
+        descripcion
+        estado
+    }
+    class "Plan de Gestión SCM" as PlanGestionSCM {
+        politicaVersionamiento
+        estrategiaRamas
+        criteriosCongelamiento
+    }
+}
+
+package "Gestión de Configuración y Bibliotecas" {
+    class "Elemento de Configuración (ECS)" as ElementoConfiguracion {
+        codigoECS
+        nombre
+        tipoECS
+        estado
+        bibliotecaActual
+    }
+    class "Versión de ECS" as VersionECS {
+        numeroVersion
+        etiqueta
+        checksumSHA256
+        fechaSello
+    }
+    class "Bloqueo de Sincronización" as BloqueoSincronizacion {
+        tipoBloqueo
+        fechaImposicion
+        estado
+    }
+    class "Línea Base" as LineaBase {
+        codigoLineaBase
+        nombreHito
+        tipoLineaBase
+        fechaCongelamiento
+        estado
+    }
+}
+
+package "Control de Cambios (RFC / ECN)" {
+    class "Solicitud de Cambio (RFC)" as SolicitudCambio {
+        codigoRFC
+        titulo
+        descripcionMotivo
+        clasificacion
+        prioridad
+        estado
+    }
+    class "Informe Técnico de Impacto" as InformeImpacto {
+        codigoInforme
+        analisisArquitectura
+        evaluacionDependencias
+        estimacionEsfuerzo
+        estimacionCosto
+        dictamenClasificacion
+    }
+    class "Dictamen de Cambio" as DictamenCambio {
+        tipoAutoridad
+        sentidoResolucion
+        justificacionFundamento
+        fechaResolucion
+    }
+    class "Orden de Cambio (ECN/ECO)" as OrdenCambio {
+        codigoOrden
+        alcanceAutorizado
+        responsableAsignado
+        fechaEmision
+        estado
+    }
+}
+
+package "Aseguramiento de Calidad y Aceptación" {
+    class "Certificación de Conformidad QA" as CertificacionQA {
+        codigoCertificado
+        resultadoPruebas
+        conclusionTecnica
+        fechaEmision
+    }
+    class "Acta de Aceptación UAT" as ActaAceptacionUAT {
+        codigoActa
+        resultadoValidacion
+        observacionesUsuario
+        fechaAceptacion
+    }
+    class "Reporte de No Conformidad" as ReporteNoConformidad {
+        codigoReporte
+        descripcionDefecto
+        severidad
+        estadoSubsanacion
+    }
+}
+
+package "Soporte e Incidencias" {
+    class "Incidencia (Ticket)" as TicketIncidencia {
+        codigoTicket
+        resumen
+        severidad
+        estado
+    }
+}
+
+package "Trazabilidad y Auditoría" {
+    class "Registro de Auditoría" as RegistroAuditoria {
+        codigoEvento
+        tipoOperacion
+        marcaTemporal
+        direccionOrigen
+        estadoIntegridad
+    }
+}
+
+' Relaciones de Gobernanza
+Usuario "1" *-- "1..*" Rol : asignado a >
+Rol "1" *-- "1..*" Permiso : otorga >
+
+' Relaciones de Proyecto
+Proyecto "1" *-- "1" PlanGestionSCM : normado por >
+Proyecto "1" o-- "1..*" Usuario : asigna participantes >
+Proyecto "1" *-- "0..*" ElementoConfiguracion : contiene >
+Proyecto "1" *-- "0..*" SolicitudCambio : ámbito de >
+Proyecto "1" *-- "0..*" LineaBase : define >
+
+' Relaciones de ECS y Bibliotecas
+ElementoConfiguracion "1" *-- "1..*" VersionECS : genera >
+ElementoConfiguracion "1" o-- "0..1" BloqueoSincronizacion : restringido por >
+LineaBase "1" o-- "1..*" VersionECS : consolida >
+
+' Relaciones de Cambio
+SolicitudCambio "1" -- "1..*" ElementoConfiguracion : afecta a >
+SolicitudCambio "1" *-- "0..1" InformeImpacto : fundamentada por >
+SolicitudCambio "1" *-- "0..1" DictamenCambio : resuelta mediante >
+DictamenCambio "1" --> "0..1" OrdenCambio : habilita emisión de >
+OrdenCambio "1" --> "1" SolicitudCambio : amparada en >
+OrdenCambio "1" --> "1..*" ElementoConfiguracion : autoriza modificación de >
+
+' Relaciones de Promoción y Versiones
+VersionECS "1" --> "0..1" OrdenCambio : implementada bajo >
+VersionECS "0..1" --> "0..1" CertificacionQA : avalada técnicamente por >
+VersionECS "0..1" --> "0..1" ActaAceptacionUAT : aceptada por usuario mediante >
+CertificacionQA "0..1" o-- "0..*" ReporteNoConformidad : documenta hallazgos en >
+
+' Relaciones de Incidencias
+TicketIncidencia "1" --> "0..1" SolicitudCambio : escala a >
+TicketIncidencia "1" --> "0..1" ElementoConfiguracion : reporta fallo en >
+
+' Relaciones de Auditoría
+RegistroAuditoria "*" --> "1" Usuario : ejecutado por >
+RegistroAuditoria "*" --> "0..1" Proyecto : contextualizado en >
+RegistroAuditoria "*" --> "0..1" SolicitudCambio : traza ciclo de >
+RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
+
+@enduml
+```
+
+### DG-13 — Modelo Lógico de la Arquitectura TraceFlow SCM
 - **ID:** DG-13  
-- **Nombre:** Modelo Lógico de la Arquitectura TraceFlow SCM  
-- **Tipo:** Componentes / Despliegue  
-- **Estado:** PENDIENTE DE RECONSTRUCCION  
-- **RF relacionados:** RNF-01, RNF-02, RNF-05, RNF-07  
-- **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2 (Pág. 95, `assets/page-095.png`).  
-- **Motivo de Pendiente:** La imagen original `page-095.png` no está presente y no existe una descripción textual explícita de los nodos físicos (Frontend React, Backend Node.js/TypeScript, PaaS Render/Supabase) en dicha sección. Se formalizará una vez validada la arquitectura de despliegue en la nube.
+- **Nombre:** Modelo Lógico de la Arquitectura de Software TraceFlow SCM  
+- **Tipo:** Componentes / Arquitectura Lógica y Física  
+- **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD)  
+- **RF relacionados:** RNF-01 a RNF-09  
+- **RN relacionadas:** RN-01 a RN-09  
+- **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.  
+- **Dictamen de Auditoría de Cierre de Análisis:** El diagrama `DG-13` incorpora especificaciones físicas de implementación (SPA React, Backend API REST Node.js/TypeScript, controladores técnicos, motor de base de datos PostgreSQL, caché Redis y almacenamiento S3/Supabase Storage) que corresponden propiamente a la fase de **DISEÑO** según `docs/DOCUMENTATION_RULES.md` Sección 7, 8 y 12. Para la fase de **ANÁLISIS**, la descomposición modular y la estructuración del sistema quedan formalmente cubiertas por el **Diagrama de Paquetes Arquitecturales (`DG-04`)** y los **31 Diagramas de Análisis de Objetos (`DG-AO`)**. Se conserva la especificación de `DG-13` como entrada técnica directa para la construcción del futuro Documento de Arquitectura de Software (SAD).

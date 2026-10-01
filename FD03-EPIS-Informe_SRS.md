@@ -1100,13 +1100,11 @@ Las Reglas de Negocio (RN-01 a RN-09) formalizan las políticas y restricciones 
 
 **Tabla TB-06: Cuadro de Reglas de Negocio (RN-01 a RN-09)**
 
-<!-- PENDIENTE DE VALIDACION: La autoridad asignada a RN-03 en el SRS original es Analista de Requerimientos / Gestor, pero la operación de Check-In con ECN es ejecutada operativamente por el Administrador de Configuración / Bibliotecario. -->
-
 | ID | Nombre de la Regla | Descripción | Autoridad | Situación Actual (Problemática) |
 | :--- | :--- | :--- | :--- | :--- |
 | RN-01 | Aprobación Obligatoria Previa a Modificación e Integración | Ningún ECS puede ser modificado ni transferido a la Biblioteca de Trabajo sin una Orden de Cambio (ECN/ECO) emitida formalmente por el CCB (para Cambios Mayores) o bajo autoridad operativa delegada compartida entre el Analista de Requerimientos/Gestor y el Arquitecto/Especialista Técnico (para Cambios Menores). Asimismo, la integración definitiva a la Biblioteca Maestra exige las debidas certificaciones de calidad y aceptación del usuario. | Comité de Control de Cambios (CCB) / Autoridad Operativa Delegada | Se modificaban e integraban cambios directamente sin autorización formal. |
 | RN-02 | Identificación Unívoca de Versiones | Toda línea base establecida tras un Check-In a la Biblioteca Maestra debe estar identificada con un estándar de versionamiento (mayor.menor.parche). | Administrador de Configuración / Bibliotecario | Se usaban nombres de carpetas y archivos comprimidos con nombres arbitrarios. |
-| RN-03 | Trazabilidad de Cambios | Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO) previamente emitida. | Analista de Requerimientos / Gestor *(ver nota en Inconsistencias)* | No existía registro de quién ni por qué se modificaba el código. |
+| RN-03 | Trazabilidad de Cambios | Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO) previamente emitida. | Administrador de Configuración / Bibliotecario y Analista de Requerimientos / Gestor | No existía registro de quién ni por qué se modificaba el código. |
 | RN-04 | Restricción de Bibliotecas Congeladas | Un ECS almacenado en la Biblioteca Maestra no puede modificarse directamente; cualquier corrección exige un nuevo ciclo completo de RFC, Check-Out y Check-In. | Administrador de Configuración / Bibliotecario | Los consultores editaban directamente los archivos entregados al cliente. |
 | RN-05 | Evaluación Técnica y Clasificación Obligatoria | Ninguna Solicitud de Cambio puede ser autorizada (por vía delegada o por el CCB) sin contar previamente con un Informe Técnico de Impacto elaborado por el Arquitecto/Especialista Técnico que evalúe arquitectura, dependencias, riesgos y el impacto sobre la Triple Restricción (alcance, tiempo y costo), dictaminando si clasifica como Cambio Menor o Mayor. | Arquitecto / Especialista Técnico | Los cambios se aprobaban sin análisis técnico documentado ni evaluación de impacto en la triple restricción. |
 | RN-06 | Bloqueo de Sincronización Obligatorio | Todo ECS que ingresa a la Biblioteca de Trabajo mediante Check-Out debe quedar bloqueado para otros usuarios hasta su Check-In o rollback. | Administrador de Configuración / Bibliotecario | Varios consultores editaban el mismo archivo de forma simultánea, generando sobreescrituras. |
@@ -5165,186 +5163,207 @@ end
 
 ---
 
-### 6.2.2. Diagrama de Clases
+### 6.2.2. Diagrama de Clases (Modelo Conceptual del Dominio)
 
 Nota: Elaboración Propia
 
-**Diagrama DG-12: Diagrama de Clases del Dominio TraceFlow SCM**
+**Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)**
 
-![Diagrama DG-12: Diagrama de Clases del Dominio TraceFlow SCM](assets/DG-12.png)
+![Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM](assets/DG-12.png)
 
-#### Código PlantUML del Diagrama
+#### Descripción Conceptual del Modelo de Dominio
+
+En estricto cumplimiento de `docs/DOCUMENTATION_RULES.md` Sección 8, el Diagrama de Clases en la fase de **ANÁLISIS** formaliza el modelo conceptual del dominio de software a partir de la consolidación de las entidades identificadas en los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`).
+
+El modelo se abstrae de artefactos físicos de implementación (tipos de datos de lenguaje de programación, firmas de métodos, controladores, servicios, repositorios o tablas relacionales) y representa exclusivamente los conceptos esenciales de gobernanza, configuración, control de cambios, aseguramiento de calidad, incidencias y auditoría.
+
+#### Código PlantUML del Diagrama (Modelo Conceptual de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-12
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
 skinparam classAttributeIconSize 0
 
-title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+title <b>DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)</b>
 
-class Usuario {
-    - id: Long
-    - nombre: String
-    - email: String
-    - passwordHash: String
-    - rol: RolUsuario
-    - estado: EstadoUsuario
-    + registrar()
-    + autenticar()
-    + asignarRol(rol: RolUsuario)
+package "Gobernanza y Seguridad" {
+    class Usuario {
+        codigo
+        nombreCompleto
+        correoElectronico
+        estado
+    }
+    class Rol {
+        nombreRol
+        descripcion
+    }
+    class Permiso {
+        codigoPermiso
+        accionPermitida
+    }
 }
 
-enum RolUsuario {
-    SOLICITANTE
-    ANALISTA_REQUERIMIENTOS
-    ARQUITECTO
-    CCB
-    ADMIN_CONFIGURACION
-    INGENIERO_SOFTWARE
-    EQUIPO_CALIDAD
+package "Gestión de Proyectos" {
+    class Proyecto {
+        codigoProyecto
+        nombre
+        descripcion
+        estado
+    }
+    class "Plan de Gestión SCM" as PlanGestionSCM {
+        politicaVersionamiento
+        estrategiaRamas
+        criteriosCongelamiento
+    }
 }
 
-class Proyecto {
-    - id: Long
-    - codigo: String
-    - nombre: String
-    - descripcion: String
-    - cliente: String
-    - estado: EstadoProyecto
-    - fechaCreacion: DateTime
-    + crearProyecto()
-    + consultarProyecto()
+package "Gestión de Configuración y Bibliotecas" {
+    class "Elemento de Configuración (ECS)" as ElementoConfiguracion {
+        codigoECS
+        nombre
+        tipoECS
+        estado
+        bibliotecaActual
+    }
+    class "Versión de ECS" as VersionECS {
+        numeroVersion
+        etiqueta
+        checksumSHA256
+        fechaSello
+    }
+    class "Bloqueo de Sincronización" as BloqueoSincronizacion {
+        tipoBloqueo
+        fechaImposicion
+        estado
+    }
+    class "Línea Base" as LineaBase {
+        codigoLineaBase
+        nombreHito
+        tipoLineaBase
+        fechaCongelamiento
+        estado
+    }
 }
 
-class ElementoConfiguracion {
-    - id: Long
-    - codigo: String
-    - nombre: String
-    - tipo: TipoECS
-    - rutaArchivo: String
-    - versionActual: String
-    - checksumSHA256: String
-    - estadoBloqueo: EstadoBloqueo
-    - bibliotecaActual: TipoBiblioteca
-    + registrarECS()
-    + verificarIntegridad(): Boolean
-    + bloquear(ordenId: Long)
-    + liberarBloqueo()
+package "Control de Cambios (RFC / ECN)" {
+    class "Solicitud de Cambio (RFC)" as SolicitudCambio {
+        codigoRFC
+        titulo
+        descripcionMotivo
+        clasificacion
+        prioridad
+        estado
+    }
+    class "Informe Técnico de Impacto" as InformeImpacto {
+        codigoInforme
+        analisisArquitectura
+        evaluacionDependencias
+        estimacionEsfuerzo
+        estimacionCosto
+        dictamenClasificacion
+    }
+    class "Dictamen de Cambio" as DictamenCambio {
+        tipoAutoridad
+        sentidoResolucion
+        justificacionFundamento
+        fechaResolucion
+    }
+    class "Orden de Cambio (ECN/ECO)" as OrdenCambio {
+        codigoOrden
+        alcanceAutorizado
+        responsableAsignado
+        fechaEmision
+        estado
+    }
 }
 
-enum TipoBiblioteca {
-    TRABAJO
-    SOPORTE
-    MAESTRA
+package "Aseguramiento de Calidad y Aceptación" {
+    class "Certificación de Conformidad QA" as CertificacionQA {
+        codigoCertificado
+        resultadoPruebas
+        conclusionTecnica
+        fechaEmision
+    }
+    class "Acta de Aceptación UAT" as ActaAceptacionUAT {
+        codigoActa
+        resultadoValidacion
+        observacionesUsuario
+        fechaAceptacion
+    }
+    class "Reporte de No Conformidad" as ReporteNoConformidad {
+        codigoReporte
+        descripcionDefecto
+        severidad
+        estadoSubsanacion
+    }
 }
 
-class SolicitudCambio {
-    - id: Long
-    - codigo: String
-    - descripcion: String
-    - justificacion: String
-    - prioridad: Prioridad
-    - estado: EstadoRFC
-    - fechaRegistro: DateTime
-    + registrarRFC()
-    + validar()
-    + subsanar()
-    + evaluarCCB()
+package "Soporte e Incidencias" {
+    class "Incidencia (Ticket)" as TicketIncidencia {
+        codigoTicket
+        resumen
+        severidad
+        estado
+    }
 }
 
-class InformeImpacto {
-    - id: Long
-    - impactoArquitectura: String
-    - esfuerzoHoras: Integer
-    - costoEstimado: Decimal
-    - tiempoEstimadoDias: Integer
-    - nivelRiesgo: NivelRiesgo
-    - fechaElaboracion: DateTime
-    + registrarInforme()
+package "Trazabilidad y Auditoría" {
+    class "Registro de Auditoría" as RegistroAuditoria {
+        codigoEvento
+        tipoOperacion
+        marcaTemporal
+        direccionOrigen
+        estadoIntegridad
+    }
 }
 
-class OrdenCambio {
-    - id: Long
-    - codigo: String
-    - fechaEmision: DateTime
-    - estado: EstadoOrden
-    + emitirOrden()
-    + cancelarOrden(motivo: String)
-    + cerrarOrden()
-}
+' Relaciones de Gobernanza
+Usuario "1" *-- "1..*" Rol : asignado a >
+Rol "1" *-- "1..*" Permiso : otorga >
 
-class CertificadoConformidad {
-    - id: Long
-    - resultado: ResultadoPrueba
-    - observaciones: String
-    - fechaCertificacion: DateTime
-    + emitirCertificado()
-}
+' Relaciones de Proyecto
+Proyecto "1" *-- "1" PlanGestionSCM : normado por >
+Proyecto "1" o-- "1..*" Usuario : asigna participantes >
+Proyecto "1" *-- "0..*" ElementoConfiguracion : contiene >
+Proyecto "1" *-- "0..*" SolicitudCambio : ámbito de >
+Proyecto "1" *-- "0..*" LineaBase : define >
 
-class NoConformidad {
-    - id: Long
-    - hallazgos: String
-    - severidad: Severidad
-    - fechaRegistro: DateTime
-    + registrarNoConformidad()
-}
+' Relaciones de ECS y Bibliotecas
+ElementoConfiguracion "1" *-- "1..*" VersionECS : genera >
+ElementoConfiguracion "1" o-- "0..1" BloqueoSincronizacion : restringido por >
+LineaBase "1" o-- "1..*" VersionECS : consolida >
 
-class LineaBase {
-    - id: Long
-    - codigo: String
-    - nombre: String
-    - version: String
-    - estado: EstadoLineaBase
-    - fechaCongelacion: DateTime
-    + crearLineaBase()
-    + congelar()
-}
+' Relaciones de Cambio
+SolicitudCambio "1" -- "1..*" ElementoConfiguracion : afecta a >
+SolicitudCambio "1" *-- "0..1" InformeImpacto : fundamentada por >
+SolicitudCambio "1" *-- "0..1" DictamenCambio : resuelta mediante >
+DictamenCambio "1" --> "0..1" OrdenCambio : habilita emisión de >
+OrdenCambio "1" --> "1" SolicitudCambio : amparada en >
+OrdenCambio "1" --> "1..*" ElementoConfiguracion : autoriza modificación de >
 
-class TicketIncidencia {
-    - id: Long
-    - codigo: String
-    - titulo: String
-    - descripcion: String
-    - estado: EstadoTicket
-    - fechaRegistro: DateTime
-    + registrarTicket()
-    + derivarARFC(): SolicitudCambio
-}
+' Relaciones de Promoción y Versiones
+VersionECS "1" --> "0..1" OrdenCambio : implementada bajo >
+VersionECS "0..1" --> "0..1" CertificacionQA : avalada técnicamente por >
+VersionECS "0..1" --> "0..1" ActaAceptacionUAT : aceptada por usuario mediante >
+CertificacionQA "0..1" o-- "0..*" ReporteNoConformidad : documenta hallazgos en >
 
-class RegistroAuditoria {
-    - id: Long
-    - accion: String
-    - modulo: String
-    - ipOrigen: String
-    - timestamp: DateTime
-    - hashRegistro: String
-    + registrarEvento()
-}
+' Relaciones de Incidencias
+TicketIncidencia "1" --> "0..1" SolicitudCambio : escala a >
+TicketIncidencia "1" --> "0..1" ElementoConfiguracion : reporta fallo en >
 
-Usuario "1" --> "*" Proyecto : administra / participa
-Proyecto "1" *-- "*" ElementoConfiguracion : contiene
-Usuario "1" --> "*" SolicitudCambio : solicita
-SolicitudCambio "1" --> "1" ElementoConfiguracion : afecta
-SolicitudCambio "1" --> "0..1" InformeImpacto : tiene
-SolicitudCambio "1" --> "0..1" OrdenCambio : genera
-OrdenCambio "1" --> "0..1" CertificadoConformidad : valida
-OrdenCambio "1" --> "*" NoConformidad : registra
-Proyecto "1" *-- "*" LineaBase : define
-LineaBase "1" o-- "1..*" ElementoConfiguracion : congela
-TicketIncidencia "0..1" --> "0..1" SolicitudCambio : deriva en
-RegistroAuditoria "*" --> "1" Usuario : generado por
+' Relaciones de Auditoría
+RegistroAuditoria "*" --> "1" Usuario : ejecutado por >
+RegistroAuditoria "*" --> "0..1" Proyecto : contextualizado en >
+RegistroAuditoria "*" --> "0..1" SolicitudCambio : traza ciclo de >
+RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
 
 @enduml
 ```
 
 
-
-<!-- Página 116 del PDF original -->
-
-
-
+---
 
 ### 6.2.3. Diagramas de Análisis de Objetos (Patrón BCE)
 
@@ -6653,58 +6672,52 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 | Transparencia y reportería de gestión | RF-18 (Generación de Reportes) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para reportes en SRS) | CU-28 | Administrador de Configuración / Bibliotecario |
 
 ---
-
 ## Inconsistencias Detectadas
 
-Las siguientes inconsistencias y discrepancias fueron identificadas durante la extracción minuciosa del documento consolidado `FD03-EPIS-Informe_SRS.md`. No fueron corregidas silenciosamente y se registran aquí para su tratamiento y decisión formal:
+Las siguientes inconsistencias y discrepancias fueron identificadas durante la extracción minuciosa del documento consolidado `FD03-EPIS-Informe_SRS.md`. A continuación se presenta el estado formal de resolución tras el cierre del SRS de ANÁLISIS:
 
 ### 1. Inconsistencia de Contexto en Perfiles de Usuario
 - **Elemento:** Párrafo explicativo posterior a la tabla de perfiles de usuario.
 - **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Págs. 30-31).
 - **Descripción:** El texto heredado hacía referencia a conceptos de tutorías universitarias ("mentoreado", "mentor", "servicio tutorial").
-- **Estado de Resolución:** Subsanado e integrado formalmente mediante la definición de la estricta segregación de funciones entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
+- **Estado de Resolución:** RESUELTA. Subsanado e integrado formalmente mediante la definición de la estricta segregación de funciones entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
 
 ### 2. Discrepancia en la Convención de Nomenclatura de Casos de Uso
 - **Elemento:** Identificadores de casos de uso.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Págs. 35-94) y 6.2.1 (Págs. 95-114).
-- **Descripción:** El SRS utiliza el código `CUS01` a `CUS28` (sin guion), mientras que `docs/DOCUMENTATION_RULES.md` establece como convención oficial mandatoria el formato `CU-XX`.
-- **Impacto:** Ambigüedad en la referencia cruzada entre diagramas, matrices y especificaciones de casos de uso.
-- **Recomendación de Revisión:** Adoptar `CU-XX` como identificador canónico en `TABLES.md` y `DIAGRAMS.md`, manteniendo `CUSXX` en una columna de compatibilidad transitoria hasta que el SRS consolidado sea refactorizado.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Págs. 35-94) y 6.2.1 (Págs. 95-114).
+- **Descripción:** Discrepancia entre la codificación original `CUS01` a `CUS28` y la convención normativa `CU-XX`.
+- **Estado de Resolución:** RESUELTA / COMPATIBILIDAD. Se adoptó `CU-XX` como estándar oficial único (SSOT) en todas las tablas (`TABLES.md`), diagramas (`DIAGRAMS.md`) y narrativas canónicas. La nomenclatura `CUSXX` se mantiene exclusivamente en una columna histórica para trazabilidad con el PDF preliminar.
 
 ### 3. Omisión del Diagrama de Secuencia para CUS03 (Consultar proyecto)
 - **Elemento:** Diagramas de secuencia del modelo lógico.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
-- **Descripción:** Existen diagramas de secuencia documentados para CUS01, CUS02 y luego salta directamente a CUS04. El caso de uso CUS03 ("Consultar proyecto") no cuenta con diagrama de secuencia en el documento original.
-- **Impacto:** Laguna de cobertura en el modelado dinámico de las interacciones del sistema.
-- **Estado de Resolución:** Subsanado e integrado formalmente mediante el diagrama `DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)`, compilado a código PlantUML y gráfico renderizado en `assets/DG-SEQ-03.png`.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
+- **Descripción:** El documento original saltaba de CUS02 a CUS04, omitiendo el diagrama de interacción de CUS03.
+- **Estado de Resolución:** RESUELTA. Reconstruido formalmente e integrado como `DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)` (1:1 con la narrativa) y `DG-AO-03`.
 
 ### 4. Malformación de Sintaxis Markdown en Encabezados de CUS19 y CUS20
 - **Elemento:** Tablas narrativas de CUS19 y CUS20.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Líneas 2012 y 2060, Págs. 74 y 76).
-- **Descripción:** Por efecto de la conversión desde PDF, los metadatos iniciales de CUS19 y CUS20 quedaron renderizados como texto corrido (`Campo Descripción Código CUS19` y `Campo Descripción Código CUS20`) antes de los saltos de página, en lugar de conservar la cabecera tabular `| Campo | Descripción |`.
-- **Impacto:** Dificultad para el parseo automatizado de los escenarios de casos de uso.
-- **Recomendación de Revisión:** Corregir la sintaxis Markdown en el SRS consolidado asegurando la estructura tabular estándar en todos los 28 casos de uso.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3.
+- **Descripción:** Metadatos iniciales renderizados como texto corrido antes de los saltos de página.
+- **Estado de Resolución:** RESUELTA. Corregido integralmente durante la reescritura de las 31 narrativas bajo la plantilla normativa única.
 
 ### 5. Autoridad de la Regla de Negocio RN-03 (Trazabilidad de Cambios)
 - **Elemento:** Campo *Autoridad* en la tabla de Reglas de Negocio.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Línea 946, Pág. 25).
-- **Descripción:** La tabla asigna la autoridad de la regla RN-03 al *"Analista de Requerimientos / Gestor"*, a pesar de que el texto de la regla establece que *"Todo Check-in registrado debe incluir un mensaje descriptivo y estar asociado a una Orden de Cambio (ECN/ECO)"*, siendo el Check-In una función estrictamente técnica y operativa del *Administrador de Configuración / Bibliotecario*.
-- **Impacto:** Atribución incorrecta de responsabilidades de cumplimiento en la biblioteca de software.
-- **Recomendación de Revisión:** Modificar la autoridad de RN-03 a *"Administrador de Configuración / Bibliotecario"* o declararla compartida con el Analista de Requerimientos (quien verifica la existencia de la ECN).
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Pág. 25) y `docs/TABLES.md` (`TB-06`).
+- **Descripción:** Atribuía autoridad exclusiva a `Analista de Requerimientos / Gestor`, omitiendo al `Administrador de Configuración / Bibliotecario` quien ejecuta materialmente el Check-In con asociación a ECN/ECO.
+- **Estado de Resolución:** RESUELTA. Establecida formalmente como **Autoridad Compartida: Administrador de Configuración / Bibliotecario y Analista de Requerimientos / Gestor**, amparada en los casos CU-08, CU-12, CU-14, CU-27 y las responsabilidades delimitadas de PU-02 y PU-05.
 
 ### 6. Duplicidad Literal entre Viabilidad Social y Viabilidad Ambiental
 - **Elemento:** Secciones de Viabilidad Social y Ambiental.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Líneas 414-450, Págs. 16-17).
-- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental (*Optimización de Recursos de Hardware*, *Reducción de la Huella de Carbono Digital*, *Digitalización y Cero Papel*, *Promoción del Trabajo Remoto*) son una réplica exacta palabra por palabra de los cuatro numerales de la Viabilidad Social.
-- **Impacto:** Redundancia que reduce el rigor técnico de la evaluación de viabilidad del sistema.
-- **Recomendación de Revisión:** Reescribir la Viabilidad Ambiental enfocándose en métricas energéticas de servidores, centros de datos en la nube y consumo de red.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Págs. 16-17).
+- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental son una réplica idéntica de la Viabilidad Social.
+- **Estado de Resolución:** OBSOLETA PARA ANÁLISIS DE SOFTWARE / DIFERIDA A FASE DE FACTIBILIDAD. No compromete los requerimientos funcionales ni el modelo conceptual de SCM. Se mantiene documentada para revisión en el ciclo de actualización del informe de factibilidad (`FD01`).
 
 ### 7. Cobertura del Cierre Exitoso en la Matriz RF-14
 - **Elemento:** Requerimiento RF-14 (Cierre Formal del Cambio y Notificaciones).
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 5.1 y 6.1.3.
-- **Descripción:** En la narrativa de los casos de uso, el RF-14 solo aparece referenciado de manera explícita en el caso de uso CUS22 ("Cancelar Orden de Cambio"), correspondiente a cierres no exitosos o cancelaciones. El cierre formal por implementación exitosa ocurre dentro de CUS20 ("Crear y congelar línea base") o de manera complementaria en el flujo de gestión de cambios sin un caso de uso denominado exclusivamente "Cerrar cambio implementado".
-- **Impacto:** Asimetría en la trazabilidad formal del cierre exitoso frente a los cierres por rechazo o cancelación.
-- **Recomendación de Revisión:** Documentar explícitamente en el caso de uso CUS20 la asociación complementaria a RF-14 o crear un caso de uso específico para el cierre administrativo exitoso por parte del CCB.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.1 y 6.1.3.
+- **Descripción:** RF-14 se referenciaba predominantemente en cancelaciones y rechazos, existiendo asimetría con el cierre exitoso.
+- **Estado de Resolución:** RESUELTA. Resuelto formalmente mediante la definición de la máquina de 14 estados del TO-BE v2 y la asignación explícita de RF-14 a los 4 estados terminales en `TB-07`, `TB-12` y los casos de uso CU-05 (Desestimada), CU-07/CU-30 (Rechazada), CU-22 (Cancelada) y CU-20 (Implementada tras aceptación UAT en CU-29).
+
 
 # Conclusiones
 

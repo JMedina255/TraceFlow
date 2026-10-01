@@ -120,6 +120,7 @@ Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de E
 
 
 ### 6.2.2. Diagrama de Clases 114
+### 6.2.3. Diagramas de Análisis de Objetos (Patrón BCE) 115
 ## 6.3. Matrices de Trazabilidad SCM 116
 
 Conclusiones 115 Bibliografía 117
@@ -1289,14 +1290,20 @@ El siguiente cuadro describe los siete perfiles de usuario (PU-01 a PU-07) que i
 | PU-05 | Administrador de Configuración / Bibliotecario | Responsable de administrar las bibliotecas (Trabajo, Soporte, Maestra), los bloqueos y las líneas base. | Experto | Ejecutar Check-Out/Check-In entre bibliotecas, aplicar y liberar bloqueos de sincronización, ejecutar rollback, establecer y congelar líneas base, validar integridad (SHA-256) y generar reportes. |
 | PU-06 | Ingeniero de Software / Desarrollador | Consultor técnico que implementa el cambio aprobado sobre el ECS en la Biblioteca de Trabajo. | Medio | Recibir Orden de Cambio y ECS autorizado, implementar modificaciones, ejecutar pruebas unitarias locales y corregir defectos reportados por QA. |
 | PU-07 | Equipo de Calidad / Testing | Responsable de validar funcional y técnicamente el cambio antes de su integración a la Biblioteca Maestra. | Medio | Ejecutar pruebas de integración y validación funcional, emitir Certificación de Conformidad, reportar no conformidades y hallazgos, y re-testear correcciones. |
-Nota: Elaboración Propia <!-- PENDIENTE DE VALIDACION: El siguiente texto sobre tutorías universitarias ("mentoreado", "mentor", "servicio tutorial") no corresponde a TraceFlow SCM y está pendiente de sustitución formal por la descripción de segregación de funciones entre los 7 roles canónicos. -->
-La delimitación de perfiles asegura una adecuada segregación de funciones, donde el mentoreado resuelve dudas temáticas, el mentor gestiona y dicta las
+Nota: Elaboración Propia
+
+La delimitación de perfiles asegura una estricta segregación de funciones y responsabilidades dentro del ciclo de vida de la gestión de configuración de software (SCM) en TraceFlow SCM:
+
+1. **Solicitante:** Origina las solicitudes formales de cambio (RFC), subsana datos observados, consulta el estado de sus trámites y realiza la validación de aceptación funcional final del cambio (UAT).
+2. **Analista de Requerimientos / Gestor:** Efectúa el triaje, validación formal y clasificación preliminar de las RFC, solicita subsanaciones, actualiza el plan de gestión, deriva incidencias operativas a solicitudes formales de cambio y ejerce la Autoridad Operativa Delegada para Cambios Menores en coordinación con el Arquitecto.
+3. **Arquitecto / Especialista Técnico:** Realiza el análisis de impacto técnico y arquitectural, define las dependencias entre Elementos de Configuración de Software (ECS), estima esfuerzo, costo y cronograma, emite el Informe Técnico de Impacto, identifica y cataloga los ECS, y co-autoriza Cambios Menores bajo la Autoridad Operativa Delegada.
+4. **Comité de Control de Cambios (CCB):** Máxima autoridad colegiada de gobernanza técnica y de negocio encargada de evaluar, aprobar o rechazar Cambios Mayores fundamentados en el Informe de Impacto, emitir formalmente las Órdenes de Cambio (ECN/ECO) mayores y auditar la trazabilidad integral del sistema.
+5. **Administrador de Configuración / Bibliotecario:** Custodio operativo de la infraestructura de configuración; gestiona la promoción controlada de ECS entre las bibliotecas de Soporte, Trabajo y Maestra mediante Check-Out y Check-In, impone y libera bloqueos exclusivos de sincronización, congela líneas base, ejecuta reversiones (rollback) ante fallos no subsanados y verifica la integridad criptográfica mediante sumas de verificación SHA-256.
+6. **Ingeniero de Software / Desarrollador:** Implementa las modificaciones técnicas autorizadas por la ECN/ECO sobre los ECS exclusivamente en la Biblioteca de Trabajo en aislamiento controlado, ejecuta pruebas unitarias locales y corrige defectos técnicos reportados durante los ciclos de verificación.
+7. **Equipo de Calidad / Testing:** Actúa como ente independiente de aseguramiento de la calidad; diseña y ejecuta pruebas de integración sobre los ECS modificados, emite Certificaciones de Conformidad, reporta no conformidades o defectos y re-evalúa correcciones previas al pase a la Biblioteca Maestra.
 
 
 <!-- Página 31 del PDF original -->
-
-
-clases acumulando horas, y la administración supervisa la calidad del servicio tutorial y formaliza las certificaciones.
 
 ### 6.1.1. Diagrama de Paquetes
 
@@ -1765,11 +1772,11 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 | CUS08 | CU-08 | Emitir Orden de Cambio (ECN/ECO) | Primario, formalización | Comité de Control de Cambios (CCB) / Analista de Requerimientos / Gestor | Administrador de Configuración / Bibliotecario | Registro y Evaluación de la RFC | RF-07 – Gestión y Emisión de Órdenes de Cambio (ECN/ECO) |
 | CUS09 | CU-09 | Registrar ECS | Primario, configuración | Arquitecto / Especialista Técnico | Administrador de Configuración / Bibliotecario | Gestión de ECS y Bibliotecas | RF-03 – Identificación de ECS |
 | CUS10 | CU-10 | Efectuar Check-Out (Soporte → Trabajo) | Primario, operación SCM | Administrador de Configuración / Bibliotecario | Ingeniero de Software / Desarrollador | Gestión de ECS y Bibliotecas | RF-08, RF-09 – Gestión de Bibliotecas y Control de Versiones |
-| CUS11 | CU-11 | Aplicar bloqueo de sincronización | Secundario, soporte SCM | Administrador de Configuración / Bibliotecario | Sistema TraceFlow SCM | Gestión de ECS y Bibliotecas | RF-09 – Control de Versiones y Bloqueos de Sincronización |
+| CUS11 | CU-11 | Aplicar bloqueo de sincronización | Secundario, soporte SCM | Administrador de Configuración / Bibliotecario | Ingeniero de Software / Desarrollador | Gestión de ECS y Bibliotecas | RF-09 – Control de Versiones y Bloqueos de Sincronización |
 | CUS12 | CU-12 | Efectuar Check-In (Trabajo → Maestra/Soporte) | Primario, operación SCM | Administrador de Configuración / Bibliotecario | Equipo de Calidad / Testing, Solicitante | Gestión de ECS y Bibliotecas | RF-08, RF-09, RF-10 – Gestión de Bibliotecas, Control de Versiones y Aceptación |
 | CUS13 | CU-13 | Consultar historial de versiones | Secundario, auditoría | Administrador de Configuración / Bibliotecario | Usuarios autorizados | Gestión de ECS y Bibliotecas | RF-09, RF-16 – Control de Versiones y Trazabilidad |
 | CUS14 | CU-14 | Implementar cambio en el ECS | Primario, desarrollo | Ingeniero de Software / Desarrollador | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-07, RF-09 – Orden de Cambio y Control de Versiones |
-| CUS15 | CU-15 | Ejecutar pruebas unitarias locales | Secundario, verificación | Ingeniero de Software / Desarrollador | Sistema de Pruebas Unitarias | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+| CUS15 | CU-15 | Ejecutar pruebas unitarias locales | Secundario, verificación | Ingeniero de Software / Desarrollador | Ninguno (Autocontenido) | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
 | CUS16 | CU-16 | Ejecutar pruebas de integración | Primario, validación QA | Equipo de Calidad / Testing | Ingeniero de Software / Desarrollador | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
 | CUS17 | CU-17 | Certificar conformidad del cambio | Primario, certificación | Equipo de Calidad / Testing | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
 | CUS18 | CU-18 | Reportar no conformidad | Alternativo, QA | Equipo de Calidad / Testing | Ingeniero de Software / Desarrollador | Implementación y Validación | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
@@ -1780,7 +1787,7 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 | CUS23 | CU-23 | Registrar incidencia | Primario, soporte | Solicitante | Analista de Requerimientos / Gestor | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
 | CUS24 | CU-24 | Consultar estado de ticket | Secundario, consulta | Solicitante | Analista de Requerimientos / Gestor | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
 | CUS25 | CU-25 | Derivar incidencia a RFC | Primario, transición | Analista de Requerimientos / Gestor | Solicitante | Incidencias y Soporte | RF-15 – Gestión de Incidencias y Soporte |
-| CUS26 | CU-26 | Validar integridad (checksum) | Secundario, seguridad | Administrador de Configuración / Bibliotecario | Sistema TraceFlow SCM | Trazabilidad, Auditoría y Reportes | RF-17, RNF-03 – Auditoría e Integridad |
+| CUS26 | CU-26 | Validar integridad (checksum) | Secundario, seguridad | Administrador de Configuración / Bibliotecario | Ninguno (Autocontenido) | Trazabilidad, Auditoría y Reportes | RF-17, RNF-03 – Auditoría e Integridad |
 | CUS27 | CU-27 | Auditar acciones del sistema | Secundario, control | Comité de Control de Cambios (CCB) | Administrador de Configuración / Bibliotecario | Trazabilidad, Auditoría y Reportes | RF-16, RF-17 – Trazabilidad de Configuración y Auditoría |
 | CUS28 | CU-28 | Generar reportes de estado | Secundario, reporte | Administrador de Configuración / Bibliotecario | Gestores y Dirección de Proyecto | Trazabilidad, Auditoría y Reportes | RF-18 – Generación de Reportes |
 | CUS29 | CU-29 | Validar aceptación del cambio por el usuario (UAT) | Primario, validación usuario | Solicitante | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-10 – Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
@@ -2622,7 +2629,7 @@ ightarrow$ En Implementación
 | **Nombre** | Aplicar bloqueo de sincronización |
 | **Tipo** | Secundario, soporte SCM |
 | **Actor principal** | Administrador de Configuración / Bibliotecario |
-| **Actores secundarios** | Sistema TraceFlow SCM |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
 | **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
 | **RF asociados** | RF-09 — Control de Versiones y Bloqueos de Sincronización |
 | **RN asociadas** | RN-06 — Bloqueo de Sincronización Obligatorio |
@@ -2902,7 +2909,7 @@ ightarrow$ En Implementación
 | **Nombre** | Ejecutar pruebas unitarias locales |
 | **Tipo** | Secundario, verificación |
 | **Actor principal** | Ingeniero de Software / Desarrollador |
-| **Actores secundarios** | Sistema de Pruebas Unitarias |
+| **Actores secundarios** | Ninguno (Autocontenido en entorno local) |
 | **Paquete / Módulo** | Implementación y Validación |
 | **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
 | **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-03 — Trazabilidad de Cambios |
@@ -3658,7 +3665,7 @@ ightarrow$ Cancelada
 | **Nombre** | Validar integridad (checksum) |
 | **Tipo** | Secundario, seguridad |
 | **Actor principal** | Administrador de Configuración / Bibliotecario |
-| **Actores secundarios** | Sistema TraceFlow SCM |
+| **Actores secundarios** | Ninguno (Autocontenido) |
 | **Paquete / Módulo** | Trazabilidad, Auditoría y Reportes |
 | **RF asociados** | RF-17 — Auditoría e Integridad<br>RNF-03 — Integridad |
 | **RN asociadas** | RN-04 — Restricción de Bibliotecas Congeladas<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
@@ -5338,6 +5345,1244 @@ RegistroAuditoria "*" --> "1" Usuario : generado por
 
 
 
+
+### 6.2.3. Diagramas de Análisis de Objetos (Patrón BCE)
+
+A continuación se presentan los diagramas de realización conceptual de casos de uso aplicando el patrón **Boundary-Control-Entity (BCE)** (Jacobson, RUP/UML) para los 31 escenarios del sistema TraceFlow SCM (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`).
+
+Este modelado formaliza la interacción entre los actores canónicos, las fronteras funcionales (`<<boundary>>`), la coordinación conceptual de reglas y flujos (`<<control>>`) y las entidades puras del dominio de configuración (`<<entity>>`), en estricto cumplimiento de `docs/DOCUMENTATION_RULES.md` Sección 7.
+
+#### Matriz General de Análisis de Objetos (BCE)
+
+| DG-AO | CU | Actor Principal | Boundary Conceptual | Control Conceptual | Entidades Clave del Dominio | RF Asociado | RN Asociada |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DG-AO-01** | CU-01 | Administrador de Configuración / Bibliotecario | Gestión de Usuarios y Roles | Control de Usuarios y Roles | Usuario, Rol, Permiso, Registro de Auditoría | RF-01 | RN-01 |
+| **DG-AO-02** | CU-02 | Analista de Requerimientos / Gestor | Administración de Proyectos | Control de Proyectos | Proyecto, Plan de Gestión SCM, Usuario, Registro de Auditoría | RF-02 | RN-02, RN-04 |
+| **DG-AO-03** | CU-03 | Analista de Requerimientos / Gestor | Consulta de Proyecto | Control de Consulta de Proyectos | Proyecto, Elemento de Configuración (ECS), Línea Base | RF-02 | RN-04 |
+| **DG-AO-04** | CU-04 | Solicitante | Registro de Solicitud de Cambio | Control de Registro de RFC | Solicitud de Cambio (RFC), Proyecto, Elemento de Configuración (ECS) | RF-04 | RN-04 |
+| **DG-AO-04.1** | CU-04.1 | Solicitante | Subsanación de Solicitud de Cambio | Control de Subsanación de RFC | Solicitud de Cambio (RFC), Observación de Solicitud, Historial de Estado RFC | RF-04 | RN-04, RN-07 |
+| **DG-AO-05** | CU-05 | Analista de Requerimientos / Gestor | Validación y Clasificación de RFC | Control de Clasificación de RFC | Solicitud de Cambio (RFC), Clasificación de Cambio, Observación de Solicitud, Notificación de Estado | RF-04, RF-05, RF-14 | RN-05, RN-07 |
+| **DG-AO-06** | CU-06 | Arquitecto / Especialista Técnico | Análisis de Impacto Técnico | Control de Análisis de Impacto | Informe Técnico de Impacto, Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Estimación de Esfuerzo y Costo | RF-05 | RN-05 |
+| **DG-AO-07** | CU-07 | Comité de Control de Cambios (CCB) | Evaluación Colegiada de Cambio Mayor | Control de Evaluación en CCB | Solicitud de Cambio (RFC), Informe Técnico de Impacto, Acta del CCB, Dictamen del CCB | RF-06, RF-14 | RN-01, RN-05, RN-07 |
+| **DG-AO-08** | CU-08 | Comité de Control de Cambios (CCB) | Emisión de Orden de Cambio | Control de Emisión ECN/ECO | Orden de Cambio (ECN/ECO), Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Registro de Auditoría | RF-07 | RN-01, RN-03 |
+| **DG-AO-09** | CU-09 | Arquitecto / Especialista Técnico | Registro de Elemento de Configuración | Control de Registro de ECS | Elemento de Configuración (ECS), Proyecto, Tipo de ECS, Registro de Auditoría | RF-03 | RN-04 |
+| **DG-AO-10** | CU-10 | Administrador de Configuración / Bibliotecario | Operación de Check-Out | Control de Check-Out | Orden de Cambio (ECN/ECO), Elemento de Configuración (ECS), Copia de Trabajo, Bloqueo de Sincronización | RF-08, RF-09 | RN-04, RN-06 |
+| **DG-AO-11** | CU-11 | Administrador de Configuración / Bibliotecario | Gestión de Bloqueos de Sincronización | Control de Bloqueo de Sincronización | Bloqueo de Sincronización, Elemento de Configuración (ECS), Orden de Cambio (ECN/ECO), Registro de Auditoría | RF-09 | RN-06 |
+| **DG-AO-12** | CU-12 | Administrador de Configuración / Bibliotecario | Operación de Check-In | Control de Check-In | Elemento de Configuración (ECS), Nueva Versión de ECS, Certificación de Conformidad QA, Acta de Aceptación UAT, Bloqueo de Sincronización | RF-08, RF-09, RF-10 | RN-01, RN-02, RN-03, RN-04, RN-06, RN-09 |
+| **DG-AO-13** | CU-13 | Administrador de Configuración / Bibliotecario | Consulta de Historial de Versiones | Control de Historial y Trazabilidad | Elemento de Configuración (ECS), Versión de ECS, Orden de Cambio (ECN/ECO), Registro de Auditoría | RF-09, RF-16 | RN-02, RN-03 |
+| **DG-AO-14** | CU-14 | Ingeniero de Software / Desarrollador | Entorno de Implementación de Cambio | Control de Modificación de ECS | Orden de Cambio (ECN/ECO), Copia de Trabajo, Bitácora de Modificación Técnica | RF-07, RF-09 | RN-03, RN-06 |
+| **DG-AO-15** | CU-15 | Ingeniero de Software / Desarrollador | Verificación de Pruebas Unitarias | Control de Pruebas Unitarias | Copia de Trabajo, Caso de Prueba Unitaria, Resultado de Prueba Unitaria | RF-10 | RN-09 |
+| **DG-AO-16** | CU-16 | Equipo de Calidad / Testing | Ejecución de Pruebas de Integración | Control de Pruebas de Integración | Elemento de Configuración (ECS), Batería de Pruebas de Integración, Resultado de Pruebas QA | RF-10 | RN-09 |
+| **DG-AO-17** | CU-17 | Equipo de Calidad / Testing | Certificación de Conformidad QA | Control de Certificación de Calidad | Certificación de Conformidad QA, Resultado de Pruebas QA, Orden de Cambio (ECN/ECO), Elemento de Configuración (ECS) | RF-10 | RN-09 |
+| **DG-AO-18** | CU-18 | Equipo de Calidad / Testing | Reporte de No Conformidad QA | Control de Defectos y No Conformidades | Reporte de No Conformidad, Defecto / Hallazgo Técnico, Orden de Cambio (ECN/ECO), Copia de Trabajo | RF-10 | RN-08, RN-09 |
+| **DG-AO-19** | CU-19 | Equipo de Calidad / Testing | Reevaluación y Re-testeo QA | Control de Ciclo de Re-testeo | Plan de Re-testeo, Reporte de No Conformidad, Registro de Subsanación, Dictamen de Re-evaluación | RF-11 | RN-08, RN-09 |
+| **DG-AO-20** | CU-20 | Administrador de Configuración / Bibliotecario | Gestión de Líneas Base | Control de Línea Base | Línea Base, Proyecto, Versión de ECS, Acta de Congelamiento, Registro de Auditoría | RF-13, RF-14 | RN-02, RN-04, RN-07 |
+| **DG-AO-21** | CU-21 | Administrador de Configuración / Bibliotecario | Operación de Rollback | Control de Reversión en Trabajo | Acta de Reversión (Rollback), Copia de Trabajo, Versión Estable de ECS, Bloqueo de Sincronización | RF-12 | RN-06, RN-08 |
+| **DG-AO-22** | CU-22 | Administrador de Configuración / Bibliotecario | Cancelación de Orden de Cambio | Control de Cancelación Definitiva | Orden de Cambio (ECN/ECO), Acta de Cancelación, Acta de Reversión (Rollback), Notificación de Cierre | RF-12, RF-14 | RN-07, RN-08 |
+| **DG-AO-23** | CU-23 | Solicitante | Registro de Incidencia | Control de Incidencias | Incidencia (Ticket), Proyecto, Elemento de Configuración (ECS), Evidencia de Incidencia | RF-15 | RN-05 |
+| **DG-AO-24** | CU-24 | Solicitante | Consulta de Estado de Ticket | Control de Consulta de Incidencias | Incidencia (Ticket), Historial de Estado de Ticket, Solicitud de Cambio (RFC) | RF-15 | RN-05 |
+| **DG-AO-25** | CU-25 | Analista de Requerimientos / Gestor | Derivación de Incidencia a RFC | Control de Transición Incidencia-RFC | Incidencia (Ticket), Solicitud de Cambio (RFC), Dictamen de Derivación | RF-15 | RN-05 |
+| **DG-AO-26** | CU-26 | Administrador de Configuración / Bibliotecario | Validación de Integridad Criptográfica | Control de Verificación de Integridad | Elemento de Configuración (ECS), Constancia de Integridad Criptográfica, Registro de Auditoría | RF-17 | RN-02, RN-04 |
+| **DG-AO-27** | CU-27 | Comité de Control de Cambios (CCB) | Auditoría y Trazabilidad del Sistema | Control de Auditoría y Cumplimiento | Registro de Auditoría, Pista de Auditoría (Audit Trail), Informe de Auditoría SCM | RF-16, RF-17 | RN-03 |
+| **DG-AO-28** | CU-28 | Administrador de Configuración / Bibliotecario | Generación de Reportes SCM | Control de Reportes de Configuración | Reporte de Estado de Configuración, Proyecto, Línea Base, Solicitud de Cambio (RFC), Orden de Cambio (ECN/ECO) | RF-18 | RN-07 |
+| **DG-AO-29** | CU-29 | Solicitante (Usuario Final) | Validación de Aceptación del Cambio (UAT) | Control de Aceptación por el Usuario | Acta de Aceptación UAT, Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Criterio de Aceptación Funcional | RF-10 | RN-07, RN-09 |
+| **DG-AO-30** | CU-30 | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico | Autorización Delegada de Cambio Menor | Control de Autorización de Cambio Menor | Dictamen de Cambio Menor, Solicitud de Cambio (RFC), Informe Técnico de Impacto, Elemento de Configuración (ECS) | RF-05, RF-07 | RN-01, RN-05, RN-07 |
+
+---
+
+---
+
+**Diagrama DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)**
+
+![Diagrama DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)](assets/DG-AO-01.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-01
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Usuarios y Roles" as B
+control "Control de Usuarios y Roles" as C
+
+entity "Usuario" as E_USR
+entity "Rol" as E_ROL
+entity "Permiso" as E_PERM
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "interactúa"
+B --> C : "solicita gestión"
+C --> E_USR : "crea / modifica / inhabilita"
+C --> E_ROL : "asigna / revoca"
+C --> E_AUD : "asienta evento de auditoría"
+E_USR "1" *-- "1..*" E_ROL : "posee"
+E_ROL "1" *-- "1..*" E_PERM : "incluye"
+E_USR --> E_AUD : "registrado en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)**
+
+![Diagrama DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)](assets/DG-AO-02.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-02
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Administración de Proyectos" as B
+control "Control de Proyectos" as C
+
+entity "Proyecto" as E_PROY
+entity "Plan de Gestión SCM" as E_PLAN
+entity "Usuario" as E_USR
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "interactúa"
+B --> C : "solicita creación / ajuste"
+C --> E_PROY : "registra / actualiza"
+C --> E_PLAN : "asocia directrices SCM"
+C --> E_USR : "asigna equipo"
+C --> E_AUD : "asienta trazabilidad"
+E_PROY "1" *-- "1" E_PLAN : "normado por"
+E_PROY "1" o-- "1..*" E_USR : "cuenta con miembros"
+E_PROY --> E_AUD : "registrado en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)**
+
+![Diagrama DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)](assets/DG-AO-03.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-03
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Consulta de Proyecto" as B
+control "Control de Consulta de Proyectos" as C
+
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Línea Base" as E_LB
+
+ACT --> B : "consulta estado"
+B --> C : "solicita datos del proyecto"
+C --> E_PROY : "recupera información"
+C --> E_ECS : "obtiene catálogo de ECS"
+C --> E_LB : "obtiene líneas base activas"
+E_PROY "1" o-- "0..*" E_ECS : "contiene"
+E_PROY "1" o-- "0..*" E_LB : "define"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)**
+
+![Diagrama DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)](assets/DG-AO-04.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-04
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Registro de Solicitud de Cambio" as B
+control "Control de Registro de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT --> B : "ingresa datos del cambio"
+B --> C : "solicita registro formal"
+C --> E_RFC : "crea en estado 'Registrada'"
+C --> E_PROY : "valida pertinencia"
+C --> E_ECS : "asocia ítem afectado"
+E_RFC --> E_PROY : "pertenece a"
+E_RFC --> E_ECS : "afecta a"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
+
+![Diagrama DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)](assets/DG-AO-04.1.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-04.1
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Subsanación de Solicitud de Cambio" as B
+control "Control de Subsanación de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Observación de Solicitud" as E_OBS
+entity "Historial de Estado RFC" as E_HIST
+
+ACT --> B : "ingresa aclaraciones y sustentos"
+B --> C : "solicita subsanación formal"
+C --> E_RFC : "reabre a estado 'Registrada'"
+C --> E_OBS : "marca observaciones subsanadas"
+C --> E_HIST : "registra evento de reingreso"
+E_RFC "1" *-- "1..*" E_OBS : "contiene"
+E_RFC "1" *-- "1..*" E_HIST : "registra evolución"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)**
+
+![Diagrama DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)](assets/DG-AO-05.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-05
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Validación y Clasificación de RFC" as B
+control "Control de Clasificación de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Clasificación de Cambio" as E_CLAS
+entity "Observación de Solicitud" as E_OBS
+entity "Notificación de Estado" as E_NOTIF
+
+ACT --> B : "evalúa completitud formal"
+B --> C : "solicita triaje y clasificación"
+C --> E_RFC : "actualiza estado ('Aceptada' / 'Observada' / 'Desestimada')"
+C --> E_CLAS : "asigna categoría (Menor / Mayor)"
+C --> E_OBS : "registra omisiones si aplica"
+C --> E_NOTIF : "emite aviso al Solicitante"
+E_RFC "1" *-- "1" E_CLAS : "clasificada mediante"
+E_RFC "1" o-- "0..*" E_OBS : "puede tener"
+E_RFC --> E_NOTIF : "dispara"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)**
+
+![Diagrama DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)](assets/DG-AO-06.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-06
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)</b>
+
+actor "Arquitecto\n/ Especialista Técnico" as ACT
+
+boundary "Análisis de Impacto Técnico" as B
+control "Control de Análisis de Impacto" as C
+
+entity "Informe Técnico de Impacto" as E_INF
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Estimación de Esfuerzo y Costo" as E_EST
+
+ACT --> B : "ingresa evaluación técnica"
+B --> C : "solicita formalización de impacto"
+C --> E_INF : "emite y firma informe"
+C --> E_RFC : "asocia a RFC y transiciona a 'En Evaluación'"
+C --> E_ECS : "identifica dependencias afectadas"
+C --> E_EST : "calcula esfuerzo, costo y cronograma"
+E_INF --> E_RFC : "fundamenta decisión de"
+E_INF --> E_ECS : "dimensiona impacto sobre"
+E_INF "1" *-- "1" E_EST : "contiene"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)**
+
+![Diagrama DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)](assets/DG-AO-07.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-07
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Evaluación Colegiada de Cambio Mayor" as B
+control "Control de Evaluación en CCB" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Informe Técnico de Impacto" as E_INF
+entity "Acta del CCB" as E_ACTA
+entity "Dictamen del CCB" as E_DICT
+
+ACT --> B : "delibera viabilidad técnica y negocio"
+B --> C : "registra votación y resolución"
+C --> E_ACTA : "confecciona acta de sesión"
+C --> E_DICT : "emite resolución formal"
+C --> E_RFC : "actualiza estado ('Aprobada' / 'Rechazada')"
+E_ACTA "1" *-- "1..*" E_DICT : "registra acuerdos de"
+E_DICT --> E_RFC : "resuelve formalmente"
+E_DICT --> E_INF : "fundamentado en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)**
+
+![Diagrama DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/DG-AO-08.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-08
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Emisión de Orden de Cambio" as B
+control "Control de Emisión ECN/ECO" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita formalización de orden"
+B --> C : "instruye emisión ejecutiva"
+C --> E_ECN : "genera orden formal con alcance y responsable"
+C --> E_RFC : "vincula a RFC aprobada"
+C --> E_ECS : "habilita intervención sobre ECS"
+C --> E_AUD : "asienta emisión de orden ejecutiva"
+E_ECN --> E_RFC : "formaliza autorización de"
+E_ECN --> E_ECS : "autoriza modificación de"
+E_ECN --> E_AUD : "registrada en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)**
+
+![Diagrama DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)](assets/DG-AO-09.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-09
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)</b>
+
+actor "Arquitecto\n/ Especialista Técnico" as ACT
+
+boundary "Registro de Elemento de Configuración" as B
+control "Control de Registro de ECS" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Proyecto" as E_PROY
+entity "Tipo de ECS" as E_TIPO
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "ingresa metadatos del ECS"
+B --> C : "solicita alta de ítem"
+C --> E_ECS : "registra con nomenclatura unívoca"
+C --> E_PROY : "asocia al proyecto correspondiente"
+C --> E_TIPO : "asigna categoría (Código, Doc, Test)"
+C --> E_AUD : "asienta registro formal"
+E_ECS --> E_PROY : "pertenece a"
+E_ECS --> E_TIPO : "catalogado como"
+E_ECS --> E_AUD : "registrado en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)**
+
+![Diagrama DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)](assets/DG-AO-10.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-10
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Check-Out" as B
+control "Control de Check-Out" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Copia de Trabajo" as E_COPIA
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "solicita extracción controlada"
+B --> C : "instruye Check-Out Soporte → Trabajo"
+C --> E_ECN : "verifica validez de orden"
+C --> E_ECS : "obtiene versión autorizada"
+C --> E_COPIA : "genera réplica en Biblioteca de Trabajo"
+C --> E_LOCK : "aplica bloqueo de sincronización"
+E_ECN --> E_ECS : "autoriza extracción de"
+E_ECS "1" *-- "1" E_COPIA : "deriva en"
+E_ECS "1" *-- "1" E_LOCK : "protegido mediante"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)**
+
+![Diagrama DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)](assets/DG-AO-11.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-11
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Bloqueos de Sincronización" as B
+control "Control de Bloqueo de Sincronización" as C
+
+entity "Bloqueo de Sincronización" as E_LOCK
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita restricción de concurrencia"
+B --> C : "aplica política de bloqueo exclusivo"
+C --> E_LOCK : "establece restricción activa"
+C --> E_ECS : "marca ítem protegido contra modificaciones"
+C --> E_ECN : "asocia orden responsable del bloqueo"
+C --> E_AUD : "registra imposición del bloqueo"
+E_LOCK --> E_ECS : "inmoviliza versión de"
+E_LOCK --> E_ECN : "amparado en"
+E_LOCK --> E_AUD : "registrado en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)**
+
+![Diagrama DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)](assets/DG-AO-12.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-12
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Check-In" as B
+control "Control de Check-In" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Nueva Versión de ECS" as E_VER
+entity "Certificación de Conformidad QA" as E_CERT
+entity "Acta de Aceptación UAT" as E_UAT
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "solicita promoción formal"
+B --> C : "instruye Check-In Trabajo → Maestra"
+C --> E_CERT : "valida certificación técnica previa"
+C --> E_UAT : "valida aceptación de usuario"
+C --> E_VER : "promueve y sella nueva versión oficial"
+C --> E_LOCK : "libera bloqueo exclusivo"
+E_ECS "1" *-- "1..*" E_VER : "incorpora"
+E_VER --> E_CERT : "avalada por"
+E_VER --> E_UAT : "aprobada mediante"
+E_LOCK --> E_ECS : "liberado tras Check-In"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)**
+
+![Diagrama DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)](assets/DG-AO-13.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-13
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Consulta de Historial de Versiones" as B
+control "Control de Historial y Trazabilidad" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Versión de ECS" as E_VER
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita trazabilidad de versiones"
+B --> C : "solicita línea temporal de cambios"
+C --> E_ECS : "recupera identificador del ECS"
+C --> E_VER : "obtiene árbol histórico y etiquetas"
+C --> E_ECN : "relaciona órdenes motivadoras"
+C --> E_AUD : "obtiene registro cronológico"
+E_ECS "1" *-- "1..*" E_VER : "evoluciona mediante"
+E_VER --> E_ECN : "originada por"
+E_VER --> E_AUD : "trazable mediante"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)**
+
+![Diagrama DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)](assets/DG-AO-14.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-14
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+
+boundary "Entorno de Implementación de Cambio" as B
+control "Control de Modificación de ECS" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Copia de Trabajo" as E_COPIA
+entity "Bitácora de Modificación Técnica" as E_BIT
+
+ACT --> B : "aplica modificaciones al código / doc"
+B --> C : "gestiona trabajo en espacio aislado"
+C --> E_ECN : "verifica alcance autorizado"
+C --> E_COPIA : "modifica ítem en Biblioteca de Trabajo"
+C --> E_BIT : "asienta detalles de intervención técnica"
+E_COPIA --> E_ECN : "amparada en"
+E_COPIA "1" *-- "1" E_BIT : "documentada mediante"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)**
+
+![Diagrama DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)](assets/DG-AO-15.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-15
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+
+boundary "Verificación de Pruebas Unitarias" as B
+control "Control de Pruebas Unitarias" as C
+
+entity "Copia de Trabajo" as E_COPIA
+entity "Caso de Prueba Unitaria" as E_TEST
+entity "Resultado de Prueba Unitaria" as E_RES
+
+ACT --> B : "ejecuta batería local"
+B --> C : "coordina verificación unitaria"
+C --> E_COPIA : "inspecciona copia modificada"
+C --> E_TEST : "ejecuta casos de prueba"
+C --> E_RES : "registra métricas y aserciones"
+E_COPIA "1" o-- "1..*" E_TEST : "validada con"
+E_TEST "1" *-- "1" E_RES : "produce"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)**
+
+![Diagrama DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)](assets/DG-AO-16.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-16
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Ejecución de Pruebas de Integración" as B
+control "Control de Pruebas de Integración" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Batería de Pruebas de Integración" as E_SUITE
+entity "Resultado de Pruebas QA" as E_RES
+
+ACT --> B : "inicia ciclo de pruebas formales"
+B --> C : "coordina ejecución de integración"
+C --> E_ECS : "obtiene paquete de trabajo"
+C --> E_SUITE : "aplica suite de integración y regresión"
+C --> E_RES : "registra coberturas y fallos"
+E_SUITE --> E_ECS : "evalúa interacción de"
+E_SUITE "1" *-- "1..*" E_RES : "genera"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)**
+
+![Diagrama DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)](assets/DG-AO-17.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-17
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Certificación de Conformidad QA" as B
+control "Control de Certificación de Calidad" as C
+
+entity "Certificación de Conformidad QA" as E_CERT
+entity "Resultado de Pruebas QA" as E_RES
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT --> B : "emite visto bueno formal"
+B --> C : "solicita emisión de certificado"
+C --> E_CERT : "confecciona constancia de pase a Maestra"
+C --> E_RES : "valida ausencia de defectos críticos"
+C --> E_ECN : "acredita cumplimiento del alcance"
+C --> E_ECS : "habilita Check-In oficial"
+E_CERT --> E_RES : "respaldada en"
+E_CERT --> E_ECN : "certifica cumplimiento de"
+E_CERT --> E_ECS : "autoriza promoción de"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)**
+
+![Diagrama DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)](assets/DG-AO-18.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-18
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Reporte de No Conformidad QA" as B
+control "Control de Defectos y No Conformidades" as C
+
+entity "Reporte de No Conformidad" as E_RNC
+entity "Defecto / Hallazgo Técnico" as E_DEF
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Copia de Trabajo" as E_COPIA
+
+ACT --> B : "registra observaciones y fallos"
+B --> C : "solicita emisión de no conformidad"
+C --> E_RNC : "crea informe formal de fallas"
+C --> E_DEF : "cataloga severidad de defectos"
+C --> E_ECN : "asocia a orden en curso"
+C --> E_COPIA : "mantiene copia retenida en Trabajo"
+E_RNC "1" *-- "1..*" E_DEF : "detalla"
+E_RNC --> E_ECN : "bloquea promoción de"
+E_RNC --> E_COPIA : "restringe integración de"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)**
+
+![Diagrama DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)](assets/DG-AO-19.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-19
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Reevaluación y Re-testeo QA" as B
+control "Control de Ciclo de Re-testeo" as C
+
+entity "Plan de Re-testeo" as E_PLAN
+entity "Reporte de No Conformidad" as E_RNC
+entity "Registro de Subsanación" as E_SUBS
+entity "Dictamen de Re-evaluación" as E_DICT
+
+ACT --> B : "inicia ciclo de reverificación"
+B --> C : "coordina re-testeo de correcciones"
+C --> E_PLAN : "establece casos de prueba enfocados"
+C --> E_RNC : "contrasta hallazgos previos"
+C --> E_SUBS : "inspecciona parches aplicados"
+C --> E_DICT : "emite dictamen (Conforme / Fallo Persistente)"
+E_PLAN --> E_RNC : "valida corrección de"
+E_PLAN --> E_SUBS : "inspecciona evidencias de"
+E_PLAN "1" *-- "1" E_DICT : "concluye en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)**
+
+![Diagrama DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)](assets/DG-AO-20.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-20
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Líneas Base" as B
+control "Control de Línea Base" as C
+
+entity "Línea Base" as E_LB
+entity "Proyecto" as E_PROY
+entity "Versión de ECS" as E_VER
+entity "Acta de Congelamiento" as E_ACTA
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita congelamiento formal"
+B --> C : "instruye fijación de línea base"
+C --> E_LB : "crea hito inmutable"
+C --> E_PROY : "asocia al proyecto"
+C --> E_VER : "vincula versiones aprobadas en Maestra"
+C --> E_ACTA : "genera acta formal de congelamiento"
+C --> E_AUD : "registra evento oficial SCM"
+E_LB --> E_PROY : "pertenece a"
+E_LB "1" o-- "1..*" E_VER : "consolida"
+E_LB "1" *-- "1" E_ACTA : "formalizada mediante"
+E_LB --> E_AUD : "registrada en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)**
+
+![Diagrama DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)](assets/DG-AO-21.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-21
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Rollback" as B
+control "Control de Reversión en Trabajo" as C
+
+entity "Acta de Reversión (Rollback)" as E_REV
+entity "Copia de Trabajo" as E_COPIA
+entity "Versión Estable de ECS" as E_ESTAB
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "instruye reversión de cambios no conformes"
+B --> C : "ejecuta protocolo de rollback"
+C --> E_REV : "confecciona acta de descarte técnico"
+C --> E_COPIA : "descarta cambios fallidos en Trabajo"
+C --> E_ESTAB : "restituye estado desde Soporte"
+C --> E_LOCK : "libera bloqueo de sincronización"
+E_REV --> E_COPIA : "ordena purga de"
+E_REV --> E_ESTAB : "restaura versión de"
+E_REV --> E_LOCK : "dispara liberación de"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)**
+
+![Diagrama DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)](assets/DG-AO-22.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-22
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Cancelación de Orden de Cambio" as B
+control "Control de Cancelación Definitiva" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Acta de Cancelación" as E_CANC
+entity "Acta de Reversión (Rollback)" as E_REV
+entity "Notificación de Cierre" as E_NOTIF
+
+ACT --> B : "registra justificación de cierre fallido"
+B --> C : "instruye cancelación formal de orden"
+C --> E_ECN : "revoca orden y transiciona a 'Cancelada'"
+C --> E_CANC : "asienta acta administrativa definitiva"
+C --> E_REV : "verifica ejecución previa de rollback"
+C --> E_NOTIF : "emite aviso de terminación a Solicitante y CCB"
+E_CANC --> E_ECN : "cancela formalmente"
+E_CANC --> E_REV : "fundamentada en"
+E_CANC --> E_NOTIF : "dispara"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)**
+
+![Diagrama DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)](assets/DG-AO-23.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-23
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Registro de Incidencia" as B
+control "Control de Incidencias" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Evidencia de Incidencia" as E_EVID
+
+ACT --> B : "reporta fallo u observación operativa"
+B --> C : "solicita alta de ticket"
+C --> E_INC : "crea ticket en estado 'Abierto'"
+C --> E_PROY : "asocia al proyecto afectado"
+C --> E_ECS : "vincula módulo con anomalía"
+C --> E_EVID : "adjunta registros y capturas"
+E_INC --> E_PROY : "afecta a"
+E_INC --> E_ECS : "reporta comportamiento de"
+E_INC "1" *-- "0..*" E_EVID : "respaldado con"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)**
+
+![Diagrama DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)](assets/DG-AO-24.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-24
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Consulta de Estado de Ticket" as B
+control "Control de Consulta de Incidencias" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Historial de Estado de Ticket" as E_HIST
+entity "Solicitud de Cambio (RFC)" as E_RFC
+
+ACT --> B : "ingresa código de seguimiento"
+B --> C : "solicita estado del ticket"
+C --> E_INC : "recupera información del incidente"
+C --> E_HIST : "obtiene avances y transiciones"
+C --> E_RFC : "identifica RFC derivada si aplica"
+E_INC "1" *-- "1..*" E_HIST : "contiene evolución de"
+E_INC o-- "0..1" E_RFC : "puede derivar en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)**
+
+![Diagrama DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)](assets/DG-AO-25.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-25
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Derivación de Incidencia a RFC" as B
+control "Control de Transición Incidencia-RFC" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Dictamen de Derivación" as E_DICT
+
+ACT --> B : "analiza causa raíz y determina necesidad SCM"
+B --> C : "instruye promoción a cambio formal"
+C --> E_INC : "actualiza estado a 'Derivado a RFC'"
+C --> E_RFC : "crea nueva RFC con trazabilidad de origen"
+C --> E_DICT : "asienta justificación técnica del triaje"
+E_DICT --> E_INC : "resuelve tratamiento de"
+E_DICT --> E_RFC : "origina formalmente"
+E_INC --> E_RFC : "trazable hacia"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)**
+
+![Diagrama DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)](assets/DG-AO-26.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-26
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Validación de Integridad Criptográfica" as B
+control "Control de Verificación de Integridad" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Constancia de Integridad Criptográfica" as E_HASH
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita verificación de hash SHA-256"
+B --> C : "ejecuta cálculo de suma de comprobación"
+C --> E_ECS : "obtiene archivo físico y hash registrado"
+C --> E_HASH : "genera constancia de coincidencia / alteración"
+C --> E_AUD : "registra resultado del control de seguridad"
+E_HASH --> E_ECS : "certifica integridad de"
+E_HASH --> E_AUD : "asentada en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)**
+
+![Diagrama DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)](assets/DG-AO-27.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-27
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Auditoría y Trazabilidad del Sistema" as B
+control "Control de Auditoría y Cumplimiento" as C
+
+entity "Registro de Auditoría" as E_AUD
+entity "Pista de Auditoría (Audit Trail)" as E_TRAIL
+entity "Informe de Auditoría SCM" as E_INF
+
+ACT --> B : "solicita inspección de pistas de auditoría"
+B --> C : "ejecuta consulta de eventos inmutables"
+C --> E_TRAIL : "recupera bitácora cronológica"
+C --> E_AUD : "valida sellos de tiempo y actores"
+C --> E_INF : "emite reporte de cumplimiento normativo"
+E_TRAIL "1" *-- "1..*" E_AUD : "compuesta por"
+E_INF --> E_TRAIL : "consolida y analiza"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)**
+
+![Diagrama DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)](assets/DG-AO-28.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-28
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Generación de Reportes SCM" as B
+control "Control de Reportes de Configuración" as C
+
+entity "Reporte de Estado de Configuración" as E_REP
+entity "Proyecto" as E_PROY
+entity "Línea Base" as E_LB
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+
+ACT --> B : "selecciona parámetros e indicadores"
+B --> C : "solicita consolidación ejecutiva"
+C --> E_REP : "confecciona reporte formal"
+C --> E_PROY : "recupera métricas de proyecto"
+C --> E_LB : "incluye estado de líneas base"
+C --> E_RFC : "totaliza estados de RFC"
+C --> E_ECN : "analiza órdenes en ejecución"
+E_REP --> E_PROY : "evalúa avance de"
+E_REP o-- "0..*" E_LB : "consolida"
+E_REP o-- "0..*" E_RFC : "reporta estados de"
+E_REP o-- "0..*" E_ECN : "detalla ejecución de"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)**
+
+![Diagrama DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)](assets/DG-AO-29.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-29
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
+
+actor "Solicitante\n(Usuario Final)" as ACT
+
+boundary "Validación de Aceptación del Cambio (UAT)" as B
+control "Control de Aceptación por el Usuario" as C
+
+entity "Acta de Aceptación UAT" as E_UAT
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Criterio de Aceptación Funcional" as E_CRIT
+
+ACT --> B : "ejecuta pruebas de usuario y registra conformidad"
+B --> C : "solicita formalización de aceptación UAT"
+C --> E_UAT : "emite acta ('Aceptada' / 'Rechazada con Observaciones')"
+C --> E_RFC : "asocia dictamen de negocio a la solicitud"
+C --> E_ECS : "avala entrega funcional del ítem"
+C --> E_CRIT : "verifica cumplimiento de expectativas operativas"
+E_UAT --> E_RFC : "certifica aceptación de"
+E_UAT --> E_ECS : "aprueba versión entregada de"
+E_UAT "1" *-- "1..*" E_CRIT : "respaldada en"
+
+@enduml
+```
+
+---
+
+**Diagrama DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)**
+
+![Diagrama DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)](assets/DG-AO-30.png)
+
+#### Código PlantUML del Diagrama (Análisis BCE)
+
+```plantuml
+@startuml DG-AO-30
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT_ANALISTA
+actor "Arquitecto\n/ Especialista Técnico" as ACT_ARQUITECTO
+
+boundary "Autorización Delegada de Cambio Menor" as B
+control "Control de Autorización de Cambio Menor" as C
+
+entity "Dictamen de Cambio Menor" as E_DICT
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Informe Técnico de Impacto" as E_INF
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT_ANALISTA --> B : "emite visto bueno operativo delegado"
+ACT_ARQUITECTO --> B : "emite visto bueno técnico delegado"
+B --> C : "solicita autorización concurrente delegada"
+C --> E_DICT : "emite dictamen conjunto favorable"
+C --> E_RFC : "transiciona estado oficial a 'Autorizada'"
+C --> E_INF : "verifica no rebasamiento de límites delegados"
+C --> E_ECS : "habilita emisión delegada de ECN/ECO"
+E_DICT --> E_RFC : "autoriza formalmente"
+E_DICT --> E_INF : "amparado en"
+E_DICT --> E_ECS : "habilita intervención sobre"
+
+@enduml
+```
+
+
+---
+
+
 ## 6.3. Matrices de Trazabilidad SCM
 
 En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENTATION_RULES.md, a continuación se presentan las matrices de trazabilidad oficiales del proyecto TraceFlow SCM extraídas de la fuente oficial docs/TABLES.md, garantizando la relación bidireccional entre requerimientos, reglas de negocio, casos de uso y actores responsables:
@@ -5415,10 +6660,9 @@ Las siguientes inconsistencias y discrepancias fueron identificadas durante la e
 
 ### 1. Inconsistencia de Contexto en Perfiles de Usuario
 - **Elemento:** Párrafo explicativo posterior a la tabla de perfiles de usuario.
-- **Ubicación Aproximada:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Líneas 1070 a 1076, Págs. 30-31).
-- **Descripción:** El texto menciona literalmente: *"...donde el mentoreado resuelve dudas temáticas, el mentor gestiona y dicta las clases acumulando horas, y la administración supervisa la calidad del servicio tutorial y formaliza las certificaciones."* Estos términos corresponden a un sistema de tutorías universitarias y no guardan ninguna relación funcional con el proyecto TraceFlow SCM.
-- **Impacto:** Confusión conceptual severa en la documentación de perfiles de usuario y RBAC.
-- **Recomendación de Revisión:** Sustituir dicho párrafo por una justificación técnica alineada a la segregación de responsabilidades entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Págs. 30-31).
+- **Descripción:** El texto heredado hacía referencia a conceptos de tutorías universitarias ("mentoreado", "mentor", "servicio tutorial").
+- **Estado de Resolución:** Subsanado e integrado formalmente mediante la definición de la estricta segregación de funciones entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
 
 ### 2. Discrepancia en la Convención de Nomenclatura de Casos de Uso
 - **Elemento:** Identificadores de casos de uso.

@@ -117,6 +117,14 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-DSEQ-21](#dg-dseq-21--ejecutar-rollback-de-ecs) | Secuencia Diseño: Ejecutar Rollback de ECS (CU-21) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
 | [DG-DSEQ-29](#dg-dseq-29--validar-aceptación-del-cambio-por-el-usuario-uat) | Secuencia Diseño: Validar Aceptación UAT (CU-29) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
 | [DG-DSEQ-30](#dg-dseq-30--autorizar-cambio-menor-por-vía-delegada) | Secuencia Diseño: Autorizar Cambio Menor (CU-30) | Secuencia Técnica | BORRADOR (SAD Diseño) | 0.2 |
+| [DG-UWE-NAV-01](#dg-uwe-nav-01--modelo-general-de-navegación-uwe-traceflow-scm) | Modelo General de Navegación UWE (TraceFlow SCM) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-02](#dg-uwe-nav-02--navegación-uwe-perfil-solicitante-pu-01) | Navegación UWE: Perfil Solicitante (PU-01) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-03](#dg-uwe-nav-03--navegación-uwe-perfil-analista-de-requerimientos--gestor-pu-02) | Navegación UWE: Perfil Analista de Requerimientos / Gestor (PU-02) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-04](#dg-uwe-nav-04--navegación-uwe-perfil-arquitecto--especialista-técnico-pu-03) | Navegación UWE: Perfil Arquitecto / Especialista Técnico (PU-03) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-05](#dg-uwe-nav-05--navegación-uwe-perfil-comité-de-control-de-cambios-ccb-pu-04) | Navegación UWE: Perfil Comité de Control de Cambios (CCB) (PU-04) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-06](#dg-uwe-nav-06--navegación-uwe-perfil-administrador-de-configuración--bibliotecario-pu-05) | Navegación UWE: Perfil Administrador de Configuración / Bibliotecario (PU-05) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-07](#dg-uwe-nav-07--navegación-uwe-perfil-ingeniero-de-software--desarrollador-pu-06) | Navegación UWE: Perfil Ingeniero de Software / Desarrollador (PU-06) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-UWE-NAV-08](#dg-uwe-nav-08--navegación-uwe-perfil-equipo-de-calidad--testing-pu-07) | Navegación UWE: Perfil Equipo de Calidad / Testing (PU-07) | Navegación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 
 ---
 
@@ -5646,6 +5654,513 @@ alt Ambas Conformidades Aprobadas Existen
     Ctrl --> UI : 28. 200 OK (Autorización Compartida Completa)
     UI --> Gestor : 29. Muestra RFC como AUTORIZADA y habilita emisión de ECN (CU-08)
 end
+
+@enduml
+```
+---
+
+# DG-UWE-NAV-01 — Modelo General de Navegación UWE (TraceFlow SCM)
+
+**ID:** DG-UWE-NAV-01 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-01 a CU-30, CU-04.1, RF-01 a RF-18, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.3
+
+![DG-UWE-NAV-01](../assets/DG-UWE-NAV-01.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-01: Modelo General de Navegación de TraceFlow SCM (UWE)</b>
+
+' Estereotipos y estilos
+skinparam class {
+    BackgroundColor<<navigationClass>> #E8F4F8
+    BorderColor<<navigationClass>> #2B6CB0
+    BackgroundColor<<index>> #EBF8FF
+    BorderColor<<index>> #3182CE
+    BackgroundColor<<menu>> #EDF2F7
+    BorderColor<<menu>> #4A5568
+    BackgroundColor<<processNode>> #FFF5F5
+    BorderColor<<processNode>> #C53030
+}
+
+package "Acceso y Sesión" {
+    class "NAV-01: Inicio de Sesión" as NAV01 <<navigationClass>>
+    class "NAV-02: Dashboard General" as NAV02 <<menu>>
+    NAV01 -down-> NAV02 : Autenticación Exitosa\n(Cookie HttpOnly)
+}
+
+package "Subsistema Proyectos" {
+    class "NAV-03: Índice de Proyectos" as NAV03 <<index>>
+    class "NAV-04: Detalle de Proyecto" as NAV04 <<navigationClass>>
+    NAV03 -right-> NAV04 : Seleccionar Proyecto
+}
+
+package "Subsistema Solicitudes de Cambio (RFC)" {
+    class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+    class "NAV-06: Detalle de RFC" as NAV06 <<navigationClass>>
+    class "NAV-07: Registrar RFC" as NAV07 <<navigationClass>>
+    class "NAV-08: Subsanar RFC" as NAV08 <<navigationClass>>
+    class "NAV-09: Análisis de Impacto" as NAV09 <<navigationClass>>
+    class "NAV-10: Deliberación CCB" as NAV10 <<processNode>>
+    class "NAV-11: Autorización Menor" as NAV11 <<processNode>>
+    class "NAV-12: Orden de Cambio (ECN)" as NAV12 <<navigationClass>>
+
+    NAV05 -right-> NAV06 : Inspeccionar Expediente
+    NAV05 ..> NAV07 : Nueva Solicitud (Solicitante)
+    NAV06 ..> NAV08 : Subsanación (En Subsanación)
+    NAV06 ..> NAV09 : Registrar Impacto (En Análisis)
+    NAV06 ..> NAV10 : Deliberar (En Evaluación - Mayor)
+    NAV06 ..> NAV11 : Doble Firma (En Evaluación - Menor)
+    NAV06 -down-> NAV12 : Orden Emitida (CU-08)
+}
+
+package "Subsistema Configuración y Bibliotecas SCM" {
+    class "NAV-13: Catálogo ECS" as NAV13 <<index>>
+    class "NAV-14: Detalle ECS" as NAV14 <<navigationClass>>
+    class "NAV-15: Explorador Bibliotecas" as NAV15 <<navigationClass>>
+    class "NAV-16: Consola Check-Out" as NAV16 <<processNode>>
+    class "NAV-17: Consola Check-In" as NAV17 <<processNode>>
+    class "NAV-18: Historial y Diffs" as NAV18 <<index>>
+
+    NAV13 -right-> NAV14 : Seleccionar ECS
+    NAV14 -down-> NAV18 : Ver Versiones
+    NAV12 ..> NAV16 : Iniciar Check-Out (Bibliotecario)
+    NAV16 -down-> NAV15 : Entrega a Trabajo
+    NAV15 ..> NAV17 : Check-In (Técnico / Definitivo)
+}
+
+package "Subsistema Calidad y Aceptación" {
+    class "NAV-19: Validación QA" as NAV19 <<navigationClass>>
+    class "NAV-20: No Conformidades" as NAV20 <<processNode>>
+    class "NAV-21: Aceptación UAT" as NAV21 <<navigationClass>>
+
+    NAV12 ..> NAV19 : Pruebas de Integración (QA)
+    NAV19 ..> NAV20 : Defecto Detectado
+    NAV19 -right-> NAV21 : Certificación Conforme -> UAT
+}
+
+package "Subsistema Líneas Base y Reversión" {
+    class "NAV-22: Consola Líneas Base" as NAV22 <<navigationClass>>
+    class "NAV-23: Consola Rollback" as NAV23 <<processNode>>
+
+    NAV21 ..> NAV22 : Congelar Línea Base (RN-09)
+    NAV19 ..> NAV23 : Fallo Insubsanable (RN-08)
+}
+
+package "Subsistema Incidencias" {
+    class "NAV-24: Bandeja Incidencias" as NAV24 <<index>>
+    class "NAV-25: Detalle Incidencia" as NAV25 <<navigationClass>>
+
+    NAV24 -right-> NAV25 : Ver Ticket
+    NAV25 ..> NAV07 : Derivar a RFC (CU-25)
+}
+
+package "Subsistema Auditoría y Gobernanza" {
+    class "NAV-26: Visor Auditoría" as NAV26 <<index>>
+    class "NAV-27: Generador Reportes" as NAV27 <<navigationClass>>
+    class "NAV-28: Usuarios y Roles" as NAV28 <<navigationClass>>
+}
+
+' Enlaces entre Menú Principal y subsistemas
+NAV02 --> NAV03 : Proyectos
+NAV02 --> NAV05 : Solicitudes
+NAV02 --> NAV13 : Catálogo ECS
+NAV02 --> NAV24 : Incidencias
+NAV02 --> NAV26 : Auditoría
+NAV02 --> NAV27 : Reportes
+NAV02 --> NAV28 : Seguridad / IAM
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-02 — Navegación UWE: Perfil Solicitante (PU-01)
+
+**ID:** DG-UWE-NAV-02 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-03, CU-04, CU-04.1, CU-13, CU-23, CU-24, CU-29 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.1
+
+![DG-UWE-NAV-02](../assets/DG-UWE-NAV-02.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-02: Modelo de Navegación — Solicitante (PU-01)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Solicitante\n(Mis Tareas y Alertas)" as NAV02 <<navClass>>
+class "NAV-05: Mis Solicitudes (RFC)" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-07: Formulario Registro RFC\n(CU-04)" as NAV07 <<process>>
+class "NAV-08: Subsanar RFC\n(CU-04.1)" as NAV08 <<process>>
+class "NAV-21: Acta de Aceptación UAT\n(CU-29, RN-09)" as NAV21 <<process>>
+class "NAV-24: Mis Incidencias\n(CU-23)" as NAV24 <<index>>
+class "NAV-25: Detalle de Incidencia\n(CU-24)" as NAV25 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Ver mis solicitudes
+NAV02 -down-> NAV24 : Ver mis incidencias
+NAV02 -right-> NAV07 : [Botón Rápido] Nueva RFC
+
+NAV05 -right-> NAV06 : Inspeccionar solicitud
+NAV05 ..> NAV07 : Registrar RFC
+
+NAV06 ..> NAV08 : [Condición: Estado = EN_SUBSANACION]
+NAV06 ..> NAV21 : [Condición: Estado = EN_ACEPTACION]
+
+NAV24 -right-> NAV25 : Ver estado del ticket
+NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-03 — Navegación UWE: Perfil Analista de Requerimientos / Gestor (PU-02)
+
+**ID:** DG-UWE-NAV-03 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-02, CU-03, CU-05, CU-07, CU-08, CU-13, CU-22, CU-24, CU-25, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.2
+
+![DG-UWE-NAV-03](../assets/DG-UWE-NAV-03.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-03: Modelo de Navegación — Analista de Requerimientos / Gestor (PU-02)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Gestor" as NAV02 <<navClass>>
+
+class "NAV-03: Índice de Proyectos\n(CU-02)" as NAV03 <<index>>
+class "NAV-04: Detalle de Proyecto\n(CU-03)" as NAV04 <<navClass>>
+
+class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+class "NAV-06: Detalle y Clasificación RFC\n(CU-05, RN-05)" as NAV06 <<navClass>>
+class "NAV-11: Autorización Cambio Menor\n(Doble Llave - CU-30)" as NAV11 <<process>>
+class "NAV-12: Emisión Orden de Cambio\n(ECN/ECO - CU-08)" as NAV12 <<process>>
+
+class "NAV-24: Bandeja de Incidencias" as NAV24 <<index>>
+class "NAV-25: Detalle y Derivación a RFC\n(CU-25)" as NAV25 <<navClass>>
+
+class "NAV-27: Reportes de Configuración\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV03 : Administrar Proyectos
+NAV02 -down-> NAV05 : Gestionar RFCs
+NAV02 -down-> NAV24 : Gestionar Incidencias
+NAV02 -down-> NAV27 : Consultar Reportes
+
+NAV03 -right-> NAV04 : Seleccionar Proyecto
+NAV04 ..> NAV03 : [Acción Contextual: Crear Proyecto]
+
+NAV05 -right-> NAV06 : Inspeccionar y Clasificar RFC
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nVisto Bueno de Gestión
+NAV06 ..> NAV12 : [Condición: Autorizada]\nEmitir Orden ECN
+
+NAV24 -right-> NAV25 : Inspeccionar Ticket
+NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-04 — Navegación UWE: Perfil Arquitecto / Especialista Técnico (PU-03)
+
+**ID:** DG-UWE-NAV-04 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-03, CU-06, CU-07, CU-09, CU-13, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.3
+
+![DG-UWE-NAV-04](../assets/DG-UWE-NAV-04.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-04: Modelo de Navegación — Arquitecto / Especialista Técnico (PU-03)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Arquitectura" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS\n(CU-09)" as NAV13 <<index>>
+class "NAV-14: Detalle de ECS\n(Arquitectura y Relaciones)" as NAV14 <<navClass>>
+
+class "NAV-05: RFCs para Análisis" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-09: Análisis de Impacto Técnico\n(CU-06, RN-05)" as NAV09 <<process>>
+class "NAV-11: Autorización Cambio Menor\n(Conformidad Técnica - CU-30)" as NAV11 <<process>>
+
+class "NAV-18: Historial y Comparador Diffs\n(CU-13)" as NAV18 <<index>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo de Configuración
+NAV02 -down-> NAV05 : Bandeja de Análisis Técnico
+
+NAV13 -right-> NAV14 : Seleccionar ECS
+NAV13 ..> NAV13 : [Acción Contextual: Registrar nuevo ECS]
+NAV14 -down-> NAV18 : Inspeccionar Versiones
+
+NAV05 -right-> NAV06 : Seleccionar RFC
+NAV06 -down-> NAV09 : [Condición: Estado = EN_ANALISIS_TECNICO]\nElaborar Informe de Impacto
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-05 — Navegación UWE: Perfil Comité de Control de Cambios (CCB) (PU-04)
+
+**ID:** DG-UWE-NAV-05 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-03, CU-07, CU-13, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.4
+
+![DG-UWE-NAV-05](../assets/DG-UWE-NAV-05.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-05: Modelo de Navegación — Comité de Control de Cambios (CCB) (PU-04)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Consola CCB\n(Sesiones y Votaciones Activas)" as NAV02 <<navClass>>
+
+class "NAV-05: Bandeja Cambios Mayores" as NAV05 <<index>>
+class "NAV-06: Detalle Expediente RFC" as NAV06 <<navClass>>
+class "NAV-09: Visor Informe de Impacto" as NAV09 <<navClass>>
+class "NAV-10: Consola Votación CCB\n(CU-07, RN-01, RN-07)" as NAV10 <<process>>
+class "NAV-12: Formalización Orden ECN\n(CU-08)" as NAV12 <<process>>
+
+class "NAV-26: Visor Auditoría Append-Only\n(CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado SCM\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Deliberación de Cambios
+NAV02 -down-> NAV26 : Auditoría de Acciones
+NAV02 -down-> NAV27 : Reportes Ejecutivos
+
+NAV05 -right-> NAV06 : Seleccionar Cambio Mayor
+NAV06 -down-> NAV09 : Inspeccionar Evaluación Técnica
+NAV06 -right-> NAV10 : [Condición: Estado = EN_EVALUACION]\nVotación y Dictamen
+NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-06 — Navegación UWE: Perfil Administrador de Configuración / Bibliotecario (PU-05)
+
+**ID:** DG-UWE-NAV-06 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-01, CU-02, CU-03, CU-09, CU-13, CU-20, CU-21, CU-26, CU-27, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.5
+
+![DG-UWE-NAV-06](../assets/DG-UWE-NAV-06.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-06: Modelo de Navegación — Administrador de Configuración / Bibliotecario (PU-05)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Configuración (SCM)" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS" as NAV13 <<index>>
+class "NAV-14: Detalle ECS y Verificación SHA-256\n(CU-26)" as NAV14 <<navClass>>
+class "NAV-15: Explorador de Bibliotecas\n(Trabajo, Soporte, Maestra)" as NAV15 <<navClass>>
+
+class "NAV-16: Consola Check-Out\n(CU-10, CU-11, RN-06)" as NAV16 <<process>>
+class "NAV-17: Consola Check-In\n(CU-12, RNF-03, RN-09)" as NAV17 <<process>>
+class "NAV-18: Historial de Versiones\n(CU-13)" as NAV18 <<index>>
+
+class "NAV-22: Consola Líneas Base\n(CU-20, RN-02, RN-09)" as NAV22 <<process>>
+class "NAV-23: Consola de Rollback\n(CU-21, RN-08, RN-06)" as NAV23 <<process>>
+
+class "NAV-28: Gestión Usuarios y Roles\n(CU-01)" as NAV28 <<navClass>>
+class "NAV-26: Auditoría Inmutable (CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado (CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo y Bibliotecas
+NAV02 -down-> NAV16 : Operaciones Check-Out
+NAV02 -down-> NAV17 : Operaciones Check-In
+NAV02 -down-> NAV22 : Líneas Base
+NAV02 -down-> NAV28 : IAM y Roles
+NAV02 -down-> NAV26 : Pistas Forenses
+NAV02 -down-> NAV27 : Generar Reportes
+
+NAV13 -right-> NAV14 : Inspeccionar ECS
+NAV14 -down-> NAV18 : Ver Historial
+NAV14 ..> NAV14 : [Acción: Validar Checksum SHA-256]
+
+NAV16 -down-> NAV15 : Bloquea y Transfiere a Trabajo
+NAV17 -down-> NAV15 : Custodia Permanente y Desbloqueo
+NAV22 -down-> NAV15 : Congela en Maestra (mayor.menor.parche)
+NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-07 — Navegación UWE: Perfil Ingeniero de Software / Desarrollador (PU-06)
+
+**ID:** DG-UWE-NAV-07 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-03, CU-10, CU-11, CU-12, CU-13, CU-14, CU-15, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.6
+
+![DG-UWE-NAV-07](../assets/DG-UWE-NAV-07.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-07: Modelo de Navegación — Ingeniero de Software / Desarrollador (PU-06)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Desarrollador\n(Mis Órdenes en Ejecución)" as NAV02 <<navClass>>
+
+class "NAV-12: Mis Órdenes Asignadas (ECN)" as NAV12 <<index>>
+class "NAV-15: Mi Espacio de Trabajo\n(Biblioteca de Trabajo - CU-14)" as NAV15 <<navClass>>
+class "NAV-18: Historial de Versiones ECS\n(CU-13)" as NAV18 <<index>>
+class "NAV-20: Bandeja de No Conformidades QA\n(CU-18, CU-19)" as NAV20 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : Ver Órdenes ECN
+NAV02 -down-> NAV20 : Defectos Asignados
+
+NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Código Fuente
+NAV15 -down-> NAV18 : Comparar con versión estable
+NAV15 ..> NAV15 : [Acción Contextual: Registrar Pruebas Unitarias CU-15]
+NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
+
+@enduml
+```
+
+---
+
+# DG-UWE-NAV-08 — Navegación UWE: Perfil Equipo de Calidad / Testing (PU-07)
+
+**ID:** DG-UWE-NAV-08 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**Trazabilidad:** CU-03, CU-13, CU-16, CU-17, CU-18, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.7
+
+![DG-UWE-NAV-08](../assets/DG-UWE-NAV-08.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-08: Modelo de Navegación — Equipo de Calidad / Testing (PU-07)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de QA\n(Órdenes Pendientes de Certificación)" as NAV02 <<navClass>>
+
+class "NAV-12: Órdenes en Pruebas (ECN)" as NAV12 <<index>>
+class "NAV-19: Consola de Validación QA\n(Pruebas de Integración - CU-16)" as NAV19 <<navClass>>
+class "NAV-20: Formulario de No Conformidad\n(CU-18)" as NAV20 <<process>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : Órdenes para Testing (Estado = EN_PRUEBAS)
+NAV12 -right-> NAV19 : Ejecutar Validación Técnica
+
+NAV19 ..> NAV20 : [Prueba Fallida]\nReportar No Conformidad (CU-18)
+NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Pasa a EN_ACEPTACION)
+NAV20 ..> NAV19 : Reevaluar y re-testear (CU-19)
 
 @enduml
 ```

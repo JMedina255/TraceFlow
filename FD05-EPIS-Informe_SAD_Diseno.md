@@ -330,7 +330,7 @@ BackupService -right-> RemoteBackups : Transferencia Segura\\nPaquete Maestro (.
 | **Backend Core** | NestJS sobre Node.js 24 LTS | Orquestación transaccional de los 31 Casos de Uso, validación de reglas de negocio (RN-01 a RN-09), cómputo criptográfico SHA-256. | Protocolo HTTP/JSON; pooling relacional hacia PostgreSQL. |
 | **Base de Datos** | PostgreSQL 16/17 | Almacenamiento transaccional de metadatos, control de versiones, sesiones opacas, bloqueos de concurrencia y auditoría inmutable. | Driver relacional nativo (`pg`/TypeORM/Prisma); volumen persistente montado. |
 | **Custodia de ECS** | Sistema de archivos local montado | Almacenamiento seguro e inmutable de los archivos binarios y textuales de los ECS, segregados por bibliotecas SCM. | Acceso por streams de I/O mediante `LocalStorageAdapter`. |
-| **Backup Worker** | Contenedor Alpine Linux con scripts cron | Generación periódica automatizada del respaldo atómico (`DB + Storage + Manifest`) y verificación de checksums cruzados. | Acceso de solo lectura a la BD y al volumen de almacenamiento. |
+| **Backup Worker** | Contenedor Alpine Linux con scripts cron | Generación periódica automatizada del respaldo coordinado y verificable (`DB + Storage + Manifest`) y verificación de checksums cruzados. | Acceso de solo lectura a la BD y al volumen de almacenamiento. |
 
 ---
 
@@ -2013,7 +2013,7 @@ En cumplimiento obligatorio de la corrección arquitectónica de ADR-010, el sis
 
 $$\mathbf{Backup\ TraceFlow} = \mathbf{Snapshot\ DB} + \mathbf{Snapshot\ Storage} + \mathbf{Manifest}$$
 
-El respaldo consolida de forma atómica:
+El respaldo consolida de forma coordinada y verificable:
 1. **Snapshot de Base de Datos**: Volcado transaccional consistente de PostgreSQL generado mediante:
    `pg_dump --format=custom --clean --if-exists tf_db > db_{timestamp}.dump`
 2. **Snapshot de Almacenamiento Físico de ECS**: Empaquetado comprimido de las bibliotecas de artefactos (`/storage/trabajo`, `/storage/soporte`, `/storage/maestra`):
@@ -2059,7 +2059,7 @@ Para satisfacer la mantenibilidad (RNF-08) y asegurar que las operaciones críti
    - `GET /health/readiness`: Verifica la conectividad activa hacia el pool de PostgreSQL y el acceso de lectura/escritura al volumen `/storage/`.
 3. **Métricas Clave de Rendimiento (RNF-06)**:
    - Interceptor global de tiempo de respuesta que mide la latencia de cada solicitud HTTP.
-   - Si una consulta de historial (`CU-13`), verificación de integridad (`CU-26`) o generación de reporte (`CU-28`) supera los **3 segundos** establecidos por `RNF-06`, se emite automáticamente una alerta de degradación de rendimiento.
+   - Las operaciones de consulta de historial de versiones (`CU-13`) y comparación de versiones están sujetas al umbral estricto de **$\le 3$ segundos** según la baseline de `RNF-06`. La verificación criptográfica (`CU-26`) y la generación de reportes (`CU-28`) se gestionan bajo objetivos internos de observabilidad para asegurar una experiencia fluida, sin constituir una obligación formal del SLA de `RNF-06`.
 
 ## 15.2 Alertas Operativas y de Integridad
 El backend emite alertas automáticas enviadas a los administradores correspondientes ante:
@@ -2078,13 +2078,13 @@ La siguiente matriz demuestra la alineación ininterrumpida entre el SRS de Aná
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- |
 | **`AuthModule` / Sessions / SoD** | ADR-003, ADR-006 | MOD-01 | RF-01, RF-17 | RNF-01 (Seguridad) | RN-01, RN-04, SoD SAD | CU-01 |
 | **`ProjectModule`** | ADR-001, ADR-003 | MOD-02 | RF-02 | RNF-05 (Escalabilidad) | RN-01 | CU-02, CU-03 |
-| **`ConfigItemModule`** | ADR-003, ADR-004 | MOD-03 | RF-03, RF-16, RF-17 | RNF-03 (Integridad), RNF-06 | RNF-03 / RF-17 (SHA-256) | CU-09, CU-26 |
+| **`ConfigItemModule`** | ADR-003, ADR-004 | MOD-03 | RF-03, RF-16, RF-17 | RNF-03 (Integridad), Observabilidad | RNF-03 / RF-17 (SHA-256) | CU-09, CU-26 |
 | **`ChangeRequestModule`** | ADR-001, ADR-009 | MOD-04 | RF-04, RF-05, RF-06, RF-07, RF-14 | RNF-04 (Usabilidad) | RN-01, RN-05, RN-07 | CU-04, CU-04.1, CU-05, CU-06, CU-07, CU-08, CU-22, CU-30 |
-| **`VersionControlModule` / SyncLock** | ADR-004, ADR-005, ADR-007 | MOD-05 | RF-08, RF-09 | RNF-01, RNF-06 | RN-02, RN-03, RN-04, RN-06 | CU-10, CU-11, CU-12, CU-13, CU-14 |
-| **`QualityModule`** | ADR-003, ADR-006 | MOD-06 | RF-10, RF-11 | RNF-01 | RN-01, RN-05 (SoD QA), RN-09 | CU-15, CU-16, CU-17, CU-18, CU-19, CU-29 |
-| **`BaselineModule`** | ADR-004, ADR-005 | MOD-07 | RF-12, RF-13 | RNF-01, RNF-06 | RN-02, RN-04, RN-08, RN-09 | CU-20, CU-21 |
+| **`VersionControlModule` / SyncLock** | ADR-004, ADR-005, ADR-007 | MOD-05 | RF-08, RF-09 | RNF-01, RNF-06 (Historial $\le 3$s) | RN-02, RN-03, RN-04, RN-06 | CU-10, CU-11, CU-12, CU-13, CU-14 |
+| **`QualityModule`** | ADR-003, ADR-006 | MOD-06 | RF-10, RF-11 | RNF-01 | RN-01, SoD Dinámico (SAD Secc. 3.4/6.3, ADR-006), RN-09 | CU-15, CU-16, CU-17, CU-18, CU-19, CU-29 |
+| **`BaselineModule`** | ADR-004, ADR-005 | MOD-07 | RF-12, RF-13 | RNF-01, RNF-06 (Comparación $\le 3$s) | RN-02, RN-04, RN-08, RN-09 | CU-20, CU-21 |
 | **`IncidentModule`** | ADR-001, ADR-009 | MOD-08 | RF-15 | RNF-04 | RN-03 | CU-23, CU-24, CU-25 |
-| **`AuditModule` / Append-Only** | ADR-004, ADR-008 | MOD-09 | RF-16, RF-17, RF-18 | RNF-01, RNF-03, RNF-06 | RN-02, RN-03 | CU-27, CU-28 |
+| **`AuditModule` / Append-Only** | ADR-004, ADR-008 | MOD-09 | RF-16, RF-17, RF-18 | RNF-01, RNF-03, Observabilidad | RN-02, RN-03 | CU-27, CU-28 |
 | **`StoragePort` / LocalStorage** | ADR-005 | Transversal (MOD-03,05,07) | RF-08, RF-09, RF-17 | RNF-03, RNF-07 (Compatibilidad) | RNF-03/RF-17 (Integridad), RN-04, RN-08 (Rollback en Trabajo) | CU-10, CU-12, CU-20, CU-21, CU-26 |
 | **Docker Compose + Backup Worker**| ADR-010 | Infraestructura | Transversal | RNF-02 (Disponibilidad), RNF-08, RNF-09 | Transversal | Transversal |
 
@@ -2134,3 +2134,667 @@ Se formaliza la auditoría de control de calidad sobre el presente documento té
 > El presente documento se declara formalmente como **FD05 — SAD DE DISEÑO v0.2 (BORRADOR CONTROLADO)**.  
 > Se certifica la ausencia de observaciones críticas o mayores de coherencia con las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los ADRs aprobados (ADR-001 a ADR-010).  
 > **No se congela todavía como Baseline de Diseño v1.0**, manteniéndose como borrador controlado para sustentar el desarrollo del Modelo UWE de Navegación y Presentación.
+
+---
+
+# 19. Modelo UWE de Navegación
+
+## 19.1 Principios del Modelo de Navegación UWE
+El **Modelo de Navegación de TraceFlow SCM** se fundamenta en la metodología **UWE (UML-based Web Engineering)**, formalizando cómo los 7 actores canónicos autenticados exploran, consultan y operan el sistema a través de la Single Page Application (SPA).
+
+### Reglas Metodológicas Fundamentales:
+1. **Distinción Conceptual Estricta**:
+   $$\mathbf{Caso\ de\ Uso\ (An\acute{a}lisis)} \neq \mathbf{Pantalla\ (Presentaci\acute{o}n)} \neq \mathbf{Nodo\ Navegacional\ (UWE)}$$
+   - Un **Caso de Uso** modela un objetivo de negocio (e.g. `CU-10 Check-Out`).
+   - Un **Nodo Navegacional** representa una unidad autónoma de información y decisión en el espacio navegable web (e.g. `NAV-16 Consola de Check-Out`).
+   - Una **Pantalla** o vista concreta materializa la disposición física de componentes UI (formularios, modales, tablas).
+   - *Corolario*: Un caso de uso complejo puede requerir múltiples nodos navegacionales secuenciales (e.g. tramitación de RFC), y múltiples operaciones conexas pueden resolverse como **acciones contextuales** dentro de un mismo nodo navegacional (e.g. `CU-11 Aplicar Bloqueo` ejecutado atómicamente dentro de `NAV-16`).
+2. **Abstracción Tecnológica**:
+   El modelo de navegación especifica **nodos, enlaces, índices, menús y recorridos por rol**, abstrayéndose de controladores NestJS, servicios de aplicación, endpoints HTTP internos, tablas de persistencia relacional o componentes React específicos.
+3. **Estereotipos y Notación UWE Estandarizada**:
+   - `<<navigationClass>>`: Nodo navegacional principal que agrupa información estructurada de una entidad o vista del sistema.
+   - `<<index>>`: Índice navegacional o lista paginada/filtrable de una colección de elementos.
+   - `<<query>>`: Entrada de consulta o formulario de filtrado dinámico que condiciona los resultados de un índice.
+   - `<<menu>>`: Estructura de navegación que provee alternativas de acceso a distintos nodos o módulos.
+   - `<<guidedTour>>`: Recorrido secuencial guiado para transacciones en múltiples pasos (e.g. registro de RFC o deliberación de CCB).
+   - `<<processNode>>` / Acción Contextual: Disparador de un proceso de negocio que ejecuta una transición de estado o mutación.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       LEYENDA DE NOTACIÓN UWE                               │
+├──────────────────────────┬──────────────────────────────────────────────────┤
+│ Símbolo / Estereotipo    │ Significado en TraceFlow SCM                     │
+├──────────────────────────┼──────────────────────────────────────────────────┤
+│ <<navigationClass>>      │ Nodo navegacional de contenido / detalle         │
+│ <<index>>                │ Lista navegable de elementos (Bandeja / Catálogo)│
+│ <<query>>                │ Filtro de búsqueda o consulta de colección       │
+│ <<menu>>                 │ Menú lateral o barra superior de navegación      │
+│ <<guidedTour>>           │ Asistente / Wizard multi-etapa guiado            │
+│ <<processNode>>          │ Acción de mutación / cambio de estado SCM        │
+│ ──> (Enlace Unidireccional)│ Navegación directa entre nodos                  │
+│ ..> (Acción Contextual)  │ Modal o acción embebida que no cambia de página  │
+└──────────────────────────┴──────────────────────────────────────────────────┘
+```
+
+---
+
+## 19.2 Catálogo de Nodos Navegacionales y Tipología de Vistas
+
+Se formalizan **28 Nodos Navegacionales Canónicos (`NAV-01` a `NAV-28`)** derivados directamente de los 31 Casos de Uso y los 9 Módulos Arquitectónicos del sistema:
+
+| NAV-ID | Nombre del Nodo | Actor(es) Canónico(s) Autorizado(s) | CU Gobernados | Módulo | Tipo de Vista Preliminar | Propósito en el Espacio Navegable |
+| :---: | :--- | :--- | :---: | :---: | :--- | :--- |
+| **NAV-01** | Inicio de Sesión | Todos (Público / Entrada) | Autenticación | MOD-01 | Formulario Centrado | Autenticación de credenciales, selección de rol y emisión de cookie de sesión `HttpOnly`. |
+| **NAV-02** | Dashboard General | Todos (Personalizado por Rol) | Múltiples | MOD-01..09 | Dashboard / Resumen | Panel principal con métricas, alertas activas y bandeja de tareas pendientes según el rol autenticado. |
+| **NAV-03** | Índice de Proyectos | Gestor, CCB, Bibliotecario | CU-02 | MOD-02 | Lista / Tabla Filtrable | Directorio general de proyectos de software bajo custodia SCM. Permite búsqueda y creación. |
+| **NAV-04** | Detalle de Proyecto | Gestor, CCB, Bibliotecario, Arquitecto | CU-02, CU-03 | MOD-02 | Detalle con Pestañas | Ficha integral del proyecto: datos generales, catálogo de ECS asociados, líneas base y miembros. |
+| **NAV-05** | Bandeja de Solicitudes (RFC) | Todos (Vistas filtradas por SoD) | CU-04..08, CU-30 | MOD-04 | Lista / Tablero Kanban | Explorador de RFCs categorizadas por los 14 estados canónicos de TB-07. |
+| **NAV-06** | Detalle de RFC | Todos (Controles por rol/estado) | CU-04..08, CU-30 | MOD-04 | Detalle con Pestañas | Expediente completo de la RFC: justificación, ECS afectado, historial de estados y acciones contextuales. |
+| **NAV-07** | Formulario de Registro de RFC | Solicitante | CU-04 | MOD-04 | Formulario Estructurado | Creación formal de una nueva solicitud de cambio con asignación automática del estado `REGISTRADA`. |
+| **NAV-08** | Subsanación de RFC | Solicitante | CU-04.1 | MOD-04 | Formulario de Corrección | Edición correctiva de campos observados por el Gestor cuando la RFC se encuentra `EN_SUBSANACION`. |
+| **NAV-09** | Análisis de Impacto Técnico | Arquitecto / Especialista Técnico | CU-06 | MOD-04 | Formulario Analítico | Registro de la evaluación técnica de arquitectura, dependencias y Triple Restricción (Alcance, Tiempo, Costo). |
+| **NAV-10** | Consola de Deliberación CCB | Comité de Control de Cambios (CCB) | CU-07 | MOD-04 | Panel Colegiado | Consola de votación y emisión de resolución formal para Cambios Mayores (`AUTORIZADA` / `RECHAZADA`). |
+| **NAV-11** | Autorización de Cambio Menor | Gestor Y Arquitecto (Doble Llave) | CU-30 | MOD-04 | Panel de Doble Firma | Consola de conformidad delegada para Cambios Menores; exige visto bueno de ambos roles (`AUTORIZADA`). |
+| **NAV-12** | Orden de Cambio (ECN/ECO) | CCB, Gestor, Bibliotecario, Dev, QA | CU-08, CU-22 | MOD-04 | Detalle / Ficha Oficial | Ficha de la Orden de Cambio emitida: desarrollador asignado, ECS autorizado, cronograma y estado. |
+| **NAV-13** | Catálogo de ECS | Arquitecto, Bibliotecario, Gestor | CU-09 | MOD-03 | Lista Jerárquica / Árbol | Inventario de Elementos de Configuración por proyecto, tipo de artefacto y biblioteca de residencia. |
+| **NAV-14** | Detalle de ECS | Arquitecto, Bibliotecario, Dev, QA | CU-09, CU-26 | MOD-03 | Detalle Técnico | Ficha técnica del ECS: metadata, biblioteca actual, estado de bloqueo (`sync_lock`) y verificación SHA-256. |
+| **NAV-15** | Explorador de Bibliotecas | Bibliotecario, Desarrollador | CU-08, CU-14 | MOD-03, 05 | Explorador de Archivos | Vista de las 3 bibliotecas (`Trabajo`, `Soporte`, `Maestra`). Acceso acotado según perfil y orden. |
+| **NAV-16** | Consola de Check-Out | Administrador / Bibliotecario | CU-10, CU-11 | MOD-05 | Formulario / Asignador | Transferencia de ECS de Soporte a Trabajo con adquisición del bloqueo persistente exclusivo (`RN-06`). |
+| **NAV-17** | Consola de Check-In | Administrador / Bibliotecario | CU-12 | MOD-05 | Formulario Multipart | Carga de artefacto modificado, verificación de hash SHA-256 (`RNF-03`) y promoción a Soporte o Maestra. |
+| **NAV-18** | Historial de Versiones y Diffs | Bibliotecario, Gestor, Dev, Arquitecto | CU-13 | MOD-05 | Línea de Tiempo / Diff | Visor cronológico inmutable de versiones de un ECS con comparador visual de cambios y metadata de orden. |
+| **NAV-19** | Consola de Validación QA | Equipo de Calidad / Testing | CU-16, CU-17, CU-19 | MOD-06 | Tablero de Ejecución | Registro de pruebas de integración y emisión de la Certificación de Conformidad técnica (con SoD). |
+| **NAV-20** | Registro de No Conformidades | Equipo de Calidad / Testing | CU-18 | MOD-06 | Formulario de Incidencias | Notificación formal de defectos detectados durante las pruebas, retornando el flujo a re-testeo. |
+| **NAV-21** | Consola de Aceptación UAT | Solicitante (Usuario Final) | CU-29 | MOD-06 | Acta Formal de Usuario | Evaluación final en entorno controlado y suscripción del Acta de Aceptación del Usuario (`RN-09`). |
+| **NAV-22** | Consola de Líneas Base | Administrador / Bibliotecario | CU-20 | MOD-07 | Catálogo / Congelador | Agrupación y congelamiento formal de versiones de ECS en Biblioteca Maestra con nomenclatura `RN-02`. |
+| **NAV-23** | Consola de Rollback | Administrador / Bibliotecario | CU-21 | MOD-07 | Modal de Reversión | Reversión de emergencia ante fallo insubsanable: purga la Biblioteca de Trabajo y libera el bloqueo (`RN-08`). |
+| **NAV-24** | Bandeja de Incidencias | Solicitante, Gestor | CU-23, CU-24 | MOD-08 | Lista de Tickets | Directorio de incidencias operativas reportadas por usuarios con filtro de estado de atención. |
+| **NAV-25** | Detalle de Incidencia | Solicitante, Gestor | CU-24, CU-25 | MOD-08 | Detalle / Derivador | Ficha del ticket de incidencia con acción resolutiva para derivarlo formalmente a Solicitud de Cambio (RFC). |
+| **NAV-26** | Visor de Auditoría Forense | CCB, Administrador / Bibliotecario | CU-27 | MOD-09 | Tabla Inmutable Append-Only| Explorador cronológico de pistas de auditoría inmutables con verificación de cadena hash SHA-256. |
+| **NAV-27** | Generador de Reportes SCM | Bibliotecario, CCB, Gestor | CU-28 | MOD-09 | Reporte / Exportador | Panel de emisión de informes consolidados de configuración, matrices de trazabilidad y actas formales. |
+| **NAV-28** | Administración de Usuarios y Roles| Administrador / Bibliotecario | CU-01 | MOD-01 | Lista y Formulario RBAC | Gestión administrativa de identidades, credenciales, asignación de roles canónicos y auditoría de accesos. |
+
+---
+
+## 19.3 Modelo General de Navegación (DG-UWE-NAV-01)
+
+El siguiente diagrama modela el **mapa global de navegación** de TraceFlow SCM, estructurado en **8 subsistemas navegacionales**. Muestra cómo se conectan los accesos perimetrales, los menús de contexto y las transiciones intermodulares sin saturar la vista con detalles internos:
+
+![DG-UWE-NAV-01](../assets/DG-UWE-NAV-01.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-01: Modelo General de Navegación de TraceFlow SCM (UWE)</b>
+
+' Estereotipos y estilos
+skinparam class {
+    BackgroundColor<<navigationClass>> #E8F4F8
+    BorderColor<<navigationClass>> #2B6CB0
+    BackgroundColor<<index>> #EBF8FF
+    BorderColor<<index>> #3182CE
+    BackgroundColor<<menu>> #EDF2F7
+    BorderColor<<menu>> #4A5568
+    BackgroundColor<<processNode>> #FFF5F5
+    BorderColor<<processNode>> #C53030
+}
+
+package "Acceso y Sesión" {
+    class "NAV-01: Inicio de Sesión" as NAV01 <<navigationClass>>
+    class "NAV-02: Dashboard General" as NAV02 <<menu>>
+    NAV01 -down-> NAV02 : Autenticación Exitosa\n(Cookie HttpOnly)
+}
+
+package "Subsistema Proyectos" {
+    class "NAV-03: Índice de Proyectos" as NAV03 <<index>>
+    class "NAV-04: Detalle de Proyecto" as NAV04 <<navigationClass>>
+    NAV03 -right-> NAV04 : Seleccionar Proyecto
+}
+
+package "Subsistema Solicitudes de Cambio (RFC)" {
+    class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+    class "NAV-06: Detalle de RFC" as NAV06 <<navigationClass>>
+    class "NAV-07: Registrar RFC" as NAV07 <<navigationClass>>
+    class "NAV-08: Subsanar RFC" as NAV08 <<navigationClass>>
+    class "NAV-09: Análisis de Impacto" as NAV09 <<navigationClass>>
+    class "NAV-10: Deliberación CCB" as NAV10 <<processNode>>
+    class "NAV-11: Autorización Menor" as NAV11 <<processNode>>
+    class "NAV-12: Orden de Cambio (ECN)" as NAV12 <<navigationClass>>
+
+    NAV05 -right-> NAV06 : Inspeccionar Expediente
+    NAV05 ..> NAV07 : Nueva Solicitud (Solicitante)
+    NAV06 ..> NAV08 : Subsanación (En Subsanación)
+    NAV06 ..> NAV09 : Registrar Impacto (En Análisis)
+    NAV06 ..> NAV10 : Deliberar (En Evaluación - Mayor)
+    NAV06 ..> NAV11 : Doble Firma (En Evaluación - Menor)
+    NAV06 -down-> NAV12 : Orden Emitida (CU-08)
+}
+
+package "Subsistema Configuración y Bibliotecas SCM" {
+    class "NAV-13: Catálogo ECS" as NAV13 <<index>>
+    class "NAV-14: Detalle ECS" as NAV14 <<navigationClass>>
+    class "NAV-15: Explorador Bibliotecas" as NAV15 <<navigationClass>>
+    class "NAV-16: Consola Check-Out" as NAV16 <<processNode>>
+    class "NAV-17: Consola Check-In" as NAV17 <<processNode>>
+    class "NAV-18: Historial y Diffs" as NAV18 <<index>>
+
+    NAV13 -right-> NAV14 : Seleccionar ECS
+    NAV14 -down-> NAV18 : Ver Versiones
+    NAV12 ..> NAV16 : Iniciar Check-Out (Bibliotecario)
+    NAV16 -down-> NAV15 : Entrega a Trabajo
+    NAV15 ..> NAV17 : Check-In (Técnico / Definitivo)
+}
+
+package "Subsistema Calidad y Aceptación" {
+    class "NAV-19: Validación QA" as NAV19 <<navigationClass>>
+    class "NAV-20: No Conformidades" as NAV20 <<processNode>>
+    class "NAV-21: Aceptación UAT" as NAV21 <<navigationClass>>
+
+    NAV12 ..> NAV19 : Pruebas de Integración (QA)
+    NAV19 ..> NAV20 : Defecto Detectado
+    NAV19 -right-> NAV21 : Certificación Conforme -> UAT
+}
+
+package "Subsistema Líneas Base y Reversión" {
+    class "NAV-22: Consola Líneas Base" as NAV22 <<navigationClass>>
+    class "NAV-23: Consola Rollback" as NAV23 <<processNode>>
+
+    NAV21 ..> NAV22 : Congelar Línea Base (RN-09)
+    NAV19 ..> NAV23 : Fallo Insubsanable (RN-08)
+}
+
+package "Subsistema Incidencias" {
+    class "NAV-24: Bandeja Incidencias" as NAV24 <<index>>
+    class "NAV-25: Detalle Incidencia" as NAV25 <<navigationClass>>
+
+    NAV24 -right-> NAV25 : Ver Ticket
+    NAV25 ..> NAV07 : Derivar a RFC (CU-25)
+}
+
+package "Subsistema Auditoría y Gobernanza" {
+    class "NAV-26: Visor Auditoría" as NAV26 <<index>>
+    class "NAV-27: Generador Reportes" as NAV27 <<navigationClass>>
+    class "NAV-28: Usuarios y Roles" as NAV28 <<navigationClass>>
+}
+
+' Enlaces entre Menú Principal y subsistemas
+NAV02 --> NAV03 : Proyectos
+NAV02 --> NAV05 : Solicitudes
+NAV02 --> NAV13 : Catálogo ECS
+NAV02 --> NAV24 : Incidencias
+NAV02 --> NAV26 : Auditoría
+NAV02 --> NAV27 : Reportes
+NAV02 --> NAV28 : Seguridad / IAM
+
+@enduml
+```
+
+---
+
+## 19.4 Modelos de Navegación por Actor Canónico
+
+A continuación se formalizan los **7 modelos de navegación específicos**, modelando con rigor las rutas y permisos que cada rol canónico tiene habilitados en la Single Page Application:
+
+---
+
+### DG-UWE-NAV-02: Modelo de Navegación del Solicitante (PU-01)
+
+El Solicitante posee un espacio de interacción centrado en originar cambios, subsanar observaciones, verificar tickets de soporte y suscribir la aceptación final (UAT):
+
+![DG-UWE-NAV-02](../assets/DG-UWE-NAV-02.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-02: Modelo de Navegación — Solicitante (PU-01)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Solicitante\n(Mis Tareas y Alertas)" as NAV02 <<navClass>>
+class "NAV-05: Mis Solicitudes (RFC)" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-07: Formulario Registro RFC\n(CU-04)" as NAV07 <<process>>
+class "NAV-08: Subsanar RFC\n(CU-04.1)" as NAV08 <<process>>
+class "NAV-21: Acta de Aceptación UAT\n(CU-29, RN-09)" as NAV21 <<process>>
+class "NAV-24: Mis Incidencias\n(CU-23)" as NAV24 <<index>>
+class "NAV-25: Detalle de Incidencia\n(CU-24)" as NAV25 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Ver mis solicitudes
+NAV02 -down-> NAV24 : Ver mis incidencias
+NAV02 -right-> NAV07 : [Botón Rápido] Nueva RFC
+
+NAV05 -right-> NAV06 : Inspeccionar solicitud
+NAV05 ..> NAV07 : Registrar RFC
+
+NAV06 ..> NAV08 : [Condición: Estado = EN_SUBSANACION]
+NAV06 ..> NAV21 : [Condición: Estado = EN_ACEPTACION]
+
+NAV24 -right-> NAV25 : Ver estado del ticket
+NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-03: Modelo de Navegación del Analista de Requerimientos / Gestor (PU-02)
+
+El Analista de Requerimientos / Gestor administra proyectos, clasifica solicitudes, ejerce autorización compartida para Cambios Menores, emite Órdenes de Cambio y deriva incidencias:
+
+![DG-UWE-NAV-03](../assets/DG-UWE-NAV-03.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-03: Modelo de Navegación — Analista de Requerimientos / Gestor (PU-02)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Gestor" as NAV02 <<navClass>>
+
+class "NAV-03: Índice de Proyectos\n(CU-02)" as NAV03 <<index>>
+class "NAV-04: Detalle de Proyecto\n(CU-03)" as NAV04 <<navClass>>
+
+class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+class "NAV-06: Detalle y Clasificación RFC\n(CU-05, RN-05)" as NAV06 <<navClass>>
+class "NAV-11: Autorización Cambio Menor\n(Doble Llave - CU-30)" as NAV11 <<process>>
+class "NAV-12: Emisión Orden de Cambio\n(ECN/ECO - CU-08)" as NAV12 <<process>>
+
+class "NAV-24: Bandeja de Incidencias" as NAV24 <<index>>
+class "NAV-25: Detalle y Derivación a RFC\n(CU-25)" as NAV25 <<navClass>>
+
+class "NAV-27: Reportes de Configuración\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV03 : Administrar Proyectos
+NAV02 -down-> NAV05 : Gestionar RFCs
+NAV02 -down-> NAV24 : Gestionar Incidencias
+NAV02 -down-> NAV27 : Consultar Reportes
+
+NAV03 -right-> NAV04 : Seleccionar Proyecto
+NAV04 ..> NAV03 : [Acción Contextual: Crear Proyecto]
+
+NAV05 -right-> NAV06 : Inspeccionar y Clasificar RFC
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nVisto Bueno de Gestión
+NAV06 ..> NAV12 : [Condición: Autorizada]\nEmitir Orden ECN
+
+NAV24 -right-> NAV25 : Inspeccionar Ticket
+NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-04: Modelo de Navegación del Arquitecto / Especialista Técnico (PU-03)
+
+El Arquitecto / Especialista Técnico cataloga nuevos ECS, elabora el Informe Técnico de Impacto y ejerce la conformidad técnica en la autorización delegada de Cambios Menores:
+
+![DG-UWE-NAV-04](../assets/DG-UWE-NAV-04.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-04: Modelo de Navegación — Arquitecto / Especialista Técnico (PU-03)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Arquitectura" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS\n(CU-09)" as NAV13 <<index>>
+class "NAV-14: Detalle de ECS\n(Arquitectura y Relaciones)" as NAV14 <<navClass>>
+
+class "NAV-05: RFCs para Análisis" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-09: Análisis de Impacto Técnico\n(CU-06, RN-05)" as NAV09 <<process>>
+class "NAV-11: Autorización Cambio Menor\n(Conformidad Técnica - CU-30)" as NAV11 <<process>>
+
+class "NAV-18: Historial y Comparador Diffs\n(CU-13)" as NAV18 <<index>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo de Configuración
+NAV02 -down-> NAV05 : Bandeja de Análisis Técnico
+
+NAV13 -right-> NAV14 : Seleccionar ECS
+NAV13 ..> NAV13 : [Acción Contextual: Registrar nuevo ECS]
+NAV14 -down-> NAV18 : Inspeccionar Versiones
+
+NAV05 -right-> NAV06 : Seleccionar RFC
+NAV06 -down-> NAV09 : [Condición: Estado = EN_ANALISIS_TECNICO]\nElaborar Informe de Impacto
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-05: Modelo de Navegación del Comité de Control de Cambios (CCB) (PU-04)
+
+El CCB delibera y vota colegiadamente sobre Cambios Mayores, emite Órdenes de Cambio, audita pistas forenses e inspecciona reportes consolidados:
+
+![DG-UWE-NAV-05](../assets/DG-UWE-NAV-05.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-05: Modelo de Navegación — Comité de Control de Cambios (CCB) (PU-04)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Consola CCB\n(Sesiones y Votaciones Activas)" as NAV02 <<navClass>>
+
+class "NAV-05: Bandeja Cambios Mayores" as NAV05 <<index>>
+class "NAV-06: Detalle Expediente RFC" as NAV06 <<navClass>>
+class "NAV-09: Visor Informe de Impacto" as NAV09 <<navClass>>
+class "NAV-10: Consola Votación CCB\n(CU-07, RN-01, RN-07)" as NAV10 <<process>>
+class "NAV-12: Formalización Orden ECN\n(CU-08)" as NAV12 <<process>>
+
+class "NAV-26: Visor Auditoría Append-Only\n(CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado SCM\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Deliberación de Cambios
+NAV02 -down-> NAV26 : Auditoría de Acciones
+NAV02 -down-> NAV27 : Reportes Ejecutivos
+
+NAV05 -right-> NAV06 : Seleccionar Cambio Mayor
+NAV06 -down-> NAV09 : Inspeccionar Evaluación Técnica
+NAV06 -right-> NAV10 : [Condición: Estado = EN_EVALUACION]\nVotación y Dictamen
+NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-06: Modelo de Navegación del Administrador de Configuración / Bibliotecario (PU-05)
+
+El Administrador de Configuración / Bibliotecario es el custodio técnico de las 3 bibliotecas, controla los bloqueos de sincronización (`sync_lock`), ejecuta Check-Out y Check-In, congela Líneas Base, ejecuta rollbacks y gestiona identidades y roles:
+
+![DG-UWE-NAV-06](../assets/DG-UWE-NAV-06.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-06: Modelo de Navegación — Administrador de Configuración / Bibliotecario (PU-05)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Configuración (SCM)" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS" as NAV13 <<index>>
+class "NAV-14: Detalle ECS y Verificación SHA-256\n(CU-26)" as NAV14 <<navClass>>
+class "NAV-15: Explorador de Bibliotecas\n(Trabajo, Soporte, Maestra)" as NAV15 <<navClass>>
+
+class "NAV-16: Consola Check-Out\n(CU-10, CU-11, RN-06)" as NAV16 <<process>>
+class "NAV-17: Consola Check-In\n(CU-12, RNF-03, RN-09)" as NAV17 <<process>>
+class "NAV-18: Historial de Versiones\n(CU-13)" as NAV18 <<index>>
+
+class "NAV-22: Consola Líneas Base\n(CU-20, RN-02, RN-09)" as NAV22 <<process>>
+class "NAV-23: Consola de Rollback\n(CU-21, RN-08, RN-06)" as NAV23 <<process>>
+
+class "NAV-28: Gestión Usuarios y Roles\n(CU-01)" as NAV28 <<navClass>>
+class "NAV-26: Auditoría Inmutable (CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado (CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo y Bibliotecas
+NAV02 -down-> NAV16 : Operaciones Check-Out
+NAV02 -down-> NAV17 : Operaciones Check-In
+NAV02 -down-> NAV22 : Líneas Base
+NAV02 -down-> NAV28 : IAM y Roles
+NAV02 -down-> NAV26 : Pistas Forenses
+NAV02 -down-> NAV27 : Generar Reportes
+
+NAV13 -right-> NAV14 : Inspeccionar ECS
+NAV14 -down-> NAV18 : Ver Historial
+NAV14 ..> NAV14 : [Acción: Validar Checksum SHA-256]
+
+NAV16 -down-> NAV15 : Bloquea y Transfiere a Trabajo
+NAV17 -down-> NAV15 : Custodia Permanente y Desbloqueo
+NAV22 -down-> NAV15 : Congela en Maestra (mayor.menor.parche)
+NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-07: Modelo de Navegación del Ingeniero de Software / Desarrollador (PU-06)
+
+El Desarrollador accede a sus órdenes asignadas, obtiene su espacio en la Biblioteca de Trabajo, registra pruebas unitarias locales y corrige defectos reportados por QA:
+
+![DG-UWE-NAV-07](../assets/DG-UWE-NAV-07.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-07: Modelo de Navegación — Ingeniero de Software / Desarrollador (PU-06)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Desarrollador\n(Mis Órdenes en Ejecución)" as NAV02 <<navClass>>
+
+class "NAV-12: Mis Órdenes Asignadas (ECN)" as NAV12 <<index>>
+class "NAV-15: Mi Espacio de Trabajo\n(Biblioteca de Trabajo - CU-14)" as NAV15 <<navClass>>
+class "NAV-18: Historial de Versiones ECS\n(CU-13)" as NAV18 <<index>>
+class "NAV-20: Bandeja de No Conformidades QA\n(CU-18, CU-19)" as NAV20 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : Ver Órdenes ECN
+NAV02 -down-> NAV20 : Defectos Asignados
+
+NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Código Fuente
+NAV15 -down-> NAV18 : Comparar con versión estable
+NAV15 ..> NAV15 : [Acción Contextual: Registrar Pruebas Unitarias CU-15]
+NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
+
+@enduml
+```
+
+---
+
+### DG-UWE-NAV-08: Modelo de Navegación del Equipo de Calidad / Testing (PU-07)
+
+El Equipo de Calidad / Testing valida las órdenes en fase de pruebas sobre la Biblioteca de Soporte, emite certificaciones de conformidad bajo Segregación de Funciones (SoD) y reporta no conformidades:
+
+![DG-UWE-NAV-08](../assets/DG-UWE-NAV-08.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-08: Modelo de Navegación — Equipo de Calidad / Testing (PU-07)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de QA\n(Órdenes Pendientes de Certificación)" as NAV02 <<navClass>>
+
+class "NAV-12: Órdenes en Pruebas (ECN)" as NAV12 <<index>>
+class "NAV-19: Consola de Validación QA\n(Pruebas de Integración - CU-16)" as NAV19 <<navClass>>
+class "NAV-20: Formulario de No Conformidad\n(CU-18)" as NAV20 <<process>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : Órdenes para Testing (Estado = EN_PRUEBAS)
+NAV12 -right-> NAV19 : Ejecutar Validación Técnica
+
+NAV19 ..> NAV20 : [Prueba Fallida]\nReportar No Conformidad (CU-18)
+NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Pasa a EN_ACEPTACION)
+NAV20 ..> NAV19 : Reevaluar y re-testear (CU-19)
+
+@enduml
+```
+
+---
+
+## 19.5 Navegación Condicionada por Estados del Ciclo de Vida (TB-07)
+
+La navegación y habilitación de acciones en TraceFlow SCM depende estrictamente del estado canónico del expediente de RFC. La siguiente matriz formaliza la disponibilidad de accesos para cada uno de los **14 estados oficiales de TB-07**:
+
+| Estado RFC (TB-07) | Actor(es) Canónico(s) Autorizado(s) | Acción Navegacional Habilitada | Nodo Origen | Nodo Destino | Regla de Negocio / Criterio de Transición |
+| :--- | :--- | :--- | :---: | :---: | :--- |
+| **1. Registrada** | Analista de Requerimientos / Gestor | Validar completitud y clasificar | `NAV-05` | `NAV-06` | Filtro formal de admisión inicial (`CU-05`). |
+| **2. En Subsanación** | Solicitante | Subsanar observaciones de solicitud | `NAV-06` | `NAV-08` | Solicitante subsana datos observados (`CU-04.1`). Retorna a revisión. |
+| **3. Clasificada** | Arquitecto / Especialista Técnico | Iniciar análisis técnico de impacto | `NAV-05` | `NAV-06` $\rightarrow$ `NAV-09` | Superó filtro inicial; admitida para evaluación técnica (`CU-06`). |
+| **4. En Análisis Técnico** | Arquitecto / Especialista Técnico | Registrar Informe Técnico de Impacto | `NAV-06` | `NAV-09` | Evalúa arquitectura, dependencias y Triple Restricción (`RN-05`). |
+| **5. En Evaluación (Mayor)** | Comité de Control de Cambios (CCB) | Deliberar y emitir dictamen colegiado | `NAV-06` | `NAV-10` | Votación colegiada con quórum y mayoría calificada (`CU-07, RN-01`). |
+| **5. En Evaluación (Menor)** | Gestor Y Arquitecto (Doble Llave) | Autorizar cambio menor por vía delegada| `NAV-06` | `NAV-11` | Exige concurrencia de ambos vistos buenos (`CU-30, RN-01, RN-05`). |
+| **6. Autorizada** | CCB / Analista de Requerimientos | Formalizar y emitir Orden de Cambio | `NAV-06` | `NAV-12` | Habilita asignación de desarrollador y emisión de ECN (`CU-08`). |
+| **7. Orden Emitida** | Administrador de Configuración | Ejecutar Check-Out con bloqueo activo | `NAV-12` | `NAV-16` | Adquiere `sync_lock` (ACTIVE) y copia ECS a Trabajo (`CU-10, RN-06`). |
+| **8. En Implementación** | Ingeniero de Software / Desarrollador | Modificar ECS y pruebas unitarias | `NAV-12` | `NAV-15` | Trabajo técnico local sobre copia autorizada (`CU-14, CU-15`). |
+| **8. En Implementación (Fin)**| Administrador de Configuración | Check-In Técnico (Trabajo $\rightarrow$ Soporte)| `NAV-15` | `NAV-17` | Entrega de artefacto a Biblioteca de Soporte para QA (`CU-12`). |
+| **9. En Pruebas** | Equipo de Calidad / Testing | Ejecutar integración y certificar QA | `NAV-12` | `NAV-19` | Valida pruebas. Si aprueba, emite conformidad técnica con SoD (`CU-17`). |
+| **9. En Pruebas (Fallo)** | Equipo de Calidad / Testing | Reportar no conformidad técnica | `NAV-19` | `NAV-20` | Registra defectos para corrección por el desarrollador (`CU-18, CU-19`). |
+| **10. En Aceptación** | Solicitante (Usuario Final) | Suscribir Acta de Aceptación UAT | `NAV-06` | `NAV-21` | Valida en entorno controlado previo a la liberación (`CU-29, RN-09`). |
+| **10. En Aceptación (Fin)** | Administrador de Configuración | Check-In Definitivo (Soporte $\rightarrow$ Maestra)| `NAV-21` | `NAV-17` $\rightarrow$ `NAV-22`| Exige Doble Conformidad (QA+UAT). Congela Línea Base (`CU-12, CU-20`). |
+| **11. Desestimada** | Analista de Requerimientos / Gestor | Cierre formal por inviabilidad inicial | `NAV-06` | Terminal | Solicitud improcedente o plazo de subsanación vencido (`CU-05, RN-07`). |
+| **12. Rechazada** | CCB / Autoridad Delegada | Cierre formal por dictamen negativo | `NAV-10` / `NAV-11` | Terminal | Rechazo técnico o de gestión fundamentado (`CU-07, CU-30, RN-07`). |
+| **13. Cancelada** | Administrador de Configuración | Rollback y cancelación de orden | `NAV-23` | Terminal | Fallo no subsanado en re-test o rechazo UAT; purga Trabajo (`CU-21, RN-08`). |
+| **14. Implementada** | Administrador de Configuración / CCB | Cierre formal exitoso | `NAV-22` | Terminal | Doble conformidad, Línea Base congelada y bloqueo liberado (`RF-14, RN-07`). |
+
+---
+
+## 19.6 Control de Acceso Navegacional vs Seguridad Backend (RBAC/SoD)
+
+Para garantizar un diseño de ciberseguridad sólido y cumplir rigurosamente con los principios arquitectónicos aprobados en **ADR-006**:
+1. **Frontend (Capa de Presentación SPA — Experiencia y Ergonomía)**:
+   - **Ocultamiento de Menús (`RoleBasedSidebar`)**: Los elementos de navegación que no correspondan al rol del usuario autenticado no se renderizan, reduciendo la carga cognitiva y evitando rutas inválidas.
+   - **Route Guards Preventivos (`ProtectedRoute`)**: Interceptan navegaciones directas por URL en el cliente (e.g. acceso forzado a `/changes/:id/ccb-deliberation` por un desarrollador), redirigiendo a una vista de error amigable.
+   - **Principio Fundamental**: *Ocultar o deshabilitar un enlace visual NO constituye seguridad*.
+2. **Backend (Capa de Aplicación y Dominio — Seguridad Autoritativa Inviolable)**:
+   - **Verificación Autoritativa por Guards de NestJS**: Toda petición HTTP entrante es interceptada secuencialmente por `AuthGuard` (valida sesión opaca activa), `RolesGuard` (valida rol canónico RBAC) y `SodGuard` (evalúa segregación dinámica de funciones en base de datos).
+   - **Bloqueo Inviolable de Violaciones**: Aunque un usuario intente enviar una solicitud manipulada (mediante Postman, cURL o manipulación del DOM), el backend rechazará la operación con `401 Unauthorized` o `403 Forbidden`, registrando de inmediato un evento de sospecha en `audit_log`.
+
+---
+
+## 19.7 Matriz de Cobertura y Trazabilidad (CU ↔ Navegación ↔ API ↔ Módulos)
+
+A continuación se demuestra la **cobertura del 100% de los 31 Casos de Uso del SRS de Análisis**, vinculando cada caso con su actor, su recorrido navegacional, su endpoint de API y su módulo responsable:
+
+| CU | Nombre Caso de Uso (Baseline) | Actor Principal (TB-10) | Nodo Origen | Acción Navegacional | Nodo Destino | Resultado en UI | Endpoint API-DRAFT-v0.2 | Módulo |
+| :---: | :--- | :--- | :---: | :--- | :---: | :--- | :--- | :---: |
+| **CU-01** | Gestionar usuarios y roles | Administrador / Bibliotecario | `NAV-02` | Accede a IAM | `NAV-28` | Directorio de usuarios y asignación RBAC | `/api/v1/users` | MOD-01 |
+| **CU-02** | Crear y administrar proyectos | Analista de Requerimientos / Gestor | `NAV-02` | Accede a Proyectos | `NAV-03` | Directorio de proyectos y modal de creación | `/api/v1/projects` | MOD-02 |
+| **CU-03** | Consultar proyecto | Gestor, CCB, Bibliotecario | `NAV-03` | Selecciona proyecto | `NAV-04` | Ficha técnica y catálogo de ECS del proyecto | `/api/v1/projects/{id}` | MOD-02 |
+| **CU-04** | Registrar Solicitud de Cambio (RFC) | Solicitante | `NAV-02` / `NAV-05` | Clic en "Nueva RFC" | `NAV-07` | Formulario de registro completado | `/api/v1/rfcs` | MOD-04 |
+| **CU-04.1**| Subsanar Solicitud de Cambio (RFC) | Solicitante | `NAV-06` | Clic en "Subsanar" | `NAV-08` | Formulario de corrección enviado | `/api/v1/rfcs/{id}/rectification` | MOD-04 |
+| **CU-05** | Validar y clasificar la solicitud | Analista de Requerimientos / Gestor | `NAV-05` | Selecciona RFC | `NAV-06` | Formulario contextual de clasificación | `/api/v1/rfcs/{id}/classify` | MOD-04 |
+| **CU-06** | Realizar análisis de impacto técnico | Arquitecto / Especialista Técnico | `NAV-06` | Clic "Evaluar Impacto"| `NAV-09` | Informe de Impacto registrado | `/api/v1/rfcs/{id}/impact-assessment` | MOD-04 |
+| **CU-07** | Evaluar viabilidad y dictaminar (CCB) | Comité de Control de Cambios (CCB) | `NAV-06` | Inicia Deliberación | `NAV-10` | Consola de votación y resolución oficial | `/api/v1/rfcs/{id}/ccb-resolution` | MOD-04 |
+| **CU-08** | Emitir Orden de Cambio (ECN/ECO) | CCB / Gestor | `NAV-06` / `NAV-10` | Clic "Emitir ECN" | `NAV-12` | Ficha de Orden de Cambio formalizada | `/api/v1/rfcs/{id}/change-order` | MOD-04 |
+| **CU-09** | Registrar ECS | Arquitecto / Especialista Técnico | `NAV-04` / `NAV-13` | Clic "Nuevo ECS" | `NAV-13` (Modal)| ECS registrado en catálogo del proyecto | `/api/v1/projects/{id}/ecs` | MOD-03 |
+| **CU-10** | Efectuar Check-Out (Soporte → Trabajo)| Administrador / Bibliotecario | `NAV-12` | Clic "Check-Out" | `NAV-16` | ECS transferido a Trabajo y asignado a Dev | `/api/v1/ecs/{id}/check-out` | MOD-05 |
+| **CU-11** | Aplicar bloqueo de sincronización | Administrador / Bibliotecario | `NAV-16` | *Atómico en CU-10* | `NAV-16` | Bloqueo `sync_lock` (ACTIVE) en PostgreSQL| `/api/v1/ecs/{id}/check-out` | MOD-05 |
+| **CU-12** | Efectuar Check-In (Trabajo → Soporte/Maestra)| Administrador / Bibliotecario | `NAV-15` | Clic "Check-In" | `NAV-17` | Archivo verificado SHA-256 y promovido | `/api/v1/ecs/{id}/check-in` | MOD-05 |
+| **CU-13** | Consultar historial de versiones | Bibliotecario, Gestor, Dev, Arquitecto| `NAV-14` | Clic "Historial" | `NAV-18` | Línea de tiempo cronológica y diffs | `/api/v1/ecs/{id}/versions` | MOD-05 |
+| **CU-14** | Implementar cambio en el ECS | Ingeniero de Software / Desarrollador | `NAV-12` | Clic "Ir a Trabajo" | `NAV-15` | Archivo descargado / modificado en Trabajo | `/api/v1/ecs/{id}/workspace-draft` | MOD-05 |
+| **CU-15** | Ejecutar pruebas unitarias locales | Ingeniero de Software / Desarrollador | `NAV-15` | Acción Contextual | `NAV-15` | Registro local de suite unitaria aprobado | `/api/v1/change-orders/{id}/unit-tests` | MOD-06 |
+| **CU-16** | Ejecutar pruebas de integración | Equipo de Calidad / Testing | `NAV-12` | Clic "Iniciar QA" | `NAV-19` | Tablero de pruebas de integración activo | `/api/v1/change-orders/{id}/integration-tests`| MOD-06 |
+| **CU-17** | Certificar conformidad del cambio | Equipo de Calidad / Testing | `NAV-19` | Clic "Certificar QA" | `NAV-19` | Certificado de Conformidad emitido (con SoD)| `/api/v1/change-orders/{id}/qa-certification` | MOD-06 |
+| **CU-18** | Reportar no conformidad | Equipo de Calidad / Testing | `NAV-19` | Clic "Reportar Defecto"|`NAV-20` | No conformidad registrada y ECN en corrección| `/api/v1/change-orders/{id}/non-conformity`| MOD-06 |
+| **CU-19** | Reevaluar y re-testear | Equipo de Calidad / Testing | `NAV-20` | Clic "Re-testear" | `NAV-19` | Re-testeo ejecutado y actualizado | `/api/v1/change-orders/{id}/retest` | MOD-06 |
+| **CU-20** | Crear y congelar línea base | Administrador / Bibliotecario | `NAV-04` / `NAV-21` | Clic "Congelar LB" | `NAV-22` | Línea base inmutable congelada (`RN-02`) | `/api/v1/projects/{id}/baselines` | MOD-07 |
+| **CU-21** | Ejecutar rollback en Biblioteca Trabajo | Administrador / Bibliotecario | `NAV-19` / `NAV-21` | Clic "Rollback" | `NAV-23` | Copia de Trabajo purgada y lock liberado | `/api/v1/change-orders/{id}/rollback` | MOD-07 |
+| **CU-22** | Cancelar Orden de Cambio | Administrador / Bibliotecario | `NAV-23` | Clic "Cancelar ECN" | `NAV-12` | Orden cancelada y expediente formalizado | `/api/v1/change-orders/{id}/cancel` | MOD-04 |
+| **CU-23** | Registrar incidencia | Solicitante | `NAV-02` / `NAV-24` | Clic "Nuevo Ticket" | `NAV-24` (Modal)| Ticket de incidencia registrado | `/api/v1/projects/{id}/incidents` | MOD-08 |
+| **CU-24** | Consultar estado de ticket | Solicitante, Gestor | `NAV-24` | Selecciona ticket | `NAV-25` | Ficha técnica de estado de incidencia | `/api/v1/incidents/{id}` | MOD-08 |
+| **CU-25** | Derivar incidencia a RFC | Analista de Requerimientos / Gestor | `NAV-25` | Clic "Derivar a RFC"| `NAV-05` $\rightarrow$ `NAV-06`| RFC creada y vinculada a la incidencia | `/api/v1/incidents/{id}/derive-rfc` | MOD-08 |
+| **CU-26** | Validar integridad (checksum) | Administrador / Bibliotecario | `NAV-14` / `NAV-18` | Clic "Verificar Hash"| `NAV-14` (Modal)| Hash SHA-256 verificado en tiempo real | `/api/v1/ecs/{id}/versions/{vId}/verify`| MOD-03 |
+| **CU-27** | Auditar acciones del sistema | Comité de Control de Cambios, Bibliotecario| `NAV-02` | Accede a Auditoría | `NAV-26` | Registro inmutable append-only filtrado | `/api/v1/audit/logs` | MOD-09 |
+| **CU-28** | Generar reportes de estado | Bibliotecario, CCB, Gestor | `NAV-02` | Accede a Reportes | `NAV-27` | Reporte SCM exportado en PDF/CSV | `/api/v1/reports/status` | MOD-09 |
+| **CU-29** | Validar aceptación del usuario (UAT)| Solicitante (Usuario Final) | `NAV-06` | Clic "Evaluar UAT" | `NAV-21` | Acta de Aceptación suscrita formalmente | `/api/v1/change-orders/{id}/uat-acceptance`| MOD-06 |
+| **CU-30** | Autorizar Cambio Menor (Vía Delegada)| Gestor Y Arquitecto (Doble Llave) | `NAV-06` | Clic "Autorizar Menor"| `NAV-11` | Visto bueno registrado; autoriza si ambos aprueban| `/api/v1/rfcs/{id}/authorizations` | MOD-04 |

@@ -239,39 +239,44 @@
 # TB-11 — Inventario de Diagramas de Secuencia del Modelo Lógico
 
 **Estado:** APROBADO  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 95-114)  
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 y `docs/DIAGRAMS.md` (Refactorización de Análisis TO-BE v2)  
 
-| ID Diagrama | Caso de Uso | Nombre del Diagrama de Secuencia | Actor Principal | Pág. SRS Original | Estado en Documentación |
+> [!NOTE]
+> Todos los diagramas de secuencia han sido refactorizados a nivel de **ANÁLISIS CONCEPTUAL** (Actor ↔ TraceFlow SCM) con correspondencia estricta 1:1 frente a las narrativas canónicas. Las versiones técnicas preliminares con artefactos de implementación física (UI, Controller, Service, Repository, Database) quedan registradas con estado `OBSOLETO — Secuencia de Diseño Prematura` para fines de trazabilidad histórica.
+
+| ID Diagrama | Caso de Uso | Nombre del Diagrama de Secuencia | Actor Principal | Nivel / Naturaleza | Estado en Documentación |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| DG-SEQ-01 | CUS01 (CU-01) | Gestionar usuarios y roles | Administrador de Configuración / Bibliotecario | Pág. 96 | Presente (assets/page-096.png) |
-| DG-SEQ-02 | CUS02 (CU-02) | Crear y administrar proyectos | Analista de Requerimientos / Gestor | Pág. 97 | Presente (assets/page-097.png) |
-| DG-SEQ-03 | CUS03 (CU-03) | Consultar proyecto | Analista de Requerimientos / Gestor | Pág. 97b | Presente (assets/DG-SEQ-03.png) |
-| DG-SEQ-04 | CUS04 (CU-04) | Registrar Solicitud de Cambio (RFC) | Solicitante | Pág. 98 | Presente (assets/page-098.png) |
-| DG-SEQ-05 | CUS05 (CU-05) | Validar y clasificar la solicitud | Analista de Requerimientos / Gestor | Pág. 99 | Presente (assets/page-099.png) |
-| DG-SEQ-06 | CUS06 (CU-06) | Realizar análisis de impacto técnico | Arquitecto / Especialista Técnico | Pág. 100 | Presente (assets/page-100.png) |
-| DG-SEQ-07 | CUS07 (CU-07) | Evaluar viabilidad y aprobar/rechazar | Comité de Control de Cambios (CCB) | Pág. 101 | Presente (assets/page-101.png) |
-| DG-SEQ-08 | CUS08 (CU-08) | Emitir Orden de Cambio (ECN/ECO) | Comité de Control de Cambios (CCB) | Pág. 102 | Presente (assets/page-102.png) |
-| DG-SEQ-09 | CUS09 (CU-09) | Registrar Elemento de Configuración (ECS) | Arquitecto / Especialista Técnico | Pág. 103 | Presente (assets/page-103.png) |
-| DG-SEQ-10 | CUS10 (CU-10) | Efectuar Check-Out de elementos de configuración | Administrador de Configuración / Bibliotecario | Pág. 104 | Presente (assets/page-104.png) |
-| DG-SEQ-11 | CUS11 (CU-11) | Aplicar bloqueo de sincronización | Administrador de Configuración / Bibliotecario | Pág. 104 | Presente (assets/page-104.png) |
-| DG-SEQ-12 | CUS12 (CU-12) | Efectuar Check-In de elementos de configuración | Administrador de Configuración / Bibliotecario | Pág. 105 | Presente (assets/page-105.png) |
-| DG-SEQ-13 | CUS13 (CU-13) | Consultar historial de versiones | Administrador de Configuración / Bibliotecario | Pág. 105 | Presente (assets/page-105.png) |
-| DG-SEQ-14 | CUS14 (CU-14) | Implementar cambio en el ECS | Ingeniero de Software / Desarrollador | Pág. 106 | Presente (assets/page-106.png) |
-| DG-SEQ-15 | CUS15 (CU-15) | Ejecutar pruebas unitarias locales | Ingeniero de Software / Desarrollador | Pág. 107 | Presente (assets/page-107.png) |
-| DG-SEQ-16 | CUS16 (CU-16) | Ejecutar pruebas de integración | Equipo de Calidad / Testing | Pág. 107 | Presente (assets/page-107.png) |
-| DG-SEQ-17 | CUS17 (CU-17) | Certificar conformidad del cambio | Equipo de Calidad / Testing | Pág. 108 | Presente (assets/page-108.png) |
-| DG-SEQ-18 | CUS18 (CU-18) | Reportar no conformidad | Equipo de Calidad / Testing | Pág. 108 | Presente (assets/page-108.png) |
-| DG-SEQ-19 | CUS19 (CU-19) | Reevaluar y re-testear | Equipo de Calidad / Testing | Pág. 109 | Presente (assets/page-109.png) |
-| DG-SEQ-20 | CUS20 (CU-20) | Crear y congelar línea base | Administrador de Configuración / Bibliotecario | Pág. 110 | Presente (assets/page-110.png) |
-| DG-SEQ-21 | CUS21 (CU-21) | Ejecutar rollback en Biblioteca de Trabajo | Administrador de Configuración / Bibliotecario | Pág. 110 | Presente (assets/page-110.png) |
-| DG-SEQ-22 | CUS22 (CU-22) | Cancelar Orden de Cambio | Administrador de Configuración / Bibliotecario | Pág. 111 | Presente (assets/page-111.png) |
-| DG-SEQ-23 | CUS23 (CU-23) | Registrar incidencia | Solicitante | Pág. 111 | Presente (assets/page-111.png) |
-| DG-SEQ-24 | CUS24 (CU-24) | Consultar estado de ticket | Solicitante | Pág. 112 | Presente (assets/page-112.png) |
-| DG-SEQ-25 | CUS25 (CU-25) | Derivar incidencia a RFC | Analista de Requerimientos / Gestor | Pág. 112 | Presente (assets/page-112.png) |
-| DG-SEQ-26 | CUS26 (CU-26) | Validar integridad mediante checksum | Administrador de Configuración / Bibliotecario | Pág. 113 | Presente (assets/page-113.png) |
-| DG-SEQ-27 | CUS27 (CU-27) | Auditar acciones del sistema | Comité de Control de Cambios (CCB) | Pág. 113 | Presente (assets/page-113.png) |
-| DG-SEQ-28 | CUS28 (CU-28) | Generar reportes de estado | Administrador de Configuración / Bibliotecario | Pág. 114 | Presente (assets/page-114.png) |
-
+| **DG-SEQ-01** | CU-01 | Gestionar usuarios y roles | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-02** | CU-02 | Crear y administrar proyectos | Analista de Requerimientos / Gestor | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-03** | CU-03 | Consultar proyecto | Analista de Requerimientos / Gestor | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-04** | CU-04 | Registrar Solicitud de Cambio (RFC) | Solicitante | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-04.1** | CU-04.1 | Subsanar Solicitud de Cambio (RFC) | Solicitante | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-05** | CU-05 | Validar y clasificar la solicitud | Analista de Requerimientos / Gestor | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-06** | CU-06 | Realizar análisis de impacto técnico | Arquitecto / Especialista Técnico | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-07** | CU-07 | Evaluar Cambio Mayor en CCB | Comité de Control de Cambios (CCB) | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-08** | CU-08 | Emitir Orden de Cambio (ECN/ECO) | CCB / Analista de Requerimientos / Gestor | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-09** | CU-09 | Registrar ECS | Arquitecto / Especialista Técnico | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-10** | CU-10 | Efectuar Check-Out | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-11** | CU-11 | Aplicar bloqueo de sincronización | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-12** | CU-12 | Efectuar Check-In | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-13** | CU-13 | Consultar historial de versiones | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-14** | CU-14 | Implementar cambio en el ECS | Ingeniero de Software / Desarrollador | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-15** | CU-15 | Ejecutar pruebas unitarias locales | Ingeniero de Software / Desarrollador | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-16** | CU-16 | Ejecutar pruebas de integración | Equipo de Calidad / Testing | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-17** | CU-17 | Certificar conformidad del cambio | Equipo de Calidad / Testing | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-18** | CU-18 | Reportar no conformidad | Equipo de Calidad / Testing | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-19** | CU-19 | Reevaluar y re-testear | Equipo de Calidad / Testing | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-20** | CU-20 | Crear y congelar línea base | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-21** | CU-21 | Ejecutar rollback | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-22** | CU-22 | Cancelar Orden de Cambio | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-23** | CU-23 | Registrar incidencia | Solicitante | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-24** | CU-24 | Consultar estado de ticket | Solicitante | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-25** | CU-25 | Derivar incidencia a RFC | Analista de Requerimientos / Gestor | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-26** | CU-26 | Validar integridad (checksum) | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-27** | CU-27 | Auditar acciones del sistema | Comité de Control de Cambios (CCB) | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-28** | CU-28 | Generar reportes de estado | Administrador de Configuración / Bibliotecario | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-29** | CU-29 | Validar aceptación del cambio por el usuario (UAT) | Solicitante (Usuario Final) | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
+| **DG-SEQ-30** | CU-30 | Autorizar Cambio Menor | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico | Análisis Conceptual (1:1) | APROBADO — Secuencia de Análisis |
 ---
 
 # TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso

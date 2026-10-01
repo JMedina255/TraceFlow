@@ -2162,7 +2162,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-04
 - **RN:** RN-01
-- **Estado(s):** En Subsanación $ightarrow$ Registrada
+- **Estado(s):** En Subsanación $
+ightarrow$ Registrada
 - **DG relacionado:** DG-03, DG-05, DG-11
 
 ---
@@ -2241,7 +2242,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-04, RF-05
 - **RN:** RN-01, RN-07
-- **Estado(s):** Registrada $ightarrow$ Clasificada (o En Subsanación / Desestimada)
+- **Estado(s):** Registrada $
+ightarrow$ Clasificada (o En Subsanación / Desestimada)
 - **DG relacionado:** DG-03, DG-04, DG-05, DG-11
 
 ---
@@ -2311,7 +2313,9 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-05
 - **RN:** RN-01, RN-05
-- **Estado(s):** Clasificada $ightarrow$ En Análisis Técnico $ightarrow$ En Evaluación
+- **Estado(s):** Clasificada $
+ightarrow$ En Análisis Técnico $
+ightarrow$ En Evaluación
 - **DG relacionado:** DG-03, DG-05, DG-11
 
 ---
@@ -2390,7 +2394,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-06
 - **RN:** RN-01, RN-05, RN-07
-- **Estado(s):** En Evaluación $ightarrow$ Autorizada (o Rechazada)
+- **Estado(s):** En Evaluación $
+ightarrow$ Autorizada (o Rechazada)
 - **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
 ---
@@ -2458,7 +2463,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-07
 - **RN:** RN-01
-- **Estado(s):** Autorizada $ightarrow$ Orden Emitida
+- **Estado(s):** Autorizada $
+ightarrow$ Orden Emitida
 - **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
 ---
@@ -2602,7 +2608,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-08, RF-09
 - **RN:** RN-01, RN-06
-- **Estado(s):** Orden Emitida $ightarrow$ En Implementación
+- **Estado(s):** Orden Emitida $
+ightarrow$ En Implementación
 - **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
 ---
@@ -3089,7 +3096,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-10
 - **RN:** RN-01, RN-09
-- **Estado(s):** En Pruebas $ightarrow$ En Aceptación
+- **Estado(s):** En Pruebas $
+ightarrow$ En Aceptación
 - **DG relacionado:** DG-03, DG-04, DG-09, DG-11
 
 ---
@@ -3225,7 +3233,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-11
 - **RN:** RN-08
-- **Estado(s):** En Pruebas $ightarrow$ En Aceptación (o vía a Cancelada)
+- **Estado(s):** En Pruebas $
+ightarrow$ En Aceptación (o vía a Cancelada)
 - **DG relacionado:** DG-03, DG-04, DG-09, DG-11
 
 ---
@@ -3295,7 +3304,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-13, RF-14
 - **RN:** RN-02, RN-04, RN-07, RN-09
-- **Estado(s):** En Aceptación $ightarrow$ Implementada
+- **Estado(s):** En Aceptación $
+ightarrow$ Implementada
 - **DG relacionado:** DG-03, DG-04, DG-09, DG-11
 
 ---
@@ -3431,7 +3441,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-12, RF-14
 - **RN:** RN-07, RN-08
-- **Estado(s):** En Pruebas / En Aceptación $ightarrow$ Cancelada
+- **Estado(s):** En Pruebas / En Aceptación $
+ightarrow$ Cancelada
 - **DG relacionado:** DG-03, DG-04, DG-09, DG-11
 
 ---
@@ -3988,7 +3999,8 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 ### Trazabilidad
 - **RF:** RF-05, RF-07
 - **RN:** RN-01, RN-05, RN-07
-- **Estado(s):** En Evaluación $ightarrow$ Autorizada (o Rechazada)
+- **Estado(s):** En Evaluación $
+ightarrow$ Autorizada (o Rechazada)
 - **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
 ---
@@ -4085,1011 +4097,1066 @@ HASH_VAL --> STORAGE : Verificación hash
 
 ### 6.2.1. Diagrama de Secuencia
 
-A continuación se presentan los diagramas de secuencia del modelo lógico de TraceFlow SCM, correspondientes a los escenarios de caso de uso detallados en la sección 6.1.3 y catalogados en `TB-11`:
+A continuación se presentan los diagramas de secuencia del modelo lógico de TraceFlow SCM a **nivel de análisis conceptual**, correspondientes exactamente a los 31 escenarios de caso de uso detallados en la sección 6.1.3 y catalogados en `TB-11`.
+
+Cada diagrama modela la interacción directa entre el actor funcional canónico y la entidad central conceptual **TraceFlow SCM**, observando correspondencia estricta 1:1 con la numeración de los pasos del Flujo Principal de cada narrativa.
+
+---
 
 **Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)**
 
 ![Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)](assets/DG-SEQ-01.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-01
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-01: Gestionar usuarios y roles (CU-01)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Gestión Usuarios" as UI
-control "Controlador Usuarios" as CTRL
-entity "Servicio RBAC" as SRV
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Usuarios del sistema" as Usuario
 
-ACT -> UI : Selecciona opción gestionar usuarios y roles
-UI -> CTRL : obtenerListaUsuarios()
-CTRL -> DB : findUsuariosYRoles()
-DB --> CTRL : listaUsuarios
-CTRL --> UI : renderUsuarios()
+Admin -> Sistema: 1. Seleccionar opción de gestión de usuarios y roles
+Sistema --> Admin: 2. Presentar directorio de usuarios y catálogo de roles canónicos
+Admin -> Sistema: 3. Ingresar datos de identidad y seleccionar rol oficial
+Sistema -> Sistema: 4. Validar campos, unicidad de correo y rol oficial (RN-01)
+Sistema -> Sistema: 5. Registrar usuario, asociar permisos RBAC y activar cuenta
+Sistema --> Admin: 6. Confirmar registro exitoso en pantalla
+Sistema --> Usuario: 6. Remitir notificación con credenciales de acceso iniciales
 
-ACT -> UI : Ingresa datos del nuevo usuario y rol
-UI -> CTRL : registrarUsuario(datos, rol)
-CTRL -> SRV : validarDatosYPermisos(datos, rol)
-SRV --> CTRL : validacionExitosa
-CTRL -> DB : insertUsuarioConRol(datos, rol)
-DB --> CTRL : confirmacionRegistro
-CTRL -> DB : registrarAuditoria("REGISTRO_USUARIO", adminId)
-CTRL --> UI : notificarExito()
-UI --> ACT : Muestra confirmación de registro
+alt A1: Modificación de rol a usuario existente
+  Admin -> Sistema: Solicitar cambio de rol a usuario registrado
+  Sistema -> Sistema: Actualizar privilegios RBAC manteniendo historial
+  Sistema --> Admin: Confirmar actualización de permisos
+else A2: Desactivación lógica de cuenta
+  Admin -> Sistema: Solicitar desactivación de cuenta de usuario
+  Sistema -> Sistema: Bloquear acceso conservando registros históricos
+  Sistema --> Admin: Confirmar desactivación de cuenta
+end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)**
 
 ![Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)](assets/DG-SEQ-02.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-02
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-02: Crear y administrar proyectos (CU-02)</b>
 
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-boundary "UI Proyectos" as UI
-control "Controlador Proyectos" as CTRL
-entity "Servicio Aislamiento SCM" as SRV
-database "BD TraceFlow" as DB
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
 
-ACT -> UI : Solicita registrar nuevo proyecto
-UI -> CTRL : iniciarFormularioProyecto()
-CTRL --> UI : mostrarFormulario()
+Analista -> Sistema: 1. Seleccionar registrar nuevo proyecto de software
+Sistema --> Analista: 2. Presentar formulario de configuración y directorio de clientes
+Analista -> Sistema: 3. Ingresar datos del proyecto, cliente, objetivos y equipo técnico
+Sistema -> Sistema: 4. Validar unicidad del nombre y coherencia de plazos contractuales
+Sistema -> Sistema: 5. Crear proyecto, aislar datos de cliente e inicializar bibliotecas (RN-01)
+Sistema --> Analista: 6. Confirmar creación de proyecto en pantalla
+Sistema --> Admin: 6. Notificar creación para inicialización del catálogo de ECS
 
-ACT -> UI : Ingresa datos, cliente y responsables
-UI -> CTRL : crearProyecto(datosProyecto)
-CTRL -> SRV : inicializarEspacioAislado(datosProyecto.nombre)
-SRV --> CTRL : espacioAisladoCreado
-CTRL -> DB : insertProyecto(datosProyecto)
-DB --> CTRL : proyectoId
-CTRL -> DB : inicializarEstructuraBibliotecas(proyectoId)
-CTRL -> DB : registrarAuditoria("CREACION_PROYECTO", analistaId)
-CTRL --> UI : notificarProyectoCreado()
-UI --> ACT : Muestra confirmación y proyecto activo
+alt A1: Actualización de parámetros de proyecto existente
+  Analista -> Sistema: Modificar fechas, alcance o equipo técnico
+  Sistema -> Sistema: Actualizar registro conservando historial
+  Sistema --> Analista: Confirmar actualización de proyecto
+end
+
 @enduml
 ```
 
-**Diagrama DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)**
+---
 
-![Diagrama DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)](assets/DG-SEQ-03.png)
+**Diagrama DG-SEQ-03: Consultar proyecto (CU-03)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-03: Consultar proyecto (CU-03)](assets/DG-SEQ-03.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-03
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-03: Consultar proyecto (CU-03)</b>
 
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-boundary "UI Proyectos" as UI
-control "Controlador Proyectos" as CTRL
-database "BD TraceFlow" as DB
+actor "Analista de Requerimientos\n/ Gestor" as Actor
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Solicita consultar proyectos
-UI -> CTRL : obtenerListaProyectos(filtros)
-CTRL -> DB : findProyectos(filtros)
-DB --> CTRL : listaProyectos
-CTRL --> UI : mostrarResultados(listaProyectos)
-UI --> ACT : Muestra listado y estado de proyectos
+Actor -> Sistema: 1. Seleccionar opción de consulta de proyectos
+Sistema --> Actor: 2. Presentar catálogo de proyectos accesibles según perfil
+Actor -> Sistema: 3. Seleccionar proyecto específico para inspeccionar
+Sistema -> Sistema: 4. Validar permisos de visualización según matriz RBAC (RN-01)
+Sistema -> Sistema: 5. Consolidar datos generales, equipo, inventario de ECS y estado de RFC
+Sistema --> Actor: 6. Presentar panel de detalle y navegación hacia artefactos
 
-ACT -> UI : Selecciona un proyecto específico
-UI -> CTRL : obtenerDetalleProyecto(proyectoId)
-CTRL -> DB : findProyectoById(proyectoId)
-DB --> CTRL : datosProyecto, ecsAsociados, lineasBase
-CTRL --> UI : mostrarDetalleProyecto(datosProyecto)
-UI --> ACT : Muestra detalle, ECS y líneas base activas
+opt A1: Búsqueda y filtrado avanzado
+  Actor -> Sistema: Aplicar filtros por cliente, estado o fecha
+  Sistema --> Actor: Actualizar listado con proyectos coincidentes
+end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)**
 
 ![Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)](assets/DG-SEQ-04.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-04
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)</b>
 
-actor "Solicitante" as ACT
-boundary "UI Solicitudes RFC" as UI
-control "Controlador RFC" as CTRL
-entity "Servicio Validación RFC" as SRV
-database "BD TraceFlow" as DB
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Analista de Requerimientos\n/ Gestor" as Analista
 
-ACT -> UI : Selecciona registrar nueva RFC
-UI -> CTRL : obtenerListaECSDisponibles(proyectoId)
-CTRL -> DB : findECSByProyecto(proyectoId)
-DB --> CTRL : listaECS
-CTRL --> UI : renderFormularioRFC(listaECS)
+Solicitante -> Sistema: 1. Seleccionar registrar nueva Solicitud de Cambio (RFC)
+Sistema --> Solicitante: 2. Presentar formulario de captura y catálogo de ECS activos
+Solicitante -> Sistema: 3. Ingresar título, descripción, justificación, prioridad y seleccionar ECS
+Sistema -> Sistema: 4. Validar completitud de campos mandatorios y vigencia de ECS (RN-01)
+Sistema -> Sistema: 5. Registrar RFC asignando código correlativo en estado 'Registrada'
+Sistema --> Solicitante: 6. Emitir comprobante de recepción formal
+Sistema --> Analista: 6. Notificar nueva RFC registrada para revisión de completitud
 
-ACT -> UI : Ingresa descripción, justificación, prioridad y ECS
-UI -> CTRL : registrarRFC(datosRFC)
-CTRL -> SRV : validarCamposObligatorios(datosRFC)
-SRV --> CTRL : camposConformes
-CTRL -> DB : insertRFC(datosRFC, estado="Registrado")
-DB --> CTRL : rfcId
-CTRL -> DB : registrarAuditoria("REGISTRO_RFC", solicitanteId)
-CTRL --> UI : confirmarRegistro(rfcId)
-UI --> ACT : Muestra código de RFC generado
+opt A1: Adjuntar documentación técnica de respaldo
+  Solicitante -> Sistema: Adjuntar archivos de soporte técnico
+  Sistema -> Sistema: Validar formato y tamaño de documentos vinculándolos a la RFC
+end
+
 @enduml
 ```
+
+---
+
+**Diagrama DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
+
+![Diagrama DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)](assets/DG-SEQ-04.1.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
+
+```plantuml
+@startuml DG-SEQ-04.1
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+
+Solicitante -> Sistema: 1. Seleccionar RFC en estado 'En Subsanación'
+Sistema --> Solicitante: 2. Presentar formulario de subsanación y pliego formal de observaciones
+Solicitante -> Sistema: 3. Modificar campos requeridos, ampliar justificación y adjuntar anexos
+Sistema -> Sistema: 4. Validar atención de observaciones y completitud de campos (RN-01)
+Sistema -> Sistema: 5. Actualizar expediente de RFC y transicionar estado oficial a 'Registrada'
+Sistema --> Solicitante: 6. Emitir confirmación de subsanación formal
+Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
+
+@enduml
+```
+
+---
 
 **Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)**
 
 ![Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)](assets/DG-SEQ-05.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-05
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-05: Validar y clasificar la solicitud (CU-05)</b>
 
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-boundary "UI Gestión RFC" as UI
-control "Controlador RFC" as CTRL
-database "BD TraceFlow" as DB
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+actor "Solicitante" as Solicitante
 
-ACT -> UI : Consulta bandeja de RFC en estado "Registrado"
-UI -> CTRL : getRFCsPendientesRevision()
-CTRL -> DB : findRFCsByEstado("Registrado")
-DB --> CTRL : listaRFCs
-CTRL --> UI : renderBandeja(listaRFCs)
+Analista -> Sistema: 1. Seleccionar RFC en estado 'Registrada' desde bandeja de evaluación
+Sistema --> Analista: 2. Presentar expediente de la solicitud, justificación, ECS y anexos
+Analista -> Sistema: 3. Revisar completitud de datos, coherencia de alcance y procedencia
+Analista -> Sistema: 4. Emitir dictamen de admisión formal y categorización preliminar
+Sistema -> Sistema: 5. Validar consistencia de admisibilidad y actualizar estado a 'Clasificada' (RN-01)
+Sistema --> Arquitecto: 6. Notificar RFC admitida habilitada para análisis de impacto técnico
 
-ACT -> UI : Selecciona RFC y valida completitud de datos
-alt Información completa
-    ACT -> UI : Asigna tipo de cambio y criticidad
-    UI -> CTRL : clasificarRFC(rfcId, tipo, criticidad)
-    CTRL -> DB : updateRFC(rfcId, estado="Clasificado", tipo, criticidad)
-    CTRL --> UI : notificarClasificacionExitosa()
-    UI --> ACT : Muestra estado "Clasificado"
-else Información incompleta (Observada)
-    ACT -> UI : Registra observaciones y solicita subsanación
-    UI -> CTRL : observarRFC(rfcId, observaciones)
-    CTRL -> DB : updateRFC(rfcId, estado="En Subsanación", observaciones)
-    CTRL --> UI : notificarEnvioSubsanacion()
-    UI --> ACT : Muestra estado "En Subsanación"
+alt A1: Información incompleta o insuficiente (Observación)
+  Analista -> Sistema: Registrar pliego de observaciones formales
+  Sistema -> Sistema: Actualizar estado de RFC a 'En Subsanación'
+  Sistema --> Solicitante: Notificar observaciones y plazo de subsanación
+else A2: Solicitud improcedente, duplicada o fuera de alcance
+  Analista -> Sistema: Formular dictamen de desestimación fundamentado
+  Sistema -> Sistema: Transicionar estado a 'Desestimada' (RN-07)
+  Sistema --> Solicitante: Notificar cierre anticipado de solicitud
 end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)**
 
 ![Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)](assets/DG-SEQ-06.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-06
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)</b>
 
-actor "Arquitecto / Especialista Técnico" as ACT
-boundary "UI Análisis Técnico" as UI
-control "Controlador Impacto" as CTRL
-entity "Servicio Dependencias ECS" as SRV
-database "BD TraceFlow" as DB
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Selecciona RFC clasificada para análisis
-UI -> CTRL : getDetalleRFCYDependencias(rfcId)
-CTRL -> SRV : calcularImpactoArquitectura(rfcId)
-SRV -> DB : findDependenciasECS(ecsId)
-DB --> SRV : grafoDependencias
-SRV --> CTRL : reporteDependencias
-CTRL --> UI : mostrarDatosAnalisis(reporteDependencias)
+Arquitecto -> Sistema: 1. Seleccionar RFC en estado 'Clasificada' desde bandeja de análisis
+Sistema --> Arquitecto: 2. Presentar expediente y actualizar estado a 'En Análisis Técnico'
+Arquitecto -> Sistema: 3. Analizar arquitectura, dependencias de ECS, riesgos, esfuerzo, tiempo y costo
+Arquitecto -> Sistema: 4. Evaluar Triple Restricción y dictaminar Cambio Menor o Mayor (RN-05)
+Sistema -> Sistema: 5. Registrar Informe Técnico de Impacto vinculándolo al expediente
+Sistema -> Sistema: 6. Transicionar estado a 'En Evaluación' y enrutar a instancia resolutiva
+Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CCB o Autoridad Delegada
 
-ACT -> UI : Registra esfuerzo, costo, tiempo, riesgos y dictamen técnico
-UI -> CTRL : guardarInformeImpacto(rfcId, informeData)
-CTRL -> DB : insertInformeTecnicoImpacto(informeData)
-CTRL -> DB : updateRFC(rfcId, estado="En Análisis Técnico" -> "En Evaluación CCB")
-CTRL --> UI : notificarInformeEmitido()
-UI --> ACT : Muestra confirmación de informe remitido al CCB
 @enduml
 ```
 
-**Diagrama DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)**
+---
 
-![Diagrama DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)](assets/DG-SEQ-07.png)
+**Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)](assets/DG-SEQ-07.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-07
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
-title <b>DG-SEQ-07: Evaluar viabilidad y aprobación por el CCB (CU-07)</b>
+title <b>DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)</b>
 
-actor "Comité de Control de Cambios (CCB)" as ACT
-boundary "Consola CCB" as UI
-control "Controlador CCB" as CTRL
-database "BD TraceFlow" as DB
+actor "Comité de Control de Cambios (CCB)" as CCB
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
 
-ACT -> UI : Consulta solicitudes en estado "En Evaluación CCB"
-UI -> CTRL : getSolicitudesEvaluacion()
-CTRL -> DB : findRFCsConInformeImpacto()
-DB --> CTRL : listaSolicitudes
-CTRL --> UI : renderBandejaCCB(listaSolicitudes)
+CCB -> Sistema: 1. Acceder al expediente de Cambio Mayor en estado 'En Evaluación'
+Sistema --> CCB: 2. Presentar expediente integral, Informe de Impacto y Triple Restricción
+CCB -> Sistema: 3. Deliberar colegiadamente sobre viabilidad técnica, contractual y económica
+CCB -> Sistema: 4. Registrar votación formal y emitir acta resolutiva aprobatoria (RN-01, RN-05)
+Sistema -> Sistema: 5. Validar cuórum legal, registrar acta formal y actualizar estado a 'Autorizada'
+Sistema --> Solicitante: 6. Notificar formalmente la resolución aprobatoria del CCB
+Sistema --> Admin: 6. Notificar habilitación para emisión de la Orden de Cambio (ECN/ECO)
 
-ACT -> UI : Evalúa viabilidad técnica y dictamen
-alt Cambio No Viable Técnicamente
-    ACT -> UI : Registra causal de rechazo técnico
-    UI -> CTRL : rechazarRFCTecnico(rfcId, causales)
-    CTRL -> DB : updateRFC(rfcId, estado="Rechazado (Técnico)", causales)
-    CTRL --> UI : notificarRechazoTecnico()
-else Cambio Viable pero Rechazado por Gestión
-    ACT -> UI : Registra causal de rechazo administrativo
-    UI -> CTRL : rechazarRFCAdministrativo(rfcId, causales)
-    CTRL -> DB : updateRFC(rfcId, estado="Rechazado (Administrativo)", causales)
-    CTRL --> UI : notificarRechazoAdministrativo()
-else Cambio Aprobado
-    ACT -> UI : Emite aprobación de la Solicitud de Cambio
-    UI -> CTRL : aprobarRFC(rfcId)
-    CTRL -> DB : updateRFC(rfcId, estado="Aprobado - Orden Emitida")
-    CTRL --> UI : habilitarEmisionOrdenCambio()
+alt A1: Dictamen de rechazo colegiado del Cambio Mayor
+  CCB -> Sistema: Registrar votación denegatoria y fundamentar causales en acta
+  Sistema -> Sistema: Transicionar estado de RFC a 'Rechazada' (RN-07)
+  Sistema --> Solicitante: Notificar resolución de rechazo formal fundamentado
 end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)**
 
 ![Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/DG-SEQ-08.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-08
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
 
-actor "Comité de Control de Cambios (CCB)" as ACT
-boundary "Consola CCB" as UI
-control "Controlador Ordenes" as CTRL
-database "BD TraceFlow" as DB
+actor "CCB / Autoridad Delegada" as Autoridad
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
 
-ACT -> UI : Selecciona RFC aprobada y solicita emisión de ECN
-UI -> CTRL : prepararECN(rfcId)
-CTRL -> DB : getDatosRFCYAprobacion(rfcId)
-DB --> CTRL : datosRFC
-CTRL --> UI : renderFormularioECN(datosRFC)
+Autoridad -> Sistema: 1. Seleccionar RFC en estado 'Autorizada'
+Sistema --> Autoridad: 2. Presentar formulario de formalización de ECN/ECO con antecedentes
+Autoridad -> Sistema: 3. Ingresar asignación de Desarrollador, plazos máximos y alcance de cambio
+Sistema -> Sistema: 4. Validar autorización formal vigente y rol activo del Desarrollador (RN-01)
+Sistema -> Sistema: 5. Expedir ECN/ECO con código unívoco y actualizar estado a 'Orden Emitida'
+Sistema --> Admin: 6. Notificar formalmente la emisión de orden para proceder con Check-Out
+Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
 
-ACT -> UI : Asigna Desarrollador responsable y fechas límite
-UI -> CTRL : emitirECN(ecnData)
-CTRL -> DB : insertOrdenCambio(ecnData)
-DB --> CTRL : ecnId
-CTRL -> DB : vincularRFCconECN(rfcId, ecnId)
-CTRL -> DB : registrarAuditoria("EMISION_ECN", ccbId)
-CTRL --> UI : confirmarEmision(ecnId)
-UI --> ACT : Muestra ECN emitida formalmente
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-09: Registrar ECS (CU-09)**
 
 ![Diagrama DG-SEQ-09: Registrar ECS (CU-09)](assets/DG-SEQ-09.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-09
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-09: Registrar ECS (CU-09)</b>
 
-actor "Arquitecto / Especialista Técnico" as ACT
-boundary "UI Gestión ECS" as UI
-control "Controlador ECS" as CTRL
-database "BD TraceFlow" as DB
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
 
-ACT -> UI : Selecciona registrar nuevo Elemento de Configuración
-UI -> CTRL : getProyectosYTiposECS()
-CTRL -> DB : findTiposECS()
-DB --> CTRL : tiposECS
-CTRL --> UI : renderFormularioECS(tiposECS)
+Arquitecto -> Sistema: 1. Seleccionar opción de registrar nuevo Elemento de Configuración (ECS)
+Sistema --> Arquitecto: 2. Presentar formulario de catalogación y jerarquía de componentes
+Arquitecto -> Sistema: 3. Ingresar nombre, clasificación, versión inicial, dependencias y archivo base
+Sistema -> Sistema: 4. Validar unicidad de nombre, estándar mayor.menor.parche y suma de integridad (RN-02)
+Sistema -> Sistema: 5. Registrar ECS con código unívoco y depositar en biblioteca designada (RN-04)
+Sistema --> Arquitecto: 6. Emitir confirmación de catalogación formal del nuevo ECS
+Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de cambios
 
-ACT -> UI : Ingresa nombre, tipo (código/doc/bd), proyecto y ruta
-UI -> CTRL : registrarECS(datosECS)
-CTRL -> DB : insertECS(datosECS, estado="Identificado")
-DB --> CTRL : ecsId
-CTRL -> DB : inicializarHistorialVersiones(ecsId, version="1.0.0")
-CTRL --> UI : notificarRegistroExitoso(ecsId)
-UI --> ACT : Muestra confirmación de ECS catalogado
 @enduml
 ```
 
-**Diagrama DG-SEQ-10: Efectuar Check-Out y bloqueo (CU-10)**
+---
 
-![Diagrama DG-SEQ-10: Efectuar Check-Out y bloqueo (CU-10)](assets/DG-SEQ-10.png)
+**Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)](assets/DG-SEQ-10.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-10
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
-title <b>DG-SEQ-10: Efectuar Check-Out y aplicar bloqueo (CU-10)</b>
+title <b>DG-SEQ-10: Efectuar Check-Out (CU-10)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Gestión Bibliotecas" as UI
-control "Controlador Bibliotecas" as CTRL
-entity "Servicio Bloqueos SCM" as SRV
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
 
-ACT -> UI : Selecciona ECN autorizada y solicita Check-Out del ECS
-UI -> CTRL : ejecutarCheckOut(ecnId, ecsId)
-CTRL -> SRV : verificarDisponibilidadBloqueo(ecsId)
-alt ECS ya se encuentra bloqueado
-    SRV --> CTRL : error("ECS bloqueado por otro usuario")
-    CTRL --> UI : mostrarErrorBloqueoActivo()
-    UI --> ACT : Informa que el ECS está en edición concurrente
-else ECS disponible
-    SRV -> DB : insertBloqueoSincronizacion(ecsId, ecnId, devId)
-    CTRL -> DB : transferirECS(ecsId, "Biblioteca Soporte", "Biblioteca Trabajo")
-    CTRL -> DB : updateEstadoRFC(rfcId, "En Implementación")
-    CTRL -> DB : registrarAuditoria("CHECK_OUT", ecsId, adminId)
-    CTRL --> UI : confirmarCheckOutExitoso()
-    UI --> ACT : Muestra ECS transferido con bloqueo activo
-end
+Admin -> Sistema: 1. Seleccionar Orden de Cambio en estado 'Orden Emitida'
+Sistema --> Admin: 2. Presentar datos de ECN/ECO, ECS en Biblioteca de Soporte y Desarrollador asignado
+Admin -> Sistema: 3. Confirmar operación de Check-Out hacia la Biblioteca de Trabajo
+Sistema -> Sistema: 4. Validar ausencia de bloqueo previo y verificar integridad del ECS (RN-06)
+Sistema -> Sistema: 5. Transferir copia a Biblioteca de Trabajo, aplicar bloqueo y actualizar a 'En Implementación'
+Sistema --> Admin: 6. Registrar asiento histórico de Check-Out en bitácora de auditoría
+Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de actividades técnicas
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)**
 
 ![Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)](assets/DG-SEQ-11.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-11
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Bloqueos SCM" as UI
-control "Controlador Bloqueos" as CTRL
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Consulta estado de bloqueos del ECS
-UI -> CTRL : getEstadoBloqueo(ecsId)
-CTRL -> DB : findBloqueoByECS(ecsId)
-DB --> CTRL : estadoBloqueo
-CTRL --> UI : mostrarDetalleBloqueo(estadoBloqueo)
+Admin -> Sistema: 1. Solicitar aplicación de bloqueo de sincronización sobre ECS
+Sistema -> Sistema: 2. Consultar estado actual de concurrencia del ECS en el catálogo
+Sistema -> Sistema: 3. Validar ausencia de bloqueo activo preexistente sobre el ECS (RN-06)
+Sistema -> Sistema: 4. Registrar bloqueo exclusivo asociando Desarrollador, ECN/ECO y estampa temporal
+Sistema -> Sistema: 5. Actualizar catálogo impidiendo nuevas operaciones de Check-Out a terceros
+Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en auditoría
 
-ACT -> UI : Confirma imposición / verificación de bloqueo
-UI -> CTRL : aplicarBloqueo(ecsId, motivo)
-CTRL -> DB : updateBloqueo(ecsId, estado="ACTIVO", motivo)
-CTRL -> DB : registrarAuditoria("BLOQUEO_APLICADO", ecsId)
-CTRL --> UI : notificarBloqueoActivo()
-UI --> ACT : Muestra bloqueo activo en Biblioteca de Trabajo
 @enduml
 ```
 
-**Diagrama DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)**
+---
 
-![Diagrama DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)](assets/DG-SEQ-12.png)
+**Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)](assets/DG-SEQ-12.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-12
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
-title <b>DG-SEQ-12: Efectuar Check-In a Biblioteca Maestra (CU-12)</b>
+title <b>DG-SEQ-12: Efectuar Check-In (CU-12)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Gestión Bibliotecas" as UI
-control "Controlador Bibliotecas" as CTRL
-entity "Servicio Certificación QA" as SRV_QA
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Comité de Control de Cambios (CCB)" as CCB
 
-ACT -> UI : Selecciona ECS certificado para Check-In
-UI -> CTRL : solicitarCheckIn(ecsId, ecnId, mensajeVersion)
-CTRL -> SRV_QA : verificarCertificacionConformidad(ecnId)
-SRV_QA -> DB : findCertificacionByECN(ecnId)
-DB --> SRV_QA : certificacionValida
-SRV_QA --> CTRL : autorizacionConforme
+Admin -> Sistema: 1. Seleccionar RFC con doble validación aprobada para proceder al Check-In
+Sistema --> Admin: 2. Presentar expediente técnico consolidando ECN/ECO, Certificado QA y Acta UAT
+Admin -> Sistema: 3. Confirmar transferencia formal del ECS hacia la Biblioteca Maestra
+Sistema -> Sistema: 4. Validar Orden Emitida, Certificado QA, Acta UAT, checksum y bloqueo vigente (RN-09)
+Sistema -> Sistema: 5. Integrar ECS en Biblioteca Maestra, asignar nueva versión y liberar bloqueo (RN-02, RN-06)
+Sistema --> Admin: 6. Registrar asiento histórico de Check-In en bitácora de auditoría
+Sistema --> CCB: 6. Notificar integración exitosa habilitando la creación de la nueva Línea Base
 
-CTRL -> DB : transferirECS(ecsId, "Biblioteca Trabajo", "Biblioteca Maestra")
-CTRL -> DB : releaseBloqueoSincronizacion(ecsId)
-CTRL -> DB : insertVersionHistorial(ecsId, mensajeVersion)
-CTRL -> DB : registrarAuditoria("CHECK_IN_MAESTRA", ecsId, adminId)
-CTRL --> UI : notificarCheckInCompletado()
-UI --> ACT : Muestra ECS integrado y bloqueo liberado
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)**
 
 ![Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)](assets/DG-SEQ-13.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-13
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-13: Consultar historial de versiones (CU-13)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Trazabilidad Versiones" as UI
-control "Controlador Historial" as CTRL
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Selecciona ECS y solicita ver historial
-UI -> CTRL : getHistorialVersiones(ecsId)
-CTRL -> DB : findVersionesByECS(ecsId)
-DB --> CTRL : listaVersionesConHashYAutor
-CTRL --> UI : renderHistorial(listaVersiones)
+Admin -> Sistema: 1. Seleccionar ECS en el catálogo y solicitar consulta de historial
+Sistema -> Sistema: 2. Recuperar historial de versiones y bitácora de transacciones del elemento
+Sistema --> Admin: 3. Presentar lista cronológica de versiones, autor, fecha, ECN/ECO y biblioteca
+Admin -> Sistema: 4. Seleccionar versión específica para inspeccionar detalles
+Sistema --> Admin: 5. Presentar memoria descriptiva, firmas de auditoría e integridad (RN-03)
+Sistema --> Admin: 6. Habilitar comparación conceptual de diferencias entre versiones
 
-ACT -> UI : Selecciona versión específica para comparar
-UI -> CTRL : compararVersiones(versionA, versionB)
-CTRL -> DB : getDiffEntreVersiones(versionA, versionB)
-DB --> CTRL : diffData
-CTRL --> UI : renderComparador(diffData)
-UI --> ACT : Muestra diferencias y trazabilidad de cambios
+opt A1: Comparación de diferencias entre dos versiones históricas
+  Admin -> Sistema: Seleccionar dos versiones y solicitar comparación
+  Sistema --> Admin: Presentar vista comparativa de diferencias conceptuales
+end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)**
 
 ![Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)](assets/DG-SEQ-14.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-14
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-14: Implementar cambio en el ECS (CU-14)</b>
 
-actor "Ingeniero de Software\n/ Desarrollador" as ACT
-boundary "UI Espacio de Trabajo" as UI
-control "Controlador Trabajo" as CTRL
-database "Biblioteca de Trabajo" as LIB_WRK
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Accede al ECS autorizado bajo Check-Out
-UI -> CTRL : obtenerCopiaTrabajo(ecsId, ecnId)
-CTRL -> LIB_WRK : getArchivoECS(ecsId)
-LIB_WRK --> CTRL : archivoFuente
-CTRL --> UI : cargarEntornoEdicion(archivoFuente)
+Dev -> Sistema: 1. Acceder a Biblioteca de Trabajo y visualizar ECN/ECO asignada
+Sistema --> Dev: 2. Presentar alcance técnico, criterios de aceptación y ECS desbloqueado
+Dev -> Sistema: 3. Realizar modificaciones, adaptaciones o correcciones sobre copia de trabajo
+Sistema -> Sistema: 4. Registrar progreso de cambios vinculándolos a la ECN/ECO (RN-03)
+Dev -> Sistema: 5. Formular memoria descriptiva detallando componentes modificados
+Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pruebas unitarias
 
-ACT -> UI : Realiza modificaciones requeridas por la ECN
-ACT -> UI : Guarda avances intermedios
-UI -> CTRL : guardarCambiosEnTrabajo(ecsId, contenidoModificado)
-CTRL -> LIB_WRK : updateArchivoTrabajo(ecsId, contenidoModificado)
-LIB_WRK --> CTRL : guardadoExitoso
-CTRL --> UI : notificarGuardado()
-UI --> ACT : Confirma actualización local en Biblioteca de Trabajo
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)**
 
 ![Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)](assets/DG-SEQ-15.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-15
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)</b>
 
-actor "Ingeniero de Software\n/ Desarrollador" as ACT
-boundary "UI Pruebas Locales" as UI
-control "Runner Pruebas Unitarias" as RUNNER
-database "Biblioteca de Trabajo" as LIB_WRK
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Solicita ejecución de suite unitaria local
-UI -> RUNNER : ejecutarPruebasUnitarias(ecsId)
-RUNNER -> LIB_WRK : cargarModuloModificado(ecsId)
-RUNNER -> RUNNER : ejecutarTests()
-RUNNER --> UI : reporteResultados(testsPasados, fallos)
+Dev -> Sistema: 1. Solicitar ejecución de conjunto de pruebas unitarias sobre ECS modificado
+Sistema --> Dev: 2. Presentar entorno de verificación unitaria y casos de prueba asociados
+Dev -> Sistema: 3. Disparar ejecución de batería de pruebas en Biblioteca de Trabajo
+Sistema -> Sistema: 4. Validar ejecución sin errores y satisfacción de criterios de cobertura (RN-01)
+Sistema -> Sistema: 5. Registrar reporte de resultados unitarios en bitácora de ECN/ECO (RN-03)
+Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a pruebas de integración
 
-alt Pruebas aprobadas (100% éxito)
-    UI --> ACT : Muestra resultado conforme; habilita entrega a QA
-else Pruebas con fallos
-    UI --> ACT : Muestra fallos y líneas con errores para corrección
-end
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)**
 
 ![Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)](assets/DG-SEQ-16.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-16
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-16: Ejecutar pruebas de integración (CU-16)</b>
 
-actor "Equipo de Calidad / Testing" as ACT
-boundary "UI Calidad y Pruebas" as UI
-control "Controlador QA" as CTRL
-database "Biblioteca de Soporte" as LIB_SUP
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Selecciona cambio entregado para validación
-UI -> CTRL : iniciarValidacionIntegracion(ecnId)
-CTRL -> LIB_SUP : desplegarEntornoPruebas(ecnId)
-CTRL -> CTRL : ejecutarBateriaIntegracionYFuncional()
-CTRL --> UI : reporteQA(casosPrueba, conformidades, noConformidades)
-UI --> ACT : Visualiza matriz de resultados de pruebas
+QA -> Sistema: 1. Seleccionar RFC en estado 'En Pruebas' desde panel de control
+Sistema --> QA: 2. Presentar expediente, ECN/ECO, ECS en Biblioteca de Soporte y plan de pruebas
+QA -> Sistema: 3. Ejecutar casos de prueba funcionales, de integración y regresión en Soporte
+Sistema -> Sistema: 4. Registrar resultados de cada caso de prueba (aprobado/fallido) y evidencias
+Sistema -> Sistema: 5. Consolidar informe de ejecución determinando cobertura y criterios de calidad
+Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certificar o reportar fallo
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)**
 
 ![Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)](assets/DG-SEQ-17.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-17
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-17: Certificar conformidad del cambio (CU-17)</b>
 
-actor "Equipo de Calidad / Testing" as ACT
-boundary "UI Calidad y Pruebas" as UI
-control "Controlador QA" as CTRL
-database "BD TraceFlow" as DB
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
 
-ACT -> UI : Confirma aprobación de todas las pruebas QA
-UI -> CTRL : certificarCambio(ecnId, actaPruebas)
-CTRL -> DB : insertCertificacionConformidad(ecnId, actaPruebas, qaId)
-CTRL -> DB : updateEstadoRFC(rfcId, "En Validación QA" -> "Certificado")
-CTRL -> DB : registrarAuditoria("CERTIFICACION_CONFORMIDAD", ecnId)
-CTRL --> UI : notificarCertificacionExitosa()
-UI --> ACT : Muestra Certificado de Conformidad emitido
+QA -> Sistema: 1. Seleccionar RFC con pruebas de integración conformes en estado 'En Pruebas'
+Sistema --> QA: 2. Presentar consolidado de resultados, informe de cobertura y ausencia de defectos
+QA -> Sistema: 3. Suscribir formalmente el dictamen técnico de Certificación de Conformidad
+Sistema -> Sistema: 4. Validar criterios técnicos de aceptación y ausencia de incidencias (RN-09)
+Sistema -> Sistema: 5. Registrar Certificado Técnico de Conformidad y actualizar estado a 'En Aceptación'
+Sistema --> Solicitante: 6. Notificar formalmente para validación de aceptación funcional (UAT)
+Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
+
 @enduml
 ```
 
-<!-- PENDIENTE DE VALIDACION: El mensaje updateEstadoRFC(..., 'Certificado') utiliza un estado que no pertenece a la máquina de estados de la RFC de la sección 5.3. -->
+---
 
 **Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)**
 
 ![Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)](assets/DG-SEQ-18.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-18
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-18: Reportar no conformidad (CU-18)</b>
 
-actor "Equipo de Calidad / Testing" as ACT
-boundary "UI Hallazgos QA" as UI
-control "Controlador Hallazgos" as CTRL
-database "BD TraceFlow" as DB
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
 
-ACT -> UI : Registra defectos encontrados en validación
-UI -> CTRL : reportarNoConformidad(ecnId, hallazgos, severidad)
-CTRL -> DB : insertNoConformidad(ecnId, hallazgos, severidad)
-CTRL -> DB : updateEstadoRFC(rfcId, "En Corrección")
-CTRL -> DB : notificarDesarrollador(ecnId, hallazgos)
-CTRL --> UI : confirmarRegistroNoConformidad()
-UI --> ACT : Muestra no conformidad registrada y asignada
+QA -> Sistema: 1. Seleccionar opción de reportar no conformidad sobre RFC en 'En Pruebas'
+Sistema --> QA: 2. Presentar formulario de registro de defectos precargando pruebas fallidas
+QA -> Sistema: 3. Detallar descripción del error, severidad, pasos de reproducción y evidencias
+Sistema -> Sistema: 4. Validar reporte, asentar defecto e incrementar contador de ciclos (RN-08)
+Sistema -> Sistema: 5. Registrar Informe de No Conformidad y suspender trámite de certificación
+Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Biblioteca de Trabajo
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)**
 
 ![Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)](assets/DG-SEQ-19.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-19
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-19: Reevaluar y re-testear (CU-19)</b>
 
-actor "Equipo de Calidad / Testing" as ACT
-boundary "UI Re-testeo QA" as UI
-control "Controlador ReTest" as CTRL
-database "BD TraceFlow" as DB
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
 
-ACT -> UI : Selecciona corrección entregada por Desarrollador
-UI -> CTRL : iniciarReTest(noConformidadId)
-CTRL -> CTRL : ejecutarPruebasAfectadas()
+QA -> Sistema: 1. Seleccionar RFC con correcciones aplicadas en estado 'En Pruebas'
+Sistema --> QA: 2. Presentar pliego de defectos previos y memorias técnicas de corrección
+QA -> Sistema: 3. Reejecutar casos de prueba focalizados y suite de regresión en Soporte
+Sistema -> Sistema: 4. Validar resultados de re-testeo y constatar levantamiento de fallas (RN-08)
+Sistema -> Sistema: 5. Consolidar dictamen de re-testeo aprobatorio y actualizar expediente
+Sistema --> QA: 6. Derivar flujo hacia Certificación Técnica de Conformidad (CU-17)
+Sistema --> Dev: 6. Notificar resultado favorable del re-testeo de calidad
 
-alt Defecto corregido satisfactoriamente
-    CTRL -> DB : updateNoConformidad(id, estado="SUBSANADA")
-    CTRL --> UI : habilitarCertificacion()
-    UI --> ACT : Muestra prueba superada
-else Defecto persiste y se agotaron reintentos
-    CTRL -> DB : updateNoConformidad(id, estado="FALLO_PERSISTENTE")
-    CTRL -> DB : dispararAlertaRollback(ecnId)
-    CTRL --> UI : notificarDerivacionRollback()
-    UI --> ACT : Muestra alerta de fallo no subsanado
+alt E1: Fallo definitivo de re-testeo por agotamiento de instancias
+  Sistema -> Sistema: Declarar fallo técnico insubsanable por límite de ciclos
+  Sistema --> QA: Notificar agotamiento de instancias y bloqueo de re-test
+  Sistema --> Dev: Notificar activación obligatoria de Rollback (CU-21)
 end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)**
 
 ![Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)](assets/DG-SEQ-20.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-20
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-20: Crear y congelar línea base (CU-20)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Líneas Base" as UI
-control "Controlador Líneas Base" as CTRL
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Comité de Control de Cambios (CCB)" as CCB
+actor "Solicitante" as Solicitante
 
-ACT -> UI : Selecciona ECS certificado en Biblioteca Maestra
-UI -> CTRL : solicitarCreacionLineaBase(proyectoId, ecsId)
-CTRL --> UI : mostrarFormularioLineaBase()
+Admin -> Sistema: 1. Acceder al módulo de Líneas Base y seleccionar ECS tras Check-In
+Sistema --> Admin: 2. Presentar inventario con versiones integradas y doble conformidad
+Admin -> Sistema: 3. Asignar etiqueta formal de versionamiento y solicitar congelamiento
+Sistema -> Sistema: 4. Validar estándar de versiones y pertenencia a Biblioteca Maestra (RN-02, RN-04)
+Sistema -> Sistema: 5. Congelar Línea Base contra edición, registrar firma y actualizar a 'Implementada'
+Sistema --> Admin: 6. Expedir Certificado formal de nueva Línea Base congelada
+Sistema --> CCB: 6. Notificar cierre exitoso del cambio en estado Implementada (RF-14, RN-07)
+Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
 
-ACT -> UI : Ingresa versión (mayor.menor.parche) y descripción
-UI -> CTRL : congelarLineaBase(proyectoId, version, ecsLista)
-CTRL -> DB : validarFormatoVersion(version)
-CTRL -> DB : insertLineaBase(proyectoId, version, estado="CONGELADA")
-DB --> CTRL : lineaBaseId
-CTRL -> DB : vincularECSaLineaBase(lineaBaseId, ecsLista)
-CTRL -> DB : registrarAuditoria("LINEA_BASE_CONGELADA", lineaBaseId, adminId)
-CTRL --> UI : confirmarLineaBaseCongelada()
-UI --> ACT : Muestra nueva Línea Base registrada y protegida
 @enduml
 ```
 
-**Diagrama DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)**
+---
 
-![Diagrama DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)](assets/DG-SEQ-21.png)
+**Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)](assets/DG-SEQ-21.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-21
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
-title <b>DG-SEQ-21: Ejecutar rollback en Biblioteca de Trabajo (CU-21)</b>
+title <b>DG-SEQ-21: Ejecutar rollback (CU-21)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Gestión Rollback" as UI
-control "Controlador Rollback" as CTRL
-database "Biblioteca de Trabajo" as LIB_WRK
-database "Biblioteca de Soporte" as LIB_SUP
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+actor "Comité de Control de Cambios (CCB)" as CCB
 
-ACT -> UI : Confirma ejecución de Rollback por fallo persistente
-UI -> CTRL : ejecutarRollbackTrabajo(ecsId, ecnId)
-CTRL -> LIB_SUP : getCopiaOriginalPrevia(ecsId)
-LIB_SUP --> CTRL : archivoOriginal
-CTRL -> LIB_WRK : sobreescribirConOriginal(ecsId, archivoOriginal)
-LIB_WRK --> CTRL : restauradoExitoso
+Admin -> Sistema: 1. Seleccionar orden no conforme sujeta a reversión en Biblioteca de Trabajo
+Sistema --> Admin: 2. Presentar historial de versiones del ECS y versión de origen estable en Soporte
+Admin -> Sistema: 3. Confirmar ejecución de reversión (rollback) sobre la copia de trabajo
+Sistema -> Sistema: 4. Validar que ECS no ingresó a Maestra y restringir reversión a Trabajo (RN-08)
+Sistema -> Sistema: 5. Descartar cambios no conformes, restituir copia previa y liberar bloqueo (RN-06)
+Sistema --> Admin: 6. Asentar acta de reversión en auditoría habilitando cancelación (CU-22)
+Sistema --> Dev: 6. Notificar descarte de copia de trabajo y liberación de bloqueo
+Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de Trabajo
 
-CTRL -> DB : releaseBloqueoSincronizacion(ecsId)
-CTRL -> DB : registrarAuditoria("ROLLBACK_TRABAJO", ecsId, ecnId)
-CTRL --> UI : notificarRollbackCompletado()
-UI --> ACT : Muestra estado previo restaurado y bloqueo liberado
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)**
 
 ![Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)](assets/DG-SEQ-22.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-22
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-22: Cancelar Orden de Cambio (CU-22)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Cancelación SCM" as UI
-control "Controlador Cierre" as CTRL
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Comité de Control de Cambios (CCB)" as CCB
 
-ACT -> UI : Selecciona ECN tras ejecución de Rollback
-UI -> CTRL : cancelarOrdenCambio(ecnId, causa="Fallo No Subsanado")
-CTRL -> DB : updateECN(ecnId, estado="CANCELADA")
-CTRL -> DB : updateRFC(rfcId, estado="Cancelado (Fallo No Subsanado)")
-CTRL -> DB : notificarSolicitante(rfcId, "Cancelado por Fallo No Subsanado")
-CTRL -> DB : registrarAuditoria("CANCELACION_ECN", ecnId)
-CTRL --> UI : confirmarCancelacionFormal()
-UI --> ACT : Muestra ECN cancelada y trámite cerrado
+Admin -> Sistema: 1. Seleccionar Orden de Cambio sujeta a cancelación definitiva
+Sistema --> Admin: 2. Presentar constancia de rollback ejecutado e informe de fallos no subsanados
+Admin -> Sistema: 3. Registrar fundamentación administrativa y técnica de la cancelación
+Sistema -> Sistema: 4. Validar rollback previo en Biblioteca de Trabajo y bloqueo liberado (RN-08)
+Sistema -> Sistema: 5. Revocar formalmente ECN/ECO y actualizar estado oficial a 'Cancelada'
+Sistema --> Solicitante: 6. Notificar cierre formal por fallo no subsanado (RF-14, RN-07)
+Sistema --> CCB: 6. Notificar resolución formal de cancelación de la orden
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-23: Registrar incidencia (CU-23)**
 
 ![Diagrama DG-SEQ-23: Registrar incidencia (CU-23)](assets/DG-SEQ-23.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-23
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-23: Registrar incidencia (CU-23)</b>
 
-actor "Solicitante" as ACT
-boundary "UI Mesa de Ayuda" as UI
-control "Controlador Tickets" as CTRL
-database "BD TraceFlow" as DB
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Analista de Requerimientos\n/ Gestor" as Analista
 
-ACT -> UI : Ingresa al portal de soporte y selecciona nueva incidencia
-UI -> CTRL : getProyectosDisponibles()
-CTRL -> DB : findProyectosCliente(solicitanteId)
-DB --> CTRL : listaProyectos
-CTRL --> UI : mostrarFormularioTicket(listaProyectos)
+Solicitante -> Sistema: 1. Seleccionar registrar nuevo reporte de incidencia en el proyecto
+Sistema --> Solicitante: 2. Presentar formulario de captura de ticket de incidencia
+Solicitante -> Sistema: 3. Ingresar título, descripción del error, pasos, severidad y anexos
+Sistema -> Sistema: 4. Validar completitud de campos y formatos de archivos autorizados
+Sistema -> Sistema: 5. Registrar ticket de soporte con código correlativo en estado 'Abierta'
+Sistema --> Solicitante: 6. Emitir comprobante de recepción formal de ticket
+Sistema --> Analista: 6. Notificar nuevo ticket de incidencia para evaluación y atención
 
-ACT -> UI : Ingresa título, descripción de falla y severidad
-UI -> CTRL : crearTicket(ticketData)
-CTRL -> DB : insertTicketIncidencia(ticketData, estado="Abierto")
-DB --> CTRL : ticketId
-CTRL --> UI : notificarTicketCreado(ticketId)
-UI --> ACT : Muestra confirmación con número de ticket
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)**
 
 ![Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)](assets/DG-SEQ-24.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-24
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-24: Consultar estado de ticket (CU-24)</b>
 
-actor "Solicitante" as ACT
-boundary "UI Mesa de Ayuda" as UI
-control "Controlador Tickets" as CTRL
-database "BD TraceFlow" as DB
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Ingresa número de ticket o consulta historial
-UI -> CTRL : getEstadoTicket(ticketId)
-CTRL -> DB : findTicketById(ticketId)
-DB --> CTRL : ticketDetalleYHistorial
-CTRL --> UI : renderEstadoTicket(ticketDetalleYHistorial)
-UI --> ACT : Muestra estado actual, respuestas y RFC asociada
+Solicitante -> Sistema: 1. Acceder a bandeja de tickets de soporte del proyecto asignado
+Sistema --> Solicitante: 2. Presentar listado de tickets registrados con estados de atención
+Solicitante -> Sistema: 3. Seleccionar ticket de incidencia específico para inspeccionar
+Sistema -> Sistema: 4. Recuperar bitácora de seguimiento, comentarios y estado de atención
+Sistema --> Solicitante: 5. Presentar detalle completo y enlace directo hacia la RFC vinculada
+Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones complementarias
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)**
 
 ![Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)](assets/DG-SEQ-25.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-25
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-25: Derivar incidencia a RFC (CU-25)</b>
 
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-boundary "UI Soporte / Analista" as UI
-control "Controlador Incidencias" as CTRL
-database "BD TraceFlow" as DB
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
 
-ACT -> UI : Evalúa ticket de incidencia abierto
-UI -> CTRL : analizarTicket(ticketId)
-CTRL --> UI : mostrarDatosTicket()
+Analista -> Sistema: 1. Seleccionar incidencia abierta y dictaminar que requiere modificación
+Sistema --> Analista: 2. Presentar opción de derivación formal hacia flujo de Solicitudes de Cambio
+Analista -> Sistema: 3. Confirmar derivación identificando ECS preliminar y fundamentando causal
+Sistema -> Sistema: 4. Validar no derivación previa y pre-poblar datos enlazando a CU-04
+Sistema -> Sistema: 5. Registrar formalmente RFC según flujo CU-04 en estado 'Registrada' (RN-01)
+Sistema -> Sistema: 6. Actualizar ticket a 'Derivada' y asentar vínculo bidireccional
+Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimiento
 
-ACT -> UI : Selecciona opción "Derivar a Solicitud de Cambio"
-UI -> CTRL : derivarTicketARFC(ticketId, datosRFC)
-CTRL -> DB : insertRFC(datosRFC, origen="TICKET", ticketId)
-DB --> CTRL : rfcId
-CTRL -> DB : updateTicket(ticketId, estado="Derivado", rfcId)
-CTRL -> DB : registrarAuditoria("DERIVACION_INCIDENCIA_A_RFC", ticketId, rfcId)
-CTRL --> UI : notificarDerivacionExitosa(rfcId)
-UI --> ACT : Muestra RFC generada vinculada al ticket
 @enduml
 ```
 
-**Diagrama DG-SEQ-26: Validar integridad SHA-256 (CU-26)**
+---
 
-![Diagrama DG-SEQ-26: Validar integridad SHA-256 (CU-26)](assets/DG-SEQ-26.png)
+**Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)**
 
-#### Código PlantUML del Diagrama
+![Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)](assets/DG-SEQ-26.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-26
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
-title <b>DG-SEQ-26: Validar integridad mediante checksum SHA-256 (CU-26)</b>
+title <b>DG-SEQ-26: Validar integridad (checksum) (CU-26)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Auditoría SCM" as UI
-control "Controlador Integridad" as CTRL
-entity "Motor Criptográfico" as HASH
-database "Repositorio ECS" as REPO
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Solicita verificación de integridad de un ECS
-UI -> CTRL : validarChecksum(ecsId, version)
-CTRL -> REPO : leerArchivo(ecsId, version)
-REPO --> CTRL : streamBytes
-CTRL -> HASH : calcularSHA256(streamBytes)
-HASH --> CTRL : hashCalculado
+Admin -> Sistema: 1. Solicitar validar la integridad del artefacto de software
+Sistema -> Sistema: 2. Recuperar artefacto de biblioteca y consultar firma oficial almacenada
+Sistema -> Sistema: 3. Calcular firma de comprobación actual sobre el contenido del artefacto
+Sistema -> Sistema: 4. Validar equivalencia exacta entre firma calculada y firma oficial (RN-04)
+Sistema -> Sistema: 5. Dictaminar conformidad de integridad y asentar estampa en auditoría
+Sistema --> Admin: 6. Confirmar integridad del ECS autorizando prosecución de operaciones (RN-09)
 
-CTRL -> DB : getChecksumRegistrado(ecsId, version)
-DB --> CTRL : hashAlmacenado
-
-alt Hash idéntico
-    CTRL --> UI : reporteIntegridad("INTEGRO", hashCalculado)
-    UI --> ACT : Muestra verificación exitosa
-else Hash divergente
-    CTRL -> DB : registrarAlertaSeguridad("INTEGRIDAD_COMPROMETIDA", ecsId)
-    CTRL --> UI : reporteIntegridad("ALTERADO", hashCalculado, hashAlmacenado)
-    UI --> ACT : Alerta de corrupción o alteración no autorizada
+alt E1: Discrepancia en la validación de integridad (Firma alterada)
+  Sistema -> Sistema: Declarar no conformidad por alteración o corrupción
+  Sistema -> Sistema: Bloquear extracción o integración del artefacto corrupto
+  Sistema --> Admin: Alertar riesgo de seguridad y registrar anomalía crítica
 end
+
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)**
 
 ![Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)](assets/DG-SEQ-27.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-27
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-27: Auditar acciones del sistema (CU-27)</b>
 
-actor "Comité de Control de Cambios (CCB)" as ACT
-boundary "UI Auditoría" as UI
-control "Controlador Auditoría" as CTRL
-database "BD TraceFlow (Logs)" as DB
+actor "Comité de Control de Cambios (CCB)" as CCB
+participant "TraceFlow SCM" as Sistema
 
-ACT -> UI : Define filtros de auditoría (fechas, usuario, ECS, acción)
-UI -> CTRL : consultarLogsAuditoria(filtros)
-CTRL -> DB : findLogsAudit(filtros)
-DB --> CTRL : registrosAuditoria
-CTRL --> UI : renderResultadosAuditoria(registrosAuditoria)
+CCB -> Sistema: 1. Acceder al panel de auditoría y trazabilidad del sistema
+Sistema --> CCB: 2. Presentar opciones de consulta y filtrado de bitácora histórica
+CCB -> Sistema: 3. Definir criterios de inspección por proyecto, rango de fechas, actor u operación
+Sistema -> Sistema: 4. Validar privilegios para visualización de registros confidenciales (RBAC)
+Sistema --> CCB: 5. Presentar secuencia cronológica de transacciones críticas y estados (RN-01)
+CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de trazabilidad
 
-ACT -> UI : Solicita exportación de pista de auditoría
-UI -> CTRL : exportarPistaAuditoria(filtros)
-CTRL --> UI : archivoDescarga (PDF/CSV)
-UI --> ACT : Entrega reporte formal de auditoría
 @enduml
 ```
+
+---
 
 **Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)**
 
 ![Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)](assets/DG-SEQ-28.png)
 
-#### Código PlantUML del Diagrama
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
 
 ```plantuml
-@startuml
+@startuml DG-SEQ-28
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
-autonumber
+skinparam sequenceMessageAlign center
 
 title <b>DG-SEQ-28: Generar reportes de estado (CU-28)</b>
 
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-boundary "UI Reportes" as UI
-control "Controlador Reportes" as CTRL
-database "BD TraceFlow" as DB
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Comité de Control de Cambios (CCB)" as CCB
 
-ACT -> UI : Selecciona tipo de reporte (inventario ECS, estado RFC, actas)
-UI -> CTRL : generarReporte(tipoReporte, proyectoId)
-CTRL -> DB : consolidarDatosReporte(tipoReporte, proyectoId)
-DB --> CTRL : datosConsolidados
-CTRL -> CTRL : compilarDocumentoReporte(datosConsolidados)
-CTRL --> UI : mostrarVistaPreviaReporte()
-UI --> ACT : Presenta vista previa y botón de descarga
+Admin -> Sistema: 1. Seleccionar opción de generación de reportes en panel de control
+Sistema --> Admin: 2. Presentar catálogo oficial de reportes respaldados por RF-18
+Admin -> Sistema: 3. Seleccionar tipo de reporte (Flujo, ECS o Actas) y definir parámetros
+Sistema -> Sistema: 4. Validar parámetros de consulta y compilar información desde registros (RN-01)
+Sistema -> Sistema: 5. Generar reporte estructurado con métricas, estados y firmas (RN-07)
+Sistema --> Admin: 6. Presentar reporte en pantalla y habilitar exportación documental formal
+Sistema --> CCB: 6. Remitir reporte consolidado oficial a dirección de proyecto y CCB
+
 @enduml
 ```
+
+---
+
+**Diagrama DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)**
+
+![Diagrama DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)](assets/DG-SEQ-29.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
+
+```plantuml
+@startuml DG-SEQ-29
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
+
+actor "Solicitante\n(Usuario Final)" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+Solicitante -> Sistema: 1. Acceder a bandeja y seleccionar RFC en 'En Aceptación' certificada por QA
+Sistema --> Solicitante: 2. Presentar entorno de pruebas de aceptación y resumen de necesidad original
+Solicitante -> Sistema: 3. Ejecutar pruebas de aceptación verificando satisfacción de necesidades operativas
+Solicitante -> Sistema: 4. Confirmar que solución satisface requerimientos y suscribir Acta UAT
+Sistema -> Sistema: 5. Validar suscripción de acta, verificar certificación de QA y anexar al expediente (RN-09)
+Sistema --> Solicitante: 6. Emitir constancia formal de conformidad de usuario
+Sistema --> Admin: 6. Notificar cumplimiento de doble validación para Check-In a Maestra
+
+alt E1: Rechazo funcional de usuario por insatisfacción de necesidad original
+  Solicitante -> Sistema: Registrar Acta de No Aceptación UAT detallando discrepancias
+  Sistema -> Sistema: Bloquear Check-In a Biblioteca Maestra (RN-09)
+  Sistema --> Admin: Notificar activación obligatoria de Rollback (CU-21) y Cancelación (CU-22)
+end
+
+@enduml
+```
+
+---
+
+**Diagrama DG-SEQ-30: Autorizar Cambio Menor (CU-30)**
+
+![Diagrama DG-SEQ-30: Autorizar Cambio Menor (CU-30)](assets/DG-SEQ-30.png)
+
+#### Código PlantUML del Diagrama (Secuencia de Análisis)
+
+```plantuml
+@startuml DG-SEQ-30
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-30: Autorizar Cambio Menor (CU-30)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+Analista -> Sistema: 1. Acceder a RFC de Cambio Menor en estado 'En Evaluación'
+Arquitecto -> Sistema: 1. Acceder a RFC de Cambio Menor en estado 'En Evaluación'
+Sistema --> Analista: 2. Presentar Informe de Impacto acreditando no afectación a Triple Restricción
+Sistema --> Arquitecto: 2. Presentar Informe de Impacto acreditando no afectación a Triple Restricción
+Analista -> Sistema: 3. Revisar viabilidad operativa y emitir visto bueno funcional
+Arquitecto -> Sistema: 4. Validar viabilidad arquitectural y emitir visto bueno técnico
+Sistema -> Sistema: 5. Validar concurrencia de ambas aprobaciones y actualizar estado a 'Autorizada' (RN-01, RN-05)
+Sistema --> Solicitante: 6. Notificar autorización formal de Cambio Menor
+Sistema --> Admin: 6. Notificar habilitación para emisión de ECN/ECO bajo autoridad delegada
+
+alt A1: Rechazo por rebasamiento de límites delegados
+  Analista -> Sistema: Denegar visto bueno delegado fundamentando causal
+  Sistema -> Sistema: Reescalar RFC a Cambio Mayor para CCB (CU-07) o transicionar a 'Rechazada'
+  Sistema --> Solicitante: Notificar reescalamiento o resolución denegatoria
+end
+
+@enduml
+```
+
+---
 
 ### 6.2.2. Diagrama de Clases
 

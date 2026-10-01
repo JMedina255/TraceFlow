@@ -6811,7 +6811,7 @@ class "CheckOutModal (NAV-16 / CU-10, CU-11)" as CheckOutDialog <<dialog>> {
     +ecsTargetInfo: ECSReferenceCard (ID, Nombre, Versión origen en Soporte)
     +assignedDeveloper: UserSelector (Ingeniero de Software PU-06)
     +authorizedECN: ECNSelector (Orden de Cambio aprobada)
-    +lockOptionCheckbox: Checkbox ("Aplicar Bloqueo Exclusivo de Sincronización - RN-06 [OBLIGATORIO]")
+    +lockMandatoryNotice: StatusText ("🔒 Bloqueo Exclusivo RN-06: Se aplicará automáticamente al confirmar Check-Out (El usuario no puede desactivarlo)")
     +btnExecuteCheckOut: ActionButton ("Confirmar Check-Out y Bloquear")
     -- Efecto Transaccional --
     * Copia física a /storage/trabajo/{devId}/{ecsId}
@@ -6955,7 +6955,7 @@ class "UserDecisionAndSignaturePanel" as Signature <<auth>> {
     +observationsInput: TextArea ("Observaciones del Solicitante / Usuario Final")
     +radioAcceptanceDecision: RadioGroup (ACEPTADA CONFORME / RECHAZADA)
     +signatureConfirmationCheck: Checkbox ("Suscribo formalmente en calidad de Solicitante autorizador")
-    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Maestra / CU-20)")
+    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Check-In Maestra CU-12 Variante B -> CU-20)")
     +btnSubmitUATRechazo: DangerButton ("Rechazar Aceptación (Deriva a Corrección/Rollback)")
 }
 
@@ -7000,7 +7000,7 @@ class "SCMGovernanceContainer" as Gov <<base>> {
 
 package "Zona A: Congelamiento de Línea Base (NAV-22 / CU-20)" as BaselineZone <<baseline>> {
     class "BaselineCreationPanel" as B1 <<baseline>> {
-        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0 (Nomenclatura RN-02)")
+        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0.0 (Nomenclatura RN-02)")
         +selectECSInMaster: MultiSelectList ("Seleccionar Versiones Certificadas en Maestra")
         +baselineDescription: TextArea ("Alcance y Justificación de la Línea Base")
         +preconditionIndicator: Badge ("Doble Conformidad (QA Conforme + Acta UAT) Verificada")

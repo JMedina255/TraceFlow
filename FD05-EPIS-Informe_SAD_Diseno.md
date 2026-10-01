@@ -1,9 +1,9 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 > **Documento de Arquitectura de Software (SAD) — Fase de Diseño**  
-> **Versión:** 0.3 (Borrador de Diseño Controlado — Modelos UWE de Navegación y Presentación)  
+> **Versión:** 0.4 (Borrador de Diseño Controlado — Wireframes de Baja Fidelidad)  
 > **Fecha:** Octubre 2026  
-> **Estado:** BORRADOR DE DISEÑO v0.3 (En proceso de revisión — No congelado como Baseline)  
+> **Estado:** BORRADOR DE DISEÑO v0.4 (En proceso de revisión — No congelado como Baseline)  
 > **Repositorio Oficial:** `TraceFlow`  
 > **Organización Cliente:** ÉXODO S.A.C.  
 > **Equipo de Desarrollo:** C-SharkTeam  
@@ -43,6 +43,7 @@
 | **0.1** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | Emisión inicial del SAD de Diseño (Borrador Controlado v0.1) a partir de las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los registros de decisión aprobados (ADR-001 a ADR-010). |
 | **0.2** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Auditoría y Saneamiento Técnico Integral**: Corrección de actores canónicos en secuencias técnicas (DG-DSEQ-10, 12, 17, 20, 21, 30); delimitación de Check-In (CU-12) vs Línea Base (CU-20); incorporación de autorización compartida para CU-30; precisión del flujo de rollback (CU-21 en Biblioteca de Trabajo); saneamiento de erratas de reglas de negocio (RN-08, RN-05, RN-04); aclaración de seguridad (Argon2id como KDF); desacoplamiento de transacciones DB+Storage con estados intermedios y compensación; y acotamiento de RNF-06. |
 | **0.3** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Incorporación de Modelos UWE de Navegación y Presentación**: Formalización de 28 nodos navegacionales (`NAV-01` a `NAV-28`), 8 diagramas de navegación (`DG-UWE-NAV-01` a `08`), 10 patrones de presentación (`PRES-01` a `PRES-10`), 13 diagramas de presentación (`DG-UWE-PRES-01` a `13`), catálogo de 19 pantallas (`SCREEN-01` a `19`), matrices de trazabilidad y accesibilidad/responsive. Saneamiento de semántica de NAV-20, clasificación de NAV-12 y orígenes de CU-20/21. |
+| **0.4** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Diseño y Formalización de Wireframes de Baja Fidelidad**: Formalización de 20 pantallas físicas (`SCREEN-01` a `SCREEN-20`) y catálogo de wireframes (`WF-01` a `WF-20`), variantes críticas (`WF-06A/B/C`, `WF-13A/B`), especificación de Shell Global, estados transversales de UI y matriz de trazabilidad cruzada. Saneamiento de erratas v0.3: secuencia UAT -> Check-In Maestra -> Línea Base, bloqueo RN-06 no desactivable, nomenclatura mayor.menor.parche (v1.0.0), delimitación de ejecutor exclusivo para Check-Out/In y división de SCREEN-19/20. |
 
 ---
 
@@ -126,18 +127,25 @@
     - 20.2 Catálogo de Patrones de Presentación (PRES-01 a PRES-10)
     - 20.3 Shell Global de la Aplicación (DG-UWE-PRES-01)
     - 20.4 Presentación de Procesos SCM y Vistas Críticas (DG-UWE-PRES-02 a 13)
-    - 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-19)
+    - 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-20)
     - 20.6 Matriz de Trazabilidad Cruzada (NAV ↔ PRES ↔ SCREEN ↔ CU)
     - 20.7 Diseño Adaptativo (Responsive) y Accesibilidad
+21. [Wireframes de Baja Fidelidad](#21-wireframes-de-baja-fidelidad)
+    - 21.1 Objetivo y Convenciones
+    - 21.2 Shell Global de Presentación
+    - 21.3 Primer Lote de Wireframes Críticos (WF-01 a WF-17)
+    - 21.4 Segundo Lote de Wireframes (WF-03 a WF-20)
+    - 21.5 Estados Alternativos y Transversales de UI
+    - 21.6 Matriz de Trazabilidad Cruzada (SCREEN ↔ WF ↔ NAV ↔ PRES ↔ CU)
 
 ---
 
 # 1. Introducción
 
 ## 1.1 Propósito
-El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.3)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces, despliegue, navegación e interacción visual del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
+El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.4)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces, despliegue, navegación, presentación visual y distribución de pantallas (wireframes) del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
 
-Esta versión **v0.3** incorpora de forma exhaustiva los **Modelos UWE de Navegación (Sección 19)** y **Presentación (Sección 20)**, formalizando los 28 nodos navegacionales (`NAV-01` a `NAV-28`), 8 diagramas de navegación (`DG-UWE-NAV-01` a `08`), 10 patrones de presentación (`PRES-01` a `PRES-10`), 13 diagramas de presentación (`DG-UWE-PRES-01` a `13`), catálogo de 19 pantallas (`SCREEN-01` a `19`) y el saneamiento riguroso de la semántica de `NAV-20`, la clasificación de `NAV-12` y los puntos de origen del Bibliotecario para `CU-20` y `CU-21`.
+Esta versión **v0.4** formaliza exhaustivamente los **Wireframes de Baja Fidelidad (Sección 21)**, cubriendo el catálogo completo de 20 pantallas físicas (`SCREEN-01` a `SCREEN-20`) y 20 wireframes canónicos (`WF-01` a `WF-20`) junto con sus variantes críticas (`WF-06A/B/C`, `WF-13A/B`), incorporando el saneamiento riguroso de v0.3 (secuencia UAT -> Check-In Maestra -> Línea Base, bloqueo RN-06 no desactivable, nomenclatura de versión mayor.menor.parche v1.0.0, ejecutor exclusivo del Bibliotecario para operaciones de custodia y separación de SCREEN-19/20).
 
 ## 1.2 Alcance
 El alcance de este documento abarca la especificación técnica completa de los 9 módulos de software de TraceFlow SCM:
@@ -3514,7 +3522,7 @@ class "CheckOutModal (NAV-16 / CU-10, CU-11)" as CheckOutDialog <<dialog>> {
     +ecsTargetInfo: ECSReferenceCard (ID, Nombre, Versión origen en Soporte)
     +assignedDeveloper: UserSelector (Ingeniero de Software PU-06)
     +authorizedECN: ECNSelector (Orden de Cambio aprobada)
-    +lockOptionCheckbox: Checkbox ("Aplicar Bloqueo Exclusivo de Sincronización - RN-06 [OBLIGATORIO]")
+    +lockMandatoryNotice: StatusText ("🔒 Bloqueo Exclusivo RN-06: Se aplicará automáticamente al confirmar Check-Out (El usuario no puede desactivarlo)")
     +btnExecuteCheckOut: ActionButton ("Confirmar Check-Out y Bloquear")
     -- Efecto Transaccional --
     * Copia física a /storage/trabajo/{devId}/{ecsId}
@@ -3654,7 +3662,7 @@ class "UserDecisionAndSignaturePanel" as Signature <<auth>> {
     +observationsInput: TextArea ("Observaciones del Solicitante / Usuario Final")
     +radioAcceptanceDecision: RadioGroup (ACEPTADA CONFORME / RECHAZADA)
     +signatureConfirmationCheck: Checkbox ("Suscribo formalmente en calidad de Solicitante autorizador")
-    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Maestra / CU-20)")
+    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Check-In Maestra CU-12 Variante B -> CU-20)")
     +btnSubmitUATRechazo: DangerButton ("Rechazar Aceptación (Deriva a Corrección/Rollback)")
 }
 
@@ -3697,7 +3705,7 @@ class "SCMGovernanceContainer" as Gov <<base>> {
 
 package "Zona A: Congelamiento de Línea Base (NAV-22 / CU-20)" as BaselineZone <<baseline>> {
     class "BaselineCreationPanel" as B1 <<baseline>> {
-        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0 (Nomenclatura RN-02)")
+        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0.0 (Nomenclatura RN-02)")
         +selectECSInMaster: MultiSelectList ("Seleccionar Versiones Certificadas en Maestra")
         +baselineDescription: TextArea ("Alcance y Justificación de la Línea Base")
         +preconditionIndicator: Badge ("Doble Conformidad (QA Conforme + Acta UAT) Verificada")
@@ -3833,10 +3841,10 @@ La interfaz de usuario implementa un sistema transversal de estados de retroalim
 
 ---
 
-## 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-19)
+## 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-20)
 
 Aplicando el principio fundamental de que **Pantalla $
-eq$ Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentación se sintetizan en **19 Pantallas Físicas Cohesivas**:
+eq$ Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentación se sintetizan en **20 Pantallas Físicas Cohesivas (SCREEN-01 a SCREEN-20)**:
 
 | SCREEN-ID | Nombre de Pantalla | Nodos NAV Consolidados | Patrón(es) PRES | Actor(es) Canónico(s) | Casos de Uso Gobernados |
 | :---: | :--- | :---: | :---: | :--- | :--- |
@@ -3852,13 +3860,14 @@ eq$ Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentació
 | **`SCREEN-10`** | **Consola de Autorización de Cambio Menor** | `NAV-11` | `PRES-07` | Gestor y Arquitecto | `CU-30` |
 | **`SCREEN-11`** | **Ficha de Orden de Cambio (ECN/ECO)** | `NAV-12` | `PRES-04` | CCB, Gestor, Biblio, Dev, QA | `CU-08, CU-22` |
 | **`SCREEN-12`** | **Explorador de ECS y Bibliotecas SCM** | `NAV-13, NAV-14, NAV-15`| `PRES-03, PRES-04, PRES-08`| Bibliotecario, Dev, Arq, QA | `CU-09, CU-14, CU-26` |
-| **`SCREEN-13`** | **Consola de Operaciones SCM (Check-Out/In)**| `NAV-16, NAV-17` | `PRES-08` | Bibliotecario, Desarrollador | `CU-10, CU-11, CU-12` |
+| **`SCREEN-13`** | **Consola de Operaciones SCM (Check-Out/In)**| `NAV-16, NAV-17` | `PRES-08` | Administrador / Bibliotecario (Ejecutor); Desarrollador (Visualizador/Receptor) | `CU-10, CU-11, CU-12` |
 | **`SCREEN-14`** | **Visor de Historial y Comparador Diff** | `NAV-18` | `PRES-09` | Todos los roles técnicos | `CU-13` |
 | **`SCREEN-15`** | **Consola de Validación QA y No Conformidades**| `NAV-19, NAV-20` | `PRES-08, PRES-05` | Equipo de Calidad, Dev | `CU-16, CU-17, CU-18, CU-19` |
 | **`SCREEN-16`** | **Centro de Suscripción de Acta UAT** | `NAV-21` | `PRES-07` | Solicitante (Usuario Final) | `CU-29` |
 | **`SCREEN-17`** | **Gestor de Líneas Base y Rollback SCM** | `NAV-22, NAV-23` | `PRES-08` | Administrador / Bibliotecario | `CU-20, CU-21` |
 | **`SCREEN-18`** | **Mesa de Entrada y Ficha de Incidencias** | `NAV-24, NAV-25` | `PRES-03, PRES-04` | Solicitante, Gestor | `CU-23, CU-24, CU-25` |
-| **`SCREEN-19`** | **Consola de Gobernanza, Auditoría e IAM** | `NAV-26, NAV-27, NAV-28`| `PRES-03, PRES-10, PRES-05`| Administrador, CCB, Gestor | `CU-01, CU-27, CU-28` |
+| **`SCREEN-19`** | **Consola de Auditoría y Reportes SCM** | `NAV-26, NAV-27` | `PRES-03, PRES-10` | CCB, Bibliotecario, Gestor | `CU-27, CU-28` |
+| **`SCREEN-20`** | **Administración de Usuarios y Roles** | `NAV-28` | `PRES-05` | Administrador / Bibliotecario | `CU-01` |
 
 ---
 
@@ -3895,7 +3904,7 @@ La siguiente matriz certifica la cobertura integral y bidireccional entre el esp
 | **`NAV-25`** | Detalle de Incidencia | `PRES-04` | `SCREEN-18` | Solicitante, Gestor | `CU-24, CU-25` |
 | **`NAV-26`** | Visor de Auditoría Forense | `PRES-03` | `SCREEN-19` | CCB, Administrador / Bibliotecario | `CU-27` |
 | **`NAV-27`** | Generador de Reportes SCM | `PRES-10` | `SCREEN-19` | Bibliotecario, CCB, Gestor | `CU-28` |
-| **`NAV-28`** | Administración de Usuarios y Roles | `PRES-05` | `SCREEN-19` | Administrador / Bibliotecario | `CU-01` |
+| **`NAV-28`** | Administración de Usuarios y Roles | `PRES-05` | `SCREEN-20` | Administrador / Bibliotecario | `CU-01` |
 
 ---
 
@@ -3918,7 +3927,7 @@ TraceFlow SCM es un sistema web corporativo enfocado en entornos de ingeniería 
   - Vista compacta de lectura y seguimiento: Navegación inferior o menú modal.
   - Tablas de índices transformadas en tarjetas apiladas verticales (Cards).
   - Formularios en flujo de columna simple.
-  - Deshabilitación intencional de operaciones de alta densidad técnica (e.g. comparador de diffs split-screen redirige a visor unificado o recomienda desktop).
+  - Presentación adaptada o simplificada (e.g. comparador de diffs en vista unificada); para operaciones de alta densidad se recomienda escritorio.
   - Orientada a consulta de estado, notificaciones de alerta y registro rápido de incidencias (`CU-23`).
 
 ### 2. Principios de Accesibilidad (Alineamiento con Buenas Prácticas WCAG)
@@ -3928,3 +3937,901 @@ Como decisión de diseño orientada a la calidad y ergonomía, el sistema adopta
 - **Navegación Completa por Teclado**: Todo botón, enlace, input y pestaña es alcanzable mediante secuencia lógica `Tab`, con indicador de foco visualmente contrastado.
 - **Independencia Cromática**: Los estados de la RFC, alertas y badges de resultado nunca dependen únicamente del color; se acompañan siempre de texto explícito e iconos distintivos (e.g. verde + checkmark + texto "APROBADA", rojo + cruz + texto "RECHAZADA").
 - **Contraste de Contenido**: Las combinaciones cromáticas de texto sobre fondo aseguran legibilidad óptima para jornadas laborales prolongadas.
+
+---
+
+# 21. Wireframes de Baja Fidelidad
+
+El presente capítulo formaliza la especificación visual y compositiva de los **Wireframes de Baja Fidelidad (Low-Fidelity Wireframes)** de TraceFlow SCM, derivados rigurosamente de la cadena de trazabilidad arquitectónica:
+
+$$\mathbf{Caso\ de\ Uso\ (CU)} \longrightarrow \mathbf{Espacio\ Navegacional\ (NAV)} \longrightarrow \mathbf{Patrcute{o}n\ de\ Presentacicute{o}n\ (PRES)} \longrightarrow \mathbf{Pantalla\ (SCREEN)} \longrightarrow \mathbf{Wireframe\ (WF)}$$
+
+---
+
+## 21.1 Objetivo y Convenciones
+
+### 1. Propósito de los Wireframes
+Los wireframes de baja fidelidad tienen por objetivo formalizar:
+- La **distribución espacial y jerarquía visual** de cada pantalla.
+- La **delimitación de regiones operativas** (encabezados, filtros, tablas, paneles, formularios y barras de acción).
+- La **disposición ergonómica de los controles interactivos** (entradas de texto, listas desplegables, selectores, botones y badges de estado).
+- La **visibilidad y habilitación contextual** de acciones según el actor canónico autenticado y el estado de la RFC en el ciclo de vida (TB-07).
+
+### 2. Convenciones de Diseño y Escala de Grises
+- **Agnosticismo Gráfico**: No se aplican colores corporativos definitivos, degradados, sombras ornamentales, fuentes tipográficas finales ni iconografía comercial. Se trabaja en **escala de grises estructurada** (bordes negros/grises, áreas de texto blanco/gris claro y acentos de contraste neutro).
+- **Semántica de Controles de Interfaz**:
+  - `[ Botón ]`: Acción interactiva ejecutable.
+  - `[X] / [ ]`: Casillas de verificación (checkbox).
+  - `(o) / ( )`: Opciones mutuamente excluyentes (radio buttons).
+  - `[ Entrada de Texto _______ ]`: Campo de captura de datos editable.
+  - `[^ Selector Desplegable v ]`: Menú de selección (dropdown).
+  - `| Columna 1 | Columna 2 |`: Estructura tabular de datos.
+  - `{ Pestaña 1 | Pestaña 2 }`: Navegación horizontal por pestañas.
+- **Doble Notación Versionable**: Cada wireframe se especifica mediante:
+  1. **Diagrama Estructurado ASCII** de alta legibilidad humana inmediata.
+  2. **Bloque PlantUML Salt** (`@startsalt ... @endsalt`) para renderizado gráfico automatizado y versionable en repositorio.
+
+---
+
+## 21.2 Shell Global de Presentación
+
+Todas las pantallas autenticadas se alojan dentro del **Shell Global** formalizado en `DG-UWE-PRES-01`, garantizando coherencia visual y navegación persistente:
+
+```
++----------------------------------------------------------------------------------------------------+
+|  TRACEFLOW SCM  |  Proyecto Activo: [^ Sistema Bancario Core v ]  | [Notif: 3] | Juan Pérez (GESTOR) [Logout] |
++-----------------+----------------------------------------------------------------------------------+
+| MENU PRINCIPAL  | Breadcrumb: Inicio > Solicitudes de Cambio > Detalle de RFC                      |
+|                 +----------------------------------------------------------------------------------+
+| [ Dashboard   ] | TITULO DE PANTALLA: RFC-2026-0042                         [ Estado: REGISTRADA ] |
+| [ Proyectos   ] | ID: RFC-2026-0042 | Proyecto: Sistema Bancario Core | Solicitante: Carlos Morales|
+| [ Solicitudes ] +----------------------------------------------------------------------------------+
+| [ Ordenes ECN ] |                                                                                  |
+| [ Catalogo ECS] |                        AREA DE CONTENIDO PRINCIPAL                               |
+| [ Bibliotecas ] |                                                                                  |
+| [ Control QA  ] |           (Se renderiza el Wireframe específico de la pantalla WF-XX)            |
+| [ Líneas Base ] |                                                                                  |
+| [ Incidencias ] |                                                                                  |
+| [ Auditoría   ] +----------------------------------------------------------------------------------+
+| [ Reportes    ] | ACCIONES CONTEXTUALES:                                                           |
+| [ Usuarios    ] | [ Volver ]                  [ Descartar ]              [ Validar y Clasificar ]  |
++-----------------+----------------------------------------------------------------------------------+
+```
+
+```plantuml
+@startsalt
+{+
+  {* <b>TRACEFLOW SCM</b> | Proyecto: [^ Pasarela de Pagos v] | [Notificaciones (2)] | Usuario: J. Pérez (GESTOR) | [Cerrar Sesión] }
+  {/ <b>Dashboard</b> | Proyectos | Solicitudes RFC | Órdenes ECN | Catálogo ECS | Bibliotecas | Calidad QA | Baselines | Incidencias | Auditoría }
+  {
+    .
+    { [Breadcrumb: Inicio > Solicitudes > RFC-2026-0042] }
+    { [<b>Expediente 360° de Solicitud de Cambio</b>] | [Badge: REGISTRADA] }
+    --
+    {
+      Contenido específico del Wireframe inyectado en este contenedor
+    }
+    --
+    { [ < Volver ] | . | [ Cancelar ] | [ Acción Primaria > ] }
+  }
+}
+@endsalt
+```
+
+---
+
+## 21.3 Primer Lote de Wireframes Críticos
+
+A continuación se formalizan los **12 Wireframes Críticos** correspondientes a las operaciones de mayor riesgo funcional, transaccional y de gobernanza:
+
+### WF-01: Portal de Acceso (Login) — SCREEN-01
+- **Trazabilidad**: `SCREEN-01` $\leftrightarrow$ `NAV-01` $\leftrightarrow$ `PRES-01` $\leftrightarrow$ Autenticación IAM (`MOD-01`).
+- **Actor(es)**: Todos los actores canónicos de TraceFlow SCM.
+- **Reglas**: Sin autoregistro público. Sin selector manual de rol. Credenciales institucionales y contraseña con feedback de error inmediato (HTTP 401).
+
+```
++-------------------------------------------------------------+
+|                                                             |
+|                    +----------------------+                 |
+|                    |    TRACEFLOW SCM     |                 |
+|                    |  Control de Software |                 |
+|                    +----------------------+                 |
+|                                                             |
+|   Usuario o Correo Institucional:                           |
+|   [ jperez@traceflow.internal                              ] |
+|                                                             |
+|   Contraseña:                                               |
+|   [ *********************************                      ] |
+|                                                             |
+|   [              INICIAR SESIÓN SEGURO                     ] |
+|                                                             |
+|   (!) Mensaje de retroalimentación:                         |
+|   [ Si las credenciales fallan: "Usuario o clave inválida" ] |
+|                                                             |
++-------------------------------------------------------------+
+```
+
+```plantuml
+@startsalt
+{+
+  {/ <b>Acceso Institucional - TraceFlow SCM</b> }
+  {
+    .
+    [Logo Institucional TraceFlow SCM]
+    .
+    Usuario Institucional: | "jperez@traceflow.internal"
+    Contraseña:            | "*******"
+    .
+    [    Iniciar Sesión    ]
+    .
+    [!] Mensaje: Credenciales verificadas mediante sesión segura HttpOnly
+  }
+}
+@endsalt
+```
+
+---
+
+### WF-02: Dashboard Principal Adaptativo — SCREEN-02
+- **Trazabilidad**: `SCREEN-02` $\leftrightarrow$ `NAV-02` $\leftrightarrow$ `PRES-02` $\leftrightarrow$ Resumen Operativo (`MOD-01..09`).
+- **Actor(es)**: Todos los actores (el contenido de las tarjetas y bandejas se adapta al rol canónico).
+- **Reglas**: Widgets trazables a CU/RF/RN. No incluye métricas comerciales.
+
+```
++----------------------------------------------------------------------------------------------------+
+| BANNER DE CONTEXTO: Bienvenido, Joan Medina | Rol: Analista de Requerimientos / Gestor (PU-02)     |
+| Proyecto Activo: [^ Pasarela de Pagos Core v ]                               [ Cambiar Proyecto ]   |
++----------------------------------------------------------------------------------------------------+
+| RESUMEN DE INDICADORES OPERATIVOS (FUENTES SCM):                                                   |
+| +--------------------+ +--------------------+ +--------------------+ +--------------------+       |
+| | RFCs por Clasificar| | Cambios Menores    | | Órdenes en Curso   | | Bloqueos Activos   |       |
+| |       4            | |       2            | |       5            | |       3            |       |
+| | (CU-05 / RF-04)    | | (CU-30 / RF-07)    | | (CU-08 / RF-08)    | | (RN-06 / MOD-05)   |       |
+| +--------------------+ +--------------------+ +--------------------+ +--------------------+       |
++----------------------------------------------------------------------------------------------------+
+| BANDEJA DE TAREAS PRIORITARIAS (ACTION ITEMS POR ROL):                                              |
+| Codigo       | Titulo                          | Prioridad | Estado TB-07   | Accion Requerida     |
+| -------------+---------------------------------+-----------+----------------+--------------------- |
+| RFC-2026-0042| Actualizar algoritmo HMAC SHA   | ALTA      | REGISTRADA     | [ Clasificar CU-05 ] |
+| RFC-2026-0045| Parche de timeout en gateway    | MEDIA     | EVALUADA_MENOR | [ Autorizar CU-30 ]  |
+| ECN-2026-0012| Refactor de auth-service.ts     | CRITICA   | EN_DESARROLLO  | [ Ver Estado ECN ]   |
++----------------------------------------------------------------------------------------------------+
+| ACCESOS DIRECTOS AUTORIZADOS:                    | ACTIVIDAD RECIENTE DEL PROYECTO:                |
+| [ + Nueva Solicitud RFC ]   [ Explorar ECS ]     | * 11:30 - Check-In verificado en Soporte (v1.1) |
+| [ Mesa de Incidencias   ]   [ Ver Reportes ]     | * 10:15 - CCB sesionó sobre RFC-2026-0039       |
++----------------------------------------------------------------------------------------------------+
+```
+
+```plantuml
+@startsalt
+{+
+  {* <b>Dashboard Adaptativo</b> | Proyecto: Pasarela de Pagos Core | Rol: Gestor (PU-02) }
+  {
+    Indicadores Operativos:
+    { [RFCs por Clasificar: 4] | [Cambios Menores: 2] | [Órdenes en Desarrollo: 5] | [Locks Activos: 3] }
+    --
+    <b>Bandeja de Tareas Prioritarias:</b>
+    {#
+      <b>Código</b> | <b>Título</b> | <b>Prioridad</b> | <b>Estado</b> | <b>Acción</b>
+      RFC-2026-0042 | Actualizar algoritmo HMAC | Alta | REGISTRADA | [Clasificar]
+      RFC-2026-0045 | Parche de timeout gateway | Media | EVALUADA | [Autorizar]
+      ECN-2026-0012 | Refactor auth-service.ts | Crítica | EN_DESARROLLO | [Ver Ficha]
+    }
+    --
+    { [ + Nueva Solicitud (RFC) ] | [ Explorar Bibliotecas ] | [ Mesa de Incidencias ] }
+  }
+}
+@endsalt
+```
+
+---
+
+### WF-05: Bandeja General de Solicitudes (RFC) — SCREEN-05
+- **Trazabilidad**: `SCREEN-05` $\leftrightarrow$ `NAV-05` $\leftrightarrow$ `PRES-03` $\leftrightarrow$ Catálogo RFC (`MOD-04`, `CU-04..08, CU-30`).
+- **Actor(es)**: Todos los roles (visibilidad de datos filtrada por SoD).
+- **Reglas**: Filtros por proyecto y estado oficial (TB-07). Acción "+ Nueva RFC" para Solicitante.
+
+```
++----------------------------------------------------------------------------------------------------+
+| TITULO: BANDEJA DE SOLICITUDES DE CAMBIO (RFC)                                                     |
+| Filtros: Proyecto: [^ Pasarela de Pagos v] | Estado: [^ Todos los Estados v] | Tipo: [^ Todos v]  |
+| Buscar por texto/código: [ RFC-2026-______________ ]               [ Filtrar ] [ Limpiar Filtros ] |
+|                                                                    [ + NUEVA SOLICITUD RFC (PU-01)]|
++----------------------------------------------------------------------------------------------------+
+| Codigo RFC    | Proyecto   | Titulo Resumido           | Tipo   | Estado TB-07   | Solicitante | Accion |
+| --------------+------------+---------------------------+--------+----------------+-------------+--------|
+| RFC-2026-0042 | Pasarela   | Soporte a TLS 1.3         | MAYOR  | REGISTRADA     | C. Morales  | [Ver]  |
+| RFC-2026-0043 | Pasarela   | Corrección en parsing DTO | MENOR  | OBSERVADA      | A. Quispe   | [Ver]  |
+| RFC-2026-0044 | Pasarela   | Rediseño de esquema DB    | MAYOR  | EN_EVALUACION  | R. Antayhua | [Ver]  |
+| RFC-2026-0045 | Pasarela   | Ajuste de log level       | MENOR  | AUTORIZADA     | J. Medina   | [Ver]  |
+| RFC-2026-0046 | Pasarela   | Refactor de transacciones | MAYOR  | EN_PRUEBAS     | F. Loyola   | [Ver]  |
+| RFC-2026-0047 | Pasarela   | Validar firma token JWT   | MENOR  | CERTIFICADA    | A. Rivera   | [Ver]  |
++----------------------------------------------------------------------------------------------------+
+| Paginación: [ << Primera ] [ < Anterior ] Página 1 de 5 [ Siguiente > ] [ Última >> ] (Total: 47)  |
++----------------------------------------------------------------------------------------------------+
+```
+
+```plantuml
+@startsalt
+{+
+  {* <b>Bandeja General de Solicitudes (RFC)</b> | Proyecto: Pasarela de Pagos | [ + Nueva RFC ] }
+  {
+    Filtro Estado: [^ Todos los estados (TB-07) v] | Filtro Tipo: [^ Todos v] | Buscar: "RFC-2026"
+    --
+    {#
+      <b>Código</b> | <b>Proyecto</b> | <b>Título</b> | <b>Tipo</b> | <b>Estado</b> | <b>Acción</b>
+      RFC-2026-0042 | Pasarela | Soporte TLS 1.3 | MAYOR | REGISTRADA | [Ver Expediente]
+      RFC-2026-0043 | Pasarela | Parsing de DTO | MENOR | OBSERVADA | [Ver Expediente]
+      RFC-2026-0044 | Pasarela | Rediseño DB | MAYOR | EN_EVALUACION | [Ver Expediente]
+      RFC-2026-0045 | Pasarela | Ajuste log level | MENOR | AUTORIZADA | [Ver Expediente]
+      RFC-2026-0046 | Pasarela | Transacciones core | MAYOR | EN_PRUEBAS | [Ver Expediente]
+    }
+    --
+    { [ < Anterior ] | Página 1 de 5 | [ Siguiente > ] }
+  }
+}
+@endsalt
+```
+
+---
+
+### WF-06: Expediente 360° de RFC — SCREEN-06
+- **Trazabilidad**: `SCREEN-06` $\leftrightarrow$ `NAV-06` $\leftrightarrow$ `PRES-04, PRES-07` $\leftrightarrow$ Gestión Integral de Cambios (`MOD-04`).
+- **Actor(es)**: Todos los roles con acciones contextuales condicionadas.
+- **Variantes Críticas**:
+  - `WF-06A`: RFC en estado inicial `REGISTRADA` / En Admisión.
+  - `WF-06B`: RFC en estado `EN_EVALUACION` / Deliberación.
+  - `WF-06C`: RFC en estado `EN_PRUEBAS` / `CERTIFICADA` / Aceptación.
+
+#### WF-06A: Estado REGISTRADA (Validación y Clasificación por Gestor)
+```
++----------------------------------------------------------------------------------------------------+
+| EXPEDIENTE: RFC-2026-0042                                              ESTADO: [ REGISTRADA ]      |
+| Proyecto: Pasarela de Pagos | Solicitante: Carlos Morales | Fecha: 2026-10-01 10:30                |
++----------------------------------------------------------------------------------------------------+
+| { [X] Resumen y Justificacion | [ ] ECS Afectados | [ ] Dictamen | [ ] ECN | [ ] QA | [ ] UAT }    |
++----------------------------------------------------------------------------------------------------+
+| RESUMEN DE LA SOLICITUD:                                                                           |
+| Titulo: Actualización de protocolo de comunicación interbancaria a TLS 1.3                        |
+| Categoria Tentativa: Cambio Correctivo / Seguridad                                                 |
+| Justificacion: La normativa regulatoria exige depreciar TLS 1.2 a partir del próximo mes.         |
+| Descripcion del Problema: Las librerías actuales rechazan conexiones de clientes actualizados.    |
+| Documentos Adjuntos: [ circular-regulatoria-2026.pdf (Descargar) ]                                 |
++----------------------------------------------------------------------------------------------------+
+| PANEL DE ADMISION Y CLASIFICACION (SOLO VISIBLE PARA ANALISTA DE REQUERIMIENTOS / GESTOR):          |
+| Dictamen de Admision: (o) Admitir Solicitud     ( ) Observar Solicitud     ( ) Desestimar          |
+| Clasificacion Oficial (RN-01):                                                                     |
+| (o) CAMBIO MAYOR (Requiere Evaluación Técnica de Arquitecto y Deliberación Colegiada de CCB)       |
+| ( ) CAMBIO MENOR (Requiere Autorización Delegada Compartida de Gestor y Arquitecto)                |
+| Observaciones del Gestor: [ Solicitud cumple completitud formal inicial.                         ] |
+|                                                                                                    |
+| [ Observar Solicitud (Pasa a OBSERVADA) ]                 [ Clasificar y Derivar a Evaluacion ]    |
++----------------------------------------------------------------------------------------------------+
+```
+
+#### WF-06B: Estado EN_EVALUACION (Evaluación de Impacto y Deliberación)
+```
++----------------------------------------------------------------------------------------------------+
+| EXPEDIENTE: RFC-2026-0042                                            ESTADO: [ EN_EVALUACION ]     |
+| Proyecto: Pasarela de Pagos | Clasificacion: CAMBIO MAYOR             | Evaluador: Arq. R. Antayhua|
++----------------------------------------------------------------------------------------------------+
+| { [ ] Resumen | [ ] ECS Afectados | [X] Informe de Impacto Tecnico | [ ] CCB | [ ] ECN | [ ] QA }  |
++----------------------------------------------------------------------------------------------------+
+| DICTAMEN DE IMPACTO TECNICO REGISTRADO POR ARQUITECTURA (RN-05):                                   |
+| * Evaluacion de Viabilidad: VIABLE TECNICAMENTE.                                                   |
+| * ECS Identificados para Intervención: ECS-CORE-001 (auth.ts), ECS-GATEWAY-003 (tls.conf)         |
+| * Analisis de Triple Restriccion:                                                                  |
+|   - Alcance: Afecta capas de red y autenticación.                                                  |
+|   - Tiempo Estimado: 12 días laborables de desarrollo e integración.                               |
+|   - Costo / Recursos: 2 Ingenieros de Software + 1 Tester QA asignados.                            |
+| * Nivel de Riesgo Operativo: MEDIO-ALTO (Servicio crítico 24/7).                                   |
+| * Recomendacion del Arquitecto: Proceder con ventana de despliegue nocturna.                       |
++----------------------------------------------------------------------------------------------------+
+| ACCIONES CONTEXTUALES:                                                                             |
+| [ Imprimir Informe de Impacto ]                   [ Convocar Sesión Deliberación CCB (CU-07) ]     |
++----------------------------------------------------------------------------------------------------+
+```
+
+#### WF-06C: Estado EN_PRUEBAS / CERTIFICADA (Aseguramiento de Calidad y UAT)
+```
++----------------------------------------------------------------------------------------------------+
+| EXPEDIENTE: RFC-2026-0042                                             ESTADO: [ CERTIFICADA ]      |
+| Proyecto: Pasarela de Pagos | Orden Asociada: ECN-2026-0015           | Tester QA: F. Loyola       |
++----------------------------------------------------------------------------------------------------+
+| { [ ] Resumen | [ ] ECS | [ ] Impacto | [ ] ECN | [X] Calidad (QA) | [X] Aceptacion (UAT) }        |
++----------------------------------------------------------------------------------------------------+
+| CERTIFICACION TECNICA EMITIDA POR EQUIPO DE CALIDAD (RN-09):                                       |
+| * Estado de Suites de Integracion: 100% PASS (24 casos de prueba automatizados ejecutados).        |
+| * Verificacion de No Conformidades: 0 defectos abiertos.                                          |
+| * Certificado QA: EMITIDO CONFORME (SoD validado: Tester no fue desarrollador de la ECN).         |
++----------------------------------------------------------------------------------------------------+
+| ACTA DE ACEPTACION DE USUARIO (UAT - CU-29):                                                       |
+| * Evaluador: Carlos Morales (Solicitante Autorizado)                                               |
+| * Estado del Acta: PENDIENTE DE SUSCRIPCION FORMAL                                                 |
+|                                                                                                    |
+| ACCION HABILITADA PARA SOLICITANTE:                                                                |
+| [ Suscribir Acta de Aceptación UAT (SCREEN-16) ]                                                   |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-07: Portal de Registro y Subsanación de RFC — SCREEN-07
+- **Trazabilidad**: `SCREEN-07` $\leftrightarrow$ `NAV-07, NAV-08` $\leftrightarrow$ `PRES-06, PRES-05` $\leftrightarrow$ Captura RFC (`CU-04, CU-04.1`).
+- **Actor(es)**: Solicitante (`PU-01`).
+- **Reglas**: Wizard multipaso secuencial. En modo subsanación, resalta los campos observados.
+
+```
++----------------------------------------------------------------------------------------------------+
+| REGISTRO DE SOLICITUD DE CAMBIO (RFC)                                 Paso 2 de 4: Justificación   |
+| [X] 1. Info General  >>>>  [o] 2. Justificacion  >>>>  [ ] 3. ECS y Adjuntos  >>>>  [ ] 4. Envio   |
++----------------------------------------------------------------------------------------------------+
+| Proyecto Seleccionado: Sistema Bancario Core                                                       |
+| Titulo de la Solicitud: Soporte a TLS 1.3 en Gateway de Pagos                                      |
+|                                                                                                    |
+| Descripcion Detallada del Requerimiento / Falla:                                                   |
+| +------------------------------------------------------------------------------------------------+ |
+| | Se requiere actualizar los protocolos criptográficos soportados por la pasarela de pagos      | |
+| | debido a la entrada en vigencia del estándar de seguridad PCI-DSS 4.0.                         | |
+| +------------------------------------------------------------------------------------------------+ |
+|                                                                                                    |
+| Justificacion de Negocio / Valor Agregado:                                                         |
+| +------------------------------------------------------------------------------------------------+ |
+| | Evitar multas regulatorias y mantener la continuidad operativa con los bancos adquirentes.     | |
+| +------------------------------------------------------------------------------------------------+ |
+|                                                                                                    |
+| Beneficio Esperado:                                                                                |
+| [ Mayor seguridad en la transmisión de datos y reducción de latencia en handshake TLS.          ] |
++----------------------------------------------------------------------------------------------------+
+| CONTROLES:                                                                                         |
+| [ < Anterior ]               [ Guardar Borrador ]                       [ Siguiente Paso > ]       |
++----------------------------------------------------------------------------------------------------+
+```
+
+```plantuml
+@startsalt
+{+
+  {* <b>Registro de Solicitud de Cambio (RFC)</b> | Paso 2 de 4: Justificación }
+  {
+    Proyecto: | [^ Sistema Bancario Core v]
+    Título:   | "Soporte a TLS 1.3 en Gateway de Pagos"
+    --
+    Descripción del Requerimiento:
+    { "Se requiere actualizar protocolos criptográficos para cumplir PCI-DSS 4.0" }
+    Justificación de Negocio:
+    { "Evitar multas regulatorias y asegurar continuidad operativa de la pasarela" }
+    --
+    { [ < Anterior ] | [ Guardar Borrador ] | [ Siguiente Paso > ] }
+  }
+}
+@endsalt
+```
+
+---
+
+### WF-09: Sala de Deliberación CCB — SCREEN-09
+- **Trazabilidad**: `SCREEN-09` $\leftrightarrow$ `NAV-10` $\leftrightarrow$ `PRES-07` $\leftrightarrow$ Evaluación CCB (`CU-07, RN-01`).
+- **Actor(es)**: Miembros del Comité de Control de Cambios (`PU-04`).
+- **Reglas**: Sin mención a quórum ni mayoría calificada. Registra votos individuales y resolución formal (aprobación/rechazo).
+
+```
++----------------------------------------------------------------------------------------------------+
+| SALA DE DELIBERACION DEL CCB                                           EXPEDIENTE: RFC-2026-0042   |
+| Solicitud: Soporte a TLS 1.3 | Proyecto: Pasarela de Pagos | Clasificacion: CAMBIO MAYOR           |
++----------------------------------------------------------------------------------------------------+
+| INFORME DE IMPACTO TECNICO (ARQUITECTURA):           ANALISIS DE TRIPLE RESTRICCION:               |
+| ECS Afectados: ECS-CORE-001, ECS-GATEWAY-003         * Alcance: Modificación de capas de red       |
+| Riesgo Técnico: MEDIO-ALTO                           * Plazo: 12 días laborables                   |
+| Viabilidad: FACTIBLE SIN REGRESIONES CRITICAS        * Costo: Asignación de 3 ingenieros           |
++----------------------------------------------------------------------------------------------------+
+| REGISTRO FORMAL DE VOTOS DE LOS MIEMBROS DEL CCB:                                                  |
+| Miembro CCB                 | Rol Institucional   | Decision      | Justificacion Registrada       |
+| ----------------------------+---------------------+---------------+--------------------------------|
+| Dr. Ricardo Valcarcel       | Presidente CCB      | APROBAR       | Cambio mandatorio regulatorio  |
+| Ing. Renzo Antayhua         | Líder de Arquitectura| APROBAR      | Impacto técnico controlado     |
+| Lic. Joan Medina            | Gestor de Proyecto  | APROBAR       | Cronograma compatible con hito |
++----------------------------------------------------------------------------------------------------+
+| EMISION DE MI DECISION INDIVIDUAL (MIEMBRO AUTENTICADO):                                           |
+| Voto: (o) APROBAR CAMBIO     ( ) RECHAZAR CAMBIO     ( ) ABSTENCION                                |
+| Fundamentación de Voto: [ Conforme con el informe técnico y el cronograma propuesto.             ] |
+| [ Registrar Mi Voto ]                                                                              |
++----------------------------------------------------------------------------------------------------+
+| RESOLUCION FORMAL COLEGIADA DE SESION (CIERRE DE EVALUACION):                                      |
+| Dictamen Final de Sesion: [ APROBADA ]                                                             |
+| [ Emitir Resolucion Oficial de Aprobacion (CU-08) ]       [ Emitir Resolucion de Rechazo ]         |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-10: Autorización Delegada de Cambio Menor — SCREEN-10
+- **Trazabilidad**: `SCREEN-10` $\leftrightarrow$ `NAV-11` $\leftrightarrow$ `PRES-07` $\leftrightarrow$ Autorización Delegada (`CU-30, RN-01, RN-05`).
+- **Actor(es)**: Analista de Requerimientos / Gestor (`PU-02`) y Arquitecto (`PU-03`).
+- **Reglas**: Mecanismo de Doble Llave Operativa. Estado final `AUTORIZADA` solo cuando ambas conformidades sean positivas.
+
+```
++----------------------------------------------------------------------------------------------------+
+| AUTORIZACION DE CAMBIO MENOR (VIA DELEGADA - DOBLE LLAVE)              RFC: RFC-2026-0045          |
+| Titulo: Ajuste de nivel de logs en microservicio de pagos             Clasificacion: CAMBIO MENOR   |
++----------------------------------------------------------------------------------------------------+
+| +-----------------------------------------------+ +-----------------------------------------------+|
+| | LLAVE 1: EVALUACION TECNICA                   | | LLAVE 2: VISTO BUENO DE GESTION               |
+| | Responsable: Arquitecto / Especialista Tecnico| | Responsable: Analista de Requerimientos/Gestor|
+| |                                               | |                                               |
+| | Estado: [ APROBADA ]                          | | Estado: [ PENDIENTE DE EVALUACION ]           |
+| | Fecha: 2026-10-01 11:20                       | | Fecha: --                                     |
+| | Observaciones Tecnicas:                       | | Observaciones de Gestion:                     |
+| | "El cambio no modifica contratos de interfaz  | | [ Evaluar impacto en cronograma y recursos   ]|
+| | ni altera dependencias entre ECS."            | | [ para el sprint en curso.                   ]|
+| |                                               | |                                               |
+| | [ Modificar Dictamen Técnico ]                | | [ Aprobar Visto Bueno ] [ Rechazar Cambio ]   |
+| +-----------------------------------------------+ +-----------------------------------------------+|
++----------------------------------------------------------------------------------------------------+
+| ESTADO DE LA AUTORIZACION CONJUNTA:                                                                |
+| [ ESTADO ACTUAL: EN_EVALUACION ]                                                                   |
+| (i) Regla de Doble Llave: La solicitud pasará a AUTORIZADA únicamente cuando ambos roles emitan     |
+| conformidad favorable. Si cualquiera de los dos roles rechaza, la RFC pasa a estado RECHAZADA.     |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-12: Explorador de ECS y Bibliotecas SCM — SCREEN-12
+- **Trazabilidad**: `SCREEN-12` $\leftrightarrow$ `NAV-13, 14, 15` $\leftrightarrow$ `PRES-03, 04, 08` $\leftrightarrow$ Custodia SCM (`MOD-03, 05`, `CU-09, 14, 26`).
+- **Actor(es)**: Bibliotecario, Desarrollador, Arquitecto, QA.
+- **Reglas**: Visualización de las 3 bibliotecas (`Trabajo`, `Soporte`, `Maestra`). Consulta de `sync_lock` y checksum SHA-256.
+
+```
++----------------------------------------------------------------------------------------------------+
+| EXPLORADOR DE ELEMENTOS DE CONFIGURACION Y BIBLIOTECAS                 Proyecto: Pasarela de Pagos |
+| Filtro Biblioteca: ( ) Trabajo (Sandbox)   (o) Soporte (Staging)   ( ) Maestra (Golden Store)      |
+| Buscar ECS: [ ECS-________________________ ]                 [ + Registrar Nuevo ECS (CU-09) ]     |
++----------------------------------------------------------------------------------------------------+
+| ID ECS       | Nombre Físico       | Versión   | Biblioteca | Checksum SHA-256 (64 hex)  | Lock    | Accion |
+| -------------+---------------------+-----------+------------+----------------------------+---------+--------|
+| ECS-CORE-001 | auth-service.ts     | v1.2.0    | SOPORTE    | e3b0c44298fc1c149afbf4c... | ACTIVO  | [Ver]  |
+| ECS-GATE-002 | tls-proxy.conf      | v1.0.0    | SOPORTE    | a8f5c12349bc1c149afde3... | LIBRE   | [Ver]  |
+| ECS-DATA-003 | payment-schema.sql  | v2.0.0    | MAESTRA    | f4c2a11228fc1c149afbb1... | LIBRE   | [Ver]  |
++----------------------------------------------------------------------------------------------------+
+| DETALLE DEL ECS SELECCIONADO (ECS-CORE-001):                                                       |
+| Ubicación en Disco: /storage/soporte/pasarela/ECS-CORE-001/v1.2.0/auth-service.ts                  |
+| Estado de Bloqueo: BLOQUEADO (sync_lock activo por dev_joan desde 2026-10-01 10:00 bajo ECN-0012) |
+|                                                                                                    |
+| [ Ver Historial y Diffs (WF-14) ]                 [ Verificar Integridad Checksum (CU-26) ]        |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-13: Consola de Operaciones SCM (Check-Out / Check-In) — SCREEN-13
+- **Trazabilidad**: `SCREEN-13` $\leftrightarrow$ `NAV-16, NAV-17` $\leftrightarrow$ `PRES-08` $\leftrightarrow$ Control de Versiones (`MOD-05`, `CU-10, 11, 12`).
+- **Actor(es)**: **Administrador de Configuración / Bibliotecario** (`PU-05`) como ejecutor exclusivo. El Desarrollador (`PU-06`) actúa como visualizador y receptor de la asignación.
+- **Variantes Visuales**:
+  - `WF-13A`: Check-Out (Soporte $
+ightarrow$ Trabajo + Bloqueo Obligatorio `RN-06`).
+  - `WF-13B`: Check-In (Trabajo $
+ightarrow$ Soporte vs Soporte $
+ightarrow$ Maestra con validación QA+UAT).
+
+#### WF-13A: Extracción y Bloqueo de Sincronización (Check-Out)
+```
++----------------------------------------------------------------------------------------------------+
+| CONSOLA DE CHECK-OUT (EXTRACCION A BIBLIOTECA DE TRABAJO)                                          |
+| Operador: Administrador de Configuración / Bibliotecario (PU-05)                                   |
++----------------------------------------------------------------------------------------------------+
+| ECS Objetivo: ECS-CORE-001 (auth-service.ts) | Versión Origen en Soporte: v1.2.0                   |
+| Orden de Cambio Autorizada: [^ ECN-2026-0015 (Soporte TLS 1.3) v ]                                 |
+| Desarrollador Asignado:     [^ Joan Medina Quispe (PU-06 Desarrollador) v ]                        |
++----------------------------------------------------------------------------------------------------+
+| CONDICION DE SEGURIDAD OPERACIONAL (RN-06):                                                        |
+| [🔒 BLOQUEO EXCLUSIVO RN-06: Se aplicará automáticamente al confirmar Check-Out]                   |
+| * El bloqueo de sincronización persistente (sync_lock) será registrado en PostgreSQL.              |
+| * Ningún otro desarrollador podrá extraer este ECS mientras la orden se encuentre en curso.        |
+| * Esta restricción es obligatoria y no puede ser desactivada por el usuario.                       |
++----------------------------------------------------------------------------------------------------+
+| Directorio Destino: /storage/trabajo/dev_joan/ECS-CORE-001/                                        |
+| [ Cancelar ]                                            [ Confirmar Check-Out y Bloquear ]         |
++----------------------------------------------------------------------------------------------------+
+```
+
+#### WF-13B: Depósito y Promoción de Artefacto (Check-In)
+```
++----------------------------------------------------------------------------------------------------+
+| CONSOLA DE CHECK-IN (PROMOCION Y CONTROL CRIPTOGRAFICO)                                            |
+| Operador: Administrador de Configuración / Bibliotecario (PU-05)                                   |
++----------------------------------------------------------------------------------------------------+
+| Tipo de Operación de Check-In:                                                                     |
+| ( ) Variante A: Trabajo -> Soporte (Pase Técnico tras Pruebas Unitarias del Desarrollador)         |
+| (o) Variante B: Soporte -> Maestra (Promoción Definitiva tras Doble Conformidad QA + UAT)           |
++----------------------------------------------------------------------------------------------------+
+| COMPROBACION DE PRECONDICIONES NORMATIVAS PARA PROMOCION A MAESTRA:                                |
+| [V] Certificación Técnica QA: CONFORME (Emitida por Equipo de Calidad con SoD - RN-09)            |
+| [V] Acta de Aceptación UAT: CONFORME (Suscrita por Carlos Morales / Solicitante - CU-29)           |
+| (i) Si alguna de las dos conformidades falta, el botón de Check-In a Maestra permanece bloqueado. |
++----------------------------------------------------------------------------------------------------+
+| Archivo a Depositar: [ auth-service.ts ]                                     [ Examinar... ]       |
+| Checksum SHA-256 Calculado en Navegador: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca49599...  |
+| Checksum SHA-256 Verificado por Servidor: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca49599... |
+| Incremento de Versión (RN-02): ( ) Parche (v1.2.1)   (o) Menor (v1.3.0)   ( ) Mayor (v2.0.0)       |
+| Notas de Versión: [ Implementación conforme de TLS 1.3 sin regresiones en pasarela bancaria.     ] |
++----------------------------------------------------------------------------------------------------+
+| [ Cancelar ]                                           [ Ejecutar Check-In y Liberar Lock ]        |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-15: Consola de Validación QA y No Conformidades — SCREEN-15
+- **Trazabilidad**: `SCREEN-15` $\leftrightarrow$ `NAV-19, NAV-20` $\leftrightarrow$ `PRES-08, PRES-05` $\leftrightarrow$ Verificación y Calidad (`MOD-06`, `CU-16..19`).
+- **Actor(es)**: Equipo de Calidad / Testing (`PU-07`) como evaluador. Desarrollador (`PU-06`) en modo consulta de defectos asignados.
+
+```
++----------------------------------------------------------------------------------------------------+
+| CONSOLA DE VALIDACION DE CALIDAD (QA TESTING)                          ECN: ECN-2026-0015          |
+| ECS en Prueba: ECS-CORE-001 | Versión en Soporte: v1.3.0 | Evaluador: Renzo Loyola (PU-07)         |
++----------------------------------------------------------------------------------------------------+
+| SUITES DE PRUEBAS DE INTEGRACION (CU-16):                                                          |
+| ID Suite   | Nombre de la Prueba                 | Tipo         | Resultado | Logs de Ejecución    |
+| -----------+-------------------------------------+--------------+-----------+----------------------|
+| TC-INT-001 | Handshake TLS 1.3 con Mock Bancario | Integración  | PASS [V]  | [ Ver Salida stdout] |
+| TC-INT-002 | Fallback controlado ante TLS 1.2    | Regresión    | PASS [V]  | [ Ver Salida stdout] |
+| TC-SEC-003 | Verificación de Cifrado AES-256     | Seguridad    | PASS [V]  | [ Ver Salida stdout] |
+| [ + Ejecutar Suite Completa ]                                                                      |
++----------------------------------------------------------------------------------------------------+
+| REGISTRO DE NO CONFORMIDADES (DEFECTOS DETECTADOS - CU-18):                                        |
+| (Actualmente no existen no conformidades abiertas para este ciclo de prueba).                      |
+| Si se detecta una falla:                                                                           |
+| [ Reportar No Conformidad (Abre Formulario NAV-20 y Deriva a Corrección por PU-06) ]               |
++----------------------------------------------------------------------------------------------------+
+| CERTIFICACION FORMAL DE CONFORMIDAD (CU-17 / SoD):                                                 |
+| [X] Declaro bajo Segregación de Funciones que no he participado en el desarrollo de este cambio.  |
+| Dictamen de Calidad: [ CERTIFICAR CONFORMIDAD QA (Habilita Fase de Aceptación UAT) ]               |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-16: Centro de Suscripción de Acta UAT — SCREEN-16
+- **Trazabilidad**: `SCREEN-16` $\leftrightarrow$ `NAV-21` $\leftrightarrow$ `PRES-07` $\leftrightarrow$ Aceptación de Usuario (`MOD-06`, `CU-29, RN-09`).
+- **Actor(es)**: Solicitante (`PU-01`).
+- **Reglas**: Precondición inviolable: Certificación QA previa. La aceptación habilita el Check-In a Maestra (CU-12B), no congela la línea base directamente.
+
+```
++----------------------------------------------------------------------------------------------------+
+| ACTA DE ACEPTACION DE USUARIO (PRUEBAS UAT - CU-29)                    RFC: RFC-2026-0042          |
+| Proyecto: Pasarela de Pagos | Solicitante Autorizado: Carlos Morales | Orden: ECN-2026-0015        |
++----------------------------------------------------------------------------------------------------+
+| COMPROBACION DE PRECONDICION DE CALIDAD (RN-09):                                                   |
+| [V] Certificación Técnica QA Emitida: CONFORME por Equipo de Calidad (Renzo Loyola, 2026-10-01)    |
+| (i) El proceso UAT se encuentra legalmente habilitado para evaluación del solicitante.             |
++----------------------------------------------------------------------------------------------------+
+| CRITERIOS DE ACEPTACION FUNCIONAL VERIFICADOS EN ENTORNO DE PRUEBAS:                              |
+| [X] La pasarela procesa transacciones con bancos afiliados utilizando el nuevo protocolo TLS 1.3. |
+| [X] El tiempo de respuesta de autorización se mantiene dentro del umbral contratado (< 1.5s).      |
+| [X] La interfaz de usuario del solicitante refleja los estados de transacción correctamente.       |
++----------------------------------------------------------------------------------------------------+
+| OBSERVACIONES DEL SOLICITANTE:                                                                     |
+| [ Pruebas operativas realizadas satisfactoriamente con 50 transacciones simuladas de prueba.    ] |
+|                                                                                                    |
+| DECISION FORMAL DE ACEPTACION:                                                                     |
+| (o) ACEPTAR CAMBIO CONFORME                                       ( ) RECHAZAR ACEPTACION          |
+|                                                                                                    |
+| [X] Suscribo formalmente el Acta de Aceptación en mi calidad de Solicitante responsable.           |
+|                                                                                                    |
+| [ Rechazar y Derivar a Corrección ]              [ SUSCRIBIR ACTA UAT CONFORME ]                   |
++----------------------------------------------------------------------------------------------------+
+| Nota Informativa: Al suscribir esta acta, el cambio queda habilitado para Check-In definitivo a     |
+| Biblioteca Maestra por el Administrador de Configuración (CU-12 Variante B), previo a la           |
+| congelación de Línea Base (CU-20).                                                                 |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-17: Gestión de Línea Base y Rollback SCM — SCREEN-17
+- **Trazabilidad**: `SCREEN-17` $\leftrightarrow$ `NAV-22, NAV-23` $\leftrightarrow$ `PRES-08` $\leftrightarrow$ Gobernanza SCM (`MOD-07`, `CU-20, CU-21`).
+- **Actor(es)**: Administrador de Configuración / Bibliotecario (`PU-05`).
+- **Reglas**: Separación visual estricta entre congelamiento en Maestra y purga en Trabajo (el rollback NO altera la Biblioteca Maestra).
+
+```
++----------------------------------------------------------------------------------------------------+
+| GOBERNANZA DE CONFIGURACION: LINEAS BASE Y ROLLBACK                    Proyecto: Pasarela de Pagos |
+| Operador Custodio: Administrador de Configuración / Bibliotecario (PU-05)                          |
++----------------------------------------------------------------------------------------------------+
+| ZONA A: CREACION Y CONGELAMIENTO DE LINEA BASE (CU-20 / RN-02 / RN-09):                            |
+| Etiqueta Normalizada: [ LB-PASARELA-v1.0.0 (Formato mayor.menor.parche)                          ] |
+| Descripcion:          [ Línea Base de Producción - Hito Regulatorio PCI-DSS 4.0                   ] |
+| Versiones de ECS en Biblioteca Maestra a Congelar:                                                 |
+| [X] ECS-CORE-001 (auth-service.ts - v1.3.0)      [X] ECS-GATE-002 (tls-proxy.conf - v1.0.0)        |
+| [X] ECS-DATA-003 (payment-schema.sql - v2.0.0)                                                     |
+| Precondición: Doble Conformidad Verificada (QA Conforme + Acta UAT Suscrita)                       |
+|                                                                                                    |
+| [ CONGELAR LINEA BASE INMUTABLE (CU-20) ]                                                          |
++----------------------------------------------------------------------------------------------------+
+| ZONA B: REVERSION OPERACIONAL (ROLLBACK EN BIBLIOTECA DE TRABAJO - CU-21 / RN-08):                 |
+| (i) Procedimiento de emergencia ante fallo insubsanable durante la fase de desarrollo.             |
+| Seleccionar Orden en Conflicto: [^ ECN-2026-0014 (Módulo de Liquidación) v ]                       |
+| Artefacto Volátil Afectado: /storage/trabajo/dev_joan/ECS-LIQ-005/ (Copia de Trabajo)              |
+| Motivo Técnico del Rollback: [ Conflicto insubsanable de dependencias con biblioteca externa.    ] |
+|                                                                                                    |
+| [!] ADVERTENCIA DE SEGURIDAD CRITICA:                                                              |
+| El rollback purga EXCLUSIVAMENTE la copia volátil en Biblioteca de Trabajo y libera el sync_lock.   |
+| Esta operación NO MODIFICA NI ELIMINA versiones históricas en Biblioteca Maestra.                  |
+|                                                                                                    |
+| [ EJECUTAR ROLLBACK EN TRABAJO Y LIBERAR LOCK ]                                                    |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+## 21.4 Segundo Lote de Wireframes
+
+A continuación se formalizan los **8 Wireframes Complementarios** para alcanzar la cobertura del 100% de pantallas del catálogo:
+
+### WF-03: Directorio General de Proyectos — SCREEN-03
+- **Trazabilidad**: `SCREEN-03` $\leftrightarrow$ `NAV-03` $\leftrightarrow$ `PRES-03` $\leftrightarrow$ Proyectos (`MOD-02`, `CU-02`).
+- **Actor(es)**: Analista de Requerimientos / Gestor, CCB, Bibliotecario.
+
+```
++----------------------------------------------------------------------------------------------------+
+| DIRECTORIO DE PROYECTOS DE SOFTWARE BAJO CUSTODIA SCM                  [ + NUEVO PROYECTO (CU-02) ]|
+| Filtro Estado: (o) Activos  ( ) Archivados  ( ) Todos      Buscar: [ PROY-_______________________ ]|
++----------------------------------------------------------------------------------------------------+
+| Codigo      | Nombre del Proyecto         | Lider del Proyecto  | ECS Totales | Baselines | Estado |
+| ------------+-----------------------------+---------------------+-------------+-----------+--------|
+| PROY-001    | Pasarela de Pagos Core      | Joan Medina         | 18          | 3         | ACTIVO |
+| PROY-002    | Sistema de Facturación ERP  | Renzo Antayhua      | 32          | 5         | ACTIVO |
+| PROY-003    | Módulo de Conciliación Bco  | Augusto Rivera      | 12          | 1         | ACTIVO |
++----------------------------------------------------------------------------------------------------+
+| Accion: Clic en cualquier fila para ingresar a la Ficha Integral de Proyecto (WF-04).              |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-04: Ficha Integral de Proyecto — SCREEN-04
+- **Trazabilidad**: `SCREEN-04` $\leftrightarrow$ `NAV-04` $\leftrightarrow$ `PRES-04` $\leftrightarrow$ Gobernanza de Proyecto (`MOD-02`, `CU-02, CU-03`).
+- **Actor(es)**: Gestor, CCB, Bibliotecario, Arquitecto.
+
+```
++----------------------------------------------------------------------------------------------------+
+| FICHA DE PROYECTO: PROY-001 (Pasarela de Pagos Core)                     ESTADO: [ ACTIVO ]        |
+| Lider de Proyecto: Joan Medina | Fecha de Creación: 2026-08-15 | Repositorio: git.internal/pasarela|
++----------------------------------------------------------------------------------------------------+
+| { [X] Informacion General | [ ] Miembros del Equipo | [ ] Catalogo de ECS | [ ] Lineas Base }      |
++----------------------------------------------------------------------------------------------------+
+| Descripcion: Sistema transaccional de pagos interbancarios con soporte a protocolos ISO 8583.     |
+| Resumen de Gobernanza: 18 ECS registrados | 4 Solicitudes activas | 3 Líneas base congeladas        |
+|                                                                                                    |
+| ACCIONES DISPONIBLES:                                                                              |
+| [ Editar Configuracion de Proyecto ]          [ Explorar Catalogo de ECS (WF-12) ]                 |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-08: Consola de Análisis de Impacto Técnico — SCREEN-08
+- **Trazabilidad**: `SCREEN-08` $\leftrightarrow$ `NAV-09` $\leftrightarrow$ `PRES-05` $\leftrightarrow$ Evaluación Técnica (`MOD-04`, `CU-06, RN-05`).
+- **Actor(es)**: Arquitecto / Especialista Técnico (`PU-03`).
+
+```
++----------------------------------------------------------------------------------------------------+
+| CONSOLA DE EVALUACION DE IMPACTO TECNICO (RN-05)                       RFC: RFC-2026-0042          |
+| Solicitud: Soporte a TLS 1.3 | Evaluador Responsable: Arquitecto / Especialista Técnico            |
++----------------------------------------------------------------------------------------------------+
+| ECS Identificados con Dependencia Cruzada:                                                         |
+| [X] ECS-CORE-001 (auth-service.ts) - Impacto Alto en Handshake                                     |
+| [X] ECS-GATE-002 (tls-proxy.conf)  - Modificación de configuración de cifrado                  |
+|                                                                                                    |
+| Evaluacion de Triple Restriccion:                                                                  |
+| Alcance: [ Impacto acotado al perímetro de red y verificación de certificados.                  ] |
+| Tiempo Estimado: [ 12 ] días laborables         Recursos: [ 2 Desarrolladores + 1 Tester QA      ] |
+|                                                                                                    |
+| Dictamen Tecnico de Viabilidad: (o) FACTIBLE / RECOMENDADO     ( ) INVIABLE / RECHAZAR             |
+| Justificacion Técnica de Arquitectura:                                                             |
+| [ La actualización es imprescindible para cumplimiento normativo. Se recomienda branch aislado.  ] |
+|                                                                                                    |
+| [ Cancelar ]                                           [ REGISTRAR INFORME DE IMPACTO (CU-06) ]    |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-11: Ficha de Orden de Cambio (ECN/ECO) — SCREEN-11
+- **Trazabilidad**: `SCREEN-11` $\leftrightarrow$ `NAV-12` $\leftrightarrow$ `PRES-04` $\leftrightarrow$ Ejecución de Cambios (`MOD-04`, `CU-08, CU-22`).
+- **Actor(es)**: CCB, Gestor, Bibliotecario, Desarrollador, QA.
+
+```
++----------------------------------------------------------------------------------------------------+
+| ORDEN DE CAMBIO: ECN-2026-0015                                          ESTADO: [ EN_DESARROLLO ]  |
+| Derivada de: RFC-2026-0042 | Proyecto: Pasarela de Pagos | Tipo de Orden: ECN (Cambio de Software) |
++----------------------------------------------------------------------------------------------------+
+| Desarrollador Asignado: Joan Medina (PU-06)          | Plazo Máximo: 2026-10-15                    |
+| ECS Autorizados para Intervención: ECS-CORE-001, ECS-GATE-002                                      |
+| Estado de Custodia: CHECK-OUT REALIZADO (Bloqueo sync_lock activo en PostgreSQL)                   |
+| Workspace Local: /storage/trabajo/dev_joan/                                                        |
++----------------------------------------------------------------------------------------------------+
+| ACCIONES SEGUN ROL AUTENTICADO:                                                                    |
+| * PU-05 Bibliotecario: [ Ejecutar Check-In a Soporte (WF-13B) ]                                    |
+| * PU-02 Gestor:        [ Cancelar Orden de Cambio con Justificación (CU-22) ]                      |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-14: Visor de Historial y Comparador Diff — SCREEN-14
+- **Trazabilidad**: `SCREEN-14` $\leftrightarrow$ `NAV-18` $\leftrightarrow$ `PRES-09` $\leftrightarrow$ Historial de Versiones (`MOD-05`, `CU-13, RF-09`).
+- **Actor(es)**: Todos los roles técnicos (Bibliotecario, Gestor, Desarrollador, Arquitecto, QA).
+
+```
++----------------------------------------------------------------------------------------------------+
+| HISTORIAL DE VERSIONES Y COMPARADOR DIFF (CU-13)                       ECS: ECS-CORE-001           |
+| Archivo: auth-service.ts | Proyecto: Pasarela de Pagos                                             |
++----------------------------------------------------------------------------------------------------+
+| ARBOL CRONOLOGICO DE VERSIONES:              COMPARADOR LADO A LADO (SPLIT-SCREEN DIFF):           |
+| (o) v1.3.0 (2026-10-01) - ECN-0015 (Actual)  | Versión Anterior (v1.2.0)  | Versión Actual (v1.3.0)|
+| ( ) v1.2.0 (2026-09-15) - ECN-0010           | ---------------------------+------------------------|
+| ( ) v1.1.0 (2026-08-30) - ECN-0004           | const tls = 'TLSv1.2';     | const tls = 'TLSv1.3'; |
+| ( ) v1.0.0 (2026-08-15) - Línea Base Inicial | secureOptions: SSL_OP_NO...| secureOptions: SSL_... |
+|                                              | // Fin bloque legacy       | ciphers: TLS_AES_256...|
++----------------------------------------------------------------------------------------------------+
+| Resumen de Diferencias: +12 líneas agregadas | -4 líneas eliminadas | Checksum SHA-256 verificado   |
+| [ Descargar Copia Certificada ]                               [ Exportar Informe de Diff ]         |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-18: Mesa de Entrada y Ficha de Incidencias — SCREEN-18
+- **Trazabilidad**: `SCREEN-18` $\leftrightarrow$ `NAV-24, NAV-25` $\leftrightarrow$ `PRES-03, PRES-04` $\leftrightarrow$ Incidencias (`MOD-08`, `CU-23, 24, 25`).
+- **Actor(es)**: Solicitante (`PU-01`), Analista de Requerimientos / Gestor (`PU-02`).
+
+```
++----------------------------------------------------------------------------------------------------+
+| MESA DE ENTRADA DE INCIDENCIAS OPERATIVAS                              [ + NUEVA INCIDENCIA (CU-23)]|
+| Filtro: [^ Todas las incidencias v] | Severidad: [^ Todas v]          Buscar: [ INC-______________ ]|
++----------------------------------------------------------------------------------------------------+
+| Ticket    | Titulo                          | Severidad | Estado      | Solicitante | Accion       |
+| ----------+---------------------------------+-----------+-------------+-------------+--------------|
+| INC-0034  | Rechazo de handshake en banco B | ALTA      | ABIERTA     | C. Morales  | [Ver Ficha]  |
+| INC-0033  | Error 504 en reporte nocturno   | MEDIA     | EN_ANALISIS | A. Quispe   | [Ver Ficha]  |
+| INC-0032  | Timeout en sincronización DTO   | CRITICA   | DERIVADA    | J. Medina   | [Ver Ficha]  |
++----------------------------------------------------------------------------------------------------+
+| EXPEDIENTE DEL TICKET SELECCIONADO (INC-0034):                                                     |
+| Descripción: Los terminales POS del Banco B reportan desconexión intermitente por protocolo obsoleto.|
+| ACCION ASISTIDA PARA GESTOR:                                                                       |
+| [ DERIVAR FORMALMENTE A SOLICITUD DE CAMBIO RFC (CU-25) ] (Pre-llena datos en SCREEN-07)          |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-19: Consola de Auditoría y Reportes SCM — SCREEN-19
+- **Trazabilidad**: `SCREEN-19` $\leftrightarrow$ `NAV-26, NAV-27` $\leftrightarrow$ `PRES-03, PRES-10` $\leftrightarrow$ Auditoría y Reportes (`MOD-09`, `CU-27, CU-28`).
+- **Actor(es)**: Comité de Control de Cambios, Bibliotecario, Gestor.
+- **Justificación de Diseño (Sección 18)**: Separada limpiamente de la administración de usuarios (SCREEN-20) para garantizar cohesión de inspección forense e informes normativos de configuración.
+
+```
++----------------------------------------------------------------------------------------------------+
+| CONSOLA DE AUDITORIA FORENSE Y REPORTES SCM (MOD-09)                                                |
+| { [X] Pista Inmutable de Auditoria (CU-27) | [ ] Generador Parametrico de Reportes (CU-28) }       |
++----------------------------------------------------------------------------------------------------+
+| FILTROS DE AUDITORIA:                                                                              |
+| Actor: [^ Todos los usuarios v] | Operación: [^ Todas las operaciones v] | Rango: [ Ultimos 7 dias]|
+| [ Verificar Cadena Criptografica SHA-256 ] -> [ ESTADO: 1,420 REGISTROS VERIFICADOS INTEGROS ]   |
++----------------------------------------------------------------------------------------------------+
+| Marca Temporal (ISO 8601)  | Actor     | Rol Canónico | Operación      | Entidad      | Hash SHA-256|
+| ---------------------------+-----------+--------------+----------------+--------------+-------------|
+| 2026-10-01T14:30:10-05:00  | rvalcarcel| PU-04 CCB    | CCB_RESOLUTN   | RFC-2026-0042| 8f92a1...   |
+| 2026-10-01T14:15:22-05:00  | rloyola   | PU-07 QA     | QA_CERTIFIED   | ECN-2026-0015| 3c44e2...   |
+| 2026-10-01T11:00:05-05:00  | jmedina   | PU-05 BIBLIO | CHECK_OUT_EXEC | ECS-CORE-001 | 1a99b4...   |
++----------------------------------------------------------------------------------------------------+
+| GENERADOR DE REPORTES NORMATIVOS (RF-18):                                                          |
+| Tipo: [^ Reporte de Estado de Configuración (CSAR) v]  Formato: (o) PDF Ejecutivo  ( ) CSV Datos   |
+| [ Generar y Descargar Reporte Oficial ]                                                            |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### WF-20: Administración de Usuarios y Roles — SCREEN-20
+- **Trazabilidad**: `SCREEN-20` $\leftrightarrow$ `NAV-28` $\leftrightarrow$ `PRES-05` $\leftrightarrow$ Gestión IAM (`MOD-01`, `CU-01`).
+- **Actor(es)**: Administrador de Configuración / Bibliotecario (`PU-05`).
+- **Justificación de Diseño (Sección 18)**: Pantalla dedicada para la administración de identidades, credenciales institucionales y asignación rigurosa de roles canónicos (TB-09) sin interferir con la bitácora de auditoría.
+
+```
++----------------------------------------------------------------------------------------------------+
+| ADMINISTRACION DE IDENTIDADES Y ROLES CANONICOS (IAM - CU-01)          [ + REGISTRAR USUARIO ]     |
+| Filtro Rol: [^ Todos los roles v] | Estado: (o) Activos  ( ) Inactivos   Buscar: [ Nombre/Email __ ]|
++----------------------------------------------------------------------------------------------------+
+| ID Usuario | Nombre Completo        | Email Institucional          | Rol Canónico Asignado | Estado|
+| -----------+------------------------+------------------------------+-----------------------+-------|
+| USR-001    | Dr. Ricardo Valcarcel  | rvalcarcel@traceflow.internal| PU-04 CCB             | ACTIVO|
+| USR-002    | Joan Medina Quispe     | jmedina@traceflow.internal   | PU-02 Gestor          | ACTIVO|
+| USR-003    | Renzo Antayhua Mamani  | rantayhua@traceflow.internal | PU-03 Arquitecto      | ACTIVO|
+| USR-004    | Renzo Loyola Vilca     | rloyola@traceflow.internal   | PU-07 QA / Testing    | ACTIVO|
+| USR-005    | Augusto Rivera Muñoz   | arivera@traceflow.internal   | PU-05 Bibliotecario   | ACTIVO|
+| USR-006    | Carlos Morales Torres  | cmorales@exodo.com.pe        | PU-01 Solicitante     | ACTIVO|
++----------------------------------------------------------------------------------------------------+
+| ACCIONES SOBRE USUARIO SELECCIONADO:                                                               |
+| [ Editar Rol Canónico ]          [ Resetear Clave de Acceso ]          [ Desactivar Cuenta ]       |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+## 21.5 Estados Alternativos y Transversales de UI
+
+Cada wireframe contempla los estados visuales transversales para garantizar feedback preventivo y manejo robusto de contingencias:
+
+### 1. Estado Vacío (Empty State)
+Cuando una consulta o tabla no arroja registros, se presenta un contenedor central con mensaje explicativo neutro y botón de acción primaria:
+```
++----------------------------------------------------------------------+
+|                                                                      |
+|                    [ Icono Neutro de Carpeta Vacía ]                 |
+|                   No se encontraron solicitudes de cambio            |
+|       Actualmente no existen RFCs registradas para este proyecto.    |
+|                                                                      |
+|                   [ + Registrar Primera Solicitud ]                  |
+|                                                                      |
++----------------------------------------------------------------------+
+```
+
+### 2. Estado de Carga Asíncrona (Loading / Skeleton State)
+Durante la resolución de peticiones HTTP, se presentan estructuras fantasma (skeletons) que preservan la jerarquía visual de la pantalla sin bloquear la ventana global.
+
+### 3. Estados de Error y Excepción Normativa
+- **Error de Validación (HTTP 400)**: Mensajes contextuales inline ubicados inmediatamente bajo el control infractor en tipografía destacada.
+- **Sesión Expirada (HTTP 401)**: Modal flotante que informa el vencimiento del token por timeout de 15 minutos (ADR-006) y solicita reingreso de contraseña sin perder el formulario en curso.
+- **Infracción de Segregación de Funciones / SoD (HTTP 403)**:
+```
++----------------------------------------------------------------------+
+| [!] ACCION BLOQUEADA POR SEGREGACION DE FUNCIONES (SoD - ADR-006)     |
+| Operación rechazada: El usuario actual figura como desarrollador de   |
+| la ECN-2026-0015 y no puede emitir certificación de conformidad QA.  |
+| [ Entendido / Cerrar Notificación ]                                  |
++----------------------------------------------------------------------+
+```
+- **Conflicto por Bloqueo Activo (HTTP 409)**:
+```
++----------------------------------------------------------------------+
+| [🔒] CONFLICTO DE CONCURRENCIA: ARTEFACTO BLOQUEADO (RN-06)          |
+| El ECS-CORE-001 se encuentra bajo bloqueo exclusivo de sincronización |
+| Custodio actual: dev_joan | Retenido desde: 2026-10-01 10:00:15       |
+| Orden activa: ECN-2026-0012 | Biblioteca afectada: Trabajo           |
+| [ Ver Ficha del Bloqueo ]                                [ Aceptar ] |
++----------------------------------------------------------------------+
+```
+
+---
+
+## 21.6 Matriz de Trazabilidad Cruzada (SCREEN ↔ WF ↔ NAV ↔ PRES ↔ CU)
+
+La siguiente matriz certifica la **cobertura exhaustiva del 100% de pantallas físicas y casos de uso de TraceFlow SCM**:
+
+| WF-ID | SCREEN-ID | NAV-ID | PRES-ID | Caso(s) de Uso | Actor Canónico Principal | Estado RFC Condicionado (TB-07) |
+| :---: | :---: | :---: | :---: | :--- | :--- | :--- |
+| **`WF-01`** | `SCREEN-01` | `NAV-01` | `PRES-01` | Autenticación | Todos los Actores | N/A (Sesión Pública) |
+| **`WF-02`** | `SCREEN-02` | `NAV-02` | `PRES-02` | Resumen Múltiple | Todos (Adaptado por Rol) | Todos los estados activos |
+| **`WF-03`** | `SCREEN-03` | `NAV-03` | `PRES-03` | `CU-02` | Gestor, CCB, Bibliotecario | N/A (Gestión de Proyecto) |
+| **`WF-04`** | `SCREEN-04` | `NAV-04` | `PRES-04` | `CU-02, CU-03` | Gestor, CCB, Bibliotecario, Arq | N/A (Ficha de Proyecto) |
+| **`WF-05`** | `SCREEN-05` | `NAV-05` | `PRES-03` | `CU-04..08, CU-30` | Todos los Actores | Todos los estados (TB-07) |
+| **`WF-06A`**| `SCREEN-06` | `NAV-06` | `PRES-04, 07` | `CU-04, CU-05` | Analista de Requerimientos/Gestor| `REGISTRADA`, `OBSERVADA` |
+| **`WF-06B`**| `SCREEN-06` | `NAV-06` | `PRES-04, 07` | `CU-06, 07, 30` | Arquitecto, CCB, Gestor | `EN_EVALUACION`, `EVALUADA` |
+| **`WF-06C`**| `SCREEN-06` | `NAV-06` | `PRES-04, 07` | `CU-08, 17, 29` | Gestor, QA, Solicitante | `EN_PRUEBAS`, `CERTIFICADA` |
+| **`WF-07`** | `SCREEN-07` | `NAV-07, 08` | `PRES-06, 05` | `CU-04, CU-04.1` | Solicitante (PU-01) | `REGISTRADA`, `OBSERVADA` |
+| **`WF-08`** | `SCREEN-08` | `NAV-09` | `PRES-05` | `CU-06` | Arquitecto / Especialista Técnico| `EN_EVALUACION` |
+| **`WF-09`** | `SCREEN-09` | `NAV-10` | `PRES-07` | `CU-07` | Comité de Control de Cambios | `EN_EVALUACION` (Cambio Mayor) |
+| **`WF-10`** | `SCREEN-10` | `NAV-11` | `PRES-07` | `CU-30` | Gestor Y Arquitecto (Doble Llave)| `EN_EVALUACION` (Cambio Menor) |
+| **`WF-11`** | `SCREEN-11` | `NAV-12` | `PRES-04` | `CU-08, CU-22` | Gestor, Bibliotecario, Dev, QA | `AUTORIZADA`, `EN_DESARROLLO` |
+| **`WF-12`** | `SCREEN-12` | `NAV-13..15` | `PRES-03,04,08`| `CU-09, 14, 26` | Bibliotecario, Dev, Arq, QA | `EN_DESARROLLO`, `EN_PRUEBAS` |
+| **`WF-13A`**| `SCREEN-13` | `NAV-16` | `PRES-08` | `CU-10, CU-11` | Bibliotecario (Ejecutor) | `AUTORIZADA`, `EN_DESARROLLO` |
+| **`WF-13B`**| `SCREEN-13` | `NAV-17` | `PRES-08` | `CU-12` | Bibliotecario (Ejecutor) | `EN_DESARROLLO`, `CERTIFICADA` |
+| **`WF-14`** | `SCREEN-14` | `NAV-18` | `PRES-09` | `CU-13` | Todos los roles técnicos | Todos los estados con versiones |
+| **`WF-15`** | `SCREEN-15` | `NAV-19, 20` | `PRES-08, 05` | `CU-16..19` | Equipo de Calidad (Eval) / Dev | `EN_PRUEBAS` |
+| **`WF-16`** | `SCREEN-16` | `NAV-21` | `PRES-07` | `CU-29` | Solicitante (Usuario Final) | `CERTIFICADA` |
+| **`WF-17`** | `SCREEN-17` | `NAV-22, 23` | `PRES-08` | `CU-20, CU-21` | Administrador / Bibliotecario | `CERTIFICADA`, `CANCELADA` |
+| **`WF-18`** | `SCREEN-18` | `NAV-24, 25` | `PRES-03, 04` | `CU-23..25` | Solicitante, Gestor | N/A (Mesa de Incidencias) |
+| **`WF-19`** | `SCREEN-19` | `NAV-26, 27` | `PRES-03, 10` | `CU-27, CU-28` | CCB, Bibliotecario, Gestor | Todos los estados (Auditoría) |
+| **`WF-20`** | `SCREEN-20` | `NAV-28` | `PRES-05` | `CU-01` | Administrador / Bibliotecario | N/A (Administración IAM) |

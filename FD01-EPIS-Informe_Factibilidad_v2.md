@@ -24,9 +24,9 @@ En el análisis de temporalidad del proyecto se distinguen tres horizontes clara
 
 **ÉXODO S.A.C.** es una empresa consultora peruana de tecnologías de la información dedicada al desarrollo y mantenimiento de software a medida para clientes de diversos sectores productivos. La organización estructura sus actividades en tres niveles: estratégico (Gerencia de Proyectos), táctico (Jefaturas de Proyecto) y operativo (equipos de desarrollo de software, aseguramiento de la calidad y soporte técnico).
 
-El diagnóstico institucional evidencia que ÉXODO S.A.C. opera bajo un esquema empírico carente de un sistema formal de Gestión de la Configuración del Software (SCM). El código fuente, los esquemas de bases de datos y la documentación técnica de los proyectos se encuentran dispersos en los discos duros locales de los consultores y en cuentas individuales en diversas plataformas de almacenamiento. Las modificaciones se coordinan por canales informales (mensajería instantánea y acuerdos verbales) sin registro de trazabilidad, propiciando incidentes críticos de sobreescritura durante el trabajo concurrente, entregas a producción sin validación formal de calidad y la ausencia de líneas base estables a las cuales retornar ante contingencias operativas. Esta situación genera un retrabajo estimado en 25% del tiempo del equipo técnico.
+El diagnóstico institucional evidencia que ÉXODO S.A.C. opera bajo un esquema empírico carente de un sistema formal de Gestión de la Configuración del Software (SCM). El código fuente, los esquemas de bases de datos y la documentación técnica de los proyectos se encuentran dispersos en los discos duros locales de los consultores y en cuentas individuales en diversas plataformas de almacenamiento. Las modificaciones se coordinan por canales informales (mensajería instantánea y acuerdos verbales) sin registro de trazabilidad, propiciando incidentes críticos de sobreescritura durante el trabajo concurrente, entregas a producción sin validación formal de calidad y la ausencia de líneas base estables a las cuales retornar ante contingencias operativas. Esta situación genera pérdidas recurrentes de tiempo y sobrecostos por retrabajo, cuya meta de reducción proyectada en el SRS es del 25% del tiempo del equipo técnico (`FD03`, Sección 3.2.2).
 
-**TraceFlow SCM** es una solución de software web centralizada diseñada específicamente para gobernar, automatizar y estandarizar los procesos de control de configuración en entornos de consultoría tecnológica, bajo los lineamientos de los estándares internacionales **IEEE Std 828** e **ISO/IEC/IEEE 12207**.
+**TraceFlow SCM** es una solución de software web centralizada diseñada específicamente para gobernar, automatizar y estandarizar los procesos de control de configuración en entornos de consultoría tecnológica, adoptando como marcos metodológicos de buenas prácticas los estándares internacionales **IEEE Std 828** e **ISO/IEC/IEEE 12207**.
 
 El propósito fundamental de TraceFlow SCM es garantizar la inmutabilidad, trazabilidad bidireccional y reproducibilidad de cada activo del ciclo de vida del software, erradicando las pérdidas de información y optimizando la productividad de los equipos de desarrollo.
 
@@ -49,13 +49,13 @@ Diseñar, evaluar la viabilidad integral y especificar la plataforma de software
 ### 1.4.2. Objetivos Específicos
 
 1. **Centralización de ECS:** Implementar un repositorio institucional estructurado y seguro que permita catalogar, identificar y resguardar de forma unificada el código fuente, los esquemas relacionales de base de datos y la documentación técnica de los proyectos de ÉXODO S.A.C.
-2. **Control formal de cambios:** Establecer un flujo estandarizado para la recepción, análisis de impacto técnico y aprobación de Solicitudes de Cambio (RFC), discriminando operativamente entre cambios menores y cambios mayores para evitar cuellos de botella burocráticos.
+2. **Control formal de cambios:** Establecer un flujo estandarizado para la recepción, análisis de impacto técnico y aprobación de Solicitudes de Cambio (RFC), asegurando que ninguna modificación sea integrada sin previa evaluación técnica y autorización formal documentada.
 3. **Gestión jerárquica de bibliotecas y versionamiento:** Administrar el ciclo de madurez de los artefactos mediante la transferencia controlada entre tres bibliotecas aisladas (Trabajo, Soporte, Maestra) a través de operaciones auditables de Check-Out y Check-In.
 4. **Congelamiento de Líneas Base (Baselines):** Proveer mecanismos formales para congelar versiones estables de los proyectos de software identificadas bajo versionamiento semántico (mayor.menor.parche), asegurando puntos de recuperación estables ante incidencias en producción.
 5. **Trazabilidad bidireccional continua:** Garantizar la reconstrucción histórica del origen, justificación, responsable y orden de cambio asociada a cada modificación en los ECS, permitiendo atender auditorías técnicas en un plazo inferior a 24 horas.
 6. **Segregación de funciones y control de concurrencia:** Delimitar las responsabilidades de acceso mediante un esquema RBAC de 7 roles canónicos e instrumentar bloqueos de sincronización transaccionales que eliminen los conflictos de edición concurrente.
 7. **Aseguramiento de la Calidad (QA):** Establecer como compuerta técnica obligatoria la ejecución de pruebas de integración y validación funcional en la Biblioteca de Soporte, condicionando cualquier integración a la Biblioteca Maestra a la emisión de una Certificación de Conformidad.
-8. **Aceptación formal del usuario (UAT):** Incorporar en el flujo de gestión de cambios una etapa de validación y aceptación directa por parte del Solicitante / Usuario Final en entornos de staging antes del congelamiento definitivo y cierre de la orden de cambio.
+8. **Validación formal de entregas y conformidad:** Establecer mecanismos de verificación y control de conformidad previos a la liberación final de los cambios autorizados, garantizando la satisfacción de los requerimientos y compromisos asumidos con los clientes de ÉXODO S.A.C.
 9. **Integridad criptográfica y auditoría:** Implementar mecanismos automatizados de cálculo y contrastación de sumas de verificación SHA-256 sobre cada archivo gestionado, registrando todas las transacciones críticas en bitácoras inmutables.
 
 ---
@@ -66,8 +66,8 @@ La identificación de riesgos se fundamenta en las restricciones operativas diag
 
 | ID | Riesgo | Tipo | Probabilidad | Impacto | Medida de mitigación |
 | :---: | :--- | :---: | :---: | :---: | :--- |
-| **RSK-01** | **Resistencia cultural al flujo formal de cambios:** Resistencia de los consultores a abandonar prácticas empíricas de edición directa y percibir el registro de RFC como una sobrecarga burocrática. | Operativo / Adopción | Alta | Alto | Conducir capacitaciones orientadas al beneficio individual (protección contra sobreescritura accidental), asegurar una interfaz intuitiva con curva de aprendizaje menor a 3 horas (`RNF-04`) y establecer canal expedito para cambios menores. |
-| **RSK-02** | **Infraestructura de hardware no homologada:** Discrepancia entre las capacidades reales de cómputo/red de los servidores de ÉXODO S.A.C. y los requisitos del motor SCM (**PENDIENTE DE VALIDACIÓN**). | Infraestructura / Técnico | Media | Alto | Realizar un inventario técnico *in situ* de servidores; modularizar la arquitectura mediante contenedores livianos (Docker) con capacidad de despliegue híbrido en PaaS cloud administrado. |
+| **RSK-01** | **Resistencia cultural al flujo formal de cambios:** Resistencia de los consultores a abandonar prácticas empíricas de edición directa y percibir el registro de RFC como una sobrecarga burocrática. | Operativo / Adopción | Alta | Alto | Conducir capacitaciones orientadas al beneficio individual (protección contra sobreescritura accidental), asegurar una interfaz intuitiva con curva de aprendizaje menor a 3 horas (`RNF-04`) y evaluar operativamente canales ágiles de tramitación para cambios rutinarios. |
+| **RSK-02** | **Infraestructura de hardware no homologada:** Discrepancia entre las capacidades reales de cómputo/red de los servidores de ÉXODO S.A.C. y los requisitos del motor SCM (**PENDIENTE DE VALIDACIÓN**). | Infraestructura / Técnico | Media | Alto | Realizar un inventario técnico *in situ* de servidores; modularizar la arquitectura mediante servicios desacoplados o virtualización ligera evaluados en el diseño técnico con capacidad de despliegue híbrido on-premise / PaaS. |
 | **RSK-03** | **Incertidumbre en flujos financieros y costos:** Falta de datos corporativos auditados sobre los ahorros reales por retrabajo y subvaluación del CAPEX en la formulación preliminar del SRS. | Económico | Alta | Alto | Formular colegiadamente el flujo de caja descontado neto corporativo con la Gerencia de ÉXODO S.A.C., reestructurando la planilla de desarrollo para integrar a los 4 miembros del C-SharkTeam. |
 | **RSK-04** | **Sobrecarga de concurrencia y contención de bloqueos:** Bloqueos transaccionales prolongados o deadlocks sobre ECS transversales compartidos por varios proyectos en la Biblioteca de Trabajo. | Concurrencia / Técnico | Media | Alto | Implementar timeouts de bloqueo configurables, pruebas unitarias de estrés transaccional y habilitar mecanismos de liberación forzada justificada bajo autorización del Administrador de Configuración. |
 | **RSK-05** | **Vulneración de confidencialidad de datos:** Acceso no autorizado o fuga de código fuente y documentación propietaria de clientes de ÉXODO S.A.C. | Seguridad | Baja | Alto | Aplicación estricta de políticas de control de acceso RBAC (`RF-01`), comunicaciones cifradas mediante protocolos HTTPS y SSH (`RNF-01`), y firmas criptográficas inalterables en bitácoras de auditoría (`RF-17`). |
@@ -96,7 +96,7 @@ El estado operativo actual (**AS-IS**) de la empresa consultora **ÉXODO S.A.C.*
 
 ### 3. Consecuencias e Impactos Identificados
 - **Pérdida Crítica de Avances por Sobreescritura:** La concurrencia desordenada provoca la eliminación involuntaria de líneas de código y funcionalidades previamente implementadas por otros desarrolladores al integrar archivos de forma manual.
-- **Retrabajo Sistémico:** Se estima que los equipos de desarrollo invierten un **25% de su tiempo productivo** en resolver conflictos de código, conciliar versiones divergentes y reconstruir código perdido por sobreescritura.
+- **Retrabajo Sistémico:** Los equipos de desarrollo experimentan un consumo improductivo continuo de horas de labor técnica en resolver conflictos de código, conciliar versiones divergentes y reconstruir código perdido por sobreescrituras accidentales. El SRS formaliza como meta de negocio reducir este retrabajo en un 25% (`FD03`, Sección 3.2.2), manteniéndose la medición cuantitativa histórica de dicha línea base en ÉXODO S.A.C. como **PENDIENTE DE VALIDACIÓN** al no existir registros de control de horas en el repositorio.
 - **Imposibilidad de Retorno Estable (Rollback):** Ante incidentes críticos o fallos catastróficos en producción, la ausencia de Líneas Base auditadas y congeladas impide ejecutar un retorno seguro a un estado operativo anterior en plazos oportunos.
 - **Incertidumbre e Incumplimiento Contractual:** Imposibilidad de certificar fehacientemente a los clientes qué versión de software fue entregada, en qué fecha y bajo qué autorización técnica, generando disputas contractuales y deterioro de la confianza institucional.
 
@@ -108,15 +108,15 @@ A continuación se establece la diferenciación estricta entre la infraestructur
 
 ### Hardware actual documentado
 - **Servidores de ÉXODO S.A.C.:** **PENDIENTE DE VALIDACIÓN**. Si bien en la Sección 3.5.1 del documento consolidado SRS (`FD03-EPIS-Informe_SRS.md`) se indica narrativamente que *"ÉXODO S.A.C. cuenta con servidores propios y acceso a servicios en la nube"*, el repositorio no contiene ninguna especificación técnica verificable sobre número de procesadores, arquitectura de CPU, cantidad de memoria RAM, capacidad y tecnología de almacenamiento (HDD/SSD), topología de red ni mecanismos de redundancia eléctrica.
-- **Estaciones de trabajo de los consultores:** **DISPONIBLE Y VERIFICADO**. Los consultores y desarrolladores de software de ÉXODO S.A.C. disponen de computadoras portátiles y de escritorio personales/corporativas operativas para tareas habituales de codificación y compilación local.
+- **Estaciones de trabajo de los consultores de ÉXODO S.A.C.:** **PENDIENTE DE VALIDACIÓN TÉCNICA / INFERIDO OPERATIVAMENTE**. Se asume operativamente que los consultores disponen de computadoras personales o corporativas para sus tareas habituales de codificación, pero el repositorio no contiene un inventario técnico *in situ* con especificaciones auditadas de dichos equipos (CPU, RAM, almacenamiento). *Nota documental:* La única infraestructura de clientes verificada documentalmente en el repositorio corresponde a los equipos personales de los 4 integrantes del equipo de desarrollo C-SharkTeam (`FD03`, Sección 3.5.1).
 
-### Hardware requerido
+### Hardware requerido o propuesto
 - **Servidor Central de Aplicaciones y Base de Datos (On-Premise o Instancia Virtual Dedicada):** **PROPUESTO**.
   - Procesador: Arquitectura x86-64 con un mínimo de 4 núcleos (quad-core) a 2.5 GHz o superior.
   - Memoria RAM: Mínimo 8 GB (recomendado 16 GB para soportar concurrencia de más de 50 proyectos simultáneos, `RNF-05`).
   - Almacenamiento: Mínimo 100 GB en unidades de estado sólido (SSD) en configuración RAID 1 o RAID 5 para alta disponibilidad y tolerancia a fallos.
   - Conectividad: Interfaz de red Gigabit Ethernet (1000 Mbps) con conexión a Internet de banda ancha simétrica y dirección IP estática.
-- **Terminales Cliente de Consultores:** **REQUERIDO**.
+- **Terminales Cliente de Consultores:** **PROPUESTO / ESTIMADO REFERENCIAL**.
   - Procesador dual-core x86-64 a 2.0 GHz, 8 GB de memoria RAM y 20 GB de espacio libre en disco para clonación de bibliotecas de trabajo locales.
 
 ### Software actual documentado
@@ -125,14 +125,16 @@ A continuación se establece la diferenciación estricta entre la infraestructur
 - **Navegadores Web:** **DISPONIBLE Y VERIFICADO**. Navegadores modernos compatibles con estándares HTML5/ECMAScript (Google Chrome, Mozilla Firefox, Microsoft Edge).
 
 ### Software / tecnologías requeridas o propuestas
-- **Tecnologías Requeridas (Obligatorias para el Dominio SCM):** **REQUERIDO**.
-  - Sistema Operativo de Servidor: Distribución Linux de nivel empresarial (Ubuntu Server 22.04 LTS o superior / Rocky Linux 9) o Windows Server 2022.
-  - Motor de Base de Datos Relacional: Sistema gestor compatible con transacciones ACID, integridad referencial y procedimientos almacenados (PostgreSQL 15+ o SQLite 3 en fase de pruebas).
+- **Tecnologías Requeridas (Principios Arquitecturales y Normativos del Dominio SCM):** **REQUERIDO**.
+  - Sistema Operativo de Servidor: Sistema operativo multiusuario de nivel empresarial (entorno Linux o Windows Server).
+  - Motor de Base de Datos Relacional: Sistema gestor con soporte pleno para transacciones ACID, integridad referencial y procedimientos de almacenamiento.
   - Algoritmo Criptográfico: Implementación estándar de funciones de resumen criptográfico SHA-256 (`RNF-03`).
-  - Protocolos de Comunicación Segura: HTTPS con soporte de cifrado TLS 1.3 y SSH v2 para operaciones de transferencia de código (`RNF-01`).
-- **Tecnologías Propuestas (Sujetas a Optimización Técnica):** **PROPUESTO**.
+  - Protocolos de Comunicación Segura: HTTPS con soporte de cifrado TLS 1.3 y SSH v2 para operaciones de transferencia segura de código (`RNF-01`).
+- **Tecnologías Propuestas (Sujetas a Optimización y Aprobación Técnica):** **PROPUESTO**.
+  - Opciones de Sistema Operativo: Distribuciones Linux empresariales (Ubuntu Server 22.04 LTS / Rocky Linux 9) o Windows Server 2022.
+  - Opciones de Base de Datos Relacional: PostgreSQL 15+ para entorno productivo o SQLite 3 en fase de pruebas locales.
   - Backend: Python con framework FastAPI/Django REST o Node.js con TypeScript y Express.
-  - Plataforma de Infraestructura como Servicio / PaaS: Render y Supabase como alternativas para alojamiento preliminar en la nube.
+  - Plataforma de Infraestructura como Servicio / PaaS: Render y Supabase como alternativas evaluadas para alojamiento preliminar en la nube.
 - **Tecnologías Por Definir:** **POR DEFINIR**.
   - Framework de Capa de Presentación: Selección definitiva entre React.js y Vue.js para la construcción de la Single Page Application (SPA).
   - Mecanismo de Almacenamiento Físico de Bibliotecas: Definición entre el sistema de archivos local del servidor del cliente (Local File System con particiones aisladas) o un servicio de almacenamiento de objetos compatible con API S3 (AWS S3 / MinIO).
@@ -298,27 +300,32 @@ La factibilidad operativa evalúa la receptividad organizacional de **ÉXODO S.A
 
 ### 1. Actores y Segregación de Responsabilidades
 El sistema se gobierna estrictamente sobre los **7 roles canónicos oficiales** definidos en la norma [`docs/DOCUMENTATION_RULES.md`](docs/DOCUMENTATION_RULES.md) (Sección 5):
-1. **`Solicitante / Usuario Final` (`PU-01`):** Cliente de ÉXODO S.A.C. o usuario interno; registra la RFC, subsana observaciones, realiza la prueba de aceptación (UAT) y es notificado al cierre.
-2. **`Analista de Requerimientos / Gestor` (`PU-02`):** Recepciona la solicitud, valida la suficiencia de datos, categoriza criticidad y clasifica el cambio entre menor y mayor.
+1. **`Solicitante / Usuario Final` (`PU-01`):** Cliente de ÉXODO S.A.C. o usuario interno; registra la RFC, subsana observaciones, realiza la validación de conformidad del entregable y es notificado al cierre.
+2. **`Analista de Requerimientos / Gestor` (`PU-02`):** Recepciona la solicitud, valida la suficiencia de datos, categoriza criticidad y evalúa preliminarmente la pertinencia del cambio.
 3. **`Arquitecto / Especialista Técnico` (`PU-03`):** Analiza dependencias e impacto sobre la arquitectura, esfuerzo en horas, cronograma, costos y riesgos; emite el Informe Técnico de Impacto vinculante (`RF-05`, `RN-05`).
-4. **`Comité de Control de Cambios (CCB)` (`PU-04`):** Órgano colegiado de decisión; evalúa el informe técnico, dictamina cambios mayores que afecten la triple restricción y emite la ECN/ECO formal (`RF-06`, `RF-07`).
+4. **`Comité de Control de Cambios (CCB)` (`PU-04`):** Órgano colegiado de decisión; evalúa el informe técnico de impacto y dictamina la aprobación o rechazo de solicitudes de cambio (`RF-06`, `RF-07`).
 5. **`Administrador de Configuración / Bibliotecario` (`PU-05`):** Custodio del software; ejecuta Check-Out y Check-In, activa/libera bloqueos de sincronización (`RN-06`), congela Líneas Base (`RN-02`) y ejecuta rollbacks ante fallos no subsanados (`RN-08`).
 6. **`Ingeniero de Software / Desarrollador` (`PU-06`):** Implementa el cambio autorizado en la Biblioteca de Trabajo y realiza pruebas unitarias locales (`CU-14`, `CU-15`).
 7. **`Equipo de Calidad / Testing` (`PU-07`):** Ente independiente; ejecuta pruebas de integración y validación funcional en Biblioteca de Soporte; emite de forma obligatoria la Certificación de Conformidad (`RN-09`).
 
-### 2. Flujo de Gestión de la Configuración del Software (SCM / GCS) Actualizado y Manejo de la Triple Restricción
-TraceFlow SCM implementa una secuencia operativa de 10 etapas optimizada para balancear el control formal con la agilidad empresarial:
+### 2. Evaluación Operativa del Flujo de Gestión de Cambios (SCM / GCS)
 
-$$\text{RFC} \longrightarrow \text{Validación} \longrightarrow \text{Análisis de impacto} \longrightarrow \text{Clasificación del cambio} \longrightarrow \text{Cambio menor / Cambio mayor} \longrightarrow \text{CCB (cuando corresponda)} \longrightarrow \text{Implementación} \longrightarrow \text{QA} \longrightarrow \text{Aceptación del Solicitante / Usuario Final} \longrightarrow \text{Check-In} \longrightarrow \text{Línea Base} \longrightarrow \text{Cierre}$$
+El proceso base documentado en el SRS vigente (`FD03`, Sección 4.2 y Diagrama `DG-03`) canaliza el 100% de las Solicitudes de Cambio (RFC) a través del Comité de Control de Cambios (CCB), fijando como compuerta técnica previa al Check-In la Certificación de Conformidad emitida por el Equipo de Calidad (Testing).
 
-#### Regla de Intervención del CCB:
-- **Cambios Mayores (Afectación de la Triple Restricción):** Modificaciones que alteran el **alcance contractual**, el **cronograma/tiempo** comprometido con el cliente, el **costo presupuestado** o la arquitectura estructural del software. Requieren obligatoriamente la convocatoria, evaluación colegiada y aprobación del Comité de Control de Cambios (CCB).
-- **Cambios Menores (Operativos / Rutinarios):** Correcciones menores de defectos o ajustes que no impactan la triple restricción ni alteran contratos de API o modelos de datos. Siguen una ruta de aprobación ágil y delegada (Analista de Requerimientos o Arquitecto), emitiendo la orden de trabajo correspondiente sin inducir retrasos administrativos ni sobrecargar al CCB.
+#### Diagnóstico Operativo y Recomendaciones de Optimización:
+Desde la perspectiva de viabilidad organizacional, la evaluación operativa concluye que someter la totalidad de las modificaciones cotidianas (incluyendo correcciones tipográficas o ajustes rutinarios menores) a la deliberación del comité colegiado generaría cuellos de botella administrativos y resistencia al uso del sistema. Por ello, este informe de factibilidad establece las siguientes **recomendaciones y condiciones operativas**:
 
-#### Compuertas de Calidad y Aceptación:
-1. *Pruebas de QA:* El Equipo de Calidad somete el artefacto a pruebas de integración. Si falla el re-testeo tras las correcciones del desarrollador, se ejecuta el Rollback en la Biblioteca de Trabajo y se cancela la orden por fallo no subsanado.
-2. *Aceptación del Usuario (UAT):* Habiéndose emitido la Certificación de Conformidad de QA, el Solicitante / Usuario Final valida funcionalmente el cambio en el entorno de soporte. Solo con su visto bueno se autoriza al Administrador a realizar el Check-In hacia la Biblioteca Maestra.
-3. *Check-In y Línea Base:* El Administrador congela una nueva Línea Base versionada (`RN-02`), libera el bloqueo y el trámite se cierra formalmente.
+1. **Bifurcación Operativa entre Cambios Mayores y Menores (Recomendación Operativa):**
+   - *Cambios Mayores (Afectación de la Triple Restricción):* Modificaciones que alteren el **alcance contractual**, el **cronograma/tiempo**, el **costo presupuestado** o la arquitectura del software. Deben mantener obligatoriamente la convocatoria y aprobación del CCB colegiado.
+   - *Cambios Menores (Operativos / Rutinarios):* Correcciones menores o ajustes que no impacten la triple restricción. Se recomienda establecer una ruta de aprobación ágil y delegada (Analista de Requerimientos o Arquitecto) para no saturar al CCB ni entorpecer los compromisos de entrega.
+
+2. **Compuerta de Aceptación del Usuario (UAT) antes del Cierre (Recomendación Operativa):**
+   - Si bien el SRS actual (`FD03`) culmina la validación técnica en el Equipo de Calidad (`RN-09`), para prevenir discrepancias contractuales con los clientes de ÉXODO S.A.C. se recomienda operativamente que el Solicitante / Usuario Final (`PU-01`) ejecute una prueba de aceptación (UAT) previa al Check-In definitivo en la Biblioteca Maestra.
+
+$$\text{Secuencia Operativa Recomendada: } \text{RFC} \longrightarrow \text{Validación} \longrightarrow \text{Impacto} \longrightarrow \text{Clasificación} \longrightarrow \text{Aprobación (CCB / Delegada)} \longrightarrow \text{Trabajo} \longrightarrow \text{QA} \longrightarrow \text{Validación de Usuario} \longrightarrow \text{Check-In Maestra} \longrightarrow \text{Línea Base} \longrightarrow \text{Cierre}$$
+
+> [!NOTE]
+> **Condición de Gobernanza Documental:** La discriminación entre cambios menores y mayores, y la compuerta formal de aceptación de usuario (UAT) constituyen recomendaciones operativas originadas en este estudio de factibilidad. **Su adopción como requerimientos funcionales formales del sistema está condicionada a su sincronización e incorporación en una actualización posterior del SRS (`FD03-EPIS-Informe_SRS.md`)**.
 
 ### 3. Adaptación, Capacitación y Sostenibilidad
 - **Adaptación y Cultura:** El personal no altera sus editores locales habituales (IDEs). El bloqueo transaccional es valorado positivamente por los consultores al proteger su código de sobreescrituras accidentales.
@@ -327,8 +334,8 @@ $$\text{RFC} \longrightarrow \text{Validación} \longrightarrow \text{Análisis 
 
 ---
 
-> ### **Conclusión de Factibilidad Operativa: VIABLE**
-> **Justificación documental:** Plenamente viable. La solución implementa una estricta segregación de funciones basada en 7 roles canónicos, optimiza la carga burocrática discriminando cambios menores y mayores con intervención del CCB cuando corresponda, introduce la compuerta de aceptación del usuario y cuenta con una meta de inducción inferior a 3 horas.
+> ### **Conclusión de Factibilidad Operativa: VIABLE CON CONDICIONES**
+> **Justificación documental:** Operativamente viable. La plataforma formaliza la segregación de responsabilidades sobre 7 roles canónicos de RBAC y mantiene una meta de inducción inferior a 3 horas (`RNF-04`). La viabilidad queda **condicionada** a formalizar en el SRS (`FD03`) la recomendación de una ruta ágil para cambios menores y la compuerta de validación de entrega con el usuario solicitante, evitando cuellos de botella burocráticos.
 
 ---
 
@@ -414,10 +421,10 @@ En caso de optar por un despliegue en plataformas cloud PaaS (como Render o Supa
 
 1. **Viabilidad Técnica Favorable pero Condicionada:** El desarrollo de TraceFlow SCM es técnicamente realizable. La arquitectura modular en 4 capas, el motor de exclusión mutua mediante bloqueos transaccionales en Check-Out, el esquema jerárquico de tres bibliotecas y la verificación criptográfica SHA-256 son técnicamente viables y alineados con las capacidades del equipo C-SharkTeam. Su viabilidad definitiva queda condicionada a la ejecución de un relevamiento físico *in situ* de los servidores de ÉXODO S.A.C. y a la elección final del framework frontend.
 2. **Viabilidad Económica Pendiente de Validación Financiera:** La dimensión económica no puede dictaminarse como aprobada en la etapa actual. Los indicadores de rentabilidad financiera (VAN de +S/. 10,801.64 y TIR de 68.20%) no pueden reproducirse matemáticamente debido a la ausencia de una serie de flujos de caja netos anuales sustentados en el repositorio. Asimismo, el presupuesto de inversión inicial (CAPEX) omitió al 50% de la mano de obra desarrolladora. Se requiere formular el modelo de flujos de caja corporativo con datos auditados de ÉXODO S.A.C.
-3. **Plena Capacidad y Viabilidad Operativa:** El sistema responde a cabalidad a las necesidades operacionales de ÉXODO S.A.C. La adopción de 7 roles canónicos de RBAC garantiza una rigurosa segregación de funciones. La incorporación de una ruta operativa ágil para cambios menores y la elevación al CCB exclusivamente cuando se compromete la triple restricción (alcance, tiempo, costo) previene la burocratización del flujo, mientras que la compuerta de aceptación del usuario (UAT) asegura la conformidad de los entregables con una curva de aprendizaje inferior a 3 horas.
+3. **Viabilidad Operativa Favorable Sujeta a Optimización:** El sistema responde a las necesidades operacionales de ÉXODO S.A.C., asegurando una estricta segregación de funciones entre los 7 roles canónicos de RBAC y una curva de inducción menor a 3 horas. Para evitar la congestión burocrática diagnosticada en el flujo base del SRS (donde el 100% de cambios pasa por el CCB colegiado), la viabilidad operativa queda condicionada a formalizar en una actualización posterior del SRS (`FD03`) la recomendación de una ruta ágil para cambios menores y la compuerta de validación de entrega con el usuario solicitante.
 4. **Viabilidad Legal con Requerimientos Contractuales:** La plataforma proporciona mecanismos idóneos para respaldar la atribución moral y patrimonial del software (D.L. 822), el control de acceso a datos protegidos (Ley 29733) y el cumplimiento de SLAs contractuales. Su viabilidad se supedita a formalizar los contratos de cesión patrimonial entre el C-SharkTeam y ÉXODO S.A.C., y a auditar las dependencias de código abierto para evitar copyleft recíproco restrictivo.
 5. **Impactos Sociales y Ambientales Altamente Favorables:** En el plano social, la herramienta reduce significativamente el estrés laboral y el sobretiempo no remunerado al erradicar la pérdida de código por sobreescritura, fomentando un clima laboral transparente y habilitando el teletrabajo seguro. En el plano ambiental, promueve la eliminación del papel en trámites de ingeniería y optimiza la retención de almacenamiento digital bajo preceptos de Green IT.
-6. **Condiciones Mandatorias Previas a la Implementación:** Antes de autorizar el inicio de la fase de codificación y despliegue corporativo (Hito FD04), deberán satisfacerse formalmente las siguientes compuertas: (a) emisión del acta de inspección de hardware de ÉXODO S.A.C., (b) aprobación gerencial del flujo de caja descontado neto a 4 desarrolladores, (c) designación oficial de los integrantes del CCB, y (d) firma de convenios de propiedad intelectual y confidencialidad.
+6. **Condiciones Mandatorias Previas a la Implementación:** Antes de autorizar el inicio de la fase de codificación y despliegue corporativo (Hito FD04), deberán satisfacerse formalmente las siguientes compuertas: (a) emisión del acta de inspección de hardware de ÉXODO S.A.C., (b) aprobación gerencial del flujo de caja descontado neto a 4 desarrolladores, (c) designación oficial de los integrantes del CCB, (d) firma de convenios de propiedad intelectual y confidencialidad, y (e) sincronización formal en el SRS (`FD03`) de las recomendaciones operativas sobre cambios menores y validación con el usuario.
 
 ---
 

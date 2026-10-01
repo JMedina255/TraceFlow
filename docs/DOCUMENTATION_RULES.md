@@ -220,3 +220,429 @@ Los mensajes de commit que involucren cambios en la documentación deben regirse
 - `update docs` *(sin prefijo convencional ni alcance)*
 - `arreglos en tablas` *(informal, sin identificador de tipo)*
 - `docs: cambio de todo` *(demasiado genérico, no especifica componentes)*
+
+---
+
+# Reglas y Recomendaciones del Docente
+
+Estas reglas complementan la gobernanza documental de TraceFlow SCM y deben
+aplicarse en las fases de análisis y diseño para mantener coherencia entre
+requerimientos, casos de uso, diagramas y futura implementación.
+
+## 1. Granularidad de la documentación
+
+Toda especificación debe redactarse con un nivel suficiente de detalle para
+que exista correspondencia clara entre:
+
+- lo documentado;
+- lo modelado;
+- lo que posteriormente será desarrollado.
+
+Se debe evitar:
+
+- descripciones demasiado generales;
+- saltos lógicos entre requerimientos y casos de uso;
+- funciones presentes en diagramas pero ausentes en narrativas;
+- elementos implementados que no estén previamente especificados.
+
+La documentación debe ser progresivamente más detallada, manteniendo siempre
+coherencia entre sus artefactos.
+
+## 2. Nivel de explicación
+
+Durante la fase de análisis, la documentación debe utilizar lenguaje natural,
+comprensible y orientado al cliente.
+
+Las narrativas deben explicar el comportamiento del sistema de forma granular,
+sin introducir detalles innecesarios de implementación.
+
+Se debe priorizar:
+
+- qué realiza el usuario;
+- qué responde el sistema;
+- qué información se valida;
+- qué decisión se toma;
+- qué resultado se obtiene.
+
+No se deben introducir en análisis detalles como:
+
+- controladores;
+- servicios;
+- repositorios;
+- endpoints;
+- consultas SQL;
+- clases técnicas;
+- métodos;
+- frameworks;
+- componentes internos de software.
+
+Estos elementos pertenecen principalmente a la fase de diseño.
+
+## 3. Casos de uso derivados mediante include y extend
+
+Las relaciones `<<include>>` y `<<extend>>` no deben contabilizarse como
+requerimientos funcionales independientes.
+
+Cuando una relación represente comportamiento complementario que requiera
+narrativa propia, debe identificarse como extensión del caso de uso principal.
+
+Convención:
+
+- CU-04       Caso de uso principal
+- CU-04.1     Comportamiento incluido o extendido
+- CU-04.2     Segundo comportamiento incluido o extendido
+- CU-04.3     Tercer comportamiento incluido o extendido
+
+La numeración debe mantenerse coherente en:
+
+- narrativa;
+- diagrama general de casos de uso;
+- diagramas de secuencia;
+- diagramas de análisis de objetos;
+- matrices de trazabilidad.
+
+No crear un nuevo RF únicamente porque exista un `include` o `extend`.
+
+## 4. Correspondencia Narrativa ↔ Diagrama de Secuencia
+
+Cada paso numerado del flujo narrativo debe poseer correspondencia directa con
+la numeración mostrada en el Diagrama de Secuencia.
+
+Ejemplo:
+
+Narrativa:
+
+1. El usuario selecciona registrar solicitud.
+2. El sistema muestra el formulario.
+3. El usuario registra la información.
+4. El sistema valida los datos.
+5. El sistema registra la solicitud.
+
+Secuencia:
+
+1. Seleccionar registrar solicitud
+2. Mostrar formulario
+3. Registrar información
+4. Validar información
+5. Confirmar registro
+
+REGLA:
+
+La secuencia no debe introducir pasos funcionales inexistentes en la narrativa.
+
+Si es necesario agregar un paso a la secuencia, primero debe actualizarse la
+narrativa.
+
+## 5. Actores en Diagramas de Secuencia de Análisis
+
+En la fase de análisis, los Diagramas de Secuencia deben mantenerse a nivel
+conceptual.
+
+Se recomienda representar principalmente:
+
+Usuario → Sistema / Aplicación
+
+y evitar introducir múltiples componentes internos o actores técnicos cuando
+no sean necesarios para explicar el comportamiento al cliente.
+
+Ejemplo válido en análisis:
+
+Solicitante → TraceFlow SCM
+
+No utilizar como estructura principal de análisis:
+
+Usuario → Frontend → Controller → Service → Repository → Database
+
+Esa granularidad corresponde a la fase de diseño.
+
+Cuando exista participación real de otro actor humano en el mismo caso de uso,
+debe evaluarse si:
+
+- corresponde al mismo caso de uso;
+- pertenece a otro caso de uso;
+- o debe representarse como una interacción separada.
+
+## 6. Diagramas obligatorios por Caso de Uso
+
+Para cada Caso de Uso definido en el SRS de análisis se debe disponer, cuando
+corresponda, de:
+
+1. Narrativa del Caso de Uso.
+2. Diagrama de Secuencia.
+3. Diagrama de Análisis de Objetos.
+
+Estos artefactos deben ser consistentes entre sí.
+
+La narrativa es la referencia funcional principal.
+
+Los diagramas deben derivarse de ella y no introducir comportamiento no
+documentado.
+
+## 7. Diagramas de Análisis de Objetos
+
+Los Diagramas de Análisis de Objetos deben rehacerse a nivel de análisis.
+
+Se recomienda utilizar el patrón conceptual:
+
+- Boundary
+- Control
+- Entity
+
+Ejemplo:
+
+Actor
+↓
+Boundary
+↓
+Control
+↓
+Entity
+
+Las entidades deben representar conceptos del dominio y no componentes
+técnicos de implementación.
+
+Evitar durante análisis:
+
+- controladores HTTP;
+- servicios REST;
+- repositorios de persistencia;
+- DTO;
+- ORM;
+- tablas de base de datos;
+- clases específicas de framework.
+
+## 8. Diagrama de Clases en fase de análisis
+
+El Diagrama de Clases utilizado durante la fase de análisis debe representar
+el modelo conceptual del dominio.
+
+Debe mostrar principalmente:
+
+- conceptos importantes;
+- relaciones;
+- asociaciones;
+- multiplicidades relevantes.
+
+No debe convertirse todavía en un modelo de implementación.
+
+Evitar en esta fase:
+
+- métodos técnicos;
+- tipos de datos específicos;
+- anotaciones de framework;
+- claves foráneas;
+- interfaces técnicas;
+- servicios;
+- controladores;
+- repositorios;
+- clases de infraestructura.
+
+Ejemplos de conceptos apropiados:
+
+- Proyecto
+- RFC
+- ECS
+- Orden de Cambio
+- Línea Base
+- Certificación
+- Usuario
+- Incidencia
+
+La versión detallada y técnica del Diagrama de Clases corresponde a la fase
+de diseño.
+
+## 9. Diagramas de Secuencia por Caso de Uso
+
+Los Diagramas de Secuencia de análisis deben rehacerse con lenguaje
+comprensible para el cliente.
+
+Deben representar:
+
+- interacción del actor;
+- respuesta del sistema;
+- validaciones;
+- decisiones;
+- resultado.
+
+No deben mostrar detalles técnicos internos.
+
+Ejemplo de análisis:
+
+Solicitante -> TraceFlow SCM:
+1. Solicitar registro de RFC
+
+TraceFlow SCM -> Solicitante:
+2. Mostrar formulario
+
+Solicitante -> TraceFlow SCM:
+3. Enviar información
+
+TraceFlow SCM -> TraceFlow SCM:
+4. Validar información
+
+TraceFlow SCM -> Solicitante:
+5. Confirmar registro
+
+En la fase de diseño, esta misma interacción podrá descomponerse en:
+
+Frontend → Controller → Service → Repository → Database
+
+## 10. Revisión del Diagrama de Actividades
+
+El Diagrama de Actividades del proceso debe revisarse cada vez que se
+modifiquen:
+
+- reglas de negocio;
+- requerimientos;
+- actores;
+- decisiones;
+- estados;
+- flujos alternativos.
+
+El Diagrama de Actividades debe representar el proceso real vigente y actuar
+como referencia transversal para los casos de uso.
+
+En TraceFlow SCM se debe verificar especialmente:
+
+- cambio menor;
+- cambio mayor;
+- triple restricción;
+- intervención del CCB;
+- QA;
+- aceptación del usuario;
+- Check-In;
+- Línea Base;
+- cierre.
+
+## 11. Relaciones entre Casos de Uso y Diagrama de Paquetes
+
+El Diagrama de Paquetes no debe representar únicamente agrupaciones visuales.
+
+Debe reflejar las dependencias funcionales entre los módulos.
+
+Las relaciones entre casos de uso deben permitir identificar también
+dependencias entre paquetes.
+
+Ejemplo:
+
+Gestión de Incidencias
+→ puede generar
+Gestión de RFC
+
+Control de Cambios
+→ utiliza
+Gestión de Bibliotecas
+
+Gestión de QA
+→ condiciona
+Check-In / Línea Base
+
+Las relaciones deben derivarse del comportamiento definido en los casos de
+uso y no agregarse solamente por criterio visual.
+
+## 12. Separación entre fase de análisis y fase de diseño
+
+TraceFlow SCM debe mantener una separación explícita entre los artefactos de:
+
+### Fase de Análisis
+
+Orientada principalmente al cliente y al entendimiento funcional.
+
+#### SRS de Análisis
+
+Debe contener:
+
+- necesidades;
+- requerimientos;
+- reglas de negocio;
+- actores;
+- casos de uso;
+- narrativas;
+- actividades;
+- secuencias conceptuales;
+- análisis de objetos;
+- modelo conceptual del dominio.
+
+Debe utilizar lenguaje natural y abstraer detalles técnicos.
+
+#### SAD de Análisis
+
+Puede ser ligeramente más técnico que el SRS, pero debe mantenerse a nivel
+conceptual.
+
+Puede representar:
+
+- módulos;
+- responsabilidades;
+- relaciones;
+- organización lógica;
+- estructura conceptual.
+
+No debe definir todavía detalles completos de implementación.
+
+---
+
+### Fase de Diseño
+
+Orientada a la solución técnica que será implementada.
+
+#### SRS de Diseño
+
+Puede ampliar o concretar los requisitos con restricciones técnicas,
+interfaces y decisiones necesarias para implementación.
+
+#### SAD de Diseño
+
+Debe contener el nivel técnico detallado, incluyendo cuando corresponda:
+
+- arquitectura definitiva;
+- tecnologías;
+- componentes;
+- servicios;
+- APIs;
+- clases de diseño;
+- persistencia;
+- interfaces;
+- despliegue;
+- seguridad técnica;
+- integración;
+- secuencias técnicas.
+
+## 13. Regla general de trazabilidad
+
+Toda decisión funcional debe poder seguirse mediante la cadena:
+
+Necesidad
+→ Requerimiento
+→ Regla de Negocio
+→ Caso de Uso
+→ Narrativa
+→ Secuencia
+→ Análisis de Objetos
+→ Módulo / Paquete
+→ Mockup
+→ Implementación futura
+
+Si un elemento aparece en una etapa pero no puede trazarse hacia su origen,
+debe considerarse una inconsistencia documental.
+
+## 14. Prioridad de coherencia documental
+
+Ante cualquier modificación funcional, actualizar en este orden:
+
+1. Proceso / Diagrama de Actividades.
+2. Requerimientos y Reglas de Negocio.
+3. Casos de Uso.
+4. Narrativas.
+5. Matrices de trazabilidad.
+6. Diagrama General de Casos de Uso.
+7. Diagrama de Paquetes.
+8. Diagramas de Secuencia.
+9. Diagramas de Análisis de Objetos.
+10. Modelo conceptual / Diagrama de Clases.
+11. Mockups.
+12. Documentos consolidados SRS / SAD.
+
+No actualizar directamente un diagrama derivado sin verificar primero la
+fuente funcional que lo origina.
+

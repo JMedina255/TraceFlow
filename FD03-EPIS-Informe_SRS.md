@@ -1758,6 +1758,7 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 | CUS02 | CU-02 | Crear y administrar proyectos | Primario, administrativo | Analista de Requerimientos / Gestor | Administrador de Configuración / Bibliotecario | Gestión de Usuarios y Proyectos | RF-02 – Gestión de Proyectos |
 | CUS03 | CU-03 | Consultar proyecto | Secundario, de consulta | Analista de Requerimientos / Gestor | Usuarios autorizados | Gestión de Usuarios y Proyectos | RF-02 – Gestión de Proyectos |
 | CUS04 | CU-04 | Registrar Solicitud de Cambio (RFC) | Primario, operativo | Solicitante | Analista de Requerimientos / Gestor | Registro y Evaluación de la RFC | RF-04 – Registro de Solicitudes de Cambio (RFC) |
+| — | CU-04.1 | Subsanar Solicitud de Cambio (RFC) | Secundario, correctivo (Extensión <<extend>> de CU-04) | Solicitante | Analista de Requerimientos / Gestor | Registro y Evaluación de la RFC | RF-04 – Registro de Solicitudes de Cambio (RFC) |
 | CUS05 | CU-05 | Validar y clasificar la solicitud | Primario, operativo | Analista de Requerimientos / Gestor | Solicitante | Registro y Evaluación de la RFC | RF-04, RF-05 – Registro, Clasificación y Análisis de Impacto |
 | CUS06 | CU-06 | Realizar análisis de impacto técnico | Primario, analítico | Arquitecto / Especialista Técnico | Analista de Requerimientos / Gestor | Registro y Evaluación de la RFC | RF-05 – Clasificación y Análisis de Impacto |
 | CUS07 | CU-07 | Evaluar viabilidad y aprobar/rechazar | Primario, decisional | Comité de Control de Cambios (CCB) | Solicitante, Analista de Requerimientos | Registro y Evaluación de la RFC | RF-06 – Evaluación y Aprobación de Cambios Mayores por el CCB |
@@ -1787,1360 +1788,2210 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 
 ---
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-01 (CUS01) |
-| Nombre | Gestionar usuarios y roles |
-| Tipo | Secundario, administrativo |
-| Requerimiento asociado | RF-01 – Gestión de Usuarios y Roles |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Usuarios del sistema |
-| Módulo relacionado | Gestión de Usuarios y Proyectos |
-| Propósito | Permitir administrar las cuentas de usuario y asignar los roles correspondientes dentro de TraceFlow SCM. |
-| Descripción | El Administrador registra usuarios, modifica sus datos y asigna uno de los roles definidos en el flujo de gestión de configuración. El sistema restringe las funcionalidades |
-
-
-<!-- Página 37 del PDF original -->
-
-
-disponibles de acuerdo con el rol asignado. Resultado esperado El usuario queda registrado o actualizado con los permisos correspondientes a su rol.
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona la opción “Gestionar usuarios y roles”. | El sistema muestra el listado de usuarios registrados y las opciones de administración. |
-| 2 | Selecciona la opción para registrar un nuevo usuario. | El sistema muestra el formulario de registro de usuario. |
-| 3 | Ingresa los datos requeridos y selecciona el rol correspondiente. | El sistema valida los datos y determina los permisos asociados al rol seleccionado. |
-| 4 | Confirma el registro. | El sistema registra al usuario y habilita las funcionalidades correspondientes a su rol. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Se requiere modificar el rol de un usuario existente. | El Administrador selecciona al usuario y cambia el rol asignado. | El sistema actualiza los permisos conservando la trazabilidad del usuario. |
-| FA02 | Se requiere desactivar una cuenta sin eliminar su historial. | El Administrador selecciona la opción de desactivación. | El sistema bloquea el acceso de la cuenta y conserva sus acciones |
-
-
-<!-- Página 38 del PDF original -->
-
-
-históricas.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Existen datos obligatorios incompletos. | El sistema no registra al usuario e indica los campos pendientes. |
-| E02 | El correo o identificador ingresado ya está registrado. | El sistema rechaza el registro e informa que el usuario ya existe. |
-| E03 | El usuario que realiza la operación no posee permisos suficientes. | El sistema bloquea la operación y registra el intento en auditoría. |
+## CU-01 — Gestionar usuarios y roles
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-02 (CUS02) |
-| Nombre | Crear y administrar proyectos |
-| Tipo | Primario, administrativo |
-| Requerimiento asociado | RF-02 – Gestión de Proyectos |
-| Actor principal | Analista de Requerimientos / Gestor |
-| Actores secundarios | Administrador de Configuración / Bibliotecario |
-| Módulo relacionado | Gestión de Usuarios y Proyectos |
-| Propósito | Permitir crear y mantener los proyectos de clientes que serán gestionados de forma independiente en TraceFlow SCM. |
-| Descripción | El Analista registra un proyecto indicando sus datos principales, cliente y responsables. El sistema crea un espacio lógico |
+| :--- | :--- |
+| **Código** | CU-01 |
+| **Nombre** | Gestionar usuarios y roles |
+| **Tipo** | Secundario, administrativo |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Usuarios del sistema |
+| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
+| **RF asociados** | RF-01 — Gestión de Usuarios y Roles |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Registrar, actualizar, asignar roles canónicos y dar de baja cuentas de usuario en TraceFlow SCM, restringiendo las funcionalidades operativas disponibles según la matriz de control de acceso basado en roles (RBAC). |
+| **Disparador** | Solicitud administrativa de alta, modificación o baja de personal en el equipo de desarrollo, calidad o gestión. |
+| **Precondiciones** | El Administrador de Configuración / Bibliotecario ha iniciado sesión con privilegios administrativos en el sistema. |
+| **Postcondiciones** | La cuenta de usuario queda registrada, actualizada o desactivada en el directorio del sistema con su perfil y permisos RBAC formalmente asociados. |
+| **Entradas** | Datos de identidad del usuario (nombres, apellidos, correo corporativo, código de colaborador) y rol oficial seleccionado de la lista canónica de 7 roles. |
+| **Salidas / Entregables** | Cuenta de usuario habilitada en el sistema, credenciales de acceso iniciales emitidas y registro de asignación de rol en auditoría. |
 
+### Flujo Principal
 
-<!-- Página 39 del PDF original -->
+1. El Administrador de Configuración / Bibliotecario selecciona la opción de gestión de usuarios y roles en el panel de administración.
+2. TraceFlow SCM presenta el directorio de cuentas de usuario activas y el catálogo de los siete roles canónicos oficiales.
+3. El Administrador de Configuración / Bibliotecario ingresa los datos de identidad del colaborador y selecciona uno de los roles oficiales de la gobernanza documental.
+4. TraceFlow SCM valida que todos los campos requeridos contengan información válida, que el correo corporativo no se encuentre duplicado y que el rol asignado corresponda a la nomenclatura oficial.
+5. TraceFlow SCM registra al usuario en el directorio del sistema, asocia los privilegios de acceso basados en roles (RBAC) correspondientes al rol asignado y activa la cuenta para operaciones del proyecto.
+6. TraceFlow SCM emite confirmación de registro exitoso en pantalla y remite una notificación formal con las instrucciones de acceso seguro al colaborador.
 
+### Flujos Alternativos
 
-independiente para administrar sus ECS, solicitudes de cambio, órdenes y líneas base. Resultado esperado El proyecto queda registrado y disponible para la gestión de configuración de forma aislada respecto de los demás proyectos.
+- **A1 — Modificación de rol a un usuario registrado**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Un colaborador cambia de funciones en el flujo de gestión de configuración.  
+  - **Secuencia:**  
+    1. El Administrador selecciona la cuenta existente y modifica el rol asignado.  
+    2. TraceFlow SCM actualiza los permisos RBAC asociados conservando la trazabilidad histórica de acciones previas del usuario.  
+  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
-**Flujo Principal:**
+- **A2 — Desactivación lógica de una cuenta de usuario**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Desvinculación de un colaborador o retiro temporal de acceso.  
+  - **Secuencia:**  
+    1. El Administrador selecciona la opción de desactivar cuenta.  
+    2. TraceFlow SCM bloquea el acceso al sistema sin eliminar los registros históricos ni firmas de auditoría generadas por el usuario.  
+  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Analista selecciona la opción “Crear proyecto”. | El sistema muestra el formulario de registro del proyecto. |
-| 2 | Ingresa el nombre, cliente, descripción y responsables del proyecto. | El sistema valida que la información obligatoria esté completa. |
-| 3 | Confirma la creación del proyecto. | El sistema genera un identificador único y crea el espacio lógico del proyecto. |
-| 4 | Revisa el proyecto registrado. | El sistema muestra el detalle y habilita las opciones de administración correspondientes. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — Correo corporativo o identificador ya registrado**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Los datos de correo o colaborador coinciden con una cuenta preexistente.  
+  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e informa que la cuenta ya existe en el sistema.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se altera el directorio de usuarios.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Se requiere actualizar información general de un proyecto. | El Analista selecciona el proyecto y modifica los campos permitidos. | El sistema actualiza la información conservando el identificador y la trazabilidad. |
-| FA02 | El proyecto ha finalizado y ya no debe recibir nuevos | El Analista solicita cambiar su estado a cerrado o inactivo. | El sistema restringe nuevas operaciones y |
+- **E2 — Intento de asignación de rol informal o no canónico**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Selección de un rol no admitido por la directriz de gobernanza documental.  
+  - **Respuesta del sistema:** TraceFlow SCM restringe la asignación únicamente a los 7 roles canónicos de DOCUMENTATION_RULES.md §5.  
+  - **Resultado:** Retorna al Paso 3 para seleccionar un rol oficial válido.
 
+### Reglas aplicadas
 
-<!-- Página 40 del PDF original -->
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Gobierna la asignación de facultades al garantizar que solo los usuarios con perfiles acreditados (CCB o Autoridad Delegada) puedan ejercer acciones resolutivas de cambio.
 
+### Estados afectados
 
-cambios. mantiene disponible el historial de consulta.
+- **Estado inicial:** N/A (Administración de identidades; no interviene directamente en el ciclo de vida de una RFC).
+- **Transición:** Registro o actualización de credenciales y permisos RBAC.
+- **Estado final:** N/A (Usuario en estado `Activo` o `Desactivado`).
 
-**Eventos de Excepción:**
+### Entregables
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Faltan datos obligatorios del proyecto. | El sistema no registra el proyecto y resalta los campos pendientes. |
-| E02 | El identificador o nombre interno del proyecto ya está en uso. | El sistema solicita utilizar un identificador diferente. |
-| E03 | Ocurre un error durante la creación del espacio lógico. | El sistema cancela la creación y notifica que la operación debe reintentarse. |
+- Ficha de usuario habilitada en el directorio corporativo con perfil y privilegios RBAC asignados.
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-03 (CUS03) |
-| Nombre | Consultar proyecto |
-| Tipo | Secundario, consulta |
-| Requerimiento asociado | RF-02 – Gestión de Proyectos |
-| Actor principal | Analista de Requerimientos / Gestor |
-| Actores secundarios | Personal autorizado del proyecto |
-| Módulo relacionado | Gestión de Usuarios y Proyectos |
-| Propósito | Permitir consultar la información general y el estado de un proyecto registrado en TraceFlow SCM. |
-| Descripción | El Analista busca un proyecto |
+### Trazabilidad
+- **RF:** RF-01
+- **RN:** RN-01
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04, DG-05
 
+---
 
-<!-- Página 41 del PDF original -->
-
-
-mediante criterios de consulta y accede a sus datos, responsables, estado y referencias de configuración disponibles según sus permisos. Resultado esperado El sistema presenta la información actualizada del proyecto seleccionado sin modificar su contenido.
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Analista accede a la opción de consulta de proyectos. | El sistema muestra los filtros de búsqueda disponibles. |
-| 2 | Ingresa uno o más criterios de búsqueda. | El sistema lista los proyectos que coinciden con los criterios y a los que tiene acceso. |
-| 3 | Selecciona un proyecto del listado. | El sistema muestra los datos generales, responsables y estado del proyecto. |
-| 4 | Revisa la información requerida. | El sistema mantiene disponibles las opciones de consulta asociadas al proyecto. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La búsqueda devuelve una cantidad elevada de proyectos. | El Analista aplica filtros adicionales. | El sistema actualiza el listado con los nuevos criterios. |
-| FA02 | El Analista desea consultar un proyecto cerrado. | Selecciona la opción de incluir proyectos inactivos o cerrados. | El sistema incorpora esos proyectos en los resultados de |
-
-
-<!-- Página 42 del PDF original -->
-
-
-consulta.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existen proyectos que coincidan con los criterios. | El sistema informa que no se encontraron resultados. |
-| E02 | El usuario intenta consultar un proyecto para el cual no posee permisos. | El sistema deniega el acceso al detalle del proyecto. |
+## CU-02 — Crear y administrar proyectos
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-04 (CUS04) |
-| Nombre | Registrar Solicitud de Cambio (RFC) |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-04 – Registro de Solicitudes de Cambio (RFC) |
-| Actor principal | Solicitante |
-| Actores secundarios | Analista de Requerimientos / Gestor |
-| Módulo relacionado | Registro y Evaluación de la RFC |
-| Propósito | Permitir registrar formalmente una necesidad de cambio sobre un proyecto o Elemento de Configuración. |
-| Descripción | El Solicitante completa una RFC indicando descripción, justificación, prioridad, ECS afectado y fecha. El sistema registra la solicitud e inicia el flujo formal de evaluación de |
+| :--- | :--- |
+| **Código** | CU-02 |
+| **Nombre** | Crear y administrar proyectos |
+| **Tipo** | Primario, administrativo |
+| **Actor principal** | Analista de Requerimientos / Gestor |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario |
+| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
+| **RF asociados** | RF-02 — Gestión de Proyectos |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Registrar y mantener los proyectos de clientes de ÉXODO S.A.C., delimitando sus espacios lógicos de trabajo, asignando responsables y garantizando el aislamiento estricto de los datos entre clientes. |
+| **Disparador** | Apertura contractual de un nuevo proyecto de software o necesidad de reconfiguración de un proyecto en curso. |
+| **Precondiciones** | El Analista de Requerimientos / Gestor cuenta con sesión activa y permisos administrativos para apertura de proyectos. |
+| **Postcondiciones** | El proyecto queda formalmente registrado en el catálogo del sistema con un espacio de configuración lógico aislado, bibliotecas inicializadas y equipo de trabajo asignado. |
+| **Entradas** | Nombre del proyecto, cliente destinatario, descripción de objetivos, fecha de inicio, plazos contractuales y equipo técnico asignado. |
+| **Salidas / Entregables** | Expediente de proyecto formalmente registrado con espacio de configuración aislado y bibliotecas inicializadas. |
 
+### Flujo Principal
 
-<!-- Página 43 del PDF original -->
+1. El Analista de Requerimientos / Gestor selecciona la opción de registrar un nuevo proyecto de software.
+2. TraceFlow SCM presenta el formulario de configuración de proyecto y el directorio corporativo de clientes.
+3. El Analista de Requerimientos / Gestor ingresa los datos generales del proyecto, cliente, objetivos contractuales y selecciona al equipo técnico asignado.
+4. TraceFlow SCM valida que el nombre del proyecto sea unívoco en el sistema y que los plazos contractuales guarden coherencia temporal.
+5. TraceFlow SCM crea el proyecto estableciendo un espacio lógico independiente, garantizando el aislamiento estricto de los datos del cliente respecto a otros proyectos y aprovisionando las estructuras iniciales de Biblioteca Maestra, Soporte y Trabajo.
+6. TraceFlow SCM emite confirmación de creación del proyecto en pantalla y notifica al Administrador de Configuración / Bibliotecario para la inicialización formal del catálogo de ECS.
 
+### Flujos Alternativos
 
-cambios. Resultado esperado La RFC queda registrada con estado “Registrado” y disponible para la validación y clasificación del Analista.
+- **A1 — Actualización de parámetros o equipo de un proyecto existente**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Modificación de fechas, asignación de nuevos consultores o ampliación de alcance.  
+  - **Secuencia:**  
+    1. El Analista selecciona el proyecto existente y edita los parámetros autorizados.  
+    2. TraceFlow SCM valida los cambios y actualiza el registro del proyecto manteniendo la integridad del historial.  
+  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
-**Flujo Principal:**
+- **A2 — Archivado o cierre formal de un proyecto culminado**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Culminación del contrato y entrega final aceptada.  
+  - **Secuencia:**  
+    1. El Analista selecciona la opción de archivado de proyecto.  
+    2. TraceFlow SCM congela el acceso de modificación, conserva las líneas base y coloca el proyecto en estado `Archivado`.  
+  - **Convergencia:** Finaliza el trámite de cierre de proyecto.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Solicitante selecciona la opción “Registrar Solicitud de Cambio (RFC)”. | El sistema muestra el formulario de registro de la solicitud. |
-| 2 | Completa la descripción, justificación, prioridad, ECS afectado y fecha. | El sistema valida los datos ingresados y la existencia del ECS seleccionado. |
-| 3 | Revisa la información y confirma el registro. | El sistema genera un identificador único para la RFC y la guarda con estado “Registrado”. |
-| 4 | Consulta la confirmación de registro. | El sistema notifica al Analista de Requerimientos / Gestor que existe una nueva RFC pendiente de revisión. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — Nombre de proyecto duplicado en el catálogo**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El identificador o denominación ingresada coincide con un proyecto registrado previamente.  
+  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e instruye especificar una denominación unívoca.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal sin crear el espacio lógico.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El Solicitante desea corregir información antes de enviar la RFC. | Modifica los campos del formulario antes de confirmar. | El sistema conserva los cambios y vuelve a validar la información. |
-| FA02 | La solicitud corresponde a una incidencia previamente registrada. | El Solicitante o Analista selecciona la incidencia relacionada. | El sistema vincula la RFC con el ticket de incidencia de origen. |
+### Reglas aplicadas
 
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que todo flujo de cambios opere únicamente dentro del marco delimitado de un proyecto formalmente aprobado.
 
-<!-- Página 44 del PDF original -->
+### Estados afectados
 
+- **Estado inicial:** N/A (Gestión de proyectos; no altera directamente el ciclo de vida de una RFC).
+- **Transición:** Creación y aprovisionamiento de espacio lógico de configuración.
+- **Estado final:** N/A (Proyecto en estado `Activo`).
 
-**Eventos de Excepción:**
+### Entregables
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Uno o más campos obligatorios están vacíos. | El sistema no registra la RFC y señala los campos que deben completarse. |
-| E02 | El ECS indicado no existe o no pertenece al proyecto seleccionado. | El sistema rechaza la selección y solicita elegir un ECS válido. |
-| E03 | Ocurre una interrupción durante el registro. | El sistema informa que la RFC no pudo registrarse y permite reintentar la operación. |
+- Registro formal de proyecto activo con espacio lógico independiente y bibliotecas de configuración inicializadas.
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-05 (CUS05) |
-| Nombre | Validar y clasificar la solicitud |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-04, RF-05 – Registro, Clasificación y Análisis de Impacto |
-| Actor principal | Analista de Requerimientos / Gestor |
-| Actores secundarios | Solicitante |
-| Módulo relacionado | Registro y Evaluación de la RFC |
-| Propósito | Verificar que la RFC contenga información suficiente y clasificar el tipo y criticidad del cambio. |
-| Descripción | El Analista revisa la información registrada en la RFC. Si está completa, determina el tipo y la |
+### Trazabilidad
+- **RF:** RF-02
+- **RN:** RN-01
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04, DG-05
 
+---
 
-<!-- Página 45 del PDF original -->
-
-
-criticidad; si requiere información adicional, solicita la subsanación al Solicitante. Resultado esperado La RFC queda en estado “Clasificado” y preparada para el análisis técnico, o en “En Subsanación” si requiere datos adicionales.
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Analista selecciona una RFC con estado “Registrado”. | El sistema muestra el detalle de la solicitud y el ECS relacionado. |
-| 2 | Revisa que la descripción, justificación, prioridad y demás datos sean suficientes. | El sistema permite validar la completitud de la información. |
-| 3 | Define el tipo y la criticidad del cambio. | El sistema registra la clasificación seleccionada. |
-| 4 | Confirma la validación de la solicitud. | El sistema actualiza el estado a “Clasificado” y la remite al análisis técnico. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La información de la RFC es incompleta o poco clara. | El Analista registra las observaciones y solicita subsanación. | El sistema cambia el estado a “En Subsanación” y notifica al Solicitante. |
-| FA02 | El Solicitante completa la información observada. | Corrige los datos y reenvía la solicitud. | El sistema devuelve la RFC al Analista para una nueva |
-
-
-<!-- Página 46 del PDF original -->
-
-
-validación.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | La RFC fue cerrada o cancelada previamente. | El sistema impide modificar su clasificación. |
-| E02 | No se puede acceder al ECS asociado a la solicitud. | El sistema informa la inconsistencia y no permite finalizar la validación. |
-| E03 | El Analista intenta clasificar sin completar los datos obligatorios de clasificación. | El sistema solicita completar la información faltante. |
+## CU-03 — Consultar proyecto
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-06 (CUS06) |
-| Nombre | Realizar análisis de impacto técnico |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-05 – Clasificación y Análisis de Impacto |
-| Actor principal | Arquitecto / Especialista Técnico |
-| Actores secundarios | Analista de Requerimientos / Gestor |
-| Módulo relacionado | Registro y Evaluación de la RFC |
-| Propósito | Determinar las consecuencias técnicas, esfuerzo, costo, tiempo y riesgos asociados a la implementación de una RFC. |
-| Descripción | El Arquitecto revisa la RFC |
+| :--- | :--- |
+| **Código** | CU-03 |
+| **Nombre** | Consultar proyecto |
+| **Tipo** | Secundario, de consulta |
+| **Actor principal** | Analista de Requerimientos / Gestor |
+| **Actores secundarios** | Usuarios autorizados (cualquiera de los 7 roles canónicos con acceso al proyecto) |
+| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
+| **RF asociados** | RF-02 — Gestión de Proyectos |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Visualizar la ficha integral de un proyecto, consultando sus datos generales, equipo asignado, estado de avance, catálogo de ECS asociados y resumen de solicitudes de cambio activas. |
+| **Disparador** | Consulta operativa del actor para verificar el estado de avance o configuración de un proyecto. |
+| **Precondiciones** | El usuario se encuentra autenticado en el sistema y posee permisos de acceso asignados sobre el proyecto a consultar. |
+| **Postcondiciones** | TraceFlow SCM presenta el panel informativo consolidado del proyecto sin alterar su configuración ni sus registros. |
+| **Entradas** | Criterios de búsqueda (denominación del proyecto, cliente o identificador). |
+| **Salidas / Entregables** | Ficha consolidada de consulta de proyecto presentada en pantalla. |
 
+### Flujo Principal
 
-<!-- Página 47 del PDF original -->
+1. El Analista de Requerimientos / Gestor (o usuario autorizado) selecciona la opción de consulta de proyectos.
+2. TraceFlow SCM presenta el catálogo de proyectos a los cuales el usuario tiene acceso concedido según su perfil.
+3. El actor selecciona el proyecto específico que desea inspeccionar.
+4. TraceFlow SCM valida los permisos de visualización del usuario sobre el proyecto seleccionado según la matriz RBAC.
+5. TraceFlow SCM consolida la información general, el equipo asignado, el inventario de ECS y el resumen de estado de las solicitudes de cambio en curso.
+6. TraceFlow SCM presenta el panel de detalle del proyecto permitiendo la navegación hacia sus artefactos de configuración asociados.
 
+### Flujos Alternativos
 
-clasificada y analiza la arquitectura, dependencias, esfuerzo, costo, tiempo y riesgos. Con esta información genera el Informe Técnico de Impacto requerido para la evaluación del CCB. Resultado esperado El Informe Técnico de Impacto queda registrado y la RFC queda disponible para evaluación del Comité de Control de Cambios.
+- **A1 — Búsqueda y filtrado avanzado de proyectos**  
+  - **Origen:** Paso 2 del Flujo Principal.  
+  - **Condición de activación:** El usuario administra múltiples proyectos y requiere filtrar por cliente o estado.  
+  - **Secuencia:**  
+    1. El actor aplica filtros por cliente, rango de fechas o estado.  
+    2. TraceFlow SCM actualiza la lista mostrando únicamente los proyectos coincidentes.  
+  - **Convergencia:** Retorna al Paso 3 del Flujo Principal.
 
-**Flujo Principal:**
+### Excepciones
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Arquitecto selecciona una RFC con estado “Clasificado”. | El sistema muestra la solicitud, el ECS afectado y la información de contexto disponible. |
-| 2 | Analiza la arquitectura, dependencias y componentes relacionados. | El sistema permite registrar los impactos técnicos identificados. |
-| 3 | Registra estimaciones de esfuerzo, costo, tiempo y riesgos. | El sistema consolida los datos en el Informe Técnico de Impacto. |
-| 4 | Finaliza y confirma el análisis. | El sistema registra el informe, actualiza el estado a “En Análisis Técnico” completado y habilita la evaluación del CCB. |
+- **E1 — Intento de acceso a proyecto no asignado al usuario**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El usuario intenta acceder a la ficha de un proyecto sobre el cual no cuenta con asignación.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la visualización e informa la restricción de acceso según RBAC.  
+  - **Resultado:** No se despliega información; el usuario permanece en el listado general.
 
-**Flujos Alternativos:**
+### Reglas aplicadas
 
-Código Situación Acción del actor Respuesta del sistema FA01 El Arquitecto Consulta el historial El sistema requiere revisar de versiones y muestra la antecedentes del cambios trazabilidad ECS. relacionados. disponible para
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Gobierna el control de acceso y visibilidad de los proyectos del sistema.
 
+### Estados afectados
 
-<!-- Página 48 del PDF original -->
+- **Estado inicial:** N/A (Operación de sólo lectura).
+- **Transición:** N/A
+- **Estado final:** N/A
 
+### Entregables
 
-complementar el análisis. FA02 Se identifica El Arquitecto El sistema impacto sobre más incorpora los registra las de un ECS. elementos dependencias e adicionales en el impactos informe. asociados a cada elemento.
+- Vista consolidada de la ficha de proyecto y estado del flujo de configuración.
 
-**Eventos de Excepción:**
+### Trazabilidad
+- **RF:** RF-02
+- **RN:** RN-01
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04, DG-05
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Falta información necesaria para completar el análisis. | El sistema impide finalizar el informe e indica los datos pendientes. |
-| E02 | El ECS relacionado ya no está disponible para consulta. | El sistema informa la inconsistencia y suspende el cierre del análisis. |
-| E03 | Se intenta remitir al CCB una RFC sin Informe Técnico completo. | El sistema bloquea la remisión hasta completar el informe. |
+---
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-07 (CUS07) |
-| Nombre | Evaluar viabilidad y aprobar/rechazar |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-06 – Evaluación y Aprobación por el CCB |
-| Actor principal | Comité de Control de Cambios (CCB) |
-
-
-<!-- Página 49 del PDF original -->
-
-
-| Actores secundarios | Arquitecto / Especialista Técnico, Analista de Requerimientos / Gestor, Solicitante |
-| --- | --- |
-| Módulo relacionado | Registro y Evaluación de la RFC |
-| Propósito | Permitir al CCB determinar la viabilidad del cambio y registrar formalmente su aprobación o rechazo. |
-| Descripción | El CCB revisa la RFC y el Informe Técnico de Impacto, evalúa la viabilidad y toma una decisión. Cuando el cambio no es aprobado, registra la causal correspondiente para conservar la trazabilidad del cierre. |
-| Resultado esperado | La RFC queda aprobada para emitir una Orden de Cambio o cerrada como rechazo técnico o administrativo, según corresponda. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El CCB selecciona una RFC lista para evaluación. | El sistema muestra la solicitud y el Informe Técnico de Impacto. |
-| 2 | Revisa la viabilidad, riesgos y estimaciones del cambio. | El sistema habilita las opciones de aprobación y rechazo. |
-| 3 | Selecciona la opción “Aprobar”. | El sistema registra la decisión del Comité. |
-| 4 | Confirma la decisión. | El sistema deja la RFC aprobada y habilita la emisión de la Orden de Cambio (ECN/ECO). |
-
-**Flujos Alternativos:**
-
-
-<!-- Página 50 del PDF original -->
-
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El cambio es considerado técnicamente inviable. | El CCB selecciona rechazo técnico y registra la causal. | El sistema cierra la RFC como “Rechazado (Técnico)” y notifica al Solicitante. |
-| FA02 | El cambio es viable, pero el CCB decide no autorizarlo. | El CCB registra la causal administrativa. | El sistema cierra la RFC como “Rechazado (Administrativo )” y notifica al Solicitante. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | La RFC no cuenta con un Informe Técnico de Impacto completo. | El sistema impide iniciar la decisión formal del CCB. |
-| E02 | Se intenta rechazar una solicitud sin registrar la causal. | El sistema exige la justificación antes de confirmar el rechazo. |
-| E03 | La RFC cambió de estado mientras estaba siendo evaluada. | El sistema actualiza la información y solicita revisar nuevamente antes de decidir. |
+## CU-04 — Registrar Solicitud de Cambio (RFC)
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-08 (CUS08) |
-| Nombre | Emitir Orden de Cambio (ECN/ECO) |
+| :--- | :--- |
+| **Código** | CU-04 |
+| **Nombre** | Registrar Solicitud de Cambio (RFC) |
+| **Tipo** | Primario, operativo |
+| **Actor principal** | Solicitante |
+| **Actores secundarios** | Analista de Requerimientos / Gestor |
+| **Paquete / Módulo** | Registro y Clasificación de Cambios |
+| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC) |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Permitir al Solicitante formalizar en el sistema la necesidad de modificación sobre un Elemento de Configuración de Software (ECS) del proyecto. |
+| **Disparador** | El Solicitante identifica un defecto, una necesidad de mejora o una adaptación funcional en el software del proyecto. |
+| **Precondiciones** | 1. El Solicitante cuenta con sesión activa y rol asignado en el proyecto.<br>2. El proyecto se encuentra en estado activo.<br>3. Existe al menos un ECS registrado en el catálogo del proyecto. |
+| **Postcondiciones** | 1. La RFC queda registrada con identificador unívoco (RFC-YYYY-NNNN) en estado oficial **`Registrada`**.<br>2. Se notifica al Analista de Requerimientos / Gestor para la revisión de completitud. |
+| **Entradas** | Título, descripción del cambio, justificación operativa, prioridad propuesta y selección del ECS afectado. |
+| **Salidas / Entregables** | Expediente digital de RFC creado en estado `Registrada` y comprobante de registro con código correlativo formal. |
 
+### Flujo Principal
 
-<!-- Página 51 del PDF original -->
+1. El Solicitante selecciona la opción de registrar una nueva Solicitud de Cambio (RFC) en el proyecto asignado.
+2. TraceFlow SCM presenta el formulario de captura cargando el catálogo de ECS activos del proyecto.
+3. El Solicitante ingresa el título, descripción de la modificación, justificación operativa, prioridad propuesta y selecciona el ECS afectado.
+4. TraceFlow SCM valida que todos los campos mandatorios contengan información sustantiva y que el ECS seleccionado pertenezca al proyecto activo.
+5. TraceFlow SCM registra formalmente la solicitud asignándole un código correlativo unívoco y estableciendo su estado oficial en **`Registrada`**.
+6. TraceFlow SCM emite el comprobante de recepción al Solicitante y envía una notificación automática al Analista de Requerimientos / Gestor para su revisión de completitud.
 
+### Flujos Alternativos
 
-| Tipo | Primario, esencial |
-| --- | --- |
-| Requerimiento asociado | RF-07 – Gestión de Órdenes de Cambio |
-| Actor principal | Comité de Control de Cambios (CCB) |
-| Actores secundarios | Analista de Requerimientos / Gestor, Administrador de Configuración / Bibliotecario |
-| Módulo relacionado | Registro y Evaluación de la RFC |
-| Propósito | Formalizar la autorización para implementar una modificación previamente aprobada por el CCB. |
-| Descripción | Una vez aprobada la RFC, el CCB genera la Orden de Cambio ECN/ECO. La orden queda vinculada con la solicitud y el ECS afectado y sirve como autorización formal para iniciar las operaciones de configuración. |
-| Resultado esperado | La Orden de Cambio queda emitida, vinculada a la RFC y disponible para iniciar el Check-Out del ECS. |
+- **A1 — Adjuntar documentación técnica o probatoria de respaldo**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Solicitante cuenta con informes de error, actas de cliente o especificaciones complementarias.  
+  - **Secuencia:**  
+    1. El Solicitante adjunta los archivos de sustento a la solicitud.  
+    2. TraceFlow SCM valida el formato y tamaño permitido de los documentos, vinculándolos al expediente de la RFC.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-**Flujo Principal:**
+- **A2 — Cancelación voluntaria del registro**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Solicitante decide no enviar la solicitud.  
+  - **Secuencia:**  
+    1. El Solicitante selecciona la opción cancelar.  
+    2. TraceFlow SCM solicita confirmación de descarte.  
+    3. El Solicitante confirma el descarte.  
+    4. TraceFlow SCM descarta los datos ingresados sin persistir transacciones.  
+  - **Convergencia:** Finaliza el caso de uso sin generar registros.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El CCB selecciona una RFC aprobada. | El sistema verifica el estado de aprobación y muestra los datos del cambio. |
-| 2 | Selecciona la opción “Emitir Orden de Cambio”. | El sistema prepara la ECN/ECO con la información asociada a la RFC. |
-| 3 | Revisa las instrucciones de ejecución y confirma la | El sistema genera el identificador de la Orden de |
+### Excepciones
 
+- **E1 — Información mandatoria incompleta**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Omisión de campos requeridos (justificación vacía o ECS no seleccionado).  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea el registro, resalta los campos observados y solicita la corrección al Solicitante.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se crea ninguna RFC.
 
-<!-- Página 52 del PDF original -->
+- **E2 — ECS seleccionado inactivo o no disponible**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El ECS seleccionado fue dado de baja o archivado en el catálogo.  
+  - **Respuesta del sistema:** TraceFlow SCM informa que el elemento no admite solicitudes y bloquea el guardado.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal para seleccionar un ECS válido.
 
+### Reglas aplicadas
 
-emisión. Cambio y la vincula al ECS.
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna alteración a un ECS se inicie sin el registro formal previo de una RFC en el sistema.
 
-# 4. Finaliza la emisión. El sistema actualiza el estado a
+### Estados afectados
 
-“Aprobado – Orden Emitida” y notifica a los responsables de ejecución.
+- **Estado inicial:** Ninguno (Creación de nuevo expediente)
+- **Transición:** Registro formal de la solicitud
+- **Estado final:** **`Registrada`** (Estado 1 de TB-07)
 
-**Flujos Alternativos:**
+### Entregables
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La Orden requiere instrucciones técnicas adicionales. | El CCB completa las observaciones antes de confirmar. | El sistema incorpora las instrucciones en la ECN/ECO. |
-| FA02 | Se requiere consultar el detalle de la RFC antes de emitir. | El CCB abre la solicitud relacionada. | El sistema muestra la trazabilidad de la aprobación sin abandonar el proceso de emisión. |
+- Expediente formal de Solicitud de Cambio (RFC) en estado oficial `Registrada`.
 
-**Eventos de Excepción:**
+### Trazabilidad
+- **RF:** RF-04
+- **RN:** RN-01
+- **Estado(s):** Registrada
+- **DG relacionado:** DG-03, DG-04, DG-05, DG-11
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | La RFC no está aprobada. | El sistema impide emitir una Orden de Cambio. |
-| E02 | Ya existe una Orden de Cambio vigente para la misma RFC. | El sistema informa la duplicidad y no genera una nueva orden. |
-| E03 | Falla el registro de la Orden. | El sistema no cambia el estado de la RFC y permite reintentar la emisión. |
+---
 
-Campo Descripción
-
-
-<!-- Página 53 del PDF original -->
-
-
-| Código | CU-09 (CUS09) |
-| --- | --- |
-| Nombre | Registrar ECS |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-03 – Identificación de ECS |
-| Actor principal | Arquitecto / Especialista Técnico |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Gestión de ECS y Bibliotecas |
-| Propósito | Permitir identificar y catalogar los Elementos de Configuración administrados por cada proyecto. |
-| Descripción | El usuario registra un ECS indicando el proyecto, nombre, tipo de elemento y versión inicial. El sistema le asigna una identificación única y lo incorpora al inventario de configuración. |
-| Resultado esperado | El ECS queda registrado, clasificado y disponible para las operaciones de versionamiento y control de cambios. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Arquitecto selecciona la opción “Registrar ECS”. | El sistema muestra el formulario de identificación del elemento. |
-| 2 | Indica proyecto, nombre, tipo y versión inicial del ECS. | El sistema valida la información y la pertenencia al proyecto. |
-| 3 | Adjunta o referencia el | El sistema valida que el |
-
-
-<!-- Página 54 del PDF original -->
-
-
-artefacto que será controlado. elemento sea accesible.
-
-# 4. Confirma el registro. El sistema genera el
-
-identificador único del ECS y lo incorpora al inventario del proyecto.
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El ECS corresponde a documentación o esquema de base de datos en lugar de código. | El usuario selecciona el tipo de ECS correspondiente. | El sistema adapta los datos de clasificación al tipo seleccionado. |
-| FA02 | El usuario desea registrar varios ECS relacionados. | Registra cada elemento e indica sus relaciones. | El sistema conserva las asociaciones entre los ECS del proyecto. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El ECS ya se encuentra registrado en el proyecto. | El sistema informa la posible duplicidad y no crea un nuevo identificador. |
-| E02 | La versión inicial ingresada no cumple el formato configurado. | El sistema solicita corregir la versión antes de continuar. |
-| E03 | El artefacto referenciado no puede ser localizado. | El sistema no completa el registro y solicita verificar la referencia. |
-
-Campo Descripción
-
-
-<!-- Página 55 del PDF original -->
-
-
-| Código | CU-10 (CUS10) |
-| --- | --- |
-| Nombre | Efectuar Check-Out (Soporte → Trabajo) |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-08, RF-09 – Gestión de Bibliotecas y Control de Versiones |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Gestión de ECS y Bibliotecas |
-| Propósito | Trasladar de forma controlada un ECS desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo para implementar una Orden de Cambio. |
-| Descripción | El Administrador selecciona una Orden de Cambio vigente y ejecuta el Check-Out del ECS asociado. El sistema registra la operación y coloca el elemento en la Biblioteca de Trabajo para su modificación controlada. |
-| Resultado esperado | El ECS queda disponible en la Biblioteca de Trabajo, asociado a la Orden de Cambio y preparado para aplicar el bloqueo de sincronización. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona una Orden de Cambio vigente. | El sistema muestra el ECS o los ECS asociados a la orden. |
-| 2 | Selecciona el ECS y solicita | El sistema verifica su |
-
-
-<!-- Página 56 del PDF original -->
-
-
-|  | efectuar el Check-Out. | ubicación, estado y disponibilidad. |
-| --- | --- | --- |
-| 3 | Confirma la operación. | El sistema traslada una copia controlada del ECS a la Biblioteca de Trabajo. |
-| 4 | Revisa la confirmación. | El sistema registra autor, fecha, versión y Orden de Cambio asociada al Check-Out. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La Orden de Cambio afecta a más de un ECS. | El Administrador selecciona los elementos requeridos. | El sistema procesa cada Check-Out de forma individual y conserva su trazabilidad. |
-| FA02 | Se requiere consultar la versión vigente antes de efectuar el Check-Out. | El Administrador abre el historial del ECS. | El sistema muestra las versiones disponibles y permite regresar a la operación. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El ECS ya tiene un Check-Out activo. | El sistema rechaza la operación e informa el bloqueo existente. |
-| E02 | La Orden de Cambio fue cancelada o no está vigente. | El sistema impide efectuar el Check-Out. |
-| E03 | El ECS no se encuentra en la | El sistema cancela la operación y solicita |
-
-
-<!-- Página 57 del PDF original -->
-
-
-Biblioteca de Soporte. revisar su ubicación actual.
+## CU-04.1 — Subsanar Solicitud de Cambio (RFC)
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-11 (CUS11) |
-| Nombre | Aplicar bloqueo de sincronización |
-| Tipo | Incluido, esencial |
-| Requerimiento asociado | RF-09 – Control de Versiones y Bloqueos de Sincronización |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Gestión de ECS y Bibliotecas |
-| Propósito | Evitar la edición concurrente de un mismo ECS mientras se encuentra en la Biblioteca de Trabajo. |
-| Descripción | Después del Check-Out, el Administrador aplica un bloqueo de sincronización sobre el ECS. Mientras el bloqueo está vigente, otros usuarios no pueden iniciar una modificación concurrente del mismo elemento. |
-| Resultado esperado | El ECS queda bloqueado para otros usuarios hasta que se realice su Check-In o rollback. |
+| :--- | :--- |
+| **Código** | CU-04.1 |
+| **Nombre** | Subsanar Solicitud de Cambio (RFC) |
+| **Tipo** | Secundario, correctivo (`<<extend>>` de CU-04) |
+| **Actor principal** | Solicitante |
+| **Actores secundarios** | Analista de Requerimientos / Gestor |
+| **Paquete / Módulo** | Registro y Clasificación de Cambios |
+| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC) |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Permitir al Solicitante corregir, completar o aclarar la información y sustentos de una RFC observada en la revisión inicial, reactivando su ciclo de evaluación. |
+| **Disparador** | El Solicitante recibe una notificación de observación formal emitida por el Analista de Requerimientos / Gestor. |
+| **Precondiciones** | La RFC se encuentra en estado oficial **`En Subsanación`** y dentro del plazo reglamentario establecido por el proyecto. |
+| **Postcondiciones** | La RFC queda actualizada con la información requerida y transiciona a estado oficial **`Registrada`** para una nueva verificación formal. |
+| **Entradas** | Pliego de modificaciones, campos corregidos, justificaciones ampliadas y nuevos anexos técnicos. |
+| **Salidas / Entregables** | Expediente de RFC subsanado y comprobante de reingreso formal emitido. |
 
-**Flujo Principal:**
+### Flujo Principal
 
-N.º Acción del actor Respuesta del sistema
+1. El Solicitante selecciona en su bandeja de solicitudes la RFC en estado "En Subsanación".
+2. TraceFlow SCM presenta el formulario de subsanación mostrando los datos de la solicitud y el pliego formal de observaciones registrado por el Analista.
+3. El Solicitante modifica los campos requeridos, amplía la justificación y adjunta los documentos aclaratorios solicitados.
+4. TraceFlow SCM valida que las modificaciones atiendan las observaciones registradas y que no existan campos mandatorios pendientes.
+5. TraceFlow SCM actualiza el expediente de la RFC y transiciona su estado oficial a **`Registrada`**.
+6. TraceFlow SCM emite confirmación de subsanación al Solicitante y envía una notificación automática al Analista de Requerimientos / Gestor para su reevaluación.
 
-# 1. El Administrador finaliza el El sistema identifica el
+### Flujos Alternativos
 
+- **A1 — Desistimiento voluntario de la solicitud observada**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Solicitante decide no subsanar la solicitud y retira el pedido.  
+  - **Secuencia:**  
+    1. El Solicitante confirma el desistimiento formal de la RFC.  
+    2. TraceFlow SCM solicita el motivo de desistimiento.  
+    3. TraceFlow SCM transiciona el estado de la RFC a `Desestimada`.  
+  - **Convergencia:** Finaliza el trámite de la solicitud.
 
-<!-- Página 58 del PDF original -->
+### Excepciones
 
+- **E1 — Vencimiento del plazo reglamentario de subsanación**  
+  - **Origen:** Paso 1 del Flujo Principal.  
+  - **Condición de fallo:** El Solicitante intenta acceder a la subsanación fuera de la ventana de tiempo autorizada.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la edición, informa que el plazo expiró y declara la solicitud en estado `Desestimada`.  
+  - **Resultado:** No se admiten cambios; el expediente se archiva como desestimado por abandono.
 
-|  | Check-Out de un ECS. | elemento trasladado a la Biblioteca de Trabajo. |
-| --- | --- | --- |
-| 2 | Solicita aplicar el bloqueo de sincronización. | El sistema comprueba que no exista otro bloqueo vigente sobre el mismo ECS. |
-| 3 | Confirma la aplicación del bloqueo. | El sistema registra el usuario, fecha y Orden de Cambio asociada. |
-| 4 | Consulta el estado del ECS. | El sistema muestra el elemento como bloqueado para edición concurrente. |
+### Reglas aplicadas
 
-**Flujos Alternativos:**
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Exige que cualquier avance hacia evaluación técnica cuente con un expediente de solicitud formalmente admitido y sin omisiones.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Se completa correctamente el Check-In del ECS. | El Administrador confirma la finalización de la operación. | El sistema libera automáticament e el bloqueo de sincronización. |
-| FA02 | Se ejecuta un rollback sobre el ECS. | El Administrador completa la reversión. | El sistema libera el bloqueo una vez restaurado el estado anterior. |
+### Estados afectados
 
-**Eventos de Excepción:**
+- **Estado inicial:** **`En Subsanación`** (Estado 2 de TB-07)
+- **Transición:** Subsanación de observaciones formales
+- **Estado final:** **`Registrada`** (Estado 1 de TB-07)
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Ya existe un bloqueo activo sobre el ECS. | El sistema impide aplicar un segundo bloqueo y muestra su responsable. |
-| E02 | El ECS no se encuentra en la Biblioteca de Trabajo. | El sistema no permite aplicar el bloqueo. |
+### Entregables
 
+- Expediente de RFC subsanado en estado oficial `Registrada`.
 
-<!-- Página 59 del PDF original -->
+### Trazabilidad
+- **RF:** RF-04
+- **RN:** RN-01
+- **Estado(s):** En Subsanación $ightarrow$ Registrada
+- **DG relacionado:** DG-03, DG-05, DG-11
 
+---
 
-E03 No se puede registrar El sistema revierte la el bloqueo. operación y mantiene el ECS sin habilitar para modificación.
-
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-12 (CUS12) |
-| Nombre | Efectuar Check-In (Trabajo → Maestra/Soporte) |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-08, RF-09 – Gestión de Bibliotecas y Control de Versiones |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Equipo de Calidad / Testing |
-| Módulo relacionado | Gestión de ECS y Bibliotecas |
-| Propósito | Integrar un ECS verificado desde la Biblioteca de Trabajo hacia la Biblioteca Maestra/Soporte mediante una operación controlada de Check-In. |
-| Descripción | El Administrador selecciona el ECS cuya conformidad fue certificada por QA, verifica la Orden de Cambio y realiza el Check-In. El sistema registra una nueva versión y deja el elemento preparado para establecer una línea base. |
-| Resultado esperado | El ECS certificado queda incorporado a la Biblioteca Maestra/Soporte con una nueva versión registrada y trazable. |
-
-
-<!-- Página 60 del PDF original -->
-
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona el ECS certificado por QA. | El sistema muestra la versión de trabajo y verifica la certificación de conformidad. |
-| 2 | Solicita efectuar el Check-In. | El sistema valida la Orden de Cambio, el bloqueo y los datos de la nueva versión. |
-| 3 | Confirma la operación e ingresa el mensaje descriptivo del cambio. | El sistema integra el ECS en la Biblioteca Maestra/Soporte y registra autor, fecha y descripción. |
-| 4 | Revisa la confirmación. | El sistema habilita la creación y congelamiento de la nueva línea base. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El Check-In involucra varios ECS certificados. | El Administrador selecciona el conjunto correspondiente. | El sistema procesa y registra cada elemento de manera independiente. |
-| FA02 | Se requiere revisar el resultado de QA antes de confirmar. | El Administrador consulta la certificación asociada. | El sistema muestra la evidencia de conformidad y permite volver al Check-In. |
-
-**Eventos de Excepción:**
-
-Código Evento de excepción Respuesta del sistema E01 El ECS no posee El sistema bloquea el certificación de Check-In.
-
-
-<!-- Página 61 del PDF original -->
-
-
-|  | conformidad de QA. |  |
-| --- | --- | --- |
-| E02 | El ECS fue modificado después de la certificación. | El sistema rechaza la operación y solicita una nueva validación. |
-| E03 | No se registra un mensaje descriptivo o una Orden de Cambio válida. | El sistema no permite completar el Check-In. |
+## CU-05 — Validar y clasificar la solicitud
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-13 (CUS13) |
-| Nombre | Consultar historial de versiones |
-| Tipo | Secundario, consulta |
-| Requerimiento asociado | RF-09, RF-16 – Control de Versiones y Trazabilidad |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Arquitecto / Especialista Técnico, Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Gestión de ECS y Bibliotecas |
-| Propósito | Permitir consultar las versiones históricas y las operaciones realizadas sobre un ECS. |
-| Descripción | El usuario autorizado selecciona un ECS y accede a su historial de versiones. El sistema muestra las versiones registradas, fechas, autores, mensajes de cambio y relaciones con las Órdenes de Cambio. |
+| :--- | :--- |
+| **Código** | CU-05 |
+| **Nombre** | Validar y clasificar la solicitud |
+| **Tipo** | Primario, operativo |
+| **Actor principal** | Analista de Requerimientos / Gestor |
+| **Actores secundarios** | Solicitante, Arquitecto / Especialista Técnico |
+| **Paquete / Módulo** | Registro y Clasificación de Cambios |
+| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC)<br>RF-05 — Clasificación y Análisis de Impacto |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
+| **Objetivo** | Efectuar la revisión formal de completitud, consistencia de alcance y procedencia de la RFC registrada, admitiéndola para análisis técnico, devolviéndola para subsanación o desestimándola por improcedencia. |
+| **Disparador** | Recepción de una notificación de nueva RFC registrada o reingresada tras subsanación. |
+| **Precondiciones** | La RFC se encuentra en estado oficial **`Registrada`**. |
+| **Postcondiciones** | La RFC transiciona a: **`Clasificada`** (admitida a análisis técnico), **`En Subsanación`** (observada) o **`Desestimada`** (cierre formal anticipado). |
+| **Entradas** | Expediente de la RFC, catálogo de requerimientos del proyecto, catálogo de ECS y criterios de admisibilidad formal. |
+| **Salidas / Entregables** | Dictamen formal de admisión/categorización preliminar, pliego de observaciones de subsanación o acta de desestimación formal. |
 
+### Flujo Principal
 
-<!-- Página 62 del PDF original -->
+1. El Analista de Requerimientos / Gestor selecciona una RFC en estado "Registrada" desde su bandeja de evaluación inicial.
+2. TraceFlow SCM presenta el expediente de la solicitud incluyendo descripción, justificación, prioridad propuesta, ECS asociado y anexos.
+3. El Analista de Requerimientos / Gestor revisa la completitud de los datos, la coherencia con el alcance del proyecto y la procedencia de la solicitud.
+4. El Analista de Requerimientos / Gestor emite el dictamen de admisión formal asignando la categorización preliminar del requerimiento.
+5. TraceFlow SCM valida la consistencia del dictamen de admisibilidad y actualiza el estado oficial de la RFC a **`Clasificada`**.
+6. TraceFlow SCM notifica al Arquitecto / Especialista Técnico que la RFC ha sido admitida formalmente y queda habilitada para el análisis de impacto técnico.
 
+### Flujos Alternativos
 
-Resultado esperado Se presenta el historial completo y trazable del ECS sin modificar ninguna versión.
+- **A1 — Información incompleta o insuficiente (Observación de RFC)**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** La solicitud carece de justificación clara, no identifica con precisión el comportamiento esperado o faltan anexos críticos.  
+  - **Secuencia:**  
+    1. El Analista de Requerimientos / Gestor redacta el pliego de observaciones indicando los requisitos a subsanar.  
+    2. TraceFlow SCM valida el pliego y actualiza el estado oficial de la RFC a `En Subsanación`.  
+    3. TraceFlow SCM notifica al Solicitante otorgándole el plazo reglamentario para corregir mediante CU-04.1.  
+  - **Convergencia:** Finaliza la revisión inicial quedando a la espera de la subsanación.
 
-**Flujo Principal:**
+- **A2 — Solicitud improcedente, duplicada o fuera del alcance contractual**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** La solicitud replica un cambio ya atendido, contradice los objetivos del proyecto o no es aplicable.  
+  - **Secuencia:**  
+    1. El Analista de Requerimientos / Gestor formula el dictamen de desestimación fundamentando las causales.  
+    2. TraceFlow SCM registra el motivo de improcedencia y transiciona el estado oficial de la RFC a `Desestimada` (estado terminal).  
+    3. TraceFlow SCM notifica el cierre anticipado al Solicitante según RN-07.  
+  - **Convergencia:** Finaliza el trámite de la RFC como estado terminal.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El usuario accede a la consulta de ECS. | El sistema muestra los criterios de búsqueda disponibles. |
-| 2 | Busca y selecciona un ECS. | El sistema muestra la versión actual y sus datos generales. |
-| 3 | Selecciona la opción “Historial de versiones”. | El sistema lista las versiones, autores, fechas y mensajes registrados. |
-| 4 | Selecciona una versión del historial. | El sistema muestra el detalle y las relaciones de trazabilidad correspondientes. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — Expediente con anexos corruptos o ilegibles**  
+  - **Origen:** Paso 2 del Flujo Principal.  
+  - **Condición de fallo:** Los archivos de respaldo adjuntos por el Solicitante no pueden visualizarse o presentan fallas de formato.  
+  - **Respuesta del sistema:** TraceFlow SCM alerta sobre la falla en los documentos adjuntos.  
+  - **Resultado:** El Analista deriva la solicitud al flujo alternativo A1 para requerir la recarga íntegra de anexos.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El usuario desea comparar dos versiones. | Selecciona dos registros del historial. | El sistema muestra la información disponible para identificar sus diferencias y cambios asociados. |
-| FA02 | El usuario filtra el historial por periodo o autor. | Define los filtros de consulta. | El sistema actualiza el listado con los registros coincidentes. |
+### Reglas aplicadas
 
-**Eventos de Excepción:**
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide que una solicitud no admitida formalmente pase a etapas técnicas de ingeniería.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece el estado `Desestimada` como un resultado de cierre formal anticipado para solicitudes inviables desde el análisis inicial.
 
-Código Evento de excepción Respuesta del sistema
+### Estados afectados
 
+- **Estado inicial:** **`Registrada`** (Estado 1 de TB-07)
+- **Transición:** Validación formal de admisibilidad y completitud
+- **Estado final:** **`Clasificada`** (Estado 3 de TB-07) / **`En Subsanación`** (Estado 2 de TB-07) / **`Desestimada`** (Estado 11 de TB-07)
 
-<!-- Página 63 del PDF original -->
+### Entregables
 
+- Dictamen formal de admisión preliminar en estado `Clasificada` (o pliego de observaciones / acta de desestimación).
 
-| E01 | El ECS no posee versiones anteriores. | El sistema informa que únicamente se encuentra disponible la versión inicial. |
-| --- | --- | --- |
-| E02 | El usuario no posee permisos sobre el proyecto. | El sistema deniega la consulta del historial. |
-| E03 | El historial no puede recuperarse temporalmente. | El sistema informa el error y permite reintentar la consulta. |
+### Trazabilidad
+- **RF:** RF-04, RF-05
+- **RN:** RN-01, RN-07
+- **Estado(s):** Registrada $ightarrow$ Clasificada (o En Subsanación / Desestimada)
+- **DG relacionado:** DG-03, DG-04, DG-05, DG-11
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-14 (CUS14) |
-| Nombre | Implementar cambio en el ECS |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-07, RF-09 – Orden de Cambio y Control de Versiones |
-| Actor principal | Ingeniero de Software / Desarrollador |
-| Actores secundarios | Administrador de Configuración / Bibliotecario |
-| Módulo relacionado | Implementación y Validación |
-| Propósito | Ejecutar técnicamente las modificaciones autorizadas en la Orden de Cambio sobre el ECS ubicado en la Biblioteca de Trabajo. |
-| Descripción | El Desarrollador accede al ECS con Check-Out vigente, revisa las instrucciones de la ECN/ECO e implementa las modificaciones autorizadas. El sistema mantiene la |
+---
 
-
-<!-- Página 64 del PDF original -->
-
-
-relación entre la versión de trabajo y la Orden de Cambio. Resultado esperado Se obtiene una nueva versión de trabajo del ECS preparada para la ejecución de pruebas unitarias locales.
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Desarrollador accede al ECS asignado en la Biblioteca de Trabajo. | El sistema verifica que exista un Check-Out y bloqueo asociado a la Orden de Cambio. |
-| 2 | Consulta las instrucciones de la ECN/ECO. | El sistema muestra el alcance y la información técnica autorizada. |
-| 3 | Implementa las modificaciones indicadas sobre el ECS. | El sistema mantiene la versión de trabajo vinculada a la Orden de Cambio. |
-| 4 | Marca la implementación como lista para pruebas unitarias. | El sistema registra el avance y habilita la etapa de pruebas locales. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Durante la implementación se detecta una dependencia adicional. | El Desarrollador registra la observación técnica. | El sistema conserva la observación asociada a la Orden de Cambio para su seguimiento. |
-| FA02 | El Desarrollador necesita consultar una versión | Accede al historial del ECS. | El sistema permite la consulta sin |
-
-
-<!-- Página 65 del PDF original -->
-
-
-anterior. alterar la versión de trabajo vigente.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El ECS está bloqueado por otro usuario o no corresponde al Desarrollador. | El sistema deniega la modificación. |
-| E02 | La Orden de Cambio fue cancelada durante la implementación. | El sistema impide continuar y notifica el cambio de estado. |
-| E03 | El ECS de trabajo no puede ser accedido. | El sistema informa la incidencia y evita registrar una implementación incompleta. |
+## CU-06 — Realizar análisis de impacto técnico
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-15 (CUS15) |
-| Nombre | Ejecutar pruebas unitarias locales |
-| Tipo | Secundario, validación |
-| Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
-| Actor principal | Ingeniero de Software / Desarrollador |
-| Actores secundarios | Equipo de Calidad / Testing |
-| Módulo relacionado | Implementación y Validación |
-| Propósito | Comprobar localmente el comportamiento de las unidades |
+| :--- | :--- |
+| **Código** | CU-06 |
+| **Nombre** | Realizar análisis de impacto técnico |
+| **Tipo** | Primario, analítico |
+| **Actor principal** | Arquitecto / Especialista Técnico |
+| **Actores secundarios** | Analista de Requerimientos / Gestor |
+| **Paquete / Módulo** | Registro y Clasificación de Cambios |
+| **RF asociados** | RF-05 — Clasificación y Análisis de Impacto |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-05 — Evaluación Técnica y Clasificación Obligatoria |
+| **Objetivo** | Evaluar las implicancias técnicas, arquitecturales y operativas del cambio sobre el software, estimando riesgos, dependencias, esfuerzo, tiempo, costo y afectación a la Triple Restricción, para dictaminar formalmente si clasifica como Cambio Menor o Cambio Mayor. |
+| **Disparador** | Notificación de RFC en estado oficial `Clasificada` disponible para análisis técnico. |
+| **Precondiciones** | La RFC se encuentra en estado oficial **`Clasificada`**. |
+| **Postcondiciones** | 1. Se emite y suscribe el Informe Técnico de Impacto.<br>2. La RFC transiciona a estado oficial **`En Evaluación`** habilitando la ruta correspondiente (CU-30 para Cambio Menor o CU-07 para Cambio Mayor). |
+| **Entradas** | Expediente de la RFC clasificada, arquitectura del sistema, mapa de dependencias de ECS, estimación de esfuerzo en horas-hombre y matriz de riesgos técnicos. |
+| **Salidas / Entregables** | Informe Técnico de Impacto formalmente suscrito con dictamen de clasificación (Cambio Menor o Cambio Mayor). |
 
+### Flujo Principal
 
-<!-- Página 66 del PDF original -->
+1. El Arquitecto / Especialista Técnico selecciona una RFC en estado "Clasificada" desde su bandeja de análisis de ingeniería.
+2. TraceFlow SCM presenta el expediente de la solicitud y actualiza su estado oficial a **`En Análisis Técnico`**.
+3. El Arquitecto / Especialista Técnico analiza el impacto en la arquitectura de software, dependencias entre ECS, riesgos técnicos, estimando el esfuerzo en horas-hombre, el tiempo de ejecución y el costo proyectado.
+4. El Arquitecto / Especialista Técnico evalúa la afectación sobre la Triple Restricción (alcance, tiempo y costo) y formula el dictamen de clasificación técnica en Cambio Menor o Cambio Mayor.
+5. TraceFlow SCM registra el Informe Técnico de Impacto vinculándolo de forma inmutable al expediente de la RFC conforme a RN-05.
+6. TraceFlow SCM transiciona el estado oficial de la RFC a **`En Evaluación`** y enruta la solicitud hacia la instancia de deliberación que corresponda según la clasificación dictaminada.
 
+### Flujos Alternativos
 
-|  | modificadas antes de remitir el ECS a las pruebas de integración. |
-| --- | --- |
-| Descripción | El Desarrollador ejecuta pruebas unitarias sobre la versión de trabajo modificada y registra sus resultados. Si existen fallos, realiza las correcciones necesarias antes de continuar al proceso de QA. |
-| Resultado esperado | Las pruebas unitarias quedan registradas y el ECS queda preparado para las pruebas de integración cuando los resultados son satisfactorios. |
+- **A1 — Solicitud de aclaración técnica al Analista o Solicitante**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Arquitecto identifica ambigüedad técnica sobre el comportamiento esperado del ECS.  
+  - **Secuencia:**  
+    1. El Arquitecto registra una consulta técnica formal asociada a la RFC.  
+    2. TraceFlow SCM notifica al Analista de Requerimientos / Gestor para responder la precisión requerida.  
+    3. El Analista ingresa la aclaración técnica en el sistema.  
+  - **Convergencia:** Retorna al Paso 3 del Flujo Principal para proseguir con el análisis.
 
-**Flujo Principal:**
+### Excepciones
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Desarrollador selecciona la versión de trabajo implementada. | El sistema muestra el ECS y la Orden de Cambio relacionados. |
-| 2 | Ejecuta las pruebas unitarias locales definidas para el cambio. | El sistema permite registrar los resultados obtenidos. |
-| 3 | Verifica que las pruebas sean satisfactorias. | El sistema guarda los resultados y la evidencia registrada. |
-| 4 | Confirma la finalización de las pruebas locales. | El sistema marca la versión como preparada para validación por QA. |
+- **E1 — Dictamen de inviabilidad técnica absoluta**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El Arquitecto dictamina que el cambio es técnica o arquitecturalmente inviable o incompatible con la estabilidad del sistema.  
+  - **Respuesta del sistema:** TraceFlow SCM registra el dictamen de inviabilidad en el Informe Técnico de Impacto.  
+  - **Resultado:** La RFC clasifica como Cambio Mayor con recomendación formal de rechazo para tratamiento colegiado en el CCB (CU-07).
 
-**Flujos Alternativos:**
+### Reglas aplicadas
 
-Código Situación Acción del actor Respuesta del sistema FA01 Una o más pruebas El Desarrollador El sistema unitarias fallan. corrige el código y actualiza los vuelve a ejecutar resultados las pruebas. manteniendo el
+- **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Mandata que ninguna RFC pueda autorizarse sin contar previamente con el Informe Técnico de Impacto que evalúe arquitectura, riesgos y la afectación a la Triple Restricción.
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Garantiza que la clasificación sea el insumo previo y obligatorio para cualquier resolución de cambio.
 
+### Estados afectados
 
-<!-- Página 67 del PDF original -->
+- **Estado inicial:** **`Clasificada`** (Estado 3 de TB-07)
+- **Transición:** Elaboración del Informe Técnico de Impacto y clasificación formal
+- **Estado final:** **`En Evaluación`** (Estado 5 de TB-07), habiendo transitado interinamente por **`En Análisis Técnico`** (Estado 4 de TB-07)
 
+### Entregables
 
-historial de intentos. FA02 Se incorporan El Desarrollador El sistema pruebas adicionales registra y ejecuta agrega sus durante la las nuevas pruebas. resultados al corrección. registro de la versión de trabajo.
+- Informe Técnico de Impacto formalmente suscrito con dictamen vinculante de clasificación técnica (Cambio Menor / Mayor).
 
-**Eventos de Excepción:**
+### Trazabilidad
+- **RF:** RF-05
+- **RN:** RN-01, RN-05
+- **Estado(s):** Clasificada $ightarrow$ En Análisis Técnico $ightarrow$ En Evaluación
+- **DG relacionado:** DG-03, DG-05, DG-11
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No se pueden completar las pruebas unitarias. | El sistema mantiene el ECS en estado de implementación y no lo habilita para QA. |
-| E02 | Se intenta finalizar con pruebas fallidas. | El sistema advierte los resultados pendientes y bloquea el avance. |
-| E03 | Se pierde la conexión al registrar resultados. | El sistema informa que los resultados no fueron confirmados y permite reintentarlo. |
+---
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-16 (CUS16) |
-| Nombre | Ejecutar pruebas de integración |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
-| Actor principal | Equipo de Calidad / Testing |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-
-
-<!-- Página 68 del PDF original -->
-
-
-| Módulo relacionado | Implementación y Validación |
-| --- | --- |
-| Propósito | Verificar que el cambio funcione correctamente al integrarse con los demás componentes y cumpla la validación funcional esperada. |
-| Descripción | El Equipo de Calidad selecciona la versión preparada por el Desarrollador, ejecuta pruebas de integración y validación funcional y registra los resultados y evidencias de la evaluación. |
-| Resultado esperado | Los resultados de las pruebas quedan registrados y el cambio queda preparado para certificación o para reportar una no conformidad. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | QA selecciona el ECS pendiente de validación. | El sistema muestra la versión, Orden de Cambio y resultados de pruebas previas. |
-| 2 | Ejecuta las pruebas de integración y validación funcional. | El sistema permite registrar resultados y evidencias de cada prueba. |
-| 3 | Consolida los resultados de la ejecución. | El sistema identifica si existen pruebas fallidas o hallazgos. |
-| 4 | Confirma que los resultados son satisfactorios. | El sistema habilita la opción de certificar la conformidad del cambio. |
-
-**Flujos Alternativos:**
-
-Código Situación Acción del actor Respuesta del sistema FA01 Se detectan QA registra los El sistema defectos durante hallazgos deriva el flujo
-
-
-<!-- Página 69 del PDF original -->
-
-
-las pruebas. detectados. hacia el reporte de no conformidad. FA02 Se requiere repetir QA ejecuta El sistema una prueba por nuevamente la conserva el evidencia prueba nuevo resultado insuficiente. seleccionada. junto con el registro anterior.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El entorno de pruebas no está disponible. | El sistema mantiene la validación pendiente y registra la interrupción. |
-| E02 | La versión del ECS no coincide con la preparada para QA. | El sistema bloquea la ejecución hasta validar la versión correcta. |
-| E03 | No se puede guardar la evidencia de una prueba. | El sistema impide cerrar la ejecución hasta completar el registro requerido. |
+## CU-07 — Evaluar Cambio Mayor en CCB
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-17 (CUS17) |
-| Nombre | Certificar conformidad del cambio |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
-| Actor principal | Equipo de Calidad / Testing |
-| Actores secundarios | Administrador de Configuración / |
+| :--- | :--- |
+| **Código** | CU-07 |
+| **Nombre** | Evaluar Cambio Mayor en CCB |
+| **Tipo** | Primario, decisional |
+| **Actor principal** | Comité de Control de Cambios (CCB) |
+| **Actores secundarios** | Solicitante, Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico |
+| **Paquete / Módulo** | Evaluación y Aprobación de Cambios |
+| **RF asociados** | RF-06 — Evaluación y Aprobación de Cambios Mayores por el CCB |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-05 — Evaluación Técnica y Clasificación Obligatoria<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
+| **Objetivo** | Deliberar colegiadamente en el seno del CCB sobre la procedencia estratégica, técnica, presupuestal y contractual de una RFC clasificada como Cambio Mayor, dictaminando formalmente su aprobación o rechazo en acta resolutiva. |
+| **Disparador** | Convocatoria a sesión de CCB ante la presencia de una o más RFC en estado `En Evaluación` con clasificación de Cambio Mayor. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Evaluación`**.<br>2. Cuenta con Informe Técnico de Impacto formalmente emitido que dictamina clasificación como **Cambio Mayor** (RN-05). |
+| **Postcondiciones** | La RFC transiciona a estado oficial **`Autorizada`** (si se aprueba) o a **`Rechazada`** (estado terminal, si no se aprueba). |
+| **Entradas** | Expediente de la RFC, Informe Técnico de Impacto, análisis de la Triple Restricción, cuórum de miembros del CCB y votos registrados. |
+| **Salidas / Entregables** | Acta Resolutiva de Sesión del CCB formalizada con registro de votos y dictamen colegiado vinculante. |
 
+### Flujo Principal
 
-<!-- Página 70 del PDF original -->
+1. El Comité de Control de Cambios (CCB) accede al expediente de la RFC clasificada como Cambio Mayor en estado "En Evaluación".
+2. TraceFlow SCM presenta el expediente integral, el Informe Técnico de Impacto, la evaluación de la Triple Restricción y la estimación de riesgos.
+3. El Comité de Control de Cambios (CCB) delibera colegiadamente sobre la viabilidad técnica, el impacto contractual, presupuestal y estratégico del cambio.
+4. El Comité de Control de Cambios (CCB) formula la votación formal de los miembros y emite el acta resolutiva con dictamen aprobatorio.
+5. TraceFlow SCM valida el cuórum legal, registra el acta formal de deliberación y actualiza el estado oficial de la RFC a **`Autorizada`**.
+6. TraceFlow SCM notifica formalmente la resolución aprobatoria al Solicitante, al Analista de Requerimientos / Gestor y al Administrador de Configuración / Bibliotecario para la emisión de la orden de cambio.
 
+### Flujos Alternativos
 
-|  | Bibliotecario |
-| --- | --- |
-| Módulo relacionado | Implementación y Validación |
-| Propósito | Formalizar que la versión modificada del ECS ha superado las pruebas de integración y validación funcional. |
-| Descripción | QA revisa los resultados registrados y, si no existen defectos pendientes, certifica la conformidad del cambio. La certificación queda asociada a la versión del ECS y habilita el Check-In a la Biblioteca Maestra/Soporte. |
-| Resultado esperado | El cambio queda certificado por QA y el ECS queda habilitado para su Check-In controlado. |
+- **A1 — Dictamen de rechazo colegiado del Cambio Mayor**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** El CCB determina que el cambio es inviable por costos, plazos contractuales, riesgos excesivos o desalineación con el cliente.  
+  - **Secuencia:**  
+    1. El Comité de Control de Cambios (CCB) registra la votación denegatoria y fundamenta formalmente las causales de rechazo en el acta.  
+    2. TraceFlow SCM registra el acta resolutiva y transiciona el estado oficial de la RFC a `Rechazada` (estado terminal).  
+    3. TraceFlow SCM notifica el rechazo fundamentado al Solicitante y a las partes interesadas según RN-07.  
+  - **Convergencia:** Concluye el ciclo de vida de la RFC como expediente archivado.
 
-**Flujo Principal:**
+- **A2 — Solicitud de ampliación de información técnica por el CCB**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El CCB considera insuficiente la evaluación de impacto para tomar una decisión informada.  
+  - **Secuencia:**  
+    1. El CCB solicita una reevaluación o ampliación del análisis técnico al Arquitecto.  
+    2. TraceFlow SCM mantiene el estado `En Evaluación` y notifica al Arquitecto los puntos a profundizar.  
+  - **Convergencia:** El expediente queda a la espera de la actualización del Informe de Impacto.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | QA abre los resultados de la validación del cambio. | El sistema muestra todas las pruebas y hallazgos asociados. |
-| 2 | Verifica que no existan pruebas fallidas ni no conformidades abiertas. | El sistema habilita la opción de certificación cuando se cumplen las condiciones. |
-| 3 | Selecciona “Certificar conformidad”. | El sistema solicita la confirmación de la certificación. |
-| 4 | Confirma la certificación. | El sistema registra responsable y fecha y habilita el Check-In del ECS. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — Falta de cuórum reglamentario en la votación del CCB**  
+  - **Origen:** Paso 5 del Flujo Principal.  
+  - **Condición de fallo:** No se cuenta con el número mínimo de integrantes autorizados para emitir resolución válida.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la formalización de la votación e indica la falta de cuórum.  
+  - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta convocar una nueva sesión válida.
 
-Código Situación Acción del actor Respuesta del sistema
+### Reglas aplicadas
 
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Restringe toda afectación de software sin la debida resolución previa del CCB para Cambios Mayores.
+- **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Asegura que el CCB fundamente su decisión en el Informe Técnico de Impacto previo.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Garantiza que ante un dictamen desfavorable la RFC transicione formalmente a `Rechazada`.
 
-<!-- Página 71 del PDF original -->
+### Estados afectados
 
+- **Estado inicial:** **`En Evaluación`** (Estado 5 de TB-07)
+- **Transición:** Deliberación y resolución colegiada del CCB
+- **Estado final:** **`Autorizada`** (Estado 6 de TB-07) o **`Rechazada`** (Estado 12 de TB-07)
 
-FA01 QA desea revisar Consulta el detalle El sistema evidencia adicional de las pruebas muestra los antes de certificar. registradas. resultados y permite volver a la pantalla de certificación. FA02 La conformidad QA selecciona la El sistema corresponde a un ejecución de re-test vincula la re-test exitoso. aprobada. certificación al ciclo de corrección correspondiente .
+### Entregables
 
-**Eventos de Excepción:**
+- Acta Resolutiva de Sesión del CCB formalizada con registro de votos y dictamen vinculante en estado `Autorizada` o `Rechazada`.
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Existen pruebas fallidas. | El sistema impide certificar la conformidad. |
-| E02 | Existe una no conformidad abierta. | El sistema mantiene bloqueada la certificación hasta su resolución. |
-| E03 | La versión del ECS cambió después de las pruebas. | El sistema invalida la certificación pendiente y solicita una nueva validación. |
+### Trazabilidad
+- **RF:** RF-06
+- **RN:** RN-01, RN-05, RN-07
+- **Estado(s):** En Evaluación $ightarrow$ Autorizada (o Rechazada)
+- **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-18 (CUS18) |
-| Nombre | Reportar no conformidad |
-| Tipo | Alternativo, esencial |
-| Requerimiento asociado | RF-10 – Gestión de Pruebas y Certificación de Conformidad |
+---
 
-
-<!-- Página 72 del PDF original -->
-
-
-| Actor principal | Equipo de Calidad / Testing |
-| --- | --- |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Implementación y Validación |
-| Propósito | Registrar formalmente los defectos o hallazgos detectados durante la validación del cambio. |
-| Descripción | Cuando una prueba no es satisfactoria, QA registra una no conformidad indicando el hallazgo y su evidencia. El sistema cambia el estado del cambio a corrección y notifica al Desarrollador responsable. |
-| Resultado esperado | La no conformidad queda registrada, el cambio pasa a “En Corrección” y el Desarrollador recibe la información necesaria para subsanarla. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | QA identifica un resultado no conforme durante la validación. | El sistema habilita el registro de un hallazgo asociado a la prueba. |
-| 2 | Describe el defecto e incorpora la evidencia disponible. | El sistema valida que la información mínima del hallazgo esté completa. |
-| 3 | Confirma el reporte de no conformidad. | El sistema registra el hallazgo y lo vincula al ECS y a la Orden de Cambio. |
-| 4 | Finaliza el registro. | El sistema actualiza el estado a “En Corrección” y notifica al Desarrollador. |
-
-
-<!-- Página 73 del PDF original -->
-
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | QA detecta varios hallazgos independientes. | Registra cada no conformidad por separado. | El sistema mantiene todos los hallazgos vinculados al mismo ciclo de validación. |
-| FA02 | QA incorpora evidencia adicional luego del registro inicial. | Adjunta la nueva evidencia antes de iniciar el re-test. | El sistema actualiza el detalle de la no conformidad sin cambiar su estado. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El hallazgo no contiene descripción suficiente. | El sistema no permite registrar la no conformidad hasta completar la información. |
-| E02 | La prueba relacionada no existe o pertenece a otra versión. | El sistema rechaza la asociación y solicita seleccionar el registro correcto. |
-| E03 | La no conformidad ya fue cerrada. | El sistema impide modificar su resultado y solicita registrar un nuevo hallazgo si corresponde. |
+## CU-08 — Emitir Orden de Cambio (ECN/ECO)
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-19 (CUS19) |
+| :--- | :--- |
+| **Código** | CU-08 |
+| **Nombre** | Emitir Orden de Cambio (ECN/ECO) |
+| **Tipo** | Primario, formalización |
+| **Actor principal** | Comité de Control de Cambios (CCB) / Analista de Requerimientos / Gestor (según tipo de cambio) |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario, Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Control de Cambios y Órdenes |
+| **RF asociados** | RF-07 — Gestión y Emisión de Órdenes de Cambio (ECN/ECO) |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Formalizar, numerar y expedir la Orden formal de Cambio (ECN/ECO) sobre una RFC previamente autorizada, asignando responsables y plazos técnicos para habilitar el Check-Out del ECS. |
+| **Disparador** | Registro de dictamen favorable que posiciona la RFC en estado oficial `Autorizada`. |
+| **Precondiciones** | La RFC se encuentra en estado oficial **`Autorizada`** (mediante CU-07 o CU-30). El caso de uso NO aprueba el cambio, únicamente formaliza su orden de ejecución. |
+| **Postcondiciones** | 1. La ECN/ECO queda formalmente expedida con código correlativo único (ECN-YYYY-NNNN).<br>2. La RFC transiciona a estado oficial **`Orden Emitida`**.<br>3. Se habilita al Administrador de Configuración para ejecutar el Check-Out (CU-10). |
+| **Entradas** | Expediente de la RFC autorizada, desarrollador asignado, cronograma de desarrollo y alcance técnico a intervenir. |
+| **Salidas / Entregables** | Documento formal de Orden de Cambio (ECN/ECO) registrado en el sistema. |
 
+### Flujo Principal
 
-<!-- Página 74 del PDF original -->
+1. La autoridad competente (CCB para Cambio Mayor o Autoridad Delegada para Cambio Menor) selecciona una RFC en estado "Autorizada".
+2. TraceFlow SCM presenta el formulario de formalización de Orden de Cambio precargando los antecedentes técnicos y la resolución aprobatoria.
+3. El emisor ingresa la asignación del Ingeniero de Software / Desarrollador responsable, los plazos máximos de ejecución y el alcance específico de modificación sobre el ECS.
+4. TraceFlow SCM valida que la RFC cuente con autorización formal vigente y que el desarrollador asignado posea rol activo en el proyecto según RN-01.
+5. TraceFlow SCM expide formalmente la Orden de Cambio (ECN/ECO) con numeración unívoca correlativa y actualiza el estado oficial de la RFC a **`Orden Emitida`**.
+6. TraceFlow SCM notifica formalmente la emisión de la orden al Administrador de Configuración / Bibliotecario y al Ingeniero de Software / Desarrollador para proceder con el Check-Out.
 
+### Flujos Alternativos
 
-| Nombre | Reevaluar y re-testear |
-| --- | --- |
-| Tipo | Alternativo, esencial |
-| Requerimiento asociado | RF-11 – Reevaluación y Re-testeo |
-| Actor principal | Equipo de Calidad / Testing |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Implementación y Validación |
-| Propósito | Comprobar que las correcciones aplicadas por el Desarrollador solucionen las no conformidades detectadas por QA. |
-| Descripción | Después de una corrección, QA vuelve a ejecutar las pruebas relacionadas con los hallazgos. El ciclo puede finalizar con certificación de conformidad o, si el fallo persiste y se agotan los reintentos, derivar al rollback. |
-| Resultado esperado | La corrección queda validada y habilita la certificación, o se registra el fallo persistente para iniciar el proceso de reversión. |
+- **A1 — Corrección de datos de asignación de la orden antes de expedir**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Se identifica indisponibilidad del desarrollador seleccionado antes de la emisión final.  
+  - **Secuencia:**  
+    1. El emisor reasigna la orden a un desarrollador alternativo calificado.  
+    2. TraceFlow SCM actualiza la asignación técnica en el borrador de la orden.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-**Flujo Principal:**
+### Excepciones
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | QA selecciona una no conformidad cuya corrección fue reportada. | El sistema muestra el hallazgo, la corrección y los resultados previos. |
-| 2 | Ejecuta nuevamente las pruebas afectadas. | El sistema registra los resultados del re-test. |
-| 3 | Confirma que el defecto fue solucionado. | El sistema marca la no conformidad como subsanada. |
+- **E1 — Intento de emisión sobre RFC no autorizada**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La solicitud no cuenta con estado oficial Autorizada o el dictamen previo fue revocado.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la generación de la orden e informa la inconsistencia de estado según RN-01.  
+  - **Resultado:** No se emite la orden; el flujo se cancela de forma inmediata.
 
+### Reglas aplicadas
 
-<!-- Página 75 del PDF original -->
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que ningún ECS puede ser extraído ni modificado sin contar con una ECN/ECO debidamente emitida tras la autorización formal del cambio.
 
+### Estados afectados
 
-# 4. Finaliza el ciclo de re-test. El sistema habilita la
+- **Estado inicial:** **`Autorizada`** (Estado 6 de TB-07)
+- **Transición:** Expedición y formalización de la ECN/ECO
+- **Estado final:** **`Orden Emitida`** (Estado 7 de TB-07)
 
-certificación de conformidad del cambio.
+### Entregables
 
-**Flujos Alternativos:**
+- Orden formal de Cambio (ECN/ECO) expedida con código correlativo en estado `Orden Emitida`.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El re-test vuelve a fallar y aún existen reintentos permitidos. | QA registra el resultado fallido y devuelve el hallazgo al Desarrollador. | El sistema inicia un nuevo ciclo de corrección y re-testeo. |
-| FA02 | El re-test falla y se agotaron los reintentos definidos. | QA confirma el fallo persistente. | El sistema deriva el cambio al flujo de rollback y cancelación. |
+### Trazabilidad
+- **RF:** RF-07
+- **RN:** RN-01
+- **Estado(s):** Autorizada $ightarrow$ Orden Emitida
+- **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
-**Eventos de Excepción:**
+---
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existe una corrección registrada para la no conformidad. | El sistema impide iniciar el re-test. |
-| E02 | La versión a re-testear no corresponde a la corrección registrada. | El sistema bloquea la ejecución y solicita seleccionar la versión correcta. |
-| E03 | No pueden registrarse los resultados del re-test. | El sistema mantiene la no conformidad abierta y permite reintentar el registro. |
-
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-20 (CUS20) |
-
-
-<!-- Página 76 del PDF original -->
-
-
-| Nombre | Crear y congelar línea base |
-<!-- PENDIENTE DE VALIDACION: RF-14 exige formalizar el cierre e informar al Solicitante para implementación exitosa. En el SRS original RF-14 solo está asociado a CU-22 (cancelación). Se requiere validar si CU-20 o un caso de uso independiente formaliza el cierre exitoso. -->
-| --- | --- |
-| Tipo | Primario, esencial |
-| Requerimiento asociado | RF-13 – Gestión de Líneas Base |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Equipo de Calidad / Testing |
-| Módulo relacionado | Líneas Base y Rollback |
-| Propósito | Establecer una versión estable, identificada y recuperable del proyecto después de integrar un cambio verificado. |
-| Descripción | Tras el Check-In de un ECS certificado, el Administrador crea una nueva línea base, asigna un identificador de versión conforme al estándar definido y congela su contenido para impedir modificaciones directas. |
-| Resultado esperado | La nueva línea base queda registrada, identificada y congelada como versión estable del proyecto. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona el ECS integrado mediante Check-In. | El sistema verifica que la versión esté registrada y certificada. |
-| 2 | Selecciona la opción “Crear línea base”. | El sistema solicita el identificador de versión correspondiente. |
-| 3 | Ingresa la versión y confirma la composición de la línea | El sistema valida que el identificador sea único y |
-
-
-<!-- Página 77 del PDF original -->
-
-
-base. cumpla el formato configurado.
-
-# 4. Confirma la creación. El sistema congela la línea
-
-base y registra la versión resultante.
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La línea base incluye varios ECS verificados. | El Administrador selecciona los elementos que formarán parte de la versión. | El sistema registra la composición completa de la línea base. |
-| FA02 | El Administrador desea revisar la versión anterior antes de crear la nueva. | Consulta el historial de líneas base. | El sistema muestra las versiones existentes y permite regresar al registro. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El identificador de versión ya existe. | El sistema rechaza el registro y solicita una versión distinta. |
-| E02 | Uno de los ECS seleccionados no está certificado o no completó Check-In. | El sistema impide congelar la línea base. |
-| E03 | La versión no cumple el estándar de versionamiento definido. | El sistema muestra el formato requerido y solicita corregirlo. |
-
-Campo Descripción
-
-
-<!-- Página 78 del PDF original -->
-
-
-| Código | CU-21 (CUS21) |
-| --- | --- |
-| Nombre | Ejecutar rollback en Biblioteca de Trabajo |
-| Tipo | Contingencia, esencial |
-| Requerimiento asociado | RF-12 – Rollback y Cancelación de Órdenes de Cambio |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Equipo de Calidad / Testing, Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Líneas Base y Rollback |
-| Propósito | Restaurar el ECS a su estado previo cuando un cambio no puede ser subsanado satisfactoriamente. |
-| Descripción | Cuando el re-test falla definitivamente, el Administrador ejecuta el rollback sobre el ECS de la Biblioteca de Trabajo. El sistema recupera la versión anterior al Check-Out y registra la reversión. |
-| Resultado esperado | El ECS queda restaurado al estado previo al cambio fallido y preparado para cancelar la Orden de Cambio. |
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador recibe la notificación de re-test no superado. | El sistema muestra la no conformidad persistente y la versión de trabajo afectada. |
-| 2 | Selecciona la opción “Ejecutar rollback”. | El sistema identifica la versión previa al Check-Out. |
-
-
-<!-- Página 79 del PDF original -->
-
-
-# 3. Confirma la reversión. El sistema restaura el estado
-
-anterior del ECS en la Biblioteca de Trabajo.
-
-# 4. Revisa la confirmación. El sistema registra el rollback
-
-en la trazabilidad y habilita la cancelación de la Orden de Cambio.
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Antes de confirmar, el Administrador desea revisar la versión que será restaurada. | Consulta el detalle de la versión previa. | El sistema muestra su información y permite regresar a la confirmación del rollback. |
-| FA02 | La Orden afecta a varios ECS y solo uno requiere reversión. | El Administrador selecciona el ECS afectado. | El sistema ejecuta el rollback únicamente sobre el elemento seleccionado. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existe una versión anterior recuperable del ECS. | El sistema detiene el rollback y genera una alerta para revisión administrativa. |
-| E02 | Se detecta una inconsistencia de integridad en la versión a restaurar. | El sistema cancela la reversión y solicita validar la integridad del artefacto. |
-
-
-<!-- Página 80 del PDF original -->
-
-
-E03 El rollback es El sistema no habilita interrumpido antes de la cancelación de la finalizar. Orden hasta confirmar la restauración completa.
+## CU-09 — Registrar ECS
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-22 (CUS22) |
-| Nombre | Cancelar Orden de Cambio |
-| Tipo | Contingencia, esencial |
-| Requerimiento asociado | RF-12, RF-14 – Rollback, Cancelación y Cierre Formal |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Solicitante, Comité de Control de Cambios (CCB) |
-| Módulo relacionado | Líneas Base y Rollback |
-| Propósito | Cerrar formalmente una Orden de Cambio cuando el fallo no puede subsanarse y el ECS ya fue restaurado. |
-| Descripción | Después de ejecutar el rollback obligatorio, el Administrador cancela la ECN/ECO por fallo no subsanado. El sistema actualiza el estado de la RFC y notifica el resultado al Solicitante. |
-| Resultado esperado | La Orden queda cancelada y la Solicitud de Cambio queda cerrada con estado “Cancelado (Fallo No Subsanado)”. |
+| :--- | :--- |
+| **Código** | CU-09 |
+| **Nombre** | Registrar ECS |
+| **Tipo** | Primario, configuración |
+| **Actor principal** | Arquitecto / Especialista Técnico |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario |
+| **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
+| **RF asociados** | RF-03 — Identificación de ECS |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-02 — Identificación Unívoca de Versiones<br>RN-04 — Restricción de Bibliotecas Congeladas |
+| **Objetivo** | Identificar, clasificar e incorporar formalmente un nuevo Elemento de Configuración de Software (código fuente, esquema de base de datos o especificación técnica) en el inventario del proyecto, asignándole identificador unívoco y depositándolo en la biblioteca correspondiente. |
+| **Disparador** | Creación de nuevos módulos de código, especificaciones de diseño, esquemas o librerías que deben quedar bajo control formal de versiones. |
+| **Precondiciones** | 1. El proyecto se encuentra en estado activo.<br>2. El actor cuenta con rol de Arquitecto o Administrador de Configuración con permisos de catalogación. |
+| **Postcondiciones** | El ECS queda registrado en el inventario oficial del proyecto con código unívoco, versión inicial (1.0.0) y firma de integridad depositado en la biblioteca designada. |
+| **Entradas** | Denominación del ECS, clasificación del artefacto (código, documento, esquema BD), descripción funcional, versión inicial, dependencias técnicas y archivo base. |
+| **Salidas / Entregables** | Ficha técnica de ECS registrada en el catálogo con código unívoco y registro de integridad inicial. |
 
-**Flujo Principal:**
+### Flujo Principal
 
+1. El Arquitecto / Especialista Técnico selecciona la opción de registrar un nuevo Elemento de Configuración de Software (ECS) en el proyecto activo.
+2. TraceFlow SCM presenta el formulario de catalogación de ECS y la estructura jerárquica de componentes del sistema.
+3. El Arquitecto / Especialista Técnico ingresa el nombre del artefacto, selecciona su tipología, define la versión inicial, especifica las dependencias con otros componentes y adjunta el archivo base.
+4. TraceFlow SCM valida que la denominación sea unívoca en el proyecto, que la versión cumpla el estándar mayor.menor.parche (RN-02) y verifica la integridad del archivo mediante comprobación de suma (checksum).
+5. TraceFlow SCM registra formalmente el ECS en el catálogo, genera su código correlativo unívoco y lo deposita en la biblioteca designada bajo control de versiones.
+6. TraceFlow SCM emite confirmación de catalogación y notifica al Administrador de Configuración / Bibliotecario la disponibilidad del nuevo ECS para el flujo de cambios.
 
-<!-- Página 81 del PDF original -->
+### Flujos Alternativos
 
+- **A1 — Registro de ECS de especificación documental o manual de usuario**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El elemento a incorporar es un documento formal y no código ejecutable.  
+  - **Secuencia:**  
+    1. El Arquitecto selecciona la categoría documental y consigna los metadatos de formato y aprobación.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona la Orden de Cambio asociada al rollback ejecutado. | El sistema verifica que la reversión del ECS haya sido completada. |
-| 2 | Selecciona la opción “Cancelar Orden de Cambio”. | El sistema solicita la confirmación y el motivo del cierre. |
-| 3 | Confirma la cancelación por fallo no subsanado. | El sistema cancela la ECN/ECO y registra la causal. |
-| 4 | Finaliza el cierre. | El sistema actualiza la RFC a “Cancelado (Fallo No Subsanado)” y notifica al Solicitante. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — Denominación de ECS duplicada en el proyecto**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Ya existe un elemento registrado con idéntica denominación y ruta lógica en el proyecto.  
+  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e instruye asignar un identificador unívoco según RN-02.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se incorpora el elemento.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El Administrador requiere revisar la evidencia del re-test fallido. | Consulta los resultados de QA antes de confirmar. | El sistema muestra los hallazgos y permite volver al proceso de cancelación. |
-| FA02 | La Orden contiene observaciones adicionales de cierre. | El Administrador registra las observaciones. | El sistema las incorpora al historial de la cancelación. |
+- **E2 — Estándar de versión inicial no conforme**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La versión ingresada no respeta la nomenclatura mayor.menor.parche.  
+  - **Respuesta del sistema:** TraceFlow SCM exige corregir la versión según la regla oficial RN-02.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal para su subsanación.
 
-**Eventos de Excepción:**
+### Reglas aplicadas
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Se intenta cancelar la Orden antes de ejecutar el rollback requerido. | El sistema bloquea la cancelación. |
-| E02 | La Orden ya se | El sistema no permite |
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que todo artefacto sujeto a cambios deba estar formalmente catalogado como ECS.
+- **RN-02 (Identificación Unívoca de Versiones):** Impone el estándar numérico mayor.menor.parche para el versionamiento del artefacto.
+- **RN-04 (Restricción de Bibliotecas Congeladas):** Protege los ECS catalogados prohibiendo su edición directa fuera del flujo de control de cambios.
 
+### Estados afectados
 
-<!-- Página 82 del PDF original -->
+- **Estado inicial:** N/A (Catalogación de inventario; no es un expediente de RFC).
+- **Transición:** Incorporación formal de artefacto al repositorio de configuración.
+- **Estado final:** N/A (ECS en estado `Vigente` en biblioteca).
 
+### Entregables
 
-encuentra cerrada o repetir la operación. cancelada. E03 No se puede notificar El sistema completa el al Solicitante. cierre y registra la notificación como pendiente de reintento.
+- Ficha técnica de ECS catalogada en el inventario del proyecto con identificador unívoco.
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-23 (CUS23) |
-| Nombre | Registrar incidencia |
-| Tipo | Primario, soporte |
-| Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
-| Actor principal | Solicitante |
-| Actores secundarios | Ingeniero de Software / Desarrollador |
-| Módulo relacionado | Incidencias y Soporte |
-| Propósito | Permitir registrar una falla o problema detectado en una versión liberada para su seguimiento formal. |
-| Descripción | El usuario reporta una incidencia indicando su descripción y la versión afectada. El sistema crea un ticket y permite que el equipo responsable realice el seguimiento o lo derive a una RFC si requiere una modificación. |
-| Resultado esperado | La incidencia queda registrada como ticket abierto con un identificador único y disponible para seguimiento. |
+### Trazabilidad
+- **RF:** RF-03
+- **RN:** RN-01, RN-02, RN-04
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04, DG-07
 
-**Flujo Principal:**
+---
 
-
-<!-- Página 83 del PDF original -->
-
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El usuario selecciona la opción “Registrar incidencia”. | El sistema muestra el formulario de reporte. |
-| 2 | Ingresa la descripción del problema, proyecto y versión afectada. | El sistema valida la información y busca coincidencias básicas con incidencias existentes. |
-| 3 | Confirma el registro. | El sistema genera un identificador único y crea el ticket con estado “Abierto”. |
-| 4 | Revisa la confirmación del reporte. | El sistema muestra el resumen de la incidencia y la habilita para seguimiento. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El sistema encuentra incidencias similares. | El usuario revisa las sugerencias antes de confirmar. | El sistema permite consultar un ticket existente o continuar con un nuevo registro. |
-| FA02 | El reporte es realizado por un miembro del equipo interno. | El Desarrollador registra la incidencia indicando el contexto técnico. | El sistema identifica al reportante y conserva la misma trazabilidad del ticket. |
-
-**Eventos de Excepción:**
-
-Código Evento de excepción Respuesta del sistema E01 No se ingresa una El sistema solicita descripción del completar la
-
-
-<!-- Página 84 del PDF original -->
-
-
-|  | problema. | información antes de registrar. |
-| --- | --- | --- |
-| E02 | La versión afectada no existe en el proyecto. | El sistema solicita seleccionar una versión válida. |
-| E03 | Ocurre un error durante la creación del ticket. | El sistema informa que la incidencia no fue registrada y permite reintentar. |
+## CU-10 — Efectuar Check-Out
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-24 (CUS24) |
-| Nombre | Consultar estado de ticket |
-| Tipo | Secundario, consulta |
-| Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
-| Actor principal | Solicitante |
-| Actores secundarios | Analista de Requerimientos / Gestor |
-| Módulo relacionado | Incidencias y Soporte |
-| Propósito | Permitir al usuario conocer el estado actual y la evolución de una incidencia reportada. |
-| Descripción | El Solicitante consulta sus tickets registrados y selecciona una incidencia para visualizar su estado, historial de atención y, cuando corresponda, la RFC derivada. |
-| Resultado esperado | El usuario visualiza la información actualizada del ticket y las acciones registradas durante su tratamiento. |
+| :--- | :--- |
+| **Código** | CU-10 |
+| **Nombre** | Efectuar Check-Out |
+| **Tipo** | Primario, operación SCM |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
+| **RF asociados** | RF-08 — Gestión de Bibliotecas de Software<br>RF-09 — Control de Versiones y Bloqueos de Sincronización |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-06 — Bloqueo de Sincronización Obligatorio |
+| **Objetivo** | Transferir de forma controlada una copia del ECS desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo asignada al Desarrollador, activando la protección de edición exclusiva. |
+| **Disparador** | Recepción de la notificación de ECN/ECO en estado oficial `Orden Emitida`. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`Orden Emitida`** con ECN/ECO formalmente vigente (RN-01).<br>2. El ECS existe y se encuentra accesible en la Biblioteca de Soporte.<br>3. El ECS no cuenta con bloqueo de sincronización activo por otra orden (RN-06). |
+| **Postcondiciones** | 1. La copia de trabajo del ECS queda disponible en la Biblioteca de Trabajo del Desarrollador asignado.<br>2. Se aplica el bloqueo de sincronización sobre el ECS (CU-11).<br>3. La RFC transiciona a estado oficial **`En Implementación`**. |
+| **Entradas** | Identificador de ECN/ECO, identificador de ECS y credenciales del Desarrollador asignado. |
+| **Salidas / Entregables** | Copia de trabajo del ECS transferida a la Biblioteca de Trabajo y constancia de Check-Out registrada en auditoría. |
 
-**Flujo Principal:**
+### Flujo Principal
 
+1. El Administrador de Configuración / Bibliotecario selecciona la Orden de Cambio en estado "Orden Emitida" para transferir el artefacto.
+2. TraceFlow SCM presenta los datos de la ECN/ECO, el ECS asociado en la Biblioteca de Soporte y el Desarrollador asignado.
+3. El Administrador de Configuración / Bibliotecario confirma la operación de Check-Out hacia la Biblioteca de Trabajo.
+4. TraceFlow SCM valida que el ECS no presente bloqueo de sincronización activo y verifica su integridad mediante comprobación de suma (checksum) según RN-06.
+5. TraceFlow SCM transfiere la copia del ECS a la Biblioteca de Trabajo, aplica el bloqueo de sincronización exclusivo y actualiza el estado oficial de la RFC a **`En Implementación`**.
+6. TraceFlow SCM genera el registro histórico de Check-Out en la bitácora y notifica al Ingeniero de Software / Desarrollador la disponibilidad del artefacto para inicio de actividades técnicas.
 
-<!-- Página 85 del PDF original -->
+### Flujos Alternativos
 
+- **A1 — Verificación y reintento por retardo en la transferencia de repositorio**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** Se produce una inconsistencia temporal en la lectura de la Biblioteca de Soporte.  
+  - **Secuencia:**  
+    1. TraceFlow SCM reintenta la lectura de integridad del artefacto.  
+    2. El sistema confirma la integridad del archivo de origen.  
+  - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Solicitante accede a la sección de incidencias o tickets. | El sistema lista los tickets asociados al usuario y sus estados. |
-| 2 | Selecciona un ticket del listado. | El sistema muestra su descripción, versión afectada, estado e historial. |
-| 3 | Revisa las actualizaciones de atención. | El sistema presenta las acciones registradas en orden cronológico. |
-| 4 | Consulta la relación con una RFC, si existe. | El sistema muestra el identificador y estado de la Solicitud de Cambio vinculada. |
+### Excepciones
 
-**Flujos Alternativos:**
+- **E1 — ECS bloqueado concurrentemente por otra orden de cambio**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El ECS se encuentra retenido bajo bloqueo de sincronización por otro desarrollo en curso según RN-06.  
+  - **Respuesta del sistema:** TraceFlow SCM deniega el Check-Out, muestra los datos del usuario que mantiene el bloqueo y registra la colisión en auditoría.  
+  - **Resultado:** La operación se detiene sin transferir archivos; la orden permanece en espera de liberación del bloqueo.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | El usuario desea ver únicamente tickets abiertos. | Aplica el filtro de estado correspondiente. | El sistema actualiza el listado. |
-| FA02 | El ticket fue derivado a una RFC. | El usuario selecciona el vínculo de la solicitud. | El sistema muestra el estado disponible de la RFC conforme a sus permisos. |
+### Reglas aplicadas
 
-**Eventos de Excepción:**
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide el Check-Out si la solicitud no cuenta con una ECN/ECO formalmente emitida.
+- **RN-06 (Bloqueo de Sincronización Obligatorio):** Exige que el Check-Out active de inmediato el bloqueo exclusivo impidiendo colisiones de edición.
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | El ticket solicitado no existe. | El sistema informa que la incidencia no fue encontrada. |
-| E02 | El ticket pertenece a otro usuario y no existe autorización de | El sistema deniega el acceso. |
+### Estados afectados
 
+- **Estado inicial:** **`Orden Emitida`** (Estado 7 de TB-07)
+- **Transición:** Ejecución de Check-Out y asignación a Biblioteca de Trabajo
+- **Estado final:** **`En Implementación`** (Estado 8 de TB-07)
 
-<!-- Página 86 del PDF original -->
+### Entregables
 
+- Constancia de Check-Out registrada con copia de trabajo alojada en la Biblioteca de Trabajo.
 
-consulta. E03 El historial del ticket El sistema muestra el no puede recuperarse. estado conocido e informa la indisponibilidad temporal del detalle.
+### Trazabilidad
+- **RF:** RF-08, RF-09
+- **RN:** RN-01, RN-06
+- **Estado(s):** Orden Emitida $ightarrow$ En Implementación
+- **DG relacionado:** DG-03, DG-04, DG-07, DG-11
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-25 (CUS25) |
-| Nombre | Derivar incidencia a RFC |
-| Tipo | Alternativo, esencial |
-| Requerimiento asociado | RF-15 – Gestión de Incidencias y Soporte |
-| Actor principal | Analista de Requerimientos / Gestor |
-| Actores secundarios | Solicitante |
-| Módulo relacionado | Incidencias y Soporte |
-| Propósito | Convertir una incidencia que requiere modificar un ECS en una Solicitud de Cambio formal. |
-| Descripción | El Analista revisa el ticket y, cuando determina que su solución exige un cambio de configuración, deriva la incidencia a una nueva RFC. El sistema mantiene el vínculo entre ambos registros. |
-| Resultado esperado | Se crea una RFC asociada a la incidencia y el ticket pasa a estado de tratamiento mediante el flujo formal de cambios. |
+---
 
-**Flujo Principal:**
-
-
-<!-- Página 87 del PDF original -->
-
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Analista selecciona una incidencia abierta. | El sistema muestra el detalle, la versión afectada y su historial. |
-| 2 | Determina que la solución requiere modificar un ECS. | El sistema habilita la opción “Derivar incidencia a RFC”. |
-| 3 | Confirma la derivación y completa la información inicial del cambio. | El sistema crea una nueva RFC vinculada al ticket original. |
-| 4 | Finaliza la derivación. | El sistema actualiza la incidencia a “En Tratamiento” y muestra el identificador de la RFC generada. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | La incidencia puede resolverse sin modificar un ECS. | El Analista decide mantenerla dentro del flujo de soporte. | El sistema no crea una RFC y conserva el ticket para atención directa. |
-| FA02 | La incidencia ya está relacionada con una RFC existente. | El Analista selecciona la solicitud correspondiente. | El sistema vincula el ticket con la RFC existente sin generar una nueva. |
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | Ya existe una RFC activa vinculada a la incidencia. | El sistema evita crear una solicitud duplicada. |
-| E02 | La incidencia se | El sistema impide la |
-
-
-<!-- Página 88 del PDF original -->
-
-
-encuentra cerrada. derivación hasta que corresponda reabrirla. E03 Falta identificar el El sistema solicita ECS o proyecto completar los datos afectado. antes de generar la RFC.
+## CU-11 — Aplicar bloqueo de sincronización
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-26 (CUS26) |
-| Nombre | Validar integridad (checksum) |
-| Tipo | Secundario, control |
-| Requerimiento asociado | RF-17, RNF-03 – Auditoría e Integridad |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Comité de Control de Cambios (CCB) |
-| Módulo relacionado | Trazabilidad, Auditoría y Reportes |
-| Propósito | Comprobar que un artefacto almacenado no haya sido alterado respecto del valor de integridad registrado. |
-| Descripción | El Administrador selecciona un ECS o una versión de línea base y solicita validar su integridad. El sistema calcula el checksum SHA-256 actual y lo compara con el valor almacenado en el registro de configuración. |
-| Resultado esperado | El sistema informa que el artefacto está “Íntegro” o genera una alerta de |
+| :--- | :--- |
+| **Código** | CU-11 |
+| **Nombre** | Aplicar bloqueo de sincronización |
+| **Tipo** | Secundario, soporte SCM |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Sistema TraceFlow SCM |
+| **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
+| **RF asociados** | RF-09 — Control de Versiones y Bloqueos de Sincronización |
+| **RN asociadas** | RN-06 — Bloqueo de Sincronización Obligatorio |
+| **Objetivo** | Establecer una restricción de concurrencia a nivel de catálogo sobre un ECS en Check-Out, impidiendo su edición simultánea o extracción por otros usuarios hasta su Check-In o Rollback. |
+| **Disparador** | Ejecución de la operación de Check-Out (CU-10) o solicitud administrativa de aseguramiento de concurrencia. |
+| **Precondiciones** | El ECS se encuentra registrado en el proyecto y sin bloqueo activo previo a nombre de otra orden. |
+| **Postcondiciones** | El ECS queda registrado en estado bloqueado ("Locked") vinculado unívocamente al Desarrollador asignado y a la ECN/ECO vigente. |
+| **Entradas** | Identificador del ECS, identificador de la ECN/ECO y usuario beneficiario del bloqueo. |
+| **Salidas / Entregables** | Registro de bloqueo activo en el catálogo de configuración y marca de exclusividad en el inventario de ECS. |
 
+### Flujo Principal
 
-<!-- Página 89 del PDF original -->
+1. El Administrador de Configuración / Bibliotecario (o TraceFlow SCM durante el Check-Out) solicita la aplicación del bloqueo de sincronización sobre el ECS.
+2. TraceFlow SCM consulta el estado actual de concurrencia del ECS en el catálogo del proyecto.
+3. TraceFlow SCM valida que el ECS no cuente con un bloqueo activo preexistente según RN-06.
+4. TraceFlow SCM registra el bloqueo exclusivo asociando el identificador del Desarrollador asignado, la ECN/ECO y la marca temporal de aplicación.
+5. TraceFlow SCM actualiza el catálogo impidiendo nuevas operaciones de Check-Out o modificación sobre el ECS por terceros consultores.
+6. TraceFlow SCM confirma la aplicación del bloqueo y asienta la transacción en la bitácora de control de concurrencia.
 
+### Flujos Alternativos
 
-integridad cuando los valores no coinciden.
+- **A1 — Consulta de estado de bloqueo previo**  
+  - **Origen:** Paso 2 del Flujo Principal.  
+  - **Condición de activación:** El Administrador verifica si un ECS ya posee bloqueo antes de planificar una asignación.  
+  - **Secuencia:**  
+    1. TraceFlow SCM presenta el detalle del bloqueo vigente (usuario, fecha y orden asociada).  
+  - **Convergencia:** Concluye la consulta sin modificar el catálogo.
 
-**Flujo Principal:**
+### Excepciones
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El Administrador selecciona un ECS o una versión almacenada. | El sistema muestra la información del artefacto y su checksum registrado. |
-| 2 | Solicita ejecutar la validación de integridad. | El sistema calcula el checksum SHA-256 del artefacto actual. |
-| 3 | Espera el resultado de la comparación. | El sistema compara el valor calculado con el checksum almacenado. |
-| 4 | Consulta el resultado. | El sistema muestra “Íntegro” cuando ambos valores coinciden y registra la validación. |
+- **E1 — Conflicto de bloqueo por concurrencia simultánea**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de fallo:** Otra transacción estableció el bloqueo milisegundos antes sobre el mismo ECS.  
+  - **Respuesta del sistema:** TraceFlow SCM rechaza la solicitud de bloqueo y notifica la colisión de concurrencia.  
+  - **Resultado:** La operación se cancela salvaguardando la integridad del repositorio.
 
-**Flujos Alternativos:**
+### Reglas aplicadas
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Los checksums no coinciden. | El Administrador revisa la alerta generada. | El sistema marca una “Alerta de integridad” y registra el evento para auditoría. |
-| FA02 | Se desea validar varios ECS de una línea base. | El Administrador selecciona los elementos correspondientes. | El sistema ejecuta la comprobación individual de cada artefacto y presenta los resultados. |
+- **RN-06 (Bloqueo de Sincronización Obligatorio):** Establece como regla mandatoria que todo ECS transferido a la Biblioteca de Trabajo quede estrictamente bloqueado para evitar sobrescrituras de código o documentos.
 
-**Eventos de Excepción:**
+### Estados afectados
 
+- **Estado inicial:** Mantiene el estado del flujo activo (típicamente durante **`Orden Emitida`** / **`En Implementación`**)
+- **Transición:** Aseguramiento de concurrencia por Check-Out
+- **Estado final:** Mantiene el estado activo (**`En Implementación`**)
 
-<!-- Página 90 del PDF original -->
+### Entregables
 
+- Asiento de bloqueo de sincronización activo registrado en la bitácora de control de configuración.
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existe un checksum previo para el artefacto. | El sistema informa que no es posible efectuar la comparación. |
-| E02 | El artefacto no puede ser leído o localizado. | El sistema registra el error de validación y no emite resultado de integridad. |
-| E03 | La operación de cálculo es interrumpida. | El sistema informa que la validación no fue completada y permite reintentar. |
+### Trazabilidad
+- **RF:** RF-09
+- **RN:** RN-06
+- **Estado(s):** Mantiene En Implementación
+- **DG relacionado:** DG-03, DG-07
 
-| Campo | Descripción |
-| --- | --- |
-| Código | CU-27 (CUS27) |
-| Nombre | Auditar acciones del sistema |
-| Tipo | Secundario, control |
-| Requerimiento asociado | RF-16, RF-17 – Trazabilidad de Configuración y Auditoría |
-| Actor principal | Comité de Control de Cambios (CCB) |
-| Actores secundarios | Administrador de Configuración / Bibliotecario |
-| Módulo relacionado | Trazabilidad, Auditoría y Reportes |
-| Propósito | Permitir reconstruir las acciones críticas realizadas durante el ciclo de vida de la configuración. |
-| Descripción | El usuario autorizado consulta el registro de auditoría mediante filtros de fecha, usuario, rol, proyecto o |
+---
 
-
-<!-- Página 91 del PDF original -->
-
-
-tipo de acción. El sistema muestra los eventos y sus relaciones con ECS, RFC, Órdenes de Cambio y líneas base. Resultado esperado Se presenta un historial auditable de las acciones realizadas y los elementos de configuración afectados.
-
-**Flujo Principal:**
-
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El usuario accede al módulo de auditoría. | El sistema presenta los filtros de consulta disponibles. |
-| 2 | Define fecha, usuario, rol, proyecto o tipo de acción. | El sistema busca los eventos que cumplen los criterios. |
-| 3 | Selecciona un evento del listado. | El sistema muestra responsable, fecha, acción ejecutada y ECS afectado. |
-| 4 | Consulta sus relaciones de trazabilidad. | El sistema presenta las RFC, Órdenes de Cambio y líneas base vinculadas al evento. |
-
-**Flujos Alternativos:**
-
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Se requiere auditar específicamente un ECS. | El usuario filtra por identificador del elemento. | El sistema presenta únicamente los eventos relacionados con dicho ECS. |
-| FA02 | Se requiere revisar la integridad de un artefacto durante la auditoría. | El usuario solicita la validación correspondiente. | El sistema deriva a la validación de checksum y registra el |
-
-
-<!-- Página 92 del PDF original -->
-
-
-resultado en auditoría.
-
-**Eventos de Excepción:**
-
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existen eventos para los filtros seleccionados. | El sistema informa que no se encontraron resultados. |
-| E02 | El usuario no posee permisos de auditoría. | El sistema deniega el acceso y registra el intento. |
-| E03 | El registro histórico está temporalmente indisponible. | El sistema informa el error y permite reintentar la consulta. |
+## CU-12 — Efectuar Check-In
 
 | Campo | Descripción |
-| --- | --- |
-| Código | CU-28 (CUS28) |
-| Nombre | Generar reportes de estado |
-| Tipo | Secundario, reporte |
-| Requerimiento asociado | RF-18 – Generación de Reportes |
-| Actor principal | Administrador de Configuración / Bibliotecario |
-| Actores secundarios | Comité de Control de Cambios (CCB), Analista de Requerimientos / Gestor |
-| Módulo relacionado | Trazabilidad, Auditoría y Reportes |
-| Propósito | Generar información consolidada sobre el flujo de cambios, inventario de ECS y actas de cambios de los proyectos. |
-| Descripción | El usuario selecciona el tipo de |
+| :--- | :--- |
+| **Código** | CU-12 |
+| **Nombre** | Efectuar Check-In |
+| **Tipo** | Primario, operación SCM |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Equipo de Calidad / Testing, Solicitante |
+| **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
+| **RF asociados** | RF-08 — Gestión de Bibliotecas de Software<br>RF-09 — Control de Versiones y Bloqueos de Sincronización<br>RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-02 — Identificación Unívoca de Versiones<br>RN-04 — Restricción de Bibliotecas Congeladas<br>RN-06 — Bloqueo de Sincronización Obligatorio<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Transferir e integrar formalmente el ECS verificado y aceptado desde la Biblioteca de Soporte hacia la Biblioteca Maestra, generando el nuevo número de versión y liberando el bloqueo de sincronización. |
+| **Disparador** | Notificación de cumplimiento concurrente de la Certificación Técnica de QA y del Acta de Aceptación UAT del Solicitante. |
+| **Precondiciones** | 1. Orden de Cambio formalmente emitida (ECN/ECO vigente).<br>2. Certificación Técnica de Conformidad emitida por QA (CU-17).<br>3. Acta de Aceptación UAT formalmente suscrita por el Solicitante (CU-29).<br>4. ECS válido con integridad comprobada mediante suma de verificación.<br>5. Bloqueo de sincronización vigente sobre el ECS a nombre de la orden. |
+| **Postcondiciones** | 1. El ECS queda integrado de forma inmutable en la Biblioteca Maestra.<br>2. Se asigna la nueva versión oficial según estándar mayor.menor.parche (RN-02).<br>3. Se libera el bloqueo de sincronización del ECS (RN-06).<br>4. Se habilita la congelación de la nueva Línea Base (CU-20). |
+| **Entradas** | Copia verificada del ECS, constancia de doble validación (QA + UAT) y metadatos de versión. |
+| **Salidas / Entregables** | Registro formal de Check-In en la Biblioteca Maestra y constancia de liberación de bloqueo de sincronización. |
 
+### Flujo Principal
 
-<!-- Página 93 del PDF original -->
+1. El Administrador de Configuración / Bibliotecario selecciona la RFC con doble validación aprobada para proceder al Check-In.
+2. TraceFlow SCM presenta el expediente técnico consolidando la ECN/ECO, el Certificado Técnico de QA y el Acta de Aceptación UAT.
+3. El Administrador de Configuración / Bibliotecario confirma la transferencia formal del ECS hacia la Biblioteca Maestra.
+4. TraceFlow SCM valida la concurrencia de la Orden Emitida, la Certificación de QA, el Acta de Aceptación UAT, la integridad del archivo (checksum SHA-256) y la vigencia del bloqueo según RN-09.
+5. TraceFlow SCM transfiere e integra el ECS en la Biblioteca Maestra, asigna la nueva versión según estándar oficial (RN-02) y libera el bloqueo de sincronización según RN-06.
+6. TraceFlow SCM registra el asiento histórico de Check-In en la bitácora de auditoría y notifica la integración exitosa al CCB y a los interesados, habilitando la creación y congelamiento de la nueva Línea Base.
 
+### Flujos Alternativos
 
-reporte y define filtros como proyecto, periodo o estado. El sistema consulta la información de configuración y trazabilidad, genera el informe y habilita su exportación. Resultado esperado El reporte solicitado queda generado con información actualizada y disponible para consulta y exportación.
+- **A1 — Check-In intermedio hacia Biblioteca de Soporte para pruebas**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** La transferencia corresponde al paso de desarrollo a pruebas en el ciclo de integración.  
+  - **Secuencia:**  
+    1. El Administrador transfiere el ECS a la Biblioteca de Soporte sin levantar el bloqueo exclusivo de desarrollo.  
+  - **Convergencia:** Permite la ejecución de pruebas de integración en CU-16.
 
-**Flujo Principal:**
+### Excepciones
 
-| N.º | Acción del actor | Respuesta del sistema |
-| --- | --- | --- |
-| 1 | El usuario accede al módulo “Reportes”. | El sistema muestra los tipos de reportes disponibles. |
-| 2 | Selecciona el tipo de informe y define proyecto, periodo u otros filtros. | El sistema valida los criterios ingresados. |
-| 3 | Selecciona la opción “Generar reporte”. | El sistema consulta y consolida los registros que cumplen los filtros. |
-| 4 | Revisa el resultado y solicita la exportación cuando corresponde. | El sistema muestra el reporte y genera el archivo en el formato habilitado. |
+- **E1 — Incumplimiento de la regla de doble validación (Falta QA o UAT)**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Se intenta ejecutar el Check-In hacia la Biblioteca Maestra faltando la Certificación de QA o el Acta UAT.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la operación e indica la ausencia de la doble validación según RN-09.  
+  - **Resultado:** El ECS permanece en la biblioteca intermedia; no se realiza la integración a la Biblioteca Maestra.
 
-**Flujos Alternativos:**
+- **E2 — Inconsistencia en la comprobación de integridad (Checksum alterado)**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La suma de verificación del archivo no coincide con el artefacto certificado.  
+  - **Respuesta del sistema:** TraceFlow SCM alerta sobre alteración no autorizada de integridad y aborta la transferencia.  
+  - **Resultado:** Se cancela la operación y se genera una alerta de seguridad en la bitácora de auditoría.
 
-| Código | Situación | Acción del actor | Respuesta del sistema |
-| --- | --- | --- | --- |
-| FA01 | Se requiere un inventario de ECS de un proyecto específico. | El usuario selecciona “Inventario de ECS” y el proyecto correspondiente. | El sistema presenta ECS, versiones, estados y bibliotecas registradas. |
-| FA02 | Se requiere un reporte del flujo de cambios por | El usuario selecciona el rango de fechas y los | El sistema consolida las RFC |
+### Reglas aplicadas
 
+- **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Prohíbe de forma absoluta la integración a la Biblioteca Maestra sin contar concurrentemente con la certificación técnica de QA y el acta formal de UAT.
+- **RN-04 (Restricción de Bibliotecas Congeladas):** Protege la Biblioteca Maestra asegurando que solo ingresen artefactos debidamente aprobados.
+- **RN-06 (Bloqueo de Sincronización Obligatorio):** Dispone la liberación formal del bloqueo únicamente cuando el Check-In ha sido perfeccionado.
 
-<!-- Página 94 del PDF original -->
+### Estados afectados
 
+- **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
+- **Transición:** Check-In formal a la Biblioteca Maestra con doble conformidad
+- **Estado final:** **`En Aceptación`** (Estado 10 de TB-07, fase final previa a congelación de Línea Base)
 
-periodo. estados requeridos. registradas, aprobadas, rechazadas, canceladas y cerradas.
+### Entregables
 
-**Eventos de Excepción:**
+- Asiento formal de Check-In a la Biblioteca Maestra y constancia de versión actualizada en el repositorio central.
 
-| Código | Evento de excepción | Respuesta del sistema |
-| --- | --- | --- |
-| E01 | No existen datos para los filtros seleccionados. | El sistema informa que el reporte no contiene registros. |
-| E02 | Ocurre un error durante la exportación. | El sistema conserva el reporte generado y permite reintentar la exportación. |
-| E03 | El usuario solicita información de un proyecto sin autorización. | El sistema deniega el acceso a esos datos y no los incluye en el reporte. |
+### Trazabilidad
+- **RF:** RF-08, RF-09, RF-10
+- **RN:** RN-01, RN-02, RN-04, RN-06, RN-09
+- **Estado(s):** Mantiene En Aceptación (inmediato anterior a Implementada)
+- **DG relacionado:** DG-03, DG-04, DG-07, DG-09, DG-11
 
+---
 
-<!-- Página 95 del PDF original -->
+## CU-13 — Consultar historial de versiones
 
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-13 |
+| **Nombre** | Consultar historial de versiones |
+| **Tipo** | Secundario, auditoría |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Usuarios autorizados |
+| **Paquete / Módulo** | Gestión de ECS y Bibliotecas |
+| **RF asociados** | RF-09 — Control de Versiones y Bloqueos de Sincronización<br>RF-16 — Trazabilidad de Configuración |
+| **RN asociadas** | RN-02 — Identificación Unívoca de Versiones<br>RN-03 — Trazabilidad de Cambios |
+| **Objetivo** | Inspeccionar la línea temporal de versiones, operaciones de Check-In, Check-Out, autores, marcas de tiempo, memorias descriptivas y Órdenes de Cambio (ECN/ECO) asociadas a un ECS a lo largo de su ciclo de vida. |
+| **Disparador** | Necesidad técnica o de auditoría de verificar la evolución histórica de un componente de software o comparar versiones. |
+| **Precondiciones** | El ECS se encuentra formalmente registrado en el catálogo del proyecto; el usuario cuenta con credenciales de lectura. |
+| **Postcondiciones** | TraceFlow SCM presenta la bitácora cronológica y árbol de versiones del ECS sin modificar su estado ni sus archivos. |
+| **Entradas** | Identificador del ECS y criterios de filtrado temporal o de versión. |
+| **Salidas / Entregables** | Reporte visual cronológico del historial de versiones y trazabilidad de operaciones Check-In/Check-Out. |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario selecciona un ECS en el catálogo del proyecto y solicita consultar su historial.
+2. TraceFlow SCM recupera el historial de versiones y la bitácora de transacciones del elemento desde el repositorio de configuración.
+3. TraceFlow SCM presenta la lista cronológica de versiones registradas indicando código de versión, autor, fecha, ECN/ECO asociada y biblioteca de residencia.
+4. El Administrador de Configuración / Bibliotecario selecciona una versión específica para inspeccionar sus detalles.
+5. TraceFlow SCM presenta la memoria descriptiva de los cambios, las firmas de auditoría y la firma de integridad de la versión seleccionada según RN-03.
+6. TraceFlow SCM habilita la comparación conceptual de diferencias respecto a la versión previa o respecto a la versión activa en la Biblioteca Maestra.
+
+### Flujos Alternativos
+
+- **A1 — Comparación de diferencias entre dos versiones históricas del ECS**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** El actor requiere auditar qué modificaciones específicas se aplicaron entre dos versiones distintas.  
+  - **Secuencia:**  
+    1. El Administrador selecciona dos versiones del historial y solicita comparación.  
+    2. TraceFlow SCM presenta la vista comparativa de diferencias conceptuales entre ambos estados del artefacto.  
+  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — ECS sin historial de modificaciones (versión inicial sin cambios)**  
+  - **Origen:** Paso 2 del Flujo Principal.  
+  - **Condición de fallo:** El elemento únicamente cuenta con su versión de catalogación base sin operaciones de cambio posteriores.  
+  - **Respuesta del sistema:** TraceFlow SCM informa que el ECS se encuentra en su versión inicial sin transacciones de Check-In adicionales.  
+  - **Resultado:** Se muestra únicamente la ficha de creación base.
+
+### Reglas aplicadas
+
+- **RN-02 (Identificación Unívoca de Versiones):** Garantiza que cada hito del historial exhiba una nomenclatura estandarizada.
+- **RN-03 (Trazabilidad de Cambios):** Asegura que cada versión del historial se encuentre inexorablemente vinculada a una ECN/ECO y a un mensaje descriptivo.
+
+### Estados afectados
+
+- **Estado inicial:** N/A (Operación de sólo lectura).
+- **Transición:** N/A
+- **Estado final:** N/A
+
+### Entregables
+
+- Vista de historial cronológico y trazabilidad de versiones del ECS presentada en pantalla.
+
+### Trazabilidad
+- **RF:** RF-09, RF-16
+- **RN:** RN-02, RN-03
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04, DG-07
+
+---
+
+## CU-14 — Implementar cambio en el ECS
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-14 |
+| **Nombre** | Implementar cambio en el ECS |
+| **Tipo** | Primario, desarrollo |
+| **Actor principal** | Ingeniero de Software / Desarrollador |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-07 — Gestión y Emisión de Órdenes de Cambio (ECN/ECO)<br>RF-09 — Control de Versiones y Bloqueos de Sincronización |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-03 — Trazabilidad de Cambios |
+| **Objetivo** | Efectuar las modificaciones técnicas y codificación sobre la copia de trabajo del ECS alojada en la Biblioteca de Trabajo, circunscribiéndose estrictamente al alcance de la ECN/ECO. |
+| **Disparador** | Notificación de disponibilidad del ECS en la Biblioteca de Trabajo tras el Check-Out. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Implementación`**.<br>2. La copia de trabajo del ECS está alojada en la Biblioteca de Trabajo con bloqueo exclusivo a nombre del Desarrollador (RN-06). |
+| **Postcondiciones** | Las modificaciones técnicas quedan consolidadas en el espacio de trabajo local preparadas para la verificación unitaria. |
+| **Entradas** | Copia de trabajo del ECS, especificaciones técnicas de la ECN/ECO y pautas de diseño del proyecto. |
+| **Salidas / Entregables** | Artefacto de software modificado en la Biblioteca de Trabajo con memoria técnica descriptiva del cambio. |
+
+### Flujo Principal
+
+1. El Ingeniero de Software / Desarrollador accede a su espacio en la Biblioteca de Trabajo y visualiza la ECN/ECO asignada.
+2. TraceFlow SCM presenta el alcance técnico de la orden, los criterios de aceptación y el ECS desbloqueado exclusivamente para su usuario.
+3. El Ingeniero de Software / Desarrollador realiza las modificaciones, adaptaciones o correcciones sobre la copia de trabajo del ECS.
+4. TraceFlow SCM registra el progreso de los cambios efectuados asociándolos inmutablemente al identificador de la ECN/ECO según RN-03.
+5. El Ingeniero de Software / Desarrollador formula la memoria descriptiva de los cambios aplicados detallando los componentes modificados.
+6. TraceFlow SCM consolida la versión de trabajo del ECS dejándola dispuesta para la ejecución de pruebas unitarias locales.
+
+### Flujos Alternativos
+
+- **A1 — Solicitud de ajuste de alcance técnico durante la implementación**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Desarrollador identifica una dependencia imprevista que requiere alterar el alcance de la orden.  
+  - **Secuencia:**  
+    1. El Desarrollador registra una consulta de alcance formal dirigida al Arquitecto.  
+    2. El Arquitecto evalúa si la consulta requiere una ampliación formal o se resuelve dentro de los parámetros de la ECN/ECO vigente.  
+  - **Convergencia:** Retorna al Paso 3 con la instrucción técnica clarificada.
+
+### Excepciones
+
+- **E1 — Pérdida de integridad de la copia de trabajo local**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Corrupción accidental del espacio de trabajo del desarrollador.  
+  - **Respuesta del sistema:** TraceFlow SCM permite reestablecer una copia limpia desde la Biblioteca de Soporte respetando el bloqueo vigente.  
+  - **Resultado:** Se reanuda la implementación en el Paso 3 sin vulnerar el repositorio central.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Limita la modificación técnica únicamente a los ECS que cuenten con ECN/ECO formalmente emitida.
+- **RN-03 (Trazabilidad de Cambios):** Exige que cada modificación realizada cuente con una descripción técnica asociada formalmente a la orden de cambio.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Implementación`** (Estado 8 de TB-07)
+- **Transición:** Desarrollo y aplicación técnica del cambio
+- **Estado final:** **`En Implementación`** (Estado 8 de TB-07)
+
+### Entregables
+
+- Copia de trabajo del ECS modificada con memoria descriptiva en la Biblioteca de Trabajo.
+
+### Trazabilidad
+- **RF:** RF-07, RF-09
+- **RN:** RN-01, RN-03
+- **Estado(s):** Mantiene En Implementación
+- **DG relacionado:** DG-03, DG-07
+
+---
+
+## CU-15 — Ejecutar pruebas unitarias locales
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-15 |
+| **Nombre** | Ejecutar pruebas unitarias locales |
+| **Tipo** | Secundario, verificación |
+| **Actor principal** | Ingeniero de Software / Desarrollador |
+| **Actores secundarios** | Sistema de Pruebas Unitarias |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-03 — Trazabilidad de Cambios |
+| **Objetivo** | Verificar de forma temprana y automatizada que los componentes modificados del ECS funcionen correctamente de forma aislada, previo a su entrega a control de calidad. |
+| **Disparador** | Culminación de las tareas de codificación en la Biblioteca de Trabajo (CU-14). |
+| **Precondiciones** | El ECS ha sido modificado y consolidado en la Biblioteca de Trabajo del Desarrollador. |
+| **Postcondiciones** | Reporte de pruebas unitarias registrado con 100% de casos críticos superados, habilitando la solicitud de pruebas de integración. |
+| **Entradas** | ECS modificado, suites de pruebas unitarias y datos de prueba locales. |
+| **Salidas / Entregables** | Reporte formal de resultados de pruebas unitarias vinculado al expediente de la ECN/ECO. |
+
+### Flujo Principal
+
+1. El Ingeniero de Software / Desarrollador solicita la ejecución del conjunto de pruebas unitarias sobre el ECS modificado.
+2. TraceFlow SCM presenta el entorno de verificación unitaria cargando los casos de prueba asociados al componente intervenido.
+3. El Ingeniero de Software / Desarrollador dispara la ejecución de la batería de pruebas en la Biblioteca de Trabajo.
+4. TraceFlow SCM valida que la totalidad de los casos de prueba unitarios se ejecuten sin errores y satisfagan los criterios de cobertura.
+5. TraceFlow SCM registra el reporte de resultados unitarios vinculándolo a la bitácora de la Orden de Cambio.
+6. TraceFlow SCM confirma el éxito de la verificación y habilita la opción de promover el artefacto para pruebas de integración con QA.
+
+### Flujos Alternativos
+
+- **A1 — Corrección inmediata de fallo unitario menor**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** Uno o más casos de prueba unitarios arrojan fallo en lógica local.  
+  - **Secuencia:**  
+    1. El Desarrollador ajusta la codificación local.  
+    2. El Desarrollador reinicia la suite de pruebas unitarias.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Fallo persistente en casos de prueba unitarios**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La suite no logra aprobarse tras múltiples ejecuciones locales.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la promoción del ECS hacia pruebas de integración.  
+  - **Resultado:** El Desarrollador debe continuar la labor de depuración en CU-14; no se permite el paso a QA.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que no se promuevan cambios inestables hacia entornos compartidos de prueba.
+- **RN-03 (Trazabilidad de Cambios):** Garantiza que los resultados de las pruebas queden asentados como evidencia técnica de la orden.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Implementación`** (Estado 8 de TB-07)
+- **Transición:** Verificación unitaria local satisfactoria
+- **Estado final:** **`En Implementación`** (Estado 8 de TB-07, habilitado para entrega a QA)
+
+### Entregables
+
+- Reporte formal de pruebas unitarias con dictamen aprobatorio registrado en la ECN/ECO.
+
+### Trazabilidad
+- **RF:** RF-10
+- **RN:** RN-01, RN-03
+- **Estado(s):** Mantiene En Implementación
+- **DG relacionado:** DG-03, DG-07
+
+---
+
+## CU-16 — Ejecutar pruebas de integración
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-16 |
+| **Nombre** | Ejecutar pruebas de integración |
+| **Tipo** | Primario, validación QA |
+| **Actor principal** | Equipo de Calidad / Testing |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Ejecutar el plan integral de pruebas funcionales, de regresión y de integración en la Biblioteca de Soporte, verificando que el cambio cumpla las especificaciones sin alterar otros módulos. |
+| **Disparador** | Entrega del ECS a control de calidad y transición de la RFC a estado oficial `En Pruebas`. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Pruebas`**.<br>2. El ECS modificado ha sido desplegado en el entorno controlado de la Biblioteca de Soporte con pruebas unitarias aprobadas. |
+| **Postcondiciones** | Resultados de pruebas de integración registrados con matrices de ejecución y evidencias adjuntas en el expediente. |
+| **Entradas** | Plan de pruebas de integración, casos de prueba del proyecto, ECS desplegado en Biblioteca de Soporte y datos de prueba. |
+| **Salidas / Entregables** | Matriz de ejecución de pruebas de integración con registro de conformidades o fallos identificados. |
+
+### Flujo Principal
+
+1. El Equipo de Calidad / Testing selecciona la RFC en estado "En Pruebas" desde su panel de control de calidad.
+2. TraceFlow SCM presenta el expediente de la solicitud, la ECN/ECO, el ECS en la Biblioteca de Soporte y el plan de pruebas de integración asignado.
+3. El Equipo de Calidad / Testing ejecuta los casos de prueba funcionales, de integración entre módulos y de regresión en el entorno de soporte.
+4. TraceFlow SCM registra los resultados de cada caso de prueba (aprobado o fallido) junto con las evidencias capturadas.
+5. TraceFlow SCM consolida el informe de ejecución determinando si se alcanzaron los criterios de cobertura y calidad requeridos por el proyecto.
+6. TraceFlow SCM confirma el cierre de la batería de pruebas y presenta el resumen consolidado para emitir la certificación técnica (CU-17) o reportar no conformidad (CU-18).
+
+### Flujos Alternativos
+
+- **A1 — Detección de fallas durante la ejecución de integración**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** Uno o más casos de prueba críticos arrojan defectos o no conformidades.  
+  - **Secuencia:**  
+    1. El Equipo de Calidad suspende la ejecución regular de la suite.  
+    2. TraceFlow SCM deriva el flujo hacia el caso de uso CU-18 (Reportar no conformidad).  
+  - **Convergencia:** Concluye la ejecución con registro de defectos pendientes de corrección.
+
+### Excepciones
+
+- **E1 — Inconsistencia en el entorno de despliegue de la Biblioteca de Soporte**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de fallo:** Falla en la disponibilidad del entorno de integración o datos de prueba desactualizados.  
+  - **Respuesta del sistema:** TraceFlow SCM alerta sobre la anomalía del entorno y preserva el estado de la batería.  
+  - **Resultado:** Se coordina el reajuste del ambiente de pruebas sin alterar la trazabilidad del cambio.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide promover cambios sin verificación rigurosa en entorno intermedio controlado.
+- **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Constituye el prerrequisito técnico mandatorio que debe completarse antes de cualquier consideración de entrega final.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
+- **Transición:** Ejecución integral de la suite de pruebas de integración
+- **Estado final:** **`En Pruebas`** (Estado 9 de TB-07)
+
+### Entregables
+
+- Matriz de resultados de pruebas de integración debidamente suscrita con evidencias técnicas.
+
+### Trazabilidad
+- **RF:** RF-10
+- **RN:** RN-01, RN-09
+- **Estado(s):** Mantiene En Pruebas
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-17 — Certificar conformidad del cambio
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-17 |
+| **Nombre** | Certificar conformidad del cambio |
+| **Tipo** | Primario, certificación |
+| **Actor principal** | Equipo de Calidad / Testing |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario, Solicitante |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Expedir el dictamen formal de Certificación Técnica de Conformidad tras constatar la superación exitosa de las pruebas de integración en la Biblioteca de Soporte, habilitando de forma exclusiva la fase de validación y aceptación por el usuario (UAT). |
+| **Disparador** | Ejecución conforme de la totalidad de las pruebas de integración requeridas (CU-16). |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Pruebas`**.<br>2. Se cuenta con el informe de pruebas de integración con 100% de casos críticos aprobados y sin defectos abiertos de severidad alta o crítica. El CU solo emite certificación técnica de QA; no sustituye la aceptación del usuario (UAT). |
+| **Postcondiciones** | 1. La Certificación Técnica de Conformidad queda suscrita y anexada al expediente.<br>2. La RFC transiciona a estado oficial **`En Aceptación`** para la validación por el Solicitante (CU-29). |
+| **Entradas** | Matriz de pruebas de integración aprobada, métricas de cobertura y dictamen técnico de calidad. |
+| **Salidas / Entregables** | Certificado Técnico de Conformidad de QA registrado formalmente en el sistema. |
+
+### Flujo Principal
+
+1. El Equipo de Calidad / Testing selecciona la RFC con pruebas de integración conformes en estado "En Pruebas".
+2. TraceFlow SCM presenta el consolidado de resultados, el informe de cobertura y la ausencia de defectos bloqueantes.
+3. El Equipo de Calidad / Testing suscribe formalmente el dictamen técnico de Certificación de Conformidad.
+4. TraceFlow SCM valida que se cumpla la totalidad de los criterios técnicos de aceptación y la ausencia de incidencias pendientes según RN-09.
+5. TraceFlow SCM registra el Certificado Técnico de Conformidad y actualiza el estado oficial de la RFC a **`En Aceptación`**.
+6. TraceFlow SCM notifica formalmente al Solicitante para que proceda con la validación de aceptación funcional (UAT) y al Administrador de Configuración.
+
+### Flujos Alternativos
+
+- **A1 — Emisión de certificación técnica con observaciones menores no bloqueantes**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Existen observaciones estéticas o de documentación que no afectan la funcionalidad ni la estabilidad.  
+  - **Secuencia:**  
+    1. El Equipo de Calidad asienta las observaciones como compromisos menores en el certificado.  
+    2. TraceFlow SCM registra las notas de conformidad condicionada sin detener el flujo.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Detección tardía de incidencia crítica no resuelta**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El sistema identifica que un caso de prueba crítico fue marcado como fallido o quedó pendiente de ejecución.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la emisión del certificado e indica el defecto no cerrado según RN-09.  
+  - **Resultado:** No se emite la certificación técnica; la solicitud permanece en estado `En Pruebas`.
+
+### Reglas aplicadas
+
+- **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Exige como primer componente obligatorio de la doble validación la Certificación Técnica de Conformidad emitida formalmente por QA.
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ningún cambio avance hacia la integración sin el respaldo explícito de calidad.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
+- **Transición:** Expedición formal de la Certificación Técnica de Conformidad de QA
+- **Estado final:** **`En Aceptación`** (Estado 10 de TB-07)
+
+### Entregables
+
+- Certificado Técnico de Conformidad expedido por QA en estado oficial `En Aceptación`.
+
+### Trazabilidad
+- **RF:** RF-10
+- **RN:** RN-01, RN-09
+- **Estado(s):** En Pruebas $ightarrow$ En Aceptación
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-18 — Reportar no conformidad
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-18 |
+| **Nombre** | Reportar no conformidad |
+| **Tipo** | Alternativo, QA |
+| **Actor principal** | Equipo de Calidad / Testing |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario<br>RF-11 — Reevaluación y Re-testeo |
+| **RN asociadas** | RN-08 — Reversión Obligatoria ante Fallo No Subsanado |
+| **Objetivo** | Documentar, categorizar y notificar formalmente los defectos o discrepancias identificadas durante las pruebas de integración en la Biblioteca de Soporte, requiriendo su subsanación técnica. |
+| **Disparador** | Detección de uno o más fallos funcionales o técnicos durante la ejecución de pruebas (CU-16). |
+| **Precondiciones** | La RFC se encuentra en estado oficial **`En Pruebas`** con pruebas de integración fallidas. |
+| **Postcondiciones** | Informe de No Conformidad registrado en el expediente, suspensión de la certificación y notificación al Desarrollador con incremento del contador de ciclos. |
+| **Entradas** | Casos de prueba fallidos, evidencias de error, severidad del defecto y pasos para reproducirlo. |
+| **Salidas / Entregables** | Informe formal de No Conformidad registrado con pliego de defectos asociados a la ECN/ECO. |
+
+### Flujo Principal
+
+1. El Equipo de Calidad / Testing selecciona la opción de reportar no conformidad sobre la RFC en estado "En Pruebas".
+2. TraceFlow SCM presenta el formulario de registro de defectos precargando los casos de prueba no conformes.
+3. El Equipo de Calidad / Testing detalla la descripción del error, la severidad (Crítica, Mayor, Menor), los pasos de reproducción y adjunta evidencias.
+4. TraceFlow SCM valida la consistencia del reporte, asienta el defecto en la bitácora técnica e incrementa el contador de ciclos de prueba según RN-08.
+5. TraceFlow SCM registra el Informe de No Conformidad en el expediente de la orden y suspende cualquier trámite de certificación.
+6. TraceFlow SCM notifica formalmente al Ingeniero de Software / Desarrollador asignado para que efectúe las correcciones requeridas en la Biblioteca de Trabajo.
+
+### Flujos Alternativos
+
+- **A1 — Clasificación del defecto como observación subsanable en línea**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El defecto se debe únicamente a un parámetro de configuración corregible de forma inmediata.  
+  - **Secuencia:**  
+    1. El Equipo de Calidad coordina la corrección del parámetro.  
+    2. Se asienta la incidencia sin requerir nuevo empaquetado de software.  
+  - **Convergencia:** Retorna a ejecución de pruebas en CU-16.
+
+### Excepciones
+
+- **E1 — Agotamiento de ciclos máximos de corrección permitidos**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El contador de ciclos de prueba acumulados excede el límite contractual o reglamentario del proyecto.  
+  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad como fallo técnico insubsanable y bloquea nuevos ciclos de desarrollo según RN-08.  
+  - **Resultado:** Se cancela la vía de re-testeo y se activa de forma obligatoria el flujo de Rollback (CU-21) y Cancelación (CU-22).
+
+### Reglas aplicadas
+
+- **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Gobierna el control de los ciclos de corrección e impone el límite a partir del cual el fallo se considera definitivo requiriendo rollback.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
+- **Transición:** Registro de no conformidad técnica y notificación de re-trabajo
+- **Estado final:** **`En Pruebas`** (Estado 9 de TB-07, con retorno a labores de corrección)
+
+### Entregables
+
+- Informe de No Conformidad registrado formalmente con pliego de defectos técnicos.
+
+### Trazabilidad
+- **RF:** RF-10, RF-11
+- **RN:** RN-08
+- **Estado(s):** Mantiene En Pruebas
+- **DG relacionado:** DG-03, DG-04, DG-09
+
+---
+
+## CU-19 — Reevaluar y re-testear
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-19 |
+| **Nombre** | Reevaluar y re-testear |
+| **Tipo** | Alternativo, esencial |
+| **Actor principal** | Equipo de Calidad / Testing |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-11 — Reevaluación y Re-testeo |
+| **RN asociadas** | RN-08 — Reversión Obligatoria ante Fallo No Subsanado |
+| **Objetivo** | Ejecutar una nueva verificación técnica focalizada en los defectos reportados y una prueba de regresión sobre el ECS corregido por el Desarrollador, resolviendo si se alcanza la conformidad o si se procede a la reversión definitiva. |
+| **Disparador** | Notificación de entrega de correcciones por parte del Desarrollador tras un reporte de no conformidad previo. |
+| **Precondiciones** | 1. Existencia de un Informe de No Conformidad registrado (CU-18).<br>2. El Desarrollador entregó la versión corregida del ECS en la Biblioteca de Soporte.<br>3. No haberse superado el límite de ciclos de corrección del proyecto (RN-08). |
+| **Postcondiciones** | Se dictamina formalmente la superación del re-testeo (habilitando CU-17) o se ratifica el fallo insubsanable (desencadenando CU-21 y CU-22). |
+| **Entradas** | Versión corregida del ECS, pliego de defectos previos, casos de prueba focalizados y suite de regresión. |
+| **Salidas / Entregables** | Dictamen de re-testeo registrado en la bitácora de aseguramiento de calidad. |
+
+### Flujo Principal
+
+1. El Equipo de Calidad / Testing selecciona la RFC con correcciones aplicadas en estado "En Pruebas".
+2. TraceFlow SCM presenta el pliego de defectos previos y las memorias técnicas de corrección registradas por el Desarrollador.
+3. El Equipo de Calidad / Testing reejecuta los casos de prueba focalizados sobre los módulos corregidos y la suite de regresión en la Biblioteca de Soporte.
+4. TraceFlow SCM valida los resultados del re-testeo y constata el levantamiento satisfactorio de la totalidad de las observaciones según RN-08.
+5. TraceFlow SCM consolida el dictamen de re-testeo aprobatorio y actualiza el expediente técnico del cambio.
+6. TraceFlow SCM deriva el flujo hacia la emisión de la Certificación Técnica de Conformidad (CU-17) y notifica el resultado favorable a los interesados.
+
+### Flujos Alternativos
+
+- **A1 — Persistencia de defectos en el re-testeo dentro del margen de reintentos**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** La corrección no solucionó integralmente el fallo, pero aún restan ciclos de corrección autorizados.  
+  - **Secuencia:**  
+    1. El Equipo de Calidad registra las fallas residuales.  
+    2. TraceFlow SCM actualiza el pliego de defectos en CU-18.  
+  - **Convergencia:** Retorna a corrección en la Biblioteca de Trabajo.
+
+### Excepciones
+
+- **E1 — Fallo definitivo de re-testeo por agotamiento de instancias**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El re-testeo arroja fallos bloqueantes y se ha alcanzado el límite de ciclos de prueba permitido por el proyecto.  
+  - **Respuesta del sistema:** TraceFlow SCM dictamina formalmente el fallo no subsanado y bloquea cualquier nueva entrega de código según RN-08.  
+  - **Resultado:** Se cancela la vía de pruebas y se activa de forma obligatoria la ejecución del Rollback (CU-21) y la Cancelación de la ECN/ECO (CU-22).
+
+### Reglas aplicadas
+
+- **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Regula el régimen de re-testeo técnico y la transición vinculante a reversión ante la no superación de las pruebas.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
+- **Transición:** Reevaluación técnica de calidad
+- **Estado final:** **`En Aceptación`** (vía CU-17 si aprueba) o inicio de transición terminal a **`Cancelada`** (vía CU-21/CU-22 si falla definitivamente)
+
+### Entregables
+
+- Dictamen formal de re-testeo asentado en el expediente de control de calidad.
+
+### Trazabilidad
+- **RF:** RF-11
+- **RN:** RN-08
+- **Estado(s):** En Pruebas $ightarrow$ En Aceptación (o vía a Cancelada)
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-20 — Crear y congelar línea base
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-20 |
+| **Nombre** | Crear y congelar línea base |
+| **Tipo** | Primario, esencial |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Comité de Control de Cambios (CCB), Solicitante |
+| **Paquete / Módulo** | Líneas Base y Rollback |
+| **RF asociados** | RF-13 — Gestión de Líneas Base<br>RF-14 — Cierre Formal del Cambio y Notificaciones |
+| **RN asociadas** | RN-02 — Identificación Unívoca de Versiones<br>RN-04 — Restricción de Bibliotecas Congeladas<br>RN-07 — Diferenciación de Resultados Formales de Cierre<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Establecer, etiquetar y congelar formalmente una nueva Línea Base (Baseline) en la Biblioteca Maestra a partir de los ECS integrados tras el Check-In conforme, formalizando el cierre exitoso del cambio en estado `Implementada`. |
+| **Disparador** | Culminación exitosa de la operación de Check-In en la Biblioteca Maestra (CU-12). |
+| **Precondiciones** | 1. Check-In conforme ejecutado en la Biblioteca Maestra (CU-12) con doble validación aprobada (RN-09).<br>2. Inventario de ECS del proyecto consistente y auditado. |
+| **Postcondiciones** | 1. Nueva Línea Base congelada y etiquetada en la Biblioteca Maestra bajo estándar mayor.menor.parche (RN-02).<br>2. La RFC transiciona a estado terminal oficial **`Implementada`**.<br>3. Expediente cerrado formalmente y archivado con trazabilidad histórica completa. |
+| **Entradas** | Catálogo de ECS en Biblioteca Maestra, etiqueta formal de versión y resolución de cierre. |
+| **Salidas / Entregables** | Certificado formal de Línea Base congelada y expediente de RFC cerrado en estado `Implementada`. |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario accede al módulo de Líneas Base y selecciona los ECS integrados en la Biblioteca Maestra tras el Check-In.
+2. TraceFlow SCM presenta el inventario de configuración con las versiones integradas y la acreditación de doble conformidad.
+3. El Administrador de Configuración / Bibliotecario asigna la etiqueta formal de versionamiento y solicita el congelamiento de la nueva Línea Base.
+4. TraceFlow SCM valida el cumplimiento del estándar unívoco de versiones (RN-02) y verifica que todos los elementos pertenezcan a la Biblioteca Maestra según RN-04.
+5. TraceFlow SCM congela la Línea Base bloqueándola contra modificaciones directas, genera la firma de auditoría y transiciona el estado oficial de la RFC a **`Implementada`**.
+6. TraceFlow SCM expide el Certificado formal de Línea Base y notifica el cierre exitoso del cambio al CCB, al Solicitante y a la gerencia del proyecto conforme a RF-14 y RN-07.
+
+### Flujos Alternativos
+
+- **A1 — Generación de Línea Base intermedia de desarrollo o pruebas**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** Se requiere congelar un hito intermedio de integración en la Biblioteca de Soporte.  
+  - **Secuencia:**  
+    1. El Administrador etiqueta una línea base de soporte identificada como preliminar.  
+    2. TraceFlow SCM registra el hito sin cerrar la RFC.  
+  - **Convergencia:** Concluye el hito intermedio sin transicionar la RFC a estado terminal.
+
+### Excepciones
+
+- **E1 — Intento de congelamiento con ECS pendientes de integración en Biblioteca Maestra**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Uno de los artefactos componentes aún se encuentra en la Biblioteca de Trabajo o no completó el Check-In.  
+  - **Respuesta del sistema:** TraceFlow SCM cancela el congelamiento e informa la inconsistencia en el catálogo de bibliotecas según RN-04.  
+  - **Resultado:** No se crea la Línea Base; se preserva la integridad del repositorio central.
+
+### Reglas aplicadas
+
+- **RN-02 (Identificación Unívoca de Versiones):** Dispone que toda línea base establecida tras un Check-In a la Biblioteca Maestra deba identificarse con el estándar oficial de versionamiento.
+- **RN-04 (Restricción de Bibliotecas Congeladas):** Garantiza que una vez congelada, la Línea Base no pueda alterarse de forma directa.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece `Implementada` como el único resultado terminal de cierre exitoso del cambio.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
+- **Transición:** Congelamiento de Línea Base y formalización de cierre exitoso
+- **Estado final:** **`Implementada`** (Estado 14 de TB-07, Estado Terminal Exitoso)
+
+### Entregables
+
+- Certificado formal de nueva Línea Base congelada y expediente de RFC cerrado en estado `Implementada`.
+
+### Trazabilidad
+- **RF:** RF-13, RF-14
+- **RN:** RN-02, RN-04, RN-07, RN-09
+- **Estado(s):** En Aceptación $ightarrow$ Implementada
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-21 — Ejecutar rollback
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-21 |
+| **Nombre** | Ejecutar rollback |
+| **Tipo** | Alternativo, correctivo |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Líneas Base y Rollback |
+| **RF asociados** | RF-12 — Rollback y Cancelación de Órdenes de Cambio |
+| **RN asociadas** | RN-06 — Bloqueo de Sincronización Obligatorio<br>RN-08 — Reversión Obligatoria ante Fallo No Subsanado |
+| **Objetivo** | Revertir de forma segura las modificaciones técnicas realizadas sobre la copia del ECS en la Biblioteca de Trabajo (o entorno intermedio de prueba), restaurando el espacio de trabajo al estado estable previo antes de cancelar la orden. El rollback se ejecuta exclusivamente sobre la Biblioteca de Trabajo o estado controlado previo, jamás sobre una Línea Base ya modificada. |
+| **Disparador** | Dictamen de fallo técnico insubsanable en re-testeo de QA (CU-19) o rechazo definitivo en aceptación de usuario (CU-29). |
+| **Precondiciones** | 1. Existencia de dictamen formal de inviabilidad técnica o rechazo insubsanable de usuario.<br>2. El cambio NO ha sido transferido a la Biblioteca Maestra ni incorporado a una Línea Base congelada.<br>3. Bloqueo de sincronización vigente sobre el ECS. |
+| **Postcondiciones** | 1. Modificaciones en la Biblioteca de Trabajo descartadas y espacio de trabajo restaurado a la versión estable previa.<br>2. Bloqueo de sincronización liberado (RN-06).<br>3. Habilitación obligatoria para la cancelación de la ECN/ECO (CU-22). |
+| **Entradas** | Identificador de ECN/ECO no superada, copia de respaldo estable de origen y dictamen de reversión. |
+| **Salidas / Entregables** | Constancia formal de Rollback ejecutado en la Biblioteca de Trabajo y asiento de liberación de bloqueo. |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario selecciona la orden no conforme sujeta a reversión en la Biblioteca de Trabajo.
+2. TraceFlow SCM presenta el historial de versiones del ECS y la versión de origen estable en la Biblioteca de Soporte.
+3. El Administrador de Configuración / Bibliotecario confirma la ejecución del procedimiento de reversión (rollback) sobre la copia de trabajo.
+4. TraceFlow SCM valida que el ECS no haya ingresado a la Biblioteca Maestra y constata que la operación se restrinja estrictamente a la Biblioteca de Trabajo según RN-08.
+5. TraceFlow SCM descarta las modificaciones no conformes, restituye el espacio de trabajo a la versión estable previa y libera el bloqueo de sincronización del ECS conforme a RN-06.
+6. TraceFlow SCM asienta el acta de reversión en la bitácora de auditoría y notifica al Desarrollador y al CCB, habilitando la cancelación formal de la orden (CU-22).
+
+### Flujos Alternativos
+
+- **A1 — Respaldo de evidencias técnicas previas a la purga de trabajo**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El Desarrollador o el Administrador solicitan archivar los logs de fallo para análisis forense posterior.  
+  - **Secuencia:**  
+    1. TraceFlow SCM empaqueta los archivos de trabajo no conformes en un repositorio de auditoría aislado.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Intento inválido de rollback sobre artefacto integrado en Biblioteca Maestra**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La solicitud pretende revertir un cambio que ya fue consolidado en la Biblioteca Maestra.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la acción e informa que un artefacto en Biblioteca Maestra solo puede corregirse mediante un nuevo ciclo formal de RFC según RN-04.  
+  - **Resultado:** Se cancela la operación de rollback directo protegiendo el repositorio congelado.
+
+### Reglas aplicadas
+
+- **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Impone como mandato que ante un fallo técnico no resuelto se restablezca obligatoriamente el ECS en la Biblioteca de Trabajo a su estado previo estable.
+- **RN-06 (Bloqueo de Sincronización Obligatorio):** Regula la liberación formal del bloqueo tras haberse concretado la reversión.
+
+### Estados afectados
+
+- **Estado inicial:** Mantiene el estado activo previo al cierre (**`En Pruebas`** o **`En Aceptación`**)
+- **Transición:** Reversión técnica y liberación de bloqueo en Biblioteca de Trabajo
+- **Estado final:** Mantiene el estado activo (habilitando la transición inmediata a **`Cancelada`** mediante CU-22)
+
+### Entregables
+
+- Constancia formal de Rollback ejecutado y registro de liberación de bloqueo en la Biblioteca de Trabajo.
+
+### Trazabilidad
+- **RF:** RF-12
+- **RN:** RN-06, RN-08
+- **Estado(s):** Mantiene estado (habilita transición a Cancelada)
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-22 — Cancelar Orden de Cambio
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-22 |
+| **Nombre** | Cancelar Orden de Cambio |
+| **Tipo** | Alternativo, cierre fallido |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Solicitante, Comité de Control de Cambios (CCB) |
+| **Paquete / Módulo** | Líneas Base y Rollback |
+| **RF asociados** | RF-12 — Rollback y Cancelación de Órdenes de Cambio<br>RF-14 — Cierre Formal del Cambio y Notificaciones |
+| **RN asociadas** | RN-07 — Diferenciación de Resultados Formales de Cierre<br>RN-08 — Reversión Obligatoria ante Fallo No Subsanado |
+| **Objetivo** | Formalizar el cierre definitivo fallido de una Orden de Cambio (ECN/ECO) y su RFC asociada tras haberse ejecutado satisfactoriamente el rollback en la Biblioteca de Trabajo, transicionando el expediente al estado oficial `Cancelada`. |
+| **Disparador** | Notificación de culminación exitosa de la operación de Rollback (CU-21). |
+| **Precondiciones** | 1. Rollback ejecutado y verificado en la Biblioteca de Trabajo con bloqueo liberado (CU-21).<br>2. Existencia de informe de fallo no subsanado en re-testeo o rechazo definitivo en UAT. |
+| **Postcondiciones** | 1. La ECN/ECO queda revocada y formalmente cancelada.<br>2. La RFC transiciona a estado terminal oficial **`Cancelada`**.<br>3. Se notifica formalmente el cierre fallido al Solicitante, al CCB y a las partes interesadas. |
+| **Entradas** | Expediente de la ECN/ECO, constancia de rollback ejecutado y sustento formal del motivo de cancelación. |
+| **Salidas / Entregables** | Resolución de Cancelación formal de Orden de Cambio y expediente de RFC cerrado en estado `Cancelada`. |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario selecciona la Orden de Cambio sujeta a cancelación definitiva.
+2. TraceFlow SCM presenta la constancia de rollback ejecutado en la Biblioteca de Trabajo y el informe de fallos no subsanados.
+3. El Administrador de Configuración / Bibliotecario registra la fundamentación administrativa y técnica de la cancelación.
+4. TraceFlow SCM valida que se haya completado previamente el rollback del ECS en la Biblioteca de Trabajo y que el bloqueo se encuentre liberado según RN-08.
+5. TraceFlow SCM revoca formalmente la ECN/ECO y actualiza el estado oficial de la RFC a **`Cancelada`** (estado terminal).
+6. TraceFlow SCM emite la Resolución de Cancelación y notifica el cierre formal por fallo no subsanado al Solicitante y al CCB conforme a RF-14 y RN-07.
+
+### Flujos Alternativos
+
+- **A1 — Registro de lecciones aprendidas técnicas en la cancelación**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** La gerencia solicita anexar un dictamen de lecciones aprendidas para evitar fallos futuros en el ECS.  
+  - **Secuencia:**  
+    1. El Administrador adjunta el informe de análisis de causas raíz al expediente.  
+  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Intento de cancelación sin constancia de rollback previo**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Se intenta cancelar la orden manteniendo modificaciones activas o el bloqueo sin liberar en la Biblioteca de Trabajo.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la cancelación e instruye la ejecución obligatoria del rollback según RN-08.  
+  - **Resultado:** No se cancela la orden; se deriva al usuario a completar CU-21.
+
+### Reglas aplicadas
+
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece `Cancelada` como el resultado terminal obligatorio ante fallos técnicos no subsanados en QA o rechazo insubsanable en UAT con reversión ejecutada.
+- **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Prohíbe la cancelación formal sin haber restaurado previamente el espacio de trabajo.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Pruebas`** o **`En Aceptación`** (Estados 9 o 10 de TB-07)
+- **Transición:** Cancelación formal de la orden tras reversión técnica
+- **Estado final:** **`Cancelada`** (Estado 13 de TB-07, Estado Terminal de Cierre Fallido)
+
+### Entregables
+
+- Resolución formal de Cancelación de Orden de Cambio y expediente de RFC cerrado en estado `Cancelada`.
+
+### Trazabilidad
+- **RF:** RF-12, RF-14
+- **RN:** RN-07, RN-08
+- **Estado(s):** En Pruebas / En Aceptación $ightarrow$ Cancelada
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-23 — Registrar incidencia
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-23 |
+| **Nombre** | Registrar incidencia |
+| **Tipo** | Primario, soporte |
+| **Actor principal** | Solicitante |
+| **Actores secundarios** | Analista de Requerimientos / Gestor |
+| **Paquete / Módulo** | Incidencias y Soporte |
+| **RF asociados** | RF-15 — Gestión de Incidencias y Soporte |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Registrar formalmente un ticket de reporte de error operacional, comportamiento anómalo o solicitud de asistencia técnica en el uso del sistema, iniciando la atención de soporte. |
+| **Disparador** | El usuario experimenta una falla en la operación del software o requiere asistencia técnica formal. |
+| **Precondiciones** | El usuario cuenta con sesión activa y rol de Solicitante asignado en el proyecto. |
+| **Postcondiciones** | La incidencia queda registrada con ticket unívoco (INC-YYYY-NNNN) en estado oficial `Abierta`, y se notifica al Analista de Requerimientos / Gestor. |
+| **Entradas** | Título del problema, módulo o función afectada, descripción detallada del error, pasos para reproducirlo, severidad propuesta y evidencias adjuntas. |
+| **Salidas / Entregables** | Ticket digital de incidencia registrado con identificador correlativo formal y comprobante de reporte emitido. |
+
+### Flujo Principal
+
+1. El Solicitante selecciona la opción de registrar un nuevo reporte de incidencia en el módulo de soporte del proyecto.
+2. TraceFlow SCM presenta el formulario de captura de ticket de incidencia.
+3. El Solicitante ingresa el título del fallo, descripción del comportamiento anómalo, pasos para su reproducción, severidad sugerida y adjunta capturas de pantalla o documentos de sustento.
+4. TraceFlow SCM valida que todos los campos requeridos contengan información sustantiva y que los archivos adjuntos satisfagan los formatos autorizados.
+5. TraceFlow SCM registra el ticket de soporte asignándole un código correlativo unívoco y estableciendo su estado oficial en "Abierta".
+6. TraceFlow SCM emite el comprobante de recepción al Solicitante y remite una notificación automática al Analista de Requerimientos / Gestor para su evaluación y atención.
+
+### Flujos Alternativos
+
+- **A1 — Descarte voluntario del registro del ticket**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El usuario desiste de formular el reporte.  
+  - **Secuencia:**  
+    1. El Solicitante selecciona la opción cancelar.  
+    2. TraceFlow SCM limpia el formulario sin registrar datos.  
+  - **Convergencia:** Concluye la interacción sin persistir transacciones.
+
+### Excepciones
+
+- **E1 — Omisión de descripción o pasos de reproducción**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El usuario no ingresa la explicación suficiente para reproducir el fallo.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la creación del ticket e instruye detallar el error.  
+  - **Resultado:** Retorna al Paso 3 del Flujo Principal para completar los datos requeridos.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que los tickets de soporte sirvan como insumo de atención, pero no autoricen modificaciones directas sobre el software sin derivar a una RFC.
+
+### Estados afectados
+
+- **Estado inicial:** N/A en ciclo de RFC (Ciclo de soporte: creación de ticket).
+- **Transición:** Registro formal de ticket de soporte.
+- **Estado final:** N/A en RFC (Ticket de soporte en estado oficial `Abierta`).
+
+### Entregables
+
+- Ticket formal de incidencia registrado en estado `Abierta` con código correlativo.
+
+### Trazabilidad
+- **RF:** RF-15
+- **RN:** RN-01
+- **Estado(s):** N/A (Ticket: Abierta)
+- **DG relacionado:** DG-04
+
+---
+
+## CU-24 — Consultar estado de ticket
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-24 |
+| **Nombre** | Consultar estado de ticket |
+| **Tipo** | Secundario, consulta |
+| **Actor principal** | Solicitante |
+| **Actores secundarios** | Analista de Requerimientos / Gestor |
+| **Paquete / Módulo** | Incidencias y Soporte |
+| **RF asociados** | RF-15 — Gestión de Incidencias y Soporte |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Verificar el estado de atención, comentarios técnicos, avances y resolución de un ticket de soporte, así como acceder al enlace directo de la Solicitud de Cambio si el ticket fue derivado a RFC. |
+| **Disparador** | Consulta operativa del usuario para dar seguimiento al estado de una incidencia previamente reportada. |
+| **Precondiciones** | Existencia del ticket registrado en el sistema; usuario con credenciales válidas y acceso al proyecto. |
+| **Postcondiciones** | TraceFlow SCM presenta el detalle actualizado del ticket y el enlace a la RFC derivada si corresponde, sin alterar registros. |
+| **Entradas** | Identificador del ticket de incidencia o criterios de búsqueda por rango de fecha o estado. |
+| **Salidas / Entregables** | Ficha de consulta de ticket presentada en pantalla con bitácora de atención y enlace a RFC asociada. |
+
+### Flujo Principal
+
+1. El Solicitante accede a la bandeja de tickets de soporte del proyecto asignado.
+2. TraceFlow SCM presenta el listado de tickets registrados por el usuario con sus estados de atención actuales (Abierta, En Análisis, Derivada, Resuelta, Cerrada).
+3. El Solicitante selecciona el ticket de incidencia que desea inspeccionar.
+4. TraceFlow SCM recupera la bitácora de seguimiento, los comentarios de soporte y el estado de atención del ticket.
+5. TraceFlow SCM presenta el detalle completo del ticket y, si la incidencia motivó una Solicitud de Cambio, despliega el enlace directo hacia la RFC vinculada.
+6. El Solicitante visualiza la evolución del caso y puede agregar aclaraciones complementarias si el ticket permanece en trámite.
+
+### Flujos Alternativos
+
+- **A1 — Incorporación de comentarios adicionales al ticket en atención**  
+  - **Origen:** Paso 6 del Flujo Principal.  
+  - **Condición de activación:** El usuario aporta nuevos antecedentes solicitados por el equipo de soporte.  
+  - **Secuencia:**  
+    1. El Solicitante ingresa el comentario y adjunta nuevas evidencias.  
+    2. TraceFlow SCM registra el comentario en la bitácora del ticket y notifica al Analista.  
+  - **Convergencia:** Concluye la actualización del ticket.
+
+### Excepciones
+
+- **E1 — Ticket de soporte inexistente o perteneciente a otro proyecto no autorizado**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de fallo:** Búsqueda de un código erróneo o restringido.  
+  - **Respuesta del sistema:** TraceFlow SCM informa que el ticket no existe o no se tienen privilegios de consulta según RBAC.  
+  - **Resultado:** No se despliega información; el usuario retorna a la bandeja general.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura la transparencia y trazabilidad en la atención de solicitudes de los usuarios.
+
+### Estados afectados
+
+- **Estado inicial:** N/A (Operación de sólo lectura).
+- **Transición:** N/A
+- **Estado final:** N/A
+
+### Entregables
+
+- Panel de estado y trazabilidad del ticket de incidencia presentado en pantalla.
+
+### Trazabilidad
+- **RF:** RF-15
+- **RN:** RN-01
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04
+
+---
+
+## CU-25 — Derivar incidencia a RFC
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-25 |
+| **Nombre** | Derivar incidencia a RFC |
+| **Tipo** | Primario, transición |
+| **Actor principal** | Analista de Requerimientos / Gestor |
+| **Actores secundarios** | Solicitante |
+| **Paquete / Módulo** | Incidencias y Soporte |
+| **RF asociados** | RF-15 — Gestión de Incidencias y Soporte<br>RF-04 — Registro de Solicitudes de Cambio (RFC) |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
+| **Objetivo** | Canalizar un ticket de soporte cuya solución exige modificar Elementos de Configuración de Software (ECS) hacia el flujo formal de control de cambios, enlazando directamente el registro de la nueva RFC en CU-04 sin duplicar la lógica de captura y garantizando la trazabilidad bidireccional. |
+| **Disparador** | El Analista de Requerimientos / Gestor concluye la evaluación del ticket determinando que no es un problema de soporte operacional sino un defecto o adaptación que requiere cambios en el software. |
+| **Precondiciones** | El ticket de soporte se encuentra en estado oficial `Abierta` o `En Análisis` y no ha sido derivado previamente. |
+| **Postcondiciones** | 1. El ticket de soporte transiciona a estado oficial `Derivada` enlazado formalmente con la nueva RFC.<br>2. Se inicia el expediente de la RFC en estado oficial **`Registrada`** mediante CU-04. |
+| **Entradas** | Ticket de soporte evaluado, dictamen técnico de derivación y selección del ECS preliminarmente afectado. |
+| **Salidas / Entregables** | Asiento formal de derivación registrado en el ticket y expediente de RFC iniciado con vínculo de trazabilidad. |
+
+### Flujo Principal
+
+1. El Analista de Requerimientos / Gestor selecciona una incidencia abierta en el panel de soporte y dictamina que su resolución exige modificar el software del proyecto.
+2. TraceFlow SCM presenta la opción de derivación formal hacia el flujo de Solicitudes de Cambio.
+3. El Analista de Requerimientos / Gestor confirma la derivación identificando el ECS preliminarmente afectado y fundamentando la causal.
+4. TraceFlow SCM valida que el ticket no haya sido derivado previamente a otra orden y pre-pobla los datos de la nueva solicitud (título, descripción del error y evidencias del ticket) enlazando al caso de uso CU-04.
+5. TraceFlow SCM ejecuta el registro formal de la RFC conforme al flujo de CU-04, asignándole un código correlativo unívoco y posicionándola en estado oficial **`Registrada`**.
+6. TraceFlow SCM actualiza el estado del ticket de soporte a "Derivada", asienta el vínculo bidireccional entre ambos expedientes y notifica al Solicitante el código de la nueva RFC asignada.
+
+### Flujos Alternativos
+
+- **A1 — Ajuste de datos pre-cargados antes de formalizar la RFC**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** El Analista requiere redactar con mayor precisión técnica la justificación de cambio respecto al reporte original del usuario.  
+  - **Secuencia:**  
+    1. El Analista complementa la descripción y justificación en el formulario pre-cargado.  
+  - **Convergencia:** Retorna al Paso 5 del Flujo Principal para proseguir con el registro de CU-04.
+
+### Excepciones
+
+- **E1 — Ticket de soporte ya derivado previamente**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El ticket ya cuenta con una RFC vinculada en el historial.  
+  - **Respuesta del sistema:** TraceFlow SCM deniega la operación e informa el identificador de la RFC preexistente.  
+  - **Resultado:** No se duplica la solicitud; el caso de uso finaliza.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna atención de soporte altere artefactos de software sin ingresar al proceso formal de RFC gobernado por TraceFlow SCM.
+
+### Estados afectados
+
+- **Estado inicial:** Ticket en estado `Abierta` / RFC: Ninguno (Creación).
+- **Transición:** Derivación formal de soporte hacia control de configuración.
+- **Estado final:** Ticket en estado `Derivada` / RFC en estado oficial **`Registrada`** (Estado 1 de TB-07).
+
+### Entregables
+
+- Asiento de derivación en el ticket de soporte y expediente de RFC registrado en estado `Registrada` con vínculo de trazabilidad.
+
+### Trazabilidad
+- **RF:** RF-04, RF-15
+- **RN:** RN-01
+- **Estado(s):** Inicia RFC en Registrada
+- **DG relacionado:** DG-03, DG-04
+
+---
+
+## CU-26 — Validar integridad (checksum)
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-26 |
+| **Nombre** | Validar integridad (checksum) |
+| **Tipo** | Secundario, seguridad |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Sistema TraceFlow SCM |
+| **Paquete / Módulo** | Trazabilidad, Auditoría y Reportes |
+| **RF asociados** | RF-17 — Auditoría e Integridad<br>RNF-03 — Integridad |
+| **RN asociadas** | RN-04 — Restricción de Bibliotecas Congeladas<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Validar la integridad del artefacto de software en cualquiera de las bibliotecas, comparando su firma digital de integridad con el registro oficial almacenado para detectar corrupciones o modificaciones no autorizadas fuera del flujo SCM. |
+| **Disparador** | Ejecución de operaciones de Check-Out, Check-In, auditorías periódicas o solicitud manual de aseguramiento de integridad. |
+| **Precondiciones** | El ECS se encuentra depositado en una de las bibliotecas del proyecto y cuenta con una firma de integridad de referencia registrada formalmente en el catálogo. |
+| **Postcondiciones** | TraceFlow SCM dictamina la conformidad de integridad del artefacto y registra el resultado en la bitácora de auditoría y seguridad. |
+| **Entradas** | Identificador del ECS, biblioteca donde reside y firma de comprobación oficial almacenada. |
+| **Salidas / Entregables** | Certificado de validación de integridad del artefacto registrado en la bitácora de seguridad. |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario (o TraceFlow SCM durante operaciones de repositorio) solicita validar la integridad del artefacto.
+2. TraceFlow SCM recupera el artefacto desde la biblioteca correspondiente y consulta la firma oficial de integridad almacenada en el catálogo de configuración.
+3. TraceFlow SCM calcula la firma de comprobación actual sobre el contenido del artefacto.
+4. TraceFlow SCM valida la equivalencia exacta entre la firma calculada y la firma oficial registrada para la versión correspondiente.
+5. TraceFlow SCM dictamina formalmente la conformidad de integridad del artefacto y registra la estampa temporal y resultado en la bitácora de auditoría.
+6. TraceFlow SCM confirma la integridad del ECS al operador, autorizando la prosecución de las operaciones de Check-In, Check-Out o auditoría.
+
+### Flujos Alternativos
+
+- **A1 — Verificación integral masiva sobre todos los ECS de una Línea Base**  
+  - **Origen:** Paso 1 del Flujo Principal.  
+  - **Condición de activación:** Auditoría periódica de integridad sobre la Biblioteca Maestra.  
+  - **Secuencia:**  
+    1. El Administrador selecciona la Línea Base completa para verificación.  
+    2. TraceFlow SCM ejecuta la comprobación de integridad secuencial sobre cada ECS componente.  
+  - **Convergencia:** Presenta el reporte consolidado de integridad en el Paso 6.
+
+### Excepciones
+
+- **E1 — Discrepancia en la validación de integridad (Firma alterada)**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** La firma calculada sobre el archivo no coincide con la firma oficial registrada en el catálogo.  
+  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad por alteración o corrupción del archivo, bloquea de inmediato su extracción o integración y genera una alerta crítica de seguridad en auditoría.  
+  - **Resultado:** La operación en curso se cancela protegiendo el repositorio contra artefactos adulterados según RN-04.
+
+### Reglas aplicadas
+
+- **RN-04 (Restricción de Bibliotecas Congeladas):** Protege la Biblioteca Maestra exigiendo comprobación de integridad ante cualquier lectura o transferencia.
+- **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Impone la verificación de integridad como control técnico previo a la integración definitiva.
+
+### Estados afectados
+
+- **Estado inicial:** N/A (Operación de aseguramiento de integridad).
+- **Transición:** Verificación y validación de firma de integridad.
+- **Estado final:** N/A
+
+### Entregables
+
+- Dictamen formal de validación de integridad del artefacto registrado en la bitácora de seguridad.
+
+### Trazabilidad
+- **RF:** RF-17
+- **RN:** RN-04, RN-09
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04
+
+---
+
+## CU-27 — Auditar acciones del sistema
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-27 |
+| **Nombre** | Auditar acciones del sistema |
+| **Tipo** | Secundario, control |
+| **Actor principal** | Comité de Control de Cambios (CCB) |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario |
+| **Paquete / Módulo** | Trazabilidad, Auditoría y Reportes |
+| **RF asociados** | RF-16 — Trazabilidad de Configuración<br>RF-17 — Auditoría e Integridad |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
+| **Objetivo** | Inspeccionar, filtrar y analizar la bitácora cronológica de eventos y transacciones críticas registradas en TraceFlow SCM (cambios de estado de RFC, autorizaciones, Check-In, Check-Out, rollbacks y accesos), garantizando la transparencia y no repudio de las operaciones desde la perspectiva del actor. |
+| **Disparador** | Sesión de control y fiscalización del CCB o auditoría periódica de cumplimiento de gobernanza SCM. |
+| **Precondiciones** | El usuario cuenta con credenciales activas y rol de CCB o Administrador de Configuración con permisos de auditoría. |
+| **Postcondiciones** | TraceFlow SCM presenta el registro inmutable de transacciones críticas y permite la emisión del informe de auditoría. |
+| **Entradas** | Criterios de filtrado de auditoría (rango de fechas, usuario responsable, proyecto, tipo de acción crítica o identificador de RFC/ECS). |
+| **Salidas / Entregables** | Reporte visual de auditoría con detalle cronológico de transacciones, estampas de tiempo, usuarios y firmas de seguridad. |
+
+### Flujo Principal
+
+1. El Comité de Control de Cambios (CCB) accede al panel de auditoría y trazabilidad del sistema.
+2. TraceFlow SCM presenta las opciones de consulta y filtrado de la bitácora histórica de eventos.
+3. El Comité de Control de Cambios (CCB) define los criterios de inspección seleccionando el proyecto, rango temporal, actor interviniente o tipo de operación crítica.
+4. TraceFlow SCM valida los privilegios del usuario para la visualización de registros confidenciales de auditoría según la matriz RBAC.
+5. TraceFlow SCM recupera y presenta la secuencia cronológica de transacciones críticas, mostrando autor, rol oficial, estampa de tiempo, acción ejecutada, justificación y los estados anterior y posterior del artefacto.
+6. El Comité de Control de Cambios (CCB) analiza el expediente de auditoría y puede emitir el informe formal de trazabilidad y cumplimiento normativo.
+
+### Flujos Alternativos
+
+- **A1 — Rastreo específico de la cadena de trazabilidad de una Solicitud de Cambio**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El CCB requiere inspeccionar el ciclo de vida completo de una RFC particular desde su registro hasta su cierre.  
+  - **Secuencia:**  
+    1. El CCB ingresa el código de la RFC.  
+    2. TraceFlow SCM presenta la línea de vida completa de la solicitud enlazando la RFC, los informes de impacto, actas, órdenes, operaciones de biblioteca y certificaciones.  
+  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Intento de acceso a registros de auditoría por usuario sin privilegios**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Un usuario con rol no autorizado intenta consultar la bitácora general de auditoría.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la consulta, registra el intento no autorizado en la bitácora de seguridad y notifica al Administrador.  
+  - **Resultado:** No se despliega información confidencial; el acceso queda denegado.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Permite verificar que cada intervención técnica haya contado con la debida resolución aprobatoria previa.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Asegura que todos los cierres documentados correspondan a uno de los cuatro resultados oficiales.
+
+### Estados afectados
+
+- **Estado inicial:** N/A (Operación de inspección y control).
+- **Transición:** N/A
+- **Estado final:** N/A
+
+### Entregables
+
+- Informe formal de auditoría y trazabilidad de eventos del sistema presentado en pantalla y disponible para exportación.
+
+### Trazabilidad
+- **RF:** RF-16, RF-17
+- **RN:** RN-01, RN-07
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04
+
+---
+
+## CU-28 — Generar reportes de estado
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-28 |
+| **Nombre** | Generar reportes de estado |
+| **Tipo** | Secundario, reporte |
+| **Actor principal** | Administrador de Configuración / Bibliotecario |
+| **Actores secundarios** | Analista de Requerimientos / Gestor, Comité de Control de Cambios (CCB) |
+| **Paquete / Módulo** | Trazabilidad, Auditoría y Reportes |
+| **RF asociados** | RF-18 — Generación de Reportes |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
+| **Objetivo** | Generar, visualizar y exportar los reportes formales del sistema respaldados exclusivamente por RF-18: (1) Reporte de estado del flujo de cambios, (2) Reporte de inventario de ECS y (3) Reporte consolidado de actas de cambios. |
+| **Disparador** | Requerimiento de la gerencia, cliente o del CCB de disponer de información consolidada para la toma de decisiones o rendición de cuentas. |
+| **Precondiciones** | El usuario cuenta con credenciales activas y permisos de generación de reportes en el proyecto seleccionado. |
+| **Postcondiciones** | El reporte oficial seleccionado queda compilado, presentado en pantalla y disponible para exportación en formatos documentales estándar. |
+| **Entradas** | Tipo de reporte seleccionado (Flujo de Cambios, Inventario de ECS o Actas de Cambios), proyecto a evaluar y parámetros de corte de fecha. |
+| **Salidas / Entregables** | Documento formal de reporte emitido en pantalla y exportable (PDF / formato estructurado). |
+
+### Flujo Principal
+
+1. El Administrador de Configuración / Bibliotecario selecciona la opción de generación de reportes en el panel de control.
+2. TraceFlow SCM presenta el catálogo oficial de reportes respaldados por RF-18: (1) Reporte de Estado del Flujo de Cambios, (2) Reporte de Inventario de ECS y (3) Reporte Consolidado de Actas de Cambios.
+3. El Administrador de Configuración / Bibliotecario selecciona el tipo de reporte requerido y define los parámetros de corte temporal y el proyecto asociado.
+4. TraceFlow SCM valida los parámetros de consulta y compila la información requerida desde los registros oficiales del proyecto.
+5. TraceFlow SCM genera el reporte estructurado consolidando métricas cuantitativas, tablas de estado, firmas formales de responsabilidad y resúmenes ejecutivos.
+6. TraceFlow SCM presenta el reporte en pantalla y habilita la opción de exportación documental formal para su entrega a la dirección de proyecto o al CCB.
+
+### Flujos Alternativos
+
+- **A1 — Generación del Reporte de Inventario de ECS**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El usuario requiere auditar el estado de los componentes por biblioteca y versiones activas.  
+  - **Secuencia:**  
+    1. El Administrador selecciona "Reporte de Inventario de ECS".  
+    2. TraceFlow SCM compila los ECS clasificados por biblioteca (Trabajo, Soporte, Maestra), versiones vigentes, bloqueos activos y líneas base.  
+  - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
+
+- **A2 — Generación del Reporte Consolidado de Actas de Cambios**  
+  - **Origen:** Paso 3 del Flujo Principal.  
+  - **Condición de activación:** El usuario requiere compilar las actas de deliberación del CCB y autorizaciones delegadas del periodo.  
+  - **Secuencia:**  
+    1. El Administrador selecciona "Reporte Consolidado de Actas de Cambios".  
+    2. TraceFlow SCM compila las resoluciones aprobatorias, actas de rechazo, ECN/ECO expedidas y actas de aceptación UAT.  
+  - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
+
+### Excepciones
+
+- **E1 — Inexistencia de transacciones en el periodo o proyecto consultado**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** Los parámetros de fecha ingresados no registran movimientos en el sistema.  
+  - **Respuesta del sistema:** TraceFlow SCM informa que no existen datos que cumplan los criterios seleccionados.  
+  - **Resultado:** No se genera el reporte; se instruye ajustar los parámetros de búsqueda en el Paso 3.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que los reportes reflejen fielmente el estatus de las autorizaciones formales.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Garantiza que las estadísticas de cierre clasifiquen las solicitudes estrictamente en los cuatro resultados terminales oficiales.
+
+### Estados afectados
+
+- **Estado inicial:** N/A (Operación de compilación y exportación de información).
+- **Transición:** N/A
+- **Estado final:** N/A
+
+### Entregables
+
+- Documento formal de reporte emitido (Estado del Flujo de Cambios, Inventario de ECS o Actas de Cambios) disponible para exportación.
+
+### Trazabilidad
+- **RF:** RF-18
+- **RN:** RN-01, RN-07
+- **Estado(s):** N/A
+- **DG relacionado:** DG-04
+
+---
+
+## CU-29 — Validar aceptación del cambio por el usuario (UAT)
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-29 |
+| **Nombre** | Validar aceptación del cambio por el usuario (UAT) |
+| **Tipo** | Primario, validación de usuario |
+| **Actor principal** | Solicitante (Usuario Final) |
+| **Actores secundarios** | Administrador de Configuración / Bibliotecario, Equipo de Calidad / Testing |
+| **Paquete / Módulo** | Implementación y Validación |
+| **RF asociados** | RF-10 — Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-09 — Doble Validación Previa al Check-In a Biblioteca Maestra |
+| **Objetivo** | Permitir al Solicitante / Usuario Final comprobar en un entorno de validación controlado que el cambio implementado responde fielmente a la necesidad funcional y de negocio que motivó la RFC original, suscribiendo el Acta de Aceptación formal. |
+| **Disparador** | Emisión de la Certificación Técnica de Conformidad por QA y transición de la RFC a estado oficial `En Aceptación`. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Aceptación`**.<br>2. Cuenta con la Certificación Técnica de Conformidad de QA debidamente suscrita (CU-17).<br>3. El software se encuentra desplegado y accesible en el entorno de validación para el usuario. |
+| **Postcondiciones** | 1. El Acta formal de Aceptación UAT queda debidamente suscrita e incorporada al expediente.<br>2. Se cumple la regla de doble validación (QA + UAT) según RN-09, habilitando el Check-In a la Biblioteca Maestra (CU-12) y la congelación de la nueva Línea Base (CU-20). |
+| **Entradas** | Entorno de validación desplegado, criterios de aceptación funcionales del usuario y necesidad original documentada en la RFC. |
+| **Salidas / Entregables** | Acta formal de Aceptación del Usuario (UAT) suscrita en el sistema. |
+
+### Flujo Principal
+
+1. El Solicitante accede a su bandeja de seguimiento y selecciona la RFC en estado "En Aceptación" certificada por QA.
+2. TraceFlow SCM presenta el entorno de pruebas de aceptación del usuario y el resumen de la necesidad funcional original documentada en la RFC.
+3. El Solicitante ejecuta las pruebas de aceptación de usuario verificando la satisfacción de las necesidades operativas y de negocio.
+4. El Solicitante confirma que la solución implementada satisface los requerimientos solicitados y suscribe formalmente el Acta de Aceptación UAT.
+5. TraceFlow SCM valida la suscripción del acta, constata la concurrencia de la certificación técnica de QA y anexa el documento al expediente según RN-09.
+6. TraceFlow SCM emite constancia de conformidad al Solicitante y notifica al Administrador de Configuración / Bibliotecario que el cambio cuenta con la doble validación aprobada para efectuar el Check-In definitivo.
+
+### Flujos Alternativos
+
+- **A1 — Formulación de observaciones funcionales menores de usuario**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de activación:** El Solicitante requiere ajustes estéticos o aclaraciones funcionales no estructurales.  
+  - **Secuencia:**  
+    1. El Solicitante asienta las observaciones en el acta de validación.  
+    2. El sistema remite las notas a la gestión del proyecto para su programación coordinada.  
+  - **Convergencia:** Si no impiden la aceptación, el Solicitante suscribe el acta conforme.
+
+### Excepciones
+
+- **E1 — Rechazo funcional de usuario por insatisfacción de la necesidad original**  
+  - **Origen:** Paso 4 del Flujo Principal.  
+  - **Condición de fallo:** El Solicitante dictamina que la solución no resuelve el requerimiento planteado o altera negativamente la operación.  
+  - **Respuesta del sistema:** TraceFlow SCM registra el Acta de No Aceptación UAT detallando las discrepancias de negocio.  
+  - **Resultado:** Si el rechazo es insubsanable, se bloquea el Check-In a Biblioteca Maestra conforme a RN-09 y se activa el flujo de Rollback (CU-21) y Cancelación de la ECN/ECO (CU-22).
+
+### Reglas aplicadas
+
+- **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Establece como requisito indispensable y concurrente el Acta de Aceptación formal del usuario para autorizar la integración definitiva del software.
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna funcionalidad ingrese a producción sin la verificación directa del solicitante.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
+- **Transición:** Validación de aceptación por el usuario final (UAT)
+- **Estado final:** **`En Aceptación`** (Estado 10 de TB-07, con habilitación de doble conformidad para pase a **`Implementada`** tras CU-12 y CU-20)
+
+### Entregables
+
+- Acta formal de Aceptación del Usuario (UAT) debidamente suscrita y anexada al expediente.
+
+### Trazabilidad
+- **RF:** RF-10
+- **RN:** RN-01, RN-09
+- **Estado(s):** Mantiene En Aceptación (habilita transición a Implementada)
+- **DG relacionado:** DG-03, DG-04, DG-09, DG-11
+
+---
+
+## CU-30 — Autorizar Cambio Menor
+
+| Campo | Descripción |
+| :--- | :--- |
+| **Código** | CU-30 |
+| **Nombre** | Autorizar Cambio Menor |
+| **Tipo** | Primario, decisional |
+| **Actor principal** | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico (Autoridad Operativa Delegada Compartida) |
+| **Actores secundarios** | Solicitante, Ingeniero de Software / Desarrollador |
+| **Paquete / Módulo** | Evaluación y Aprobación de Cambios |
+| **RF asociados** | RF-05 — Clasificación y Análisis de Impacto<br>RF-07 — Gestión y Emisión de Órdenes de Cambio (ECN/ECO) |
+| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-05 — Evaluación Técnica y Clasificación Obligatoria<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
+| **Objetivo** | Resolver de forma ágil y compartida la aprobación o rechazo de una RFC clasificada técnicamente como Cambio Menor, asegurando la no afectación a la Triple Restricción. |
+| **Disparador** | Notificación de RFC en estado oficial `En Evaluación` con dictamen técnico de Cambio Menor. |
+| **Precondiciones** | 1. La RFC se encuentra en estado oficial **`En Evaluación`**.<br>2. Cuenta con Informe Técnico de Impacto formal que dictamina clasificación como **Cambio Menor** (RN-05). |
+| **Postcondiciones** | La RFC transiciona a estado oficial **`Autorizada`** (si ambos actores otorgan visto bueno) o a **`Rechazada`** / reescalada (si se deniega o excede límites). |
+| **Entradas** | Expediente de la RFC, Informe Técnico de Impacto de Cambio Menor, visto bueno del Analista y visto bueno del Arquitecto. |
+| **Salidas / Entregables** | Resolución de Autorización Delegada compartida registrada formalmente en el expediente. |
+
+### Flujo Principal
+
+1. La Autoridad Operativa Delegada (Analista de Requerimientos y Arquitecto) accede a la RFC clasificada como Cambio Menor en estado "En Evaluación".
+2. TraceFlow SCM presenta el Informe Técnico de Impacto acreditando que el cambio no altera la Triple Restricción (alcance, tiempo y costo).
+3. El Analista de Requerimientos / Gestor revisa la viabilidad operativa y emite su visto bueno funcional en el sistema.
+4. El Arquitecto / Especialista Técnico valida la viabilidad arquitectural y emite su visto bueno técnico en el sistema.
+5. TraceFlow SCM valida la concurrencia obligatoria de ambas autorizaciones compartidas y actualiza el estado oficial de la RFC a **`Autorizada`**.
+6. TraceFlow SCM notifica la autorización al Solicitante, al Administrador de Configuración / Bibliotecario y a los evaluadores, habilitando la emisión de la orden formal de cambio.
+
+### Flujos Alternativos
+
+- **A1 — Rechazo por rebasamiento de límites delegados o impacto no previsto**  
+  - **Origen:** Paso 3 o 4 del Flujo Principal.  
+  - **Condición de activación:** Alguno de los dos actores detecta que el cambio afectará plazos contractuales o costos, superando el marco de cambio menor.  
+  - **Secuencia:**  
+    1. El actor deniega el visto bueno delegado fundamentando el motivo en el sistema.  
+    2. TraceFlow SCM reescala formalmente la RFC reclasificándola a Cambio Mayor para tratamiento por el CCB (CU-07), o transiciona a `Rechazada` si resulta improcedente.  
+  - **Convergencia:** Se canaliza por la vía colegiada del CCB o finaliza como rechazo según corresponda.
+
+### Excepciones
+
+- **E1 — Aprobación unilateral incompleta**  
+  - **Origen:** Paso 5 del Flujo Principal.  
+  - **Condición de fallo:** Solo uno de los dos roles requeridos registró su visto bueno en el sistema.  
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la transición a Autorizada e informa que la aprobación requiere autorización compartida obligatoria según RN-01.  
+  - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta registrarse la segunda conformidad requerida.
+
+### Reglas aplicadas
+
+- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que los Cambios Menores puedan autorizarse bajo autoridad operativa delegada compartida entre el Analista y el Arquitecto.
+- **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Exige que la autorización delegada se fundamente estrictamente en el Informe Técnico de Impacto previo.
+- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece el cierre formal en `Rechazada` en caso de denegación definitiva.
+
+### Estados afectados
+
+- **Estado inicial:** **`En Evaluación`** (Estado 5 de TB-07)
+- **Transición:** Resolución conjunta de la Autoridad Operativa Delegada
+- **Estado final:** **`Autorizada`** (Estado 6 de TB-07) o **`Rechazada`** (Estado 12 de TB-07)
+
+### Entregables
+
+- Resolución de Autorización Delegada debidamente suscrita de forma compartida en estado `Autorizada`.
+
+### Trazabilidad
+- **RF:** RF-05, RF-07
+- **RN:** RN-01, RN-05, RN-07
+- **Estado(s):** En Evaluación $ightarrow$ Autorizada (o Rechazada)
+- **DG relacionado:** DG-03, DG-04, DG-07, DG-11
+
+---
 
 ## 6.2. Modelo Lógico
 

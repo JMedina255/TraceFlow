@@ -100,6 +100,8 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-AO-30](#dg-ao-30-análisis-de-objetos-autorizar-cambio-menor-cu-30) | Análisis de Objetos: Autorizar Cambio Menor (CU-30) | Análisis (BCE) | APROBADO | 1.0 |
 | [DG-12](#dg-12--modelo-conceptual-del-dominio-traceflow-scm) | Modelo Conceptual del Dominio TraceFlow SCM | Clases Conceptuales (Análisis) | APROBADO | 2.0 |
 | [DG-13](#dg-13--modelo-lógico-de-la-arquitectura-traceflow-scm) | Modelo Lógico de la Arquitectura TraceFlow SCM | Componentes / Arquitectura Física | PENDIENTE (SAD) | 1.0 |
+| [DG-SAD-A01](#dg-sad-a01--contexto-arquitectónico-de-traceflow-scm-fase-de-análisis) | Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis) | Contexto / Arquitectura Conceptual | APROBADO | 1.0 |
+| [DG-SAD-A02](#dg-sad-a02--arquitectura-lógica-conceptual-de-traceflow-scm) | Arquitectura Lógica Conceptual de TraceFlow SCM | Paquetes / Arquitectura Conceptual | APROBADO | 1.0 |
 
 ---
 
@@ -4224,3 +4226,170 @@ RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
 - **RN relacionadas:** RN-01 a RN-09  
 - **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.  
 - **Dictamen de Auditoría de Cierre de Análisis:** El diagrama `DG-13` incorpora especificaciones físicas de implementación (SPA React, Backend API REST Node.js/TypeScript, controladores técnicos, motor de base de datos PostgreSQL, caché Redis y almacenamiento S3/Supabase Storage) que corresponden propiamente a la fase de **DISEÑO** según `docs/DOCUMENTATION_RULES.md` Sección 7, 8 y 12. Para la fase de **ANÁLISIS**, la descomposición modular y la estructuración del sistema quedan formalmente cubiertas por el **Diagrama de Paquetes Arquitecturales (`DG-04`)** y los **31 Diagramas de Análisis de Objetos (`DG-AO`)**. Se conserva la especificación de `DG-13` como entrada técnica directa para la construcción del futuro Documento de Arquitectura de Software (SAD).
+
+---
+
+# Diagramas del Documento de Arquitectura de Software (SAD - Fase de Análisis)
+
+### DG-SAD-A01 — Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)
+- **ID:** DG-SAD-A01  
+- **Nombre:** Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)  
+- **Tipo:** Contexto / Arquitectura Conceptual  
+- **Estado:** APROBADO  
+- **Versión:** 1.0  
+- **RF relacionados:** RF-01 a RF-18  
+- **RN relacionadas:** RN-01 a RN-09  
+- **CU relacionados:** CU-01 a CU-30, CU-04.1  
+- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 3.  
+- **Descripción:** Modela la frontera del sistema TraceFlow SCM y su interacción conceptual con los 7 actores canónicos de la organización, estableciendo con rigor que TraceFlow SCM es el sistema bajo estudio y no un actor externo.
+
+```plantuml
+@startuml DG-SAD-A01
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SAD-A01: Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)</b>
+
+actor "Solicitante" as ACT_SOL
+actor "Analista de Requerimientos\n/ Gestor" as ACT_ANA
+actor "Arquitecto\n/ Especialista Técnico" as ACT_ARQ
+actor "Comité de Control\nde Cambios (CCB)" as ACT_CCB
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT_ADM
+actor "Ingeniero de Software\n/ Desarrollador" as ACT_DEV
+actor "Equipo de Calidad\n/ Testing" as ACT_QA
+
+rectangle "TraceFlow SCM\n(Sistema de Gestión de Configuración de Software)" as SYS #E8F0FE {
+    rectangle "Gobernanza y Control de Acceso" as SUB_GOB
+    rectangle "Gestión de Proyectos y ECS" as SUB_PROJ
+    rectangle "Control de Cambios (RFC / ECN)" as SUB_CHG
+    rectangle "Gestión de Bibliotecas y Versionamiento" as SUB_LIB
+    rectangle "Implementación, QA y Aceptación (UAT)" as SUB_QA
+    rectangle "Trazabilidad, Auditoría y Reportes" as SUB_AUD
+}
+
+' Interacciones de Actores Canónicos
+ACT_SOL --> SUB_CHG : "Registra RFC y subsana datos (CU-04, CU-04.1)"
+ACT_SOL --> SUB_QA : "Valida aceptación funcional UAT (CU-29)"
+ACT_SOL --> SUB_AUD : "Registra incidencias y consulta estado (CU-23, CU-24)"
+
+ACT_ANA --> SUB_PROJ : "Crea y administra proyectos (CU-02, CU-03)"
+ACT_ANA --> SUB_CHG : "Valida y clasifica solicitudes (CU-05)"
+ACT_ANA --> SUB_CHG : "Co-autoriza Cambios Menores bajo autoridad delegada (CU-30)"
+ACT_ANA --> SUB_AUD : "Deriva incidencias a RFC (CU-25)"
+
+ACT_ARQ --> SUB_PROJ : "Registra y clasifica nuevos ECS (CU-09)"
+ACT_ARQ --> SUB_CHG : "Realiza análisis de impacto técnico (CU-06)"
+ACT_ARQ --> SUB_CHG : "Co-autoriza Cambios Menores bajo autoridad delegada (CU-30)"
+
+ACT_CCB --> SUB_CHG : "Evalúa y aprueba/rechaza Cambios Mayores (CU-07)"
+ACT_CCB --> SUB_CHG : "Emite Órdenes de Cambio mayores ECN/ECO (CU-08)"
+ACT_CCB --> SUB_AUD : "Audita acciones y trazabilidad integral (CU-27)"
+
+ACT_ADM --> SUB_GOB : "Gestiona usuarios, roles y permisos RBAC (CU-01)"
+ACT_ADM --> SUB_LIB : "Opera Check-Out y Check-In entre bibliotecas (CU-10, CU-12)"
+ACT_ADM --> SUB_LIB : "Aplica y libera bloqueos de sincronización (CU-11)"
+ACT_ADM --> SUB_LIB : "Congela Líneas Base y ejecuta Rollback (CU-20, CU-21, CU-22)"
+ACT_ADM --> SUB_AUD : "Valida integridad SHA-256 y genera reportes (CU-26, CU-28)"
+
+ACT_DEV --> SUB_QA : "Implementa cambios autorizados en Trabajo (CU-14)"
+ACT_DEV --> SUB_QA : "Ejecuta pruebas unitarias locales (CU-15)"
+
+ACT_QA --> SUB_QA : "Ejecuta pruebas de integración (CU-16)"
+ACT_QA --> SUB_QA : "Certifica conformidad del cambio (CU-17)"
+ACT_QA --> SUB_QA : "Reporta no conformidades y re-testea (CU-18, CU-19)"
+
+@enduml
+```
+
+### DG-SAD-A02 — Arquitectura Lógica Conceptual de TraceFlow SCM
+- **ID:** DG-SAD-A02  
+- **Nombre:** Arquitectura Lógica Conceptual de TraceFlow SCM  
+- **Tipo:** Paquetes / Dependencias Arquitectónicas Conceptuales  
+- **Estado:** APROBADO  
+- **Versión:** 1.0  
+- **RF relacionados:** RF-01 a RF-18  
+- **RN relacionadas:** RN-01 a RN-09  
+- **CU relacionados:** CU-01 a CU-30, CU-04.1  
+- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 4.  
+- **Descripción:** Representa los 9 módulos conceptuales del sistema, sus responsabilidades delimitadas y las relaciones de dependencia lógica y colaboración conceptual unidireccionales que garantizan alta cohesión y bajo acoplamiento.
+
+```plantuml
+@startuml DG-SAD-A02
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-SAD-A02: Arquitectura Lógica Conceptual de TraceFlow SCM</b>
+
+package "MOD-01: Gobernanza y Control de Acceso" as M_GOB #F8F9FA {
+    class "Control de Identidad y Roles" as C_GOB <<boundary>>
+}
+
+package "MOD-02: Gestión de Proyectos" as M_PROJ #F8F9FA {
+    class "Administración de Proyectos" as C_PROJ <<control>>
+}
+
+package "MOD-03: Gestión de Configuración (Identificación de ECS)" as M_ECS #F8F9FA {
+    class "Catálogo e Inventario de ECS" as C_ECS <<entity>>
+}
+
+package "MOD-04: Control de Cambios (RFC / ECN)" as M_CHG #F8F9FA {
+    class "Gestión de RFC y Órdenes ECN" as C_CHG <<control>>
+}
+
+package "MOD-05: Gestión de Bibliotecas y Versionamiento" as M_LIB #F8F9FA {
+    class "Custodia y Versionado en 3 Bibliotecas" as C_LIB <<control>>
+}
+
+package "MOD-06: Implementación y Validación de Calidad" as M_QA #F8F9FA {
+    class "Verificación, Pruebas y UAT" as C_QA <<control>>
+}
+
+package "MOD-07: Líneas Base y Reversión" as M_BASE #F8F9FA {
+    class "Congelamiento y Rollback" as C_BASE <<control>>
+}
+
+package "MOD-08: Soporte y Gestión de Incidencias" as M_INC #F8F9FA {
+    class "Mesa de Incidencias y Escalamiento" as C_INC <<control>>
+}
+
+package "MOD-09: Trazabilidad, Auditoría y Reportes" as M_AUD #F8F9FA {
+    class "Status Accounting y Auditoría Inmutable" as C_AUD <<control>>
+}
+
+' Relaciones de dependencia y colaboración conceptual
+M_GOB ..> M_PROJ : "restringe acceso por rol"
+M_GOB ..> M_CHG : "valida privilegios de autorización"
+M_GOB ..> M_LIB : "autoriza operaciones de biblioteca"
+
+M_PROJ --> M_ECS : "delimita catálogo de"
+M_PROJ --> M_BASE : "define hitos de línea base en"
+
+M_INC --> M_CHG : "deriva incidentes a RFC"
+M_INC ..> M_ECS : "identifica ítem con falla"
+
+M_CHG --> M_ECS : "evalúa impacto sobre"
+M_CHG --> M_LIB : "emite ECN habilitando Check-Out"
+M_CHG --> M_QA : "notifica orden autorizada para implementación"
+
+M_LIB --> M_ECS : "custodia versiones de"
+M_LIB --> M_QA : "provee copia en Trabajo / recibe copia certificada"
+M_LIB --> M_BASE : "suministra versiones aprobadas para congelar"
+
+M_QA --> M_LIB : "exige certificación previa a Check-In"
+M_QA --> M_BASE : "dispara protocolo de rollback ante fallo no subsanado"
+
+M_BASE --> M_LIB : "inmoviliza versiones en Biblioteca Maestra"
+
+M_AUD <-- M_GOB : "audita autenticación y RBAC"
+M_AUD <-- M_CHG : "traza ciclo de vida de RFC y ECN"
+M_AUD <-- M_LIB : "registra Check-Out/In y bloqueos"
+M_AUD <-- M_QA : "asienta certificaciones y dictámenes UAT"
+M_AUD <-- M_BASE : "registra congelamientos y reversiones"
+
+@enduml
+```
+

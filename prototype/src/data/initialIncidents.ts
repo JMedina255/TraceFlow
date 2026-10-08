@@ -1,0 +1,48 @@
+import type { Incident } from '../types';
+
+export const INITIAL_INCIDENTS: Incident[] = [
+  {
+    id: 'INC-2026-0001',
+    code: 'INC-2026-0001',
+    projectId: 'PRJ-001',
+    projectName: 'Pasarela de Pagos Core',
+    reportedByUserId: 'USR-004',
+    reportedByUserName: 'Renzo Fernando Loyola Vilca Choque',
+    title: 'Fallo de autenticación por incompatibilidad de hash en sesiones concurrentes',
+    description: 'Usuarios finales reportan cierre forzado de sesión tras múltiples consultas simultáneas.',
+    priority: 'ALTA',
+    status: 'DERIVADA_A_RFC',
+    derivedRfcId: 'RFC-2026-0001', // Trazabilidad con CU-25
+    derivedRfcCode: 'RFC-2026-0001',
+    createdAt: '2026-09-07T14:20:00Z',
+    updatedAt: '2026-09-08T09:00:00Z',
+  },
+  {
+    id: 'INC-2026-0002',
+    code: 'INC-2026-0002',
+    projectId: 'PRJ-001',
+    projectName: 'Pasarela de Pagos Core',
+    reportedByUserId: 'USR-001',
+    reportedByUserName: 'Joan Cristian Medina Quispe',
+    title: 'Discrepancia en decimales en reporte de conciliación nocturna',
+    description: 'El total de comisiones presenta una diferencia de S/. 0.02 respecto al extracto del switch bancario.',
+    priority: 'MEDIA',
+    status: 'EN_ANALISIS',
+    createdAt: '2026-10-04T18:00:00Z',
+    updatedAt: '2026-10-05T09:30:00Z',
+  },
+  {
+    id: 'INC-2026-0003',
+    code: 'INC-2026-0003',
+    projectId: 'PRJ-002',
+    projectName: 'Portal Autoservicio Clientes',
+    reportedByUserId: 'USR-004',
+    reportedByUserName: 'Renzo Fernando Loyola Vilca Choque',
+    title: 'Desborde visual en visualización de pólizas en pantallas de 1366x768',
+    description: 'La tabla de coberturas no habilita desplazamiento horizontal en resoluciones intermedias.',
+    priority: 'BAJA',
+    status: 'ABIERTA',
+    createdAt: '2026-10-06T16:45:00Z',
+    updatedAt: '2026-10-06T16:45:00Z',
+  },
+];

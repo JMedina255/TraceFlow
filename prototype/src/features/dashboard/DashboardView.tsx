@@ -76,7 +76,7 @@ export const DashboardView: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Fase IV — Motor de Simulación y Datos Mock</span>
+            <span>Fase V — CU-04 Registro de Solicitud de Cambio (RFC)</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
             Bienvenido, {currentUser?.fullName}

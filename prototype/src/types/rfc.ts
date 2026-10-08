@@ -23,6 +23,8 @@ export type ChangeClassification = 'CAMBIO_MENOR' | 'CAMBIO_MAYOR';
 
 export type Priority = 'BAJA' | 'MEDIA' | 'ALTA' | 'CRITICA';
 
+export type ChangeCategory = 'CORRECTIVO' | 'ADAPTATIVO' | 'PERFECTIVO';
+
 export interface RFCStatusMetadata {
   status: RFCStatus;
   label: string;
@@ -161,6 +163,8 @@ export interface RFC {
   description: string;
   justification: string;
   priority: Priority;
+  category?: ChangeCategory;
+  proposedSolution?: string;
   affectedEcsId: string;
   affectedEcsName: string;
   status: RFCStatus;
@@ -170,7 +174,20 @@ export interface RFC {
   cancellationReason?: string;
   technicalImpact?: TechnicalImpactAssessment;
   ecnId?: string;
+  attachments?: string[];
   createdAt: string;
   updatedAt: string;
   closedAt?: string;
+}
+
+export interface CreateRfcDTO {
+  projectId: string;
+  title: string;
+  description: string;
+  justification: string;
+  proposedSolution?: string;
+  priority: Priority;
+  category: ChangeCategory;
+  affectedEcsId: string;
+  attachments?: string[];
 }

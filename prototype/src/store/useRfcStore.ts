@@ -1,13 +1,15 @@
 import { create } from 'zustand';
-import type { RFC } from '../types';
+import type { RFC, CreateRfcDTO, User } from '../types';
 import { INITIAL_RFCS } from '../data/initialRfcs';
 import { storageService } from '../services/storage.service';
+import { rfcService } from '../services/rfc.service';
 
 interface RfcState {
   rfcs: RFC[];
   getRfcsByProject: (projectId: string) => RFC[];
   getRfcById: (rfcId: string) => RFC | undefined;
   reloadRfcs: () => void;
+  createRfc: (dto: CreateRfcDTO, user: User) => RFC;
 }
 
 const STORAGE_KEY_RFCS = 'rfcs';
@@ -30,4 +32,11 @@ export const useRfcStore = create<RfcState>((set, get) => ({
   reloadRfcs: () => {
     set({ rfcs: loadRfcs() });
   },
+
+  createRfc: (dto: CreateRfcDTO, user: User) => {
+    const newRfc = rfcService.create(dto, user);
+    set((state) => ({ rfcs: [newRfc, ...state.rfcs] }));
+    return newRfc;
+  },
 }));
+

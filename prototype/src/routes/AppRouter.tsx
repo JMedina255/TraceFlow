@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { LoginView } from '../features/auth/LoginView';
 import { DashboardView } from '../features/dashboard/DashboardView';
+import { RfcCreateView } from '../features/rfcs/RfcCreateView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -56,17 +57,8 @@ export const AppRouter: React.FC = () => {
               />
             }
           />
-          <Route
-            path="/rfcs/new"
-            element={
-              <ScreenPlaceholder
-                meta={ROUTES_METADATA['/rfcs/new']}
-                relatedRoutes={[
-                  { label: 'Volver a Bandeja de Solicitudes', path: '/rfcs' },
-                ]}
-              />
-            }
-          />
+          <Route path="/rfcs/new" element={<RfcCreateView />} />
+
           <Route
             path="/rfcs/:rfcId"
             element={

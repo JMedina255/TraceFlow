@@ -10,13 +10,13 @@ export const Breadcrumb: React.FC = () => {
   // Si estamos en la raíz o dashboard, breadcrumb simple
   if (pathname === '/' || pathname === '/dashboard') {
     return (
-      <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-400 py-1">
-        <span className="flex items-center gap-1.5 font-medium text-slate-300">
-          <Home className="w-3.5 h-3.5 text-indigo-400" />
+      <nav aria-label="Breadcrumb" className="flex items-center text-xs text-upt-muted py-1">
+        <span className="flex items-center gap-1.5 font-medium text-upt-text-secondary">
+          <Home className="w-3.5 h-3.5 text-upt-secondary" />
           <span>Inicio</span>
         </span>
-        <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-slate-600" />
-        <span className="text-slate-100 font-semibold">Dashboard</span>
+        <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-upt-muted/70" />
+        <span className="text-upt-primary font-semibold">Dashboard</span>
       </nav>
     );
   }
@@ -55,26 +55,26 @@ export const Breadcrumb: React.FC = () => {
   });
 
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center flex-wrap text-xs text-slate-400 py-1">
+    <nav aria-label="Breadcrumb" className="flex items-center flex-wrap text-xs text-upt-muted py-1">
       <Link
         to="/dashboard"
-        className="flex items-center gap-1.5 hover:text-indigo-300 transition-colors"
+        className="flex items-center gap-1.5 text-upt-text-secondary hover:text-upt-bright transition-colors"
       >
-        <Home className="w-3.5 h-3.5 text-indigo-400" />
+        <Home className="w-3.5 h-3.5 text-upt-secondary" />
         <span>Inicio</span>
       </Link>
 
       {breadcrumbs.map((crumb) => (
         <React.Fragment key={crumb.path}>
-          <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-slate-600 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-upt-muted/70 shrink-0" />
           {crumb.isLast ? (
-            <span className="text-slate-100 font-semibold truncate max-w-xs" aria-current="page">
+            <span className="text-upt-primary font-semibold truncate max-w-xs" aria-current="page">
               {crumb.label}
             </span>
           ) : (
             <Link
               to={crumb.path}
-              className="hover:text-indigo-300 transition-colors truncate max-w-xs"
+              className="text-upt-text-secondary hover:text-upt-bright transition-colors truncate max-w-xs"
             >
               {crumb.label}
             </Link>

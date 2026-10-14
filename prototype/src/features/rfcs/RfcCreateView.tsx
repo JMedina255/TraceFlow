@@ -268,36 +268,36 @@ export const RfcCreateView: React.FC = () => {
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Toast de Guardado de Borrador */}
       {draftSavedToast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-emerald-950 border border-emerald-600 text-emerald-200 px-4 py-3 rounded-xl shadow-lg animate-in fade-in slide-in-from-bottom-2">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-900 px-4 py-3 rounded-xl shadow-xl animate-in fade-in slide-in-from-bottom-2">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           <span className="text-xs font-medium">Borrador guardado exitosamente en este navegador.</span>
         </div>
       )}
 
       {/* Encabezado Principal y Badges Normativos */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-upt-border pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-blue-50 text-upt-primary border border-blue-200">
               CU-04 / RF-04
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-text-secondary border border-upt-border">
               SCREEN-07 / WF-07
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-800 text-slate-400 border border-slate-700">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-muted border border-upt-border">
               Patrón PRES-06
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/80">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200">
               Correlativo Proyectado: {nextRfcCodePreview}
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-400" />
+          <h1 className="text-2xl font-bold tracking-tight text-upt-primary flex items-center gap-2">
+            <FileText className="w-6 h-6 text-upt-secondary" />
             Registro de Solicitud de Cambio (RFC)
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-upt-muted mt-1 max-w-3xl">
             Formalización de necesidad de cambio sobre Elementos de Configuración de Software (ECS) del proyecto. 
-            El envío transiciona automáticamente al estado inicial oficial <strong className="text-slate-200">REGISTRADA</strong>.
+            El envío transiciona automáticamente al estado inicial oficial <strong className="text-upt-text font-semibold">REGISTRADA</strong>.
           </p>
         </div>
 
@@ -305,17 +305,17 @@ export const RfcCreateView: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowDiscardModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-xs text-slate-300 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-upt-border bg-white hover:bg-upt-bg/60 text-xs text-upt-text-secondary transition-colors cursor-pointer shadow-xs"
           >
-            <X className="w-3.5 h-3.5 text-slate-400" />
+            <X className="w-3.5 h-3.5 text-upt-muted" />
             <span>Cancelar</span>
           </button>
           <button
             type="button"
             onClick={handleSaveDraft}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-xs text-slate-300 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-upt-border bg-white hover:bg-upt-bg/60 text-xs text-upt-text-secondary transition-colors cursor-pointer shadow-xs"
           >
-            <Save className="w-3.5 h-3.5 text-slate-400" />
+            <Save className="w-3.5 h-3.5 text-upt-muted" />
             <span>Guardar Borrador</span>
           </button>
         </div>
@@ -323,28 +323,28 @@ export const RfcCreateView: React.FC = () => {
 
       {/* Alerta de Segregación de Funciones (SoD) si el rol NO es Solicitante PU-01 */}
       {!isAuthorized && (
-        <div className="bg-amber-950/30 border border-amber-600/50 rounded-2xl p-5 shadow-sm space-y-3">
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5 shadow-xs space-y-3">
           <div className="flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <h2 className="text-sm font-semibold text-amber-200">
+              <h2 className="text-sm font-semibold text-amber-900">
                 Restricción de Segregación de Funciones (SoD / RBAC)
               </h2>
-              <p className="text-xs text-amber-300/90 leading-relaxed">
-                El caso de uso <strong className="text-white">CU-04: Registrar Solicitud de Cambio</strong> está reservado exclusivamente al rol{' '}
-                <strong className="text-white">Solicitante (PU-01)</strong> conforme a la gobernanza oficial de TraceFlow SCM (FD03 §TB-09 / DG-05). 
-                Actualmente estás operando como <strong className="text-white">{currentUser.fullName}</strong> con el rol{' '}
-                <strong className="text-white">{currentUser.roleLabel} ({activeRoleId})</strong>.
+              <p className="text-xs text-amber-800 leading-relaxed">
+                El caso de uso <strong className="text-amber-950 font-bold">CU-04: Registrar Solicitud de Cambio</strong> está reservado exclusivamente al rol{' '}
+                <strong className="text-amber-950 font-bold">Solicitante (PU-01)</strong> conforme a la gobernanza oficial de TraceFlow SCM (FD03 §TB-09 / DG-05). 
+                Actualmente estás operando como <strong className="text-amber-950 font-bold">{currentUser.fullName}</strong> con el rol{' '}
+                <strong className="text-amber-950 font-bold">{currentUser.roleLabel} ({activeRoleId})</strong>.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-amber-800/40">
+          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-amber-200">
             {currentUser.allowedRoleIds.includes('PU-01') ? (
               <button
                 type="button"
                 onClick={() => switchRole('PU-01')}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold text-xs transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
                 <Check className="w-4 h-4" />
                 <span>Asumir mi Rol Solicitante (PU-01)</span>
@@ -357,13 +357,13 @@ export const RfcCreateView: React.FC = () => {
                   switchUser('USR-001');
                   switchRole('PU-01');
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold text-xs transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
                 <Check className="w-4 h-4" />
                 <span>Cambiar a Usuario Demo con Rol Solicitante (PU-01)</span>
               </button>
             )}
-            <span className="text-[11px] text-amber-400/80">
+            <span className="text-[11px] text-amber-800/90 font-medium">
               * El servicio y el formulario bloquearán el envío hasta que actives el rol Solicitante.
             </span>
           </div>
@@ -371,7 +371,7 @@ export const RfcCreateView: React.FC = () => {
       )}
 
       {/* Barra de Progreso del Wizard (Paso 1 a 4) - PRES-06 */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+      <div className="bg-upt-surface border border-upt-border rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {[
             { step: 1, label: '1. Información General', desc: 'Proyecto, Título y Criticidad' },
@@ -390,30 +390,30 @@ export const RfcCreateView: React.FC = () => {
                 }}
                 className={`p-3 rounded-xl border transition-all text-left ${
                   isCurrent
-                    ? 'bg-indigo-950/60 border-indigo-600 text-white shadow-sm ring-1 ring-indigo-500/20'
+                    ? 'bg-blue-50 border-upt-bright text-upt-primary shadow-xs ring-1 ring-upt-bright/30'
                     : isDone
-                    ? 'bg-slate-900/80 border-slate-700/80 text-slate-300 cursor-pointer hover:bg-slate-800/50'
-                    : 'bg-slate-950/40 border-slate-800/80 text-slate-500 cursor-not-allowed opacity-75'
+                    ? 'bg-emerald-50/60 border-emerald-200 text-upt-text cursor-pointer hover:bg-emerald-50'
+                    : 'bg-upt-bg border-upt-border text-upt-muted cursor-not-allowed opacity-75'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-mono ${
                       isDone
-                        ? 'bg-emerald-600 text-white'
+                        ? 'bg-upt-success text-white'
                         : isCurrent
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-slate-800 text-slate-500'
+                        ? 'bg-upt-bright text-white'
+                        : 'bg-upt-border text-upt-muted'
                     }`}
                   >
                     {isDone ? <Check className="w-3.5 h-3.5" /> : item.step}
                   </span>
-                  <span className="text-[10px] font-mono text-slate-500">
+                  <span className="text-[10px] font-mono text-upt-muted">
                     Paso {item.step}/4
                   </span>
                 </div>
-                <div className="text-xs font-semibold truncate">{item.label}</div>
-                <div className="text-[11px] text-slate-400 truncate">{item.desc}</div>
+                <div className="text-xs font-semibold truncate text-upt-text">{item.label}</div>
+                <div className="text-[11px] text-upt-muted truncate">{item.desc}</div>
               </div>
             );
           })}
@@ -422,37 +422,37 @@ export const RfcCreateView: React.FC = () => {
 
       {/* Mensaje de Error de Envío General */}
       {submitError && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-700/60 text-red-200 text-xs flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-upt-error text-xs flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-upt-error shrink-0 mt-0.5" />
           <div>
-            <div className="font-semibold text-red-300">No se pudo procesar la Solicitud de Cambio</div>
+            <div className="font-semibold text-red-900">No se pudo procesar la Solicitud de Cambio</div>
             <div>{submitError}</div>
           </div>
         </div>
       )}
 
       {/* Contenedor del Formulario Activo */}
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <form onSubmit={handleSubmit} className="bg-upt-surface border border-upt-border rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
         
         {/* ========================================================================= */}
         {/* PASO 1: INFORMACIÓN GENERAL */}
         {/* ========================================================================= */}
         {currentStep === 1 && (
           <div className="space-y-6 animate-in fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-indigo-400" />
+            <div className="border-b border-upt-border pb-4">
+              <h2 className="text-lg font-bold text-upt-primary flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-upt-secondary" />
                 Paso 1: Información General de la Solicitud
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-upt-muted mt-1">
                 Indica el proyecto asignado, el título conciso del requerimiento y su categorización inicial.
               </p>
             </div>
 
             {/* Selector de Proyecto */}
             <div className="space-y-2">
-              <label htmlFor="project-select" className="block text-xs font-semibold text-slate-300">
-                Proyecto de Software Asignado <span className="text-red-400">*</span>
+              <label htmlFor="project-select" className="block text-xs font-semibold text-upt-text">
+                Proyecto de Software Asignado <span className="text-upt-error">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {projects.map((proj) => {
@@ -463,32 +463,32 @@ export const RfcCreateView: React.FC = () => {
                       onClick={() => handleProjectSelect(proj.id)}
                       className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-indigo-950/60 border-indigo-600 text-white shadow-sm ring-1 ring-indigo-500/20'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          ? 'bg-blue-50 border-upt-bright text-upt-primary shadow-xs ring-1 ring-upt-bright/30'
+                          : 'bg-white border-upt-border text-upt-text-secondary hover:border-upt-bright/50 hover:bg-upt-bg'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-mono text-xs font-bold text-indigo-400">{proj.code}</span>
-                        {isSelected && <Check className="w-4 h-4 text-indigo-400" />}
+                        <span className="font-mono text-xs font-bold text-upt-primary">{proj.code}</span>
+                        {isSelected && <Check className="w-4 h-4 text-upt-bright" />}
                       </div>
-                      <div className="text-xs font-semibold text-white truncate">{proj.name}</div>
-                      <div className="text-[11px] text-slate-500 mt-1">Cliente: {proj.client}</div>
+                      <div className="text-xs font-semibold text-upt-text truncate">{proj.name}</div>
+                      <div className="text-[11px] text-upt-muted mt-1">Cliente: {proj.client}</div>
                     </div>
                   );
                 })}
               </div>
               {fieldErrors.projectId && (
-                <p className="text-xs text-red-400 mt-1">{fieldErrors.projectId}</p>
+                <p className="text-xs text-upt-error mt-1">{fieldErrors.projectId}</p>
               )}
             </div>
 
             {/* Título de la RFC */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="rfc-title" className="block text-xs font-semibold text-slate-300">
-                  Título de la Solicitud de Cambio <span className="text-red-400">*</span>
+                <label htmlFor="rfc-title" className="block text-xs font-semibold text-upt-text">
+                  Título de la Solicitud de Cambio <span className="text-upt-error">*</span>
                 </label>
-                <span className={`text-[11px] font-mono ${formData.title.length > 120 ? 'text-red-400' : 'text-slate-500'}`}>
+                <span className={`text-[11px] font-mono ${formData.title.length > 120 ? 'text-upt-error font-semibold' : 'text-upt-muted'}`}>
                   {formData.title.length}/120 caracteres
                 </span>
               </div>
@@ -498,12 +498,12 @@ export const RfcCreateView: React.FC = () => {
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="Ej. Actualización del protocolo de handshake TLS 1.3 en el gateway de pagos..."
-                className={`w-full px-4 py-2.5 rounded-xl bg-slate-950 border text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                  fieldErrors.title ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-800'
+                className={`w-full px-4 py-2.5 rounded-xl bg-white border text-xs sm:text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright transition-colors ${
+                  fieldErrors.title ? 'border-upt-error ring-1 ring-upt-error' : 'border-upt-border'
                 }`}
               />
               {fieldErrors.title && (
-                <p className="text-xs text-red-400">{fieldErrors.title}</p>
+                <p className="text-xs text-upt-error">{fieldErrors.title}</p>
               )}
             </div>
 
@@ -511,15 +511,15 @@ export const RfcCreateView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Prioridad Propuesta */}
               <div className="space-y-2">
-                <label htmlFor="priority-select" className="block text-xs font-semibold text-slate-300">
-                  Prioridad Propuesta por el Solicitante <span className="text-red-400">*</span>
+                <label htmlFor="priority-select" className="block text-xs font-semibold text-upt-text">
+                  Prioridad Propuesta por el Solicitante <span className="text-upt-error">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: 'BAJA', label: 'Baja', color: 'border-slate-700 text-slate-300' },
-                    { value: 'MEDIA', label: 'Media', color: 'border-blue-700/60 text-blue-300' },
-                    { value: 'ALTA', label: 'Alta', color: 'border-amber-700/60 text-amber-300' },
-                    { value: 'CRITICA', label: 'Crítica / Urgente', color: 'border-red-700/60 text-red-300' },
+                    { value: 'BAJA', label: 'Baja' },
+                    { value: 'MEDIA', label: 'Media' },
+                    { value: 'ALTA', label: 'Alta' },
+                    { value: 'CRITICA', label: 'Crítica / Urgente' },
                   ].map((p) => {
                     const isSelected = formData.priority === p.value;
                     return (
@@ -527,10 +527,10 @@ export const RfcCreateView: React.FC = () => {
                         key={p.value}
                         type="button"
                         onClick={() => handleInputChange('priority', p.value)}
-                        className={`px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-center ${
+                        className={`px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-center cursor-pointer ${
                           isSelected
-                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm font-semibold'
-                            : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                            ? 'bg-upt-institutional border-upt-institutional text-white shadow-sm font-semibold'
+                            : 'bg-white border-upt-border text-upt-text-secondary hover:border-upt-bright/50 hover:bg-upt-bg'
                         }`}
                       >
                         {p.label}
@@ -542,8 +542,8 @@ export const RfcCreateView: React.FC = () => {
 
               {/* Categoría de Cambio */}
               <div className="space-y-2">
-                <label htmlFor="category-select" className="block text-xs font-semibold text-slate-300">
-                  Categoría de Cambio <span className="text-red-400">*</span>
+                <label htmlFor="category-select" className="block text-xs font-semibold text-upt-text">
+                  Categoría de Cambio <span className="text-upt-error">*</span>
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
@@ -557,10 +557,10 @@ export const RfcCreateView: React.FC = () => {
                         key={c.value}
                         type="button"
                         onClick={() => handleInputChange('category', c.value)}
-                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm font-semibold'
-                            : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                            ? 'bg-upt-institutional border-upt-institutional text-white shadow-sm font-semibold'
+                            : 'bg-white border-upt-border text-upt-text-secondary hover:border-upt-bright/50 hover:bg-upt-bg'
                         }`}
                       >
                         <div className="text-xs font-semibold truncate">{c.label}</div>
@@ -579,12 +579,12 @@ export const RfcCreateView: React.FC = () => {
         {/* ========================================================================= */}
         {currentStep === 2 && (
           <div className="space-y-6 animate-in fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <FileCode2 className="w-5 h-5 text-indigo-400" />
+            <div className="border-b border-upt-border pb-4">
+              <h2 className="text-lg font-bold text-upt-primary flex items-center gap-2">
+                <FileCode2 className="w-5 h-5 text-upt-secondary" />
                 Paso 2: Justificación y Descripción Detallada
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-upt-muted mt-1">
                 Conforme a la regla de completitud del SRS (RN-01 / CU-04), la justificación y descripción deben ser sustantivas para evitar la desestimación en el filtro del Gestor.
               </p>
             </div>
@@ -592,10 +592,10 @@ export const RfcCreateView: React.FC = () => {
             {/* Descripción Detallada */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="rfc-description" className="block text-xs font-semibold text-slate-300">
-                  Descripción Detallada del Requerimiento o Falla <span className="text-red-400">*</span>
+                <label htmlFor="rfc-description" className="block text-xs font-semibold text-upt-text">
+                  Descripción Detallada del Requerimiento o Falla <span className="text-upt-error">*</span>
                 </label>
-                <span className="text-[11px] text-slate-500 font-mono">
+                <span className="text-[11px] text-upt-muted font-mono">
                   Mínimo 15 caracteres ({formData.description.trim().length} ingresados)
                 </span>
               </div>
@@ -605,22 +605,22 @@ export const RfcCreateView: React.FC = () => {
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 placeholder="Describa de manera precisa la necesidad operativa, los pasos para reproducir la falla si aplica, o la nueva funcionalidad esperada en el sistema..."
-                className={`w-full px-4 py-3 rounded-xl bg-slate-950 border text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                  fieldErrors.description ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-800'
+                className={`w-full px-4 py-3 rounded-xl bg-white border text-xs sm:text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright transition-colors ${
+                  fieldErrors.description ? 'border-upt-error ring-1 ring-upt-error' : 'border-upt-border'
                 }`}
               />
               {fieldErrors.description && (
-                <p className="text-xs text-red-400">{fieldErrors.description}</p>
+                <p className="text-xs text-upt-error">{fieldErrors.description}</p>
               )}
             </div>
 
             {/* Justificación de Negocio */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="rfc-justification" className="block text-xs font-semibold text-slate-300">
-                  Justificación de Negocio / Valor Agregado <span className="text-red-400">*</span>
+                <label htmlFor="rfc-justification" className="block text-xs font-semibold text-upt-text">
+                  Justificación de Negocio / Valor Agregado <span className="text-upt-error">*</span>
                 </label>
-                <span className="text-[11px] text-slate-500 font-mono">
+                <span className="text-[11px] text-upt-muted font-mono">
                   Mínimo 15 caracteres ({formData.justification.trim().length} ingresados)
                 </span>
               </div>
@@ -630,22 +630,22 @@ export const RfcCreateView: React.FC = () => {
                 value={formData.justification}
                 onChange={(e) => handleInputChange('justification', e.target.value)}
                 placeholder="Explique el impacto de no implementar el cambio (riesgo operativo, multas, interrupción de servicio) y el beneficio concreto para el negocio..."
-                className={`w-full px-4 py-3 rounded-xl bg-slate-950 border text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                  fieldErrors.justification ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-800'
+                className={`w-full px-4 py-3 rounded-xl bg-white border text-xs sm:text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright transition-colors ${
+                  fieldErrors.justification ? 'border-upt-error ring-1 ring-upt-error' : 'border-upt-border'
                 }`}
               />
               {fieldErrors.justification && (
-                <p className="text-xs text-red-400">{fieldErrors.justification}</p>
+                <p className="text-xs text-upt-error">{fieldErrors.justification}</p>
               )}
             </div>
 
             {/* Propuesta Técnica Sugerida (Opcional) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="rfc-proposedSolution" className="block text-xs font-semibold text-slate-300">
-                  Propuesta Técnica Sugerida / Beneficio Esperado <span className="text-slate-500">(Opcional)</span>
+                <label htmlFor="rfc-proposedSolution" className="block text-xs font-semibold text-upt-text">
+                  Propuesta Técnica Sugerida / Beneficio Esperado <span className="text-upt-muted">(Opcional)</span>
                 </label>
-                <span className="text-[11px] text-slate-500">Evaluada por el Arquitecto en CU-06</span>
+                <span className="text-[11px] text-upt-muted">Evaluada por el Arquitecto en CU-06</span>
               </div>
               <textarea
                 id="rfc-proposedSolution"
@@ -653,7 +653,7 @@ export const RfcCreateView: React.FC = () => {
                 value={formData.proposedSolution}
                 onChange={(e) => handleInputChange('proposedSolution', e.target.value)}
                 placeholder="Si cuenta con una propuesta de solución o indicación técnica preliminar, detalle aquí..."
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-upt-border text-xs sm:text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright"
               />
             </div>
           </div>
@@ -664,12 +664,12 @@ export const RfcCreateView: React.FC = () => {
         {/* ========================================================================= */}
         {currentStep === 3 && (
           <div className="space-y-6 animate-in fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-400" />
+            <div className="border-b border-upt-border pb-4">
+              <h2 className="text-lg font-bold text-upt-primary flex items-center gap-2">
+                <Layers className="w-5 h-5 text-upt-secondary" />
                 Paso 3: Elemento de Configuración (ECS) y Evidencias
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-upt-muted mt-1">
                 Selecciona del catálogo activo el Elemento de Configuración de Software afectado por la solicitud y adjunta antecedentes de sustento.
               </p>
             </div>
@@ -677,16 +677,16 @@ export const RfcCreateView: React.FC = () => {
             {/* Selector de ECS */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Seleccionar ECS Afectado del Proyecto ({projectEcsList.length} disponibles) <span className="text-red-400">*</span>
+                <label className="block text-xs font-semibold text-upt-text">
+                  Seleccionar ECS Afectado del Proyecto ({projectEcsList.length} disponibles) <span className="text-upt-error">*</span>
                 </label>
-                <span className="text-[11px] text-indigo-400 font-mono">
+                <span className="text-[11px] text-upt-secondary font-mono font-medium">
                   {formData.affectedEcsId ? `Seleccionado: ${formData.affectedEcsId}` : 'Ninguno seleccionado'}
                 </span>
               </div>
 
               {projectEcsList.length === 0 ? (
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center text-slate-400 text-xs">
+                <div className="p-4 rounded-xl bg-upt-bg border border-upt-border text-center text-upt-muted text-xs">
                   No se encontraron ECS registrados para este proyecto. Contacte al Administrador SCM (CU-09).
                 </div>
               ) : (
@@ -699,35 +699,35 @@ export const RfcCreateView: React.FC = () => {
                         onClick={() => handleInputChange('affectedEcsId', ecs.id)}
                         className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-indigo-950/60 border-indigo-600 text-white shadow-sm ring-1 ring-indigo-500/20'
-                            : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                            ? 'bg-blue-50 border-upt-bright text-upt-primary shadow-xs ring-1 ring-upt-bright/30'
+                            : 'bg-white border-upt-border text-upt-text-secondary hover:border-upt-bright/50 hover:bg-upt-bg'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-mono text-xs font-bold text-indigo-300">{ecs.code}</span>
+                          <span className="font-mono text-xs font-bold text-upt-primary">{ecs.code}</span>
                           <div className="flex items-center gap-1.5">
                             <span
                               className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold ${
                                 ecs.currentLibrary === 'MAESTRA'
-                                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                   : ecs.currentLibrary === 'SOPORTE'
-                                  ? 'bg-blue-950 text-blue-300 border border-blue-800'
-                                  : 'bg-amber-950 text-amber-300 border border-amber-800'
+                                  ? 'bg-blue-50 text-upt-secondary border border-blue-200'
+                                  : 'bg-amber-50 text-amber-800 border border-amber-200'
                               }`}
                             >
                               {ecs.currentLibrary}
                             </span>
                             {ecs.lock?.isLocked && (
-                              <span className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-mono bg-red-950 text-red-300 border border-red-800" title="Bloqueado bajo RN-06">
+                              <span className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-mono bg-red-50 text-red-800 border border-red-200" title="Bloqueado bajo RN-06">
                                 <Lock className="w-2.5 h-2.5" />
                                 RN-06
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className="text-xs font-semibold text-white truncate">{ecs.name}</div>
-                        <div className="text-[11px] text-slate-500 mt-1 truncate">
-                          Versión: <span className="font-mono text-slate-400">{ecs.currentVersion}</span> &bull; Tipo: {ecs.type}
+                        <div className="text-xs font-semibold text-upt-text truncate">{ecs.name}</div>
+                        <div className="text-[11px] text-upt-muted mt-1 truncate">
+                          Versión: <span className="font-mono text-upt-text-secondary font-medium">{ecs.currentVersion}</span> &bull; Tipo: {ecs.type}
                         </div>
                       </div>
                     );
@@ -735,19 +735,19 @@ export const RfcCreateView: React.FC = () => {
                 </div>
               )}
               {fieldErrors.affectedEcsId && (
-                <p className="text-xs text-red-400">{fieldErrors.affectedEcsId}</p>
+                <p className="text-xs text-upt-error">{fieldErrors.affectedEcsId}</p>
               )}
             </div>
 
             {/* Evidencias y Documentación de Respaldo (Flujo Alternativo A1) */}
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <label className="block text-xs font-semibold text-slate-300">
+            <div className="space-y-3 pt-4 border-t border-upt-border">
+              <label className="block text-xs font-semibold text-upt-text">
                 Documentación Técnica o Probatoria de Respaldo (Flujo A1)
               </label>
               
               {/* Sugerencias Rápidas */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] text-slate-500">Archivos sugeridos para la demo:</span>
+                <span className="text-[11px] text-upt-muted">Archivos sugeridos para la demo:</span>
                 {SUGGESTED_ATTACHMENTS.map((sug) => {
                   const already = formData.attachments.includes(sug);
                   return (
@@ -758,8 +758,8 @@ export const RfcCreateView: React.FC = () => {
                       onClick={() => handleAddAttachment(sug)}
                       className={`text-[10px] font-mono px-2 py-1 rounded border transition-colors ${
                         already
-                          ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed'
-                          : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-indigo-500 hover:text-white'
+                          ? 'bg-upt-bg border-upt-border text-upt-muted/60 cursor-not-allowed'
+                          : 'bg-white border-upt-border text-upt-text-secondary hover:border-upt-bright hover:text-upt-primary cursor-pointer'
                       }`}
                     >
                       + {sug}
@@ -771,13 +771,13 @@ export const RfcCreateView: React.FC = () => {
               {/* Input personalizado */}
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Paperclip className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                  <Paperclip className="w-4 h-4 text-upt-muted absolute left-3 top-3" />
                   <input
                     type="text"
                     value={customAttachment}
                     onChange={(e) => setCustomAttachment(e.target.value)}
                     placeholder="Nombre de archivo de sustento (ej. acta_cliente_2026.pdf, log_error.txt)..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-upt-border text-xs text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -789,7 +789,7 @@ export const RfcCreateView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleAddAttachment(customAttachment)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-upt-bg hover:bg-upt-border text-upt-text border border-upt-border text-xs font-medium transition-colors cursor-pointer"
                 >
                   Adjuntar
                 </button>
@@ -801,14 +801,14 @@ export const RfcCreateView: React.FC = () => {
                   {formData.attachments.map((att) => (
                     <span
                       key={att}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/60 border border-indigo-800 text-indigo-300 text-xs font-mono"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-upt-secondary text-xs font-mono"
                     >
-                      <Paperclip className="w-3 h-3 text-indigo-400" />
+                      <Paperclip className="w-3 h-3 text-upt-secondary" />
                       <span>{att}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveAttachment(att)}
-                        className="text-indigo-400 hover:text-red-400 transition-colors ml-1"
+                        className="text-upt-muted hover:text-upt-error transition-colors ml-1 cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -825,86 +825,86 @@ export const RfcCreateView: React.FC = () => {
         {/* ========================================================================= */}
         {currentStep === 4 && (
           <div className="space-y-6 animate-in fade-in">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-indigo-400" />
+            <div className="border-b border-upt-border pb-4">
+              <h2 className="text-lg font-bold text-upt-primary flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-upt-secondary" />
                 Paso 4: Confirmación y Envío Formal de la Solicitud
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Revisa la ficha técnica antes del envío definitivo. Tras la confirmación, la solicitud quedará radicada en estado <strong className="text-slate-200">REGISTRADA</strong> y se emitirá la firma de auditoría.
+              <p className="text-xs text-upt-muted mt-1">
+                Revisa la ficha técnica antes del envío definitivo. Tras la confirmación, la solicitud quedará radicada en estado <strong className="text-upt-text font-semibold">REGISTRADA</strong> y se emitirá la firma de auditoría.
               </p>
             </div>
 
             {/* ReadOnlySummaryCard: Ficha Resumen Consolidada */}
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
-                <span className="text-xs font-semibold text-slate-400">Resumen Técnico de la Solicitud</span>
-                <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-800/80">
+            <div className="bg-upt-bg border border-upt-border rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-upt-border/80">
+                <span className="text-xs font-semibold text-upt-text-secondary">Resumen Técnico de la Solicitud</span>
+                <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
                   {nextRfcCodePreview} &bull; REGISTRADA
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
-                  <span className="text-slate-500 block">Proyecto Seleccionado:</span>
-                  <span className="font-semibold text-white">{activeProject.name} ({activeProject.code})</span>
+                  <span className="text-upt-muted block">Proyecto Seleccionado:</span>
+                  <span className="font-semibold text-upt-text">{activeProject.name} ({activeProject.code})</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Solicitante Responsable (PU-01):</span>
-                  <span className="font-semibold text-white">{currentUser.fullName} ({currentUser.email})</span>
+                  <span className="text-upt-muted block">Solicitante Responsable (PU-01):</span>
+                  <span className="font-semibold text-upt-text">{currentUser.fullName} ({currentUser.email})</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Prioridad Propuesta:</span>
-                  <span className="font-semibold text-amber-300">{formData.priority}</span>
+                  <span className="text-upt-muted block">Prioridad Propuesta:</span>
+                  <span className="font-bold text-amber-800">{formData.priority}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Categoría de Cambio:</span>
-                  <span className="font-semibold text-indigo-300">{formData.category}</span>
+                  <span className="text-upt-muted block">Categoría de Cambio:</span>
+                  <span className="font-semibold text-upt-secondary">{formData.category}</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800/80 space-y-2">
+              <div className="pt-2 border-t border-upt-border/80 space-y-2">
                 <div>
-                  <span className="text-slate-500 block text-xs">Título Formal:</span>
-                  <div className="text-xs font-bold text-white">{formData.title}</div>
+                  <span className="text-upt-muted block text-xs">Título Formal:</span>
+                  <div className="text-xs font-bold text-upt-primary">{formData.title}</div>
                 </div>
 
                 <div>
-                  <span className="text-slate-500 block text-xs">Descripción Detallada:</span>
-                  <p className="text-xs text-slate-300 whitespace-pre-line bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                  <span className="text-upt-muted block text-xs">Descripción Detallada:</span>
+                  <p className="text-xs text-upt-text whitespace-pre-line bg-white p-3 rounded-lg border border-upt-border">
                     {formData.description}
                   </p>
                 </div>
 
                 <div>
-                  <span className="text-slate-500 block text-xs">Justificación de Negocio / Valor:</span>
-                  <p className="text-xs text-slate-300 whitespace-pre-line bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                  <span className="text-upt-muted block text-xs">Justificación de Negocio / Valor:</span>
+                  <p className="text-xs text-upt-text whitespace-pre-line bg-white p-3 rounded-lg border border-upt-border">
                     {formData.justification}
                   </p>
                 </div>
 
                 {formData.proposedSolution && (
                   <div>
-                    <span className="text-slate-500 block text-xs">Solución Técnica Sugerida:</span>
-                    <p className="text-xs text-slate-300 whitespace-pre-line bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                    <span className="text-upt-muted block text-xs">Solución Técnica Sugerida:</span>
+                    <p className="text-xs text-upt-text whitespace-pre-line bg-white p-3 rounded-lg border border-upt-border">
                       {formData.proposedSolution}
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <span className="text-slate-500 block text-xs">Elemento de Configuración (ECS) Afectado:</span>
-                  <div className="text-xs font-semibold text-indigo-300 font-mono mt-1">
+                  <span className="text-upt-muted block text-xs">Elemento de Configuración (ECS) Afectado:</span>
+                  <div className="text-xs font-semibold text-upt-primary font-mono mt-1">
                     {selectedEcs ? `${selectedEcs.code} — ${selectedEcs.name} (Biblioteca: ${selectedEcs.currentLibrary}, v${selectedEcs.currentVersion})` : formData.affectedEcsId}
                   </div>
                 </div>
 
                 {formData.attachments.length > 0 && (
                   <div>
-                    <span className="text-slate-500 block text-xs">Archivos de Sustento Adjuntos ({formData.attachments.length}):</span>
+                    <span className="text-upt-muted block text-xs">Archivos de Sustento Adjuntos ({formData.attachments.length}):</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {formData.attachments.map((a) => (
-                        <span key={a} className="font-mono text-[11px] bg-slate-900 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+                        <span key={a} className="font-mono text-[11px] bg-white text-upt-text-secondary px-2 py-0.5 rounded border border-upt-border">
                           {a}
                         </span>
                       ))}
@@ -915,20 +915,20 @@ export const RfcCreateView: React.FC = () => {
             </div>
 
             {/* Checkbox de Declaración de Veracidad */}
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
+            <div className="p-4 rounded-xl bg-upt-bg border border-upt-border space-y-2">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.termsAccepted}
                   onChange={(e) => handleInputChange('termsAccepted', e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 rounded border-upt-border bg-white text-upt-institutional focus:ring-upt-bright focus:ring-offset-0 cursor-pointer"
                 />
-                <span className="text-xs text-slate-300 leading-relaxed">
+                <span className="text-xs text-upt-text-secondary leading-relaxed">
                   Declaro que la información consignada corresponde a una necesidad técnica o defecto justificado, y autorizo su tramitación formal bajo las políticas de gestión de configuración de software (IEEE 828 / TraceFlow SCM).
                 </span>
               </label>
               {fieldErrors.termsAccepted && (
-                <p className="text-xs text-red-400 pl-7">{fieldErrors.termsAccepted}</p>
+                <p className="text-xs text-upt-error pl-7">{fieldErrors.termsAccepted}</p>
               )}
             </div>
           </div>
@@ -937,13 +937,13 @@ export const RfcCreateView: React.FC = () => {
         {/* ========================================================================= */}
         {/* CONTROLES DE NAVEGACIÓN DEL WIZARD */}
         {/* ========================================================================= */}
-        <div className="flex items-center justify-between pt-6 border-t border-slate-800">
+        <div className="flex items-center justify-between pt-6 border-t border-upt-border">
           <div>
             {currentStep > 1 && (
               <button
                 type="button"
                 onClick={handlePrevious}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-upt-border bg-white hover:bg-upt-bg/60 text-xs font-semibold text-upt-text-secondary transition-colors cursor-pointer shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Paso Anterior</span>
@@ -956,7 +956,7 @@ export const RfcCreateView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm cursor-pointer"
               >
                 <span>Siguiente Paso</span>
                 <ArrowRight className="w-4 h-4" />
@@ -967,8 +967,8 @@ export const RfcCreateView: React.FC = () => {
                 disabled={!isAuthorized || !formData.termsAccepted}
                 className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md ${
                   isAuthorized && formData.termsAccepted
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-                    : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                    ? 'bg-upt-success hover:bg-emerald-700 text-white cursor-pointer'
+                    : 'bg-upt-bg text-upt-muted/60 cursor-not-allowed border border-upt-border'
                 }`}
               >
                 <Send className="w-4 h-4" />
@@ -983,49 +983,49 @@ export const RfcCreateView: React.FC = () => {
       {/* MODAL DE ÉXITO Y EXPEDIENTE CREADO */}
       {/* ========================================================================= */}
       {createdRfc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-upt-text/50 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-full bg-emerald-950 border border-emerald-600/80 text-emerald-400 mx-auto flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 mx-auto flex items-center justify-center">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-upt-primary">
                 ¡Solicitud de Cambio Registrada Exitosamente!
               </h3>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                La solicitud ha sido catalogada formalmente en el sistema y ha ingresado al ciclo de vida en estado oficial <strong className="text-slate-200">REGISTRADA</strong>.
+              <p className="text-xs text-upt-muted max-w-md mx-auto">
+                La solicitud ha sido catalogada formalmente en el sistema y ha ingresado al ciclo de vida en estado oficial <strong className="text-upt-text font-semibold">REGISTRADA</strong>.
               </p>
             </div>
 
             {/* Ficha de Comprobante */}
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 font-mono text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="text-slate-500">Código de Expediente:</span>
-                <span className="font-bold text-emerald-400 text-sm">{createdRfc.code}</span>
+            <div className="bg-upt-bg border border-upt-border rounded-xl p-4 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-upt-border/80 pb-2">
+                <span className="text-upt-muted">Código de Expediente:</span>
+                <span className="font-bold text-emerald-700 text-sm">{createdRfc.code}</span>
               </div>
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="text-slate-500">Estado Oficial (TB-07):</span>
-                <span className="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">
+              <div className="flex items-center justify-between border-b border-upt-border/80 pb-2">
+                <span className="text-upt-muted">Estado Oficial (TB-07):</span>
+                <span className="px-2 py-0.5 rounded text-[11px] bg-blue-50 text-upt-secondary border border-blue-200 font-semibold">
                   {createdRfc.status}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="text-slate-500">Proyecto Afectado:</span>
-                <span className="text-white truncate max-w-[240px]">{createdRfc.projectName}</span>
+              <div className="flex items-center justify-between border-b border-upt-border/80 pb-2">
+                <span className="text-upt-muted">Proyecto Afectado:</span>
+                <span className="text-upt-text truncate max-w-[240px]">{createdRfc.projectName}</span>
               </div>
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="text-slate-500">ECS Vinculado:</span>
-                <span className="text-indigo-300 truncate max-w-[240px]">{createdRfc.affectedEcsName}</span>
+              <div className="flex items-center justify-between border-b border-upt-border/80 pb-2">
+                <span className="text-upt-muted">ECS Vinculado:</span>
+                <span className="text-upt-primary font-semibold truncate max-w-[240px]">{createdRfc.affectedEcsName}</span>
               </div>
               <div className="flex items-center justify-between pt-1">
-                <span className="text-slate-500">Fecha de Radicación:</span>
-                <span className="text-slate-400">{new Date(createdRfc.createdAt).toLocaleString()}</span>
+                <span className="text-upt-muted">Fecha de Radicación:</span>
+                <span className="text-upt-text-secondary">{new Date(createdRfc.createdAt).toLocaleString()}</span>
               </div>
             </div>
 
             {/* Aviso de Trazabilidad e Integridad */}
-            <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-800/60 text-[11px] text-indigo-300 flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-[11px] text-upt-text-secondary flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-upt-secondary shrink-0 mt-0.5" />
               <div>
                 <strong>Trazabilidad y Notificaciones:</strong> Se ha emitido la firma de auditoría forense con hash SHA-256 y se ha puesto a disposición del <strong>Analista de Requerimientos / Gestor (PU-02)</strong> para su validación de completitud y clasificación (CU-05).
               </div>
@@ -1035,21 +1035,21 @@ export const RfcCreateView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <Link
                 to={`/rfcs/${createdRfc.id}`}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Ver Expediente</span>
               </Link>
               <Link
                 to="/dashboard"
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs"
               >
                 <span>Ir al Dashboard</span>
               </Link>
               <button
                 type="button"
                 onClick={handleResetForm}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs cursor-pointer"
               >
                 <span>Registrar Otra</span>
               </button>
@@ -1062,27 +1062,27 @@ export const RfcCreateView: React.FC = () => {
       {/* MODAL DE CONFIRMACIÓN DE DESCARTE (Flujo Alternativo A2) */}
       {/* ========================================================================= */}
       {showDiscardModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-amber-400">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-upt-text/50 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-amber-700">
               <AlertTriangle className="w-6 h-6" />
-              <h3 className="text-base font-bold text-white">¿Descartar registro de solicitud?</h3>
+              <h3 className="text-base font-bold text-upt-primary">¿Descartar registro de solicitud?</h3>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-upt-text-secondary leading-relaxed">
               Conforme al flujo alternativo A2 del SRS, si cancelas el registro los datos no guardados se perderán y no se emitirá ninguna transacción en el catálogo ni en auditoría.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setShowDiscardModal(false)}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors"
+                className="px-4 py-2 rounded-lg bg-white hover:bg-upt-bg/60 text-upt-text border border-upt-border text-xs font-medium transition-colors cursor-pointer shadow-xs"
               >
                 Continuar editando
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
-                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors"
+                className="px-4 py-2 rounded-lg bg-upt-error hover:bg-red-700 text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
               >
                 Sí, descartar y salir
               </button>

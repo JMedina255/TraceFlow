@@ -1,0 +1,48 @@
+{
+  "name": "TraceFlow SCM - UPT Inspired Theme",
+  "version": "1.0.0",
+  "description": "Tokens de diseño del tema claro institucional inspirado en la paleta UPT para TraceFlow SCM",
+  "palette": {
+    "primary": "#0E3167",
+    "institutional": "#2D366F",
+    "secondary": "#1E4686",
+    "brightBlue": "#3267BE",
+    "gold": "#9F7C3A",
+    "yellow": "#FECE22",
+    "pageBackground": "#F3F4F6",
+    "surface": "#FFFFFF",
+    "primaryText": "#111D39",
+    "secondaryText": "#25396A",
+    "mutedText": "#6B7280",
+    "defaultBorder": "#E5E7EB",
+    "success": "#16803C",
+    "error": "#B42318"
+  },
+  "semantic": {
+    "sidebar": {
+      "background": "#0E3167",
+      "text": "#FFFFFF",
+      "active": "#3267BE",
+      "indicator": "#FECE22"
+    },
+    "topbar": {
+      "background": "#2D366F",
+      "text": "#FFFFFF"
+    },
+    "page": {
+      "background": "#F3F4F6",
+      "surface": "#FFFFFF",
+      "border": "#E5E7EB"
+    },
+    "text": {
+      "primary": "#111D39",
+      "secondary": "#25396A",
+      "muted": "#6B7280"
+    },
+    "feedback": {
+      "success": "#16803C",
+      "error": "#B42318",
+      "warning": "#FECE22"
+    }
+  }
+}

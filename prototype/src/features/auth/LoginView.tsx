@@ -34,20 +34,20 @@ export const LoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100 font-sans antialiased">
+    <div className="min-h-screen bg-upt-bg flex flex-col items-center justify-center p-4 text-upt-text font-sans antialiased">
       {/* Tarjeta de Inicio de Sesión (WF-01 / SCREEN-01) */}
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md bg-upt-surface border border-upt-border rounded-2xl p-8 shadow-xl space-y-6">
         {/* Identidad de Marca */}
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-xl bg-indigo-600 text-white shadow-md">
+          <div className="inline-flex p-3 rounded-xl bg-upt-institutional text-white shadow-md">
             <GitBranch className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">TraceFlow SCM</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-bold tracking-tight text-upt-primary">TraceFlow SCM</h1>
+          <p className="text-xs text-upt-muted">
             Sistema de Gestión de Configuración de Software y Control de Cambios
           </p>
           <div className="pt-1">
-            <span className="text-[11px] font-mono text-indigo-300 bg-indigo-950/80 border border-indigo-800 px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-mono text-upt-secondary bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full font-medium">
               Portal Corporativo — ÉXODO S.A.C.
             </span>
           </div>
@@ -55,7 +55,7 @@ export const LoginView: React.FC = () => {
 
         {/* Alerta de Error (si aplica) */}
         {errorMessage && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center gap-2">
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-upt-error text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
@@ -64,34 +64,34 @@ export const LoginView: React.FC = () => {
         {/* Formulario (WF-01) */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-upt-text mb-1.5">
               Usuario o Correo Institucional
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+              <Mail className="w-4 h-4 text-upt-muted absolute left-3 top-3 pointer-events-none" />
               <input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="usuario@exodo.pe"
-                className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3 py-2 bg-white border border-upt-border rounded-lg text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright transition-all"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-upt-text mb-1.5">
               Contraseña Institucional
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+              <Lock className="w-4 h-4 text-upt-muted absolute left-3 top-3 pointer-events-none" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3 py-2 bg-white border border-upt-border rounded-lg text-sm text-upt-text placeholder-upt-muted/70 focus:outline-none focus:ring-2 focus:ring-upt-bright focus:border-upt-bright transition-all"
                 required
               />
             </div>
@@ -99,7 +99,7 @@ export const LoginView: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-upt-institutional hover:bg-upt-primary text-white rounded-lg font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-upt-bright focus:ring-offset-2 cursor-pointer"
           >
             <span>Iniciar Sesión Seguro</span>
             <ArrowRight className="w-4 h-4" />
@@ -107,11 +107,11 @@ export const LoginView: React.FC = () => {
         </form>
 
         {/* Metadatos de Demostración */}
-        <div className="pt-2 border-t border-slate-800/80 text-center">
-          <p className="text-[11px] text-slate-500">
+        <div className="pt-2 border-t border-upt-border text-center">
+          <p className="text-[11px] text-upt-muted">
             Credenciales de prueba preconfiguradas para demostración académica.
           </p>
-          <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-indigo-400">
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-upt-secondary font-medium">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Autenticación institucional simulada (ADR-006)</span>
           </div>
@@ -119,7 +119,7 @@ export const LoginView: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="mt-8 text-center text-xs text-slate-600">
+      <footer className="mt-8 text-center text-xs text-upt-muted">
         TraceFlow SCM &copy; 2026 — EPIS / Universidad Privada de Tacna
       </footer>
     </div>

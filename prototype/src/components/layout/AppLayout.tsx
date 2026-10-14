@@ -8,7 +8,7 @@ export const AppLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased">
+    <div className="min-h-screen bg-upt-bg text-upt-text flex flex-col font-sans antialiased">
       {/* Topbar Persistente */}
       <Topbar
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -21,7 +21,7 @@ export const AppLayout: React.FC = () => {
         {isSidebarOpen && (
           <div
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 lg:hidden"
+            className="fixed inset-0 bg-upt-text/50 backdrop-blur-xs z-30 lg:hidden"
             aria-hidden="true"
           />
         )}
@@ -33,13 +33,13 @@ export const AppLayout: React.FC = () => {
         />
 
         {/* Área Central de Contenido con Scroll Independiente */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-slate-950">
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-upt-bg">
           {/* Barra de Sub-Cabecera con Breadcrumb */}
-          <div className="border-b border-slate-800/80 bg-slate-900/40 px-4 sm:px-6 py-2.5 flex items-center justify-between">
+          <div className="border-b border-upt-border bg-upt-surface px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-xs">
             <Breadcrumb />
-            <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-upt-muted font-mono">
               <span>Modo Demostración</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="w-2 h-2 rounded-full bg-upt-success" />
             </div>
           </div>
 

@@ -19,9 +19,12 @@ import {
   FileCode,
   CheckCircle,
   XCircle,
+  ShieldCheck,
+  X,
 } from 'lucide-react';
 import { useRfcStore } from '../../store/useRfcStore';
 import { useProjectStore } from '../../store/useProjectStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { ecsService } from '../../services/ecs.service';
 import { auditService } from '../../services/audit.service';
 import { INITIAL_ECNS } from '../../data/initialEcns';
@@ -38,16 +41,80 @@ type DetailTab = 'resumen' | 'ecs' | 'impacto' | 'dictamen' | 'ecn' | 'qa' | 'au
 export const RfcDetailView: React.FC = () => {
   const { rfcId } = useParams<{ rfcId: string }>();
 
-  const { getRfcById } = useRfcStore();
+  const { admitRfc, observeRfc, dismissRfc } = useRfcStore();
+  const rfcs = useRfcStore((state) => state.rfcs);
   const { activeProject, setActiveProject } = useProjectStore();
+  const { currentUser, activeRoleId, switchRole } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<DetailTab>('resumen');
 
-  // Buscar el expediente en el store de RFCs
+  // Estados interactivos para CU-05 (Revisión Inicial del Gestor PU-02)
+  const [decisionMode, setDecisionMode] = useState<'admit' | 'observe' | 'dismiss'>('admit');
+  const [admissionNotes, setAdmissionNotes] = useState<string>(
+    'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'
+  );
+  const [observationNotes, setObservationNotes] = useState<string>('');
+  const [dismissalReason, setDismissalReason] = useState<string>('');
+  const [confirmDismiss, setConfirmDismiss] = useState<boolean>(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
+
+  // Buscar el expediente en el store de RFCs (reactivo ante cambios en rfcs)
   const rfc = useMemo(() => {
     if (!rfcId) return undefined;
-    return getRfcById(rfcId);
-  }, [rfcId, getRfcById]);
+    return rfcs.find((r) => r.id === rfcId || r.code === rfcId);
+  }, [rfcId, rfcs]);
+
+  // Handlers para las 3 decisiones de CU-05
+  const handleAdmit = () => {
+    if (!rfc) return;
+    setActionError(null);
+    try {
+      admitRfc(rfc.id, admissionNotes, currentUser);
+      setActionSuccessMessage(`La solicitud ${rfc.code} fue admitida formalmente (REGISTRADA -> CLASIFICADA).`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al admitir la solicitud.';
+      setActionError(msg);
+    }
+  };
+
+  const handleObserve = () => {
+    if (!rfc) return;
+    setActionError(null);
+    const trimmed = observationNotes.trim();
+    if (!trimmed || trimmed.length < 10) {
+      setActionError('El pliego de observaciones debe contener al menos 10 caracteres descriptivos.');
+      return;
+    }
+    try {
+      observeRfc(rfc.id, trimmed, currentUser);
+      setActionSuccessMessage(`Se emitió el pliego de observaciones para ${rfc.code} (REGISTRADA -> EN_SUBSANACION).`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al formular observaciones.';
+      setActionError(msg);
+    }
+  };
+
+  const handleDismiss = () => {
+    if (!rfc) return;
+    setActionError(null);
+    const trimmed = dismissalReason.trim();
+    if (!trimmed || trimmed.length < 10) {
+      setActionError('La justificación de desestimación es obligatoria y debe contener al menos 10 caracteres.');
+      return;
+    }
+    if (!confirmDismiss) {
+      setActionError('Debe marcar la casilla de confirmación para desestimar definitivamente el expediente.');
+      return;
+    }
+    try {
+      dismissRfc(rfc.id, trimmed, currentUser);
+      setActionSuccessMessage(`La solicitud ${rfc.code} fue desestimada y archivada definitivamente (REGISTRADA -> DESESTIMADA).`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al desestimar la solicitud.';
+      setActionError(msg);
+    }
+  };
 
   // Consultar ECS afectado
   const ecsInfo = useMemo(() => {
@@ -235,9 +302,9 @@ export const RfcDetailView: React.FC = () => {
   };
 
   // Determinación de la Variante Contextual Oficial (WF-06A, WF-06B, WF-06C)
-  const isVariantA = ['REGISTRADA', 'EN_SUBSANACION', 'CLASIFICADA'].includes(rfc.status);
+  const isVariantA = ['REGISTRADA', 'EN_SUBSANACION', 'CLASIFICADA', 'DESESTIMADA'].includes(rfc.status);
   const isVariantB = ['EN_ANALISIS_TECNICO', 'EN_EVALUACION'].includes(rfc.status);
-  const isVariantC = ['AUTORIZADA', 'ORDEN_EMITIDA', 'EN_IMPLEMENTACION', 'EN_PRUEBAS', 'EN_ACEPTACION', 'IMPLEMENTADA', 'DESESTIMADA', 'RECHAZADA', 'CANCELADA'].includes(rfc.status);
+  const isVariantC = ['AUTORIZADA', 'ORDEN_EMITIDA', 'EN_IMPLEMENTACION', 'EN_PRUEBAS', 'EN_ACEPTACION', 'IMPLEMENTADA', 'RECHAZADA', 'CANCELADA'].includes(rfc.status);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-16">
@@ -332,9 +399,9 @@ export const RfcDetailView: React.FC = () => {
       {/* PANEL DE PRESENTACIÓN CONTEXTUAL POR ESTADO (WF-06A / WF-06B / WF-06C) */}
       {/* ========================================================================= */}
 
-      {/* VARIANTE WF-06A: REGISTRADA / EN_SUBSANACION / CLASIFICADA */}
+      {/* VARIANTE WF-06A: REGISTRADA / EN_SUBSANACION / CLASIFICADA / DESESTIMADA */}
       {isVariantA && (
-        <div className="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 shadow-xs space-y-3">
+        <div className="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 shadow-xs space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-blue-100 text-upt-primary rounded-lg shrink-0 mt-0.5">
@@ -349,16 +416,19 @@ export const RfcDetailView: React.FC = () => {
                 </div>
                 <h3 className="text-sm font-bold text-upt-primary">
                   {rfc.status === 'REGISTRADA' && 'Solicitud registrada pendiente de evaluación formal de completitud'}
-                  {rfc.status === 'EN_SUBSANACION' && 'Solicitud observada en subsanación por el solicitante'}
+                  {rfc.status === 'EN_SUBSANACION' && 'Solicitud observada en proceso de subsanación por el solicitante'}
                   {rfc.status === 'CLASIFICADA' && 'Solicitud admitida formalmente y clasificada para análisis técnico'}
+                  {rfc.status === 'DESESTIMADA' && 'Solicitud desestimada — Expediente cerrado anticipadamente'}
                 </h3>
                 <p className="text-xs text-upt-text-secondary leading-relaxed">
                   {rfc.status === 'REGISTRADA' &&
-                    'El Analista de Requerimientos / Gestor (PU-02) verificará la veracidad, completitud de la justificación (RN-01) y pertinencia del ECS antes de clasificarla como Cambio Mayor o Menor.'}
+                    'El Analista de Requerimientos / Gestor (PU-02) verificará la veracidad, completitud de la justificación (RN-01) y pertinencia del ECS antes de admitir, observar o desestimar el cambio.'}
                   {rfc.status === 'EN_SUBSANACION' &&
-                    `El Gestor registró observaciones sobre la solicitud. El Solicitante (${rfc.requesterName}) dispone del plazo normativo para subsanar los datos antes de que sea desestimada.`}
+                    `El Gestor registró observaciones formales sobre la solicitud. El Solicitante (${rfc.requesterName}) dispone del plazo para subsanar los datos o formular su descargo técnico.`}
                   {rfc.status === 'CLASIFICADA' &&
-                    'La solicitud ha superado el filtro formal y está lista para que el Arquitecto de Software elabore el Informe Técnico de Impacto (CU-06).'}
+                    'La solicitud ha superado el filtro formal de admisión y está lista para que el Arquitecto de Software elabore el Informe Técnico de Impacto (CU-06).'}
+                  {rfc.status === 'DESESTIMADA' &&
+                    'El expediente concluyó de forma anticipada bajo la regla RN-07 y se encuentra en estado terminal. No admite nuevas modificaciones ordinarias.'}
                 </p>
               </div>
             </div>
@@ -370,25 +440,360 @@ export const RfcDetailView: React.FC = () => {
             </div>
           </div>
 
-          {/* Panel de Subsanación si el usuario es Solicitante y la RFC está en subsanación */}
-          {rfc.status === 'EN_SUBSANACION' && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1.5">
-              <div className="font-semibold text-amber-900 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-amber-700" />
-                <span>Observaciones registradas para subsanación:</span>
+          {/* Toast / Alerta de Acción Exitosa */}
+          {actionSuccessMessage && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-950 flex items-center justify-between gap-2 animate-in fade-in">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-semibold">{actionSuccessMessage}</span>
               </div>
-              <p className="text-amber-800 text-[11px] leading-relaxed pl-5 italic">
-                {rfc.subsanacionNotes || 'Faltan antecedentes probatorios del impacto transaccional en la pasarela.'}
-              </p>
+              <button
+                type="button"
+                onClick={() => setActionSuccessMessage(null)}
+                className="text-emerald-700 hover:text-emerald-900 p-0.5 rounded cursor-pointer"
+                title="Cerrar notificación"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
-          {/* Aviso de CU-05 Pendiente */}
+          {/* CASO 1: RFC EN REGISTRADA - EVALUACIÓN CU-05 */}
+          {rfc.status === 'REGISTRADA' && (
+            <>
+              {activeRoleId === 'PU-02' ? (
+                /* Consola Activa de Revisión Inicial (PU-02 Gestor) */
+                <div className="p-4 sm:p-5 bg-white border-2 border-blue-300 rounded-xl shadow-2xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-upt-primary" />
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-bold text-upt-primary">
+                          Consola de Revisión Inicial y Dictamen de Admisión (CU-05)
+                        </h4>
+                        <p className="text-[11px] text-upt-muted">
+                          Acción autorizada para el Analista de Requerimientos / Gestor (PU-02)
+                        </p>
+                      </div>
+                    </div>
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-blue-50 text-upt-primary font-bold border border-blue-200 self-start sm:self-auto">
+                      Rol Activo: PU-02
+                    </span>
+                  </div>
+
+                  {actionError && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-upt-error text-xs rounded-xl flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="block font-semibold">Error en la operación:</strong>
+                        <span>{actionError}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Selector de Decisión: 3 Opciones Normativas */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDecisionMode('admit');
+                        setActionError(null);
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        decisionMode === 'admit'
+                          ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-2xs font-semibold'
+                          : 'bg-upt-bg/50 border-upt-border text-upt-text hover:bg-emerald-50/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span className="text-xs font-bold">Opción A: Admitir RFC</span>
+                      </div>
+                      <p className="text-[11px] text-upt-muted mt-1 leading-snug">
+                        Transiciona a CLASIFICADA para posterior análisis técnico (CU-06).
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDecisionMode('observe');
+                        setActionError(null);
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        decisionMode === 'observe'
+                          ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-2xs font-semibold'
+                          : 'bg-upt-bg/50 border-upt-border text-upt-text hover:bg-amber-50/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        <span className="text-xs font-bold">Opción B: Observar RFC</span>
+                      </div>
+                      <p className="text-[11px] text-upt-muted mt-1 leading-snug">
+                        Exige pliego de subsanación. Transiciona a EN_SUBSANACION.
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDecisionMode('dismiss');
+                        setActionError(null);
+                      }}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        decisionMode === 'dismiss'
+                          ? 'bg-red-50 border-red-400 text-red-950 shadow-2xs font-semibold'
+                          : 'bg-upt-bg/50 border-upt-border text-upt-text hover:bg-red-50/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-upt-error" />
+                        <span className="text-xs font-bold">Opción C: Desestimar RFC</span>
+                      </div>
+                      <p className="text-[11px] text-upt-muted mt-1 leading-snug">
+                        Cierre anticipado formal bajo RN-07. Transiciona a DESESTIMADA.
+                      </p>
+                    </button>
+                  </div>
+
+                  {/* Panel de Formulario Específico según la Decisión */}
+                  {decisionMode === 'admit' && (
+                    <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-xl space-y-3">
+                      <div className="space-y-1">
+                        <label htmlFor="admitNotesInput" className="text-xs font-bold text-emerald-950 block">
+                          Dictamen Preliminar / Observaciones de Admisión:
+                        </label>
+                        <textarea
+                          id="admitNotesInput"
+                          rows={2}
+                          value={admissionNotes}
+                          onChange={(e) => setAdmissionNotes(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-emerald-300 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                          placeholder="Ingrese las observaciones o confirmación de completitud..."
+                        />
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+                        <span className="text-[11px] text-emerald-800">
+                          * La clasificación técnica definitiva en Cambio Mayor o Menor será determinada por el Arquitecto en CU-06.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleAdmit}
+                          className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Admitir Solicitud (REGISTRADA &rarr; CLASIFICADA)</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {decisionMode === 'observe' && (
+                    <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3">
+                      <div className="space-y-1">
+                        <label htmlFor="observeNotesInput" className="text-xs font-bold text-amber-950 flex items-center justify-between">
+                          <span>Pliego Formal de Observaciones para Subsanación *</span>
+                          <span className="font-mono text-[10px] text-amber-800">Mínimo 10 caracteres</span>
+                        </label>
+                        <textarea
+                          id="observeNotesInput"
+                          rows={3}
+                          value={observationNotes}
+                          onChange={(e) => setObservationNotes(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-amber-300 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-200"
+                          placeholder="Indique detalladamente al solicitante qué campos corregir (justificación, alcance, evidencias probatorias)..."
+                        />
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+                        <span className="text-[11px] text-amber-900">
+                          * La solicitud pasará al estado EN_SUBSANACION para que el Solicitante la rectifique en CU-04.1.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleObserve}
+                          className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                        >
+                          <AlertTriangle className="w-4 h-4" />
+                          <span>Emitir Pliego de Observaciones (REGISTRADA &rarr; EN_SUBSANACION)</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {decisionMode === 'dismiss' && (
+                    <div className="p-4 bg-red-50/50 border border-red-200 rounded-xl space-y-3">
+                      <div className="space-y-1">
+                        <label htmlFor="dismissReasonInput" className="text-xs font-bold text-red-950 flex items-center justify-between">
+                          <span>Fundamentación Mandatoria de Desestimación *</span>
+                          <span className="font-mono text-[10px] text-red-800">Mínimo 10 caracteres</span>
+                        </label>
+                        <textarea
+                          id="dismissReasonInput"
+                          rows={3}
+                          value={dismissalReason}
+                          onChange={(e) => setDismissalReason(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-red-300 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-red-200"
+                          placeholder="Explique las razones de improcedencia, falta de justificación o inviabilidad del cambio..."
+                        />
+                      </div>
+
+                      <label className="flex items-start gap-2 text-xs text-red-950 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={confirmDismiss}
+                          onChange={(e) => setConfirmDismiss(e.target.checked)}
+                          className="mt-0.5 rounded border-red-300 text-red-600 focus:ring-red-300 cursor-pointer"
+                        />
+                        <span>
+                          Confirmo la desestimación definitiva de este expediente y su archivo en estado terminal <strong>DESESTIMADA</strong> bajo la regla RN-07.
+                        </span>
+                      </label>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-red-200">
+                        <span className="text-[11px] text-red-800 font-mono">
+                          * Esta acción es irreversible e inhabilita ulteriores modificaciones.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleDismiss}
+                          className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          <span>Desestimar Definitivamente (REGISTRADA &rarr; DESESTIMADA)</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Aviso Informativo SoD cuando el usuario no es PU-02 */
+                <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl text-xs space-y-2">
+                  <div className="flex items-center gap-2 text-upt-primary font-semibold">
+                    <Lock className="w-4 h-4" />
+                    <span>Segregación de Funciones (CU-05 / SoD): Revisión Inicial Reservada al Gestor (PU-02)</span>
+                  </div>
+                  <p className="text-upt-text-secondary leading-relaxed">
+                    Esta solicitud está a la espera de validación formal de completitud y pertinencia por el Analista de Requerimientos / Gestor (PU-02). Su rol en la sesión activa es <strong>{currentUser.roleLabel} ({activeRoleId})</strong>.
+                  </p>
+                  {currentUser.allowedRoleIds.includes('PU-02') && (
+                    <button
+                      type="button"
+                      onClick={() => switchRole('PU-02')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors cursor-pointer mt-1"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>Conmutar al rol PU-02 para evaluar esta solicitud</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* CASO 2: RFC EN SUBSANACIÓN (CU-04.1) */}
+          {rfc.status === 'EN_SUBSANACION' && (
+            <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-xl text-xs space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 font-bold text-amber-950">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>PLIEGO DE OBSERVACIONES PENDIENTE DE SUBSANACIÓN (CU-04.1)</span>
+                </div>
+                <span className="font-mono text-[11px] text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-300">
+                  Acción del Solicitante
+                </span>
+              </div>
+
+              <div className="bg-white/95 p-3 rounded-lg border border-amber-200 text-amber-950 leading-relaxed whitespace-pre-line font-sans">
+                {rfc.subsanacionNotes || 'Faltan antecedentes probatorios del impacto transaccional en la pasarela.'}
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-amber-900 border-t border-amber-200/80 pt-2 font-mono">
+                <span>Observado por Gestor: <strong>{rfc.observedBy || 'Analista de Requerimientos'}</strong></span>
+                {rfc.observedAt && (
+                  <span>Fecha: {new Date(rfc.observedAt).toLocaleString('es-PE')}</span>
+                )}
+              </div>
+
+              {/* Botón para que el Solicitante subsane */}
+              <div className="pt-2 border-t border-amber-200 flex flex-wrap items-center justify-between gap-3">
+                {activeRoleId === 'PU-01' ? (
+                  <Link
+                    to={`/rfcs/${rfc.id}/edit`}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
+                  >
+                    <FileCode className="w-4 h-4" />
+                    <span>Corregir y Subsanar Solicitud (CU-04.1)</span>
+                  </Link>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] text-amber-900">
+                      * La subsanación debe ser efectuada por el Solicitante ({rfc.requesterName}).
+                    </span>
+                    {currentUser.allowedRoleIds.includes('PU-01') && (
+                      <button
+                        type="button"
+                        onClick={() => switchRole('PU-01')}
+                        className="text-[11px] font-bold text-amber-950 underline hover:text-amber-800 cursor-pointer"
+                      >
+                        Conmutar al rol PU-01
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* CASO 3: RFC CLASIFICADA TRAS ADMISIÓN */}
+          {rfc.status === 'CLASIFICADA' && (
+            <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-emerald-950">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>SOLICITUD ADMITIDA FORMALMENTE (CU-05)</span>
+              </div>
+              <p className="text-emerald-900 leading-relaxed bg-white/80 p-3 rounded-lg border border-emerald-200">
+                {rfc.admissionNotes || 'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'}
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-emerald-800 border-t border-emerald-200 pt-1.5 font-mono">
+                <span>Admitido por: <strong>{rfc.admittedBy || 'Gestor SCM'}</strong></span>
+                {rfc.admittedAt && (
+                  <span>Fecha: {new Date(rfc.admittedAt).toLocaleString('es-PE')}</span>
+                )}
+              </div>
+              <div className="pt-1 text-[11px] text-emerald-900 font-medium">
+                &bull; Próxima fase: Elaboración del Informe Técnico de Impacto en Arquitectura (CU-06).
+              </div>
+            </div>
+          )}
+
+          {/* CASO 4: RFC DESESTIMADA */}
+          {rfc.status === 'DESESTIMADA' && (
+            <div className="p-4 bg-gray-100 border border-gray-300 rounded-xl text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-gray-900">
+                <XCircle className="w-4 h-4 text-gray-600 shrink-0" />
+                <span>SOLICITUD DESESTIMADA — ESTADO TERMINAL (RN-07)</span>
+              </div>
+              <p className="text-gray-700 leading-relaxed bg-white/80 p-3 rounded-lg border border-gray-200">
+                <strong>Fundamentación del cierre:</strong> {rfc.dismissalReason || 'Cierre formal anticipado por falta de sustento técnico o desistimiento voluntario.'}
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-gray-600 border-t border-gray-200 pt-1.5 font-mono">
+                <span>Responsable del cierre: <strong>{rfc.dismissedBy || 'Gestor SCM'}</strong></span>
+                {rfc.dismissedAt && (
+                  <span>Fecha: {new Date(rfc.dismissedAt).toLocaleString('es-PE')}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Footer de Estado */}
           <div className="pt-2 border-t border-blue-200/80 flex items-center justify-between text-xs text-upt-muted">
             <span className="text-[11px]">
-              * La operación CU-05 (Clasificar / Observar / Desestimar) corresponde a la siguiente fase de desarrollo (Fase V.3).
+              Trazabilidad de Admisión y Subsanación: CU-05 / CU-04.1
             </span>
-            <span className="font-mono text-[11px] text-upt-secondary font-semibold">Estado Actual: {rfc.status}</span>
+            <span className="font-mono text-[11px] text-upt-secondary font-semibold">
+              Estado Actual: {rfc.status}
+            </span>
           </div>
         </div>
       )}
@@ -585,6 +990,24 @@ export const RfcDetailView: React.FC = () => {
               ) : (
                 <div className="p-3.5 rounded-xl bg-upt-bg/40 border border-upt-border text-xs text-upt-muted italic">
                   No se registró propuesta técnica preliminar por el Solicitante. La solución arquitectural será formulada por el especialista técnico en CU-06.
+                </div>
+              )}
+
+              {/* Notas de Descargo y Subsanación (CU-04.1) */}
+              {rfc.subsanacionResponseNotes && (
+                <div className="space-y-1.5 p-4 rounded-xl bg-blue-50/70 border border-blue-200">
+                  <span className="text-xs font-semibold text-upt-primary flex items-center gap-1.5">
+                    <FileCheck2 className="w-4 h-4 text-upt-secondary" />
+                    Notas de Descargo / Subsanación formuladas por el Solicitante (CU-04.1):
+                  </span>
+                  <div className="p-3 rounded-lg bg-white border border-blue-100 text-xs sm:text-sm text-upt-text leading-relaxed whitespace-pre-line shadow-2xs">
+                    {rfc.subsanacionResponseNotes}
+                  </div>
+                  {rfc.subsanatedAt && (
+                    <span className="text-[10px] font-mono text-upt-muted block pt-1">
+                      Fecha de Subsanación: {new Date(rfc.subsanatedAt).toLocaleString('es-PE')}
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -912,11 +1335,39 @@ export const RfcDetailView: React.FC = () => {
                   </p>
                 </div>
               ) : rfc.status === 'DESESTIMADA' ? (
-                <div className="p-5 rounded-2xl bg-gray-100 border border-gray-300 text-xs space-y-2">
-                  <div className="font-bold text-gray-900">SOLICITUD DESESTIMADA EN REVISIÓN INICIAL</div>
-                  <p className="text-gray-700">
-                    Cierre formal anticipado por falta de sustento técnico o incumplimiento del plazo de subsanación de observaciones.
+                <div className="p-5 rounded-2xl bg-gray-100 border border-gray-300 text-xs space-y-3">
+                  <div className="flex items-center gap-2 font-bold text-gray-900">
+                    <XCircle className="w-5 h-5 text-gray-700" />
+                    <span>SOLICITUD DESESTIMADA EN REVISIÓN INICIAL (RN-07)</span>
+                  </div>
+                  <p className="text-gray-800 leading-relaxed bg-white/80 p-3 rounded-lg border border-gray-200">
+                    {rfc.dismissalReason || 'Cierre formal anticipado por falta de sustento técnico o desistimiento voluntario.'}
                   </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-gray-600 border-t border-gray-200 pt-2 font-mono">
+                    <span>Responsable del cierre: {rfc.dismissedBy || 'Gestor SCM'}</span>
+                    {rfc.dismissedAt && (
+                      <span>Fecha: {new Date(rfc.dismissedAt).toLocaleString('es-PE')}</span>
+                    )}
+                  </div>
+                </div>
+              ) : rfc.status === 'CLASIFICADA' ? (
+                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-300 text-xs space-y-3">
+                  <div className="flex items-center gap-2 font-bold text-upt-primary">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <span>DICTAMEN PRELIMINAR DE ADMISIÓN (CU-05)</span>
+                  </div>
+                  <p className="text-upt-text-secondary leading-relaxed bg-white/90 p-3 rounded-lg border border-blue-200">
+                    {rfc.admissionNotes || 'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'}
+                  </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-upt-muted border-t border-blue-200 pt-2 font-mono">
+                    <span>Admitido por: {rfc.admittedBy || 'Gestor SCM'}</span>
+                    {rfc.admittedAt && (
+                      <span>Fecha: {new Date(rfc.admittedAt).toLocaleString('es-PE')}</span>
+                    )}
+                  </div>
+                  <div className="pt-1 text-[11px] text-upt-primary font-semibold">
+                    * El dictamen colegiado definitivo (CU-07 / CU-30) se emitirá tras la elaboración del Informe Técnico de Impacto en Arquitectura (CU-06).
+                  </div>
                 </div>
               ) : (
                 /* Estado Pendiente Real */

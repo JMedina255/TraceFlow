@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "test": "node --experimental-strip-types --loader ./scripts/ts-resolver.mjs src/services/rfc.service.spec.mjs",
+    "test": "node --experimental-strip-types --loader ./scripts/ts-resolver.mjs src/services/rfc.service.spec.mjs && node --experimental-strip-types --loader ./scripts/ts-resolver.mjs src/services/rfc.views.spec.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

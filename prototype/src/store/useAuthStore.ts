@@ -30,7 +30,7 @@ const getInitialUser = (): DemoUserConfig => {
 
 const getInitialRole = (user: DemoUserConfig): { role: CanonicalRole; roleId: CanonicalRoleId } => {
   const savedRoleId = storageService.get<CanonicalRoleId | null>(STORAGE_KEY_ROLE_ID, null);
-  if (savedRoleId && CANONICAL_ROLES[savedRoleId]) {
+  if (savedRoleId && CANONICAL_ROLES[savedRoleId] && user.allowedRoleIds.includes(savedRoleId)) {
     return {
       roleId: savedRoleId,
       role: CANONICAL_ROLES[savedRoleId].role,
@@ -80,18 +80,29 @@ export const useAuthStore = create<AuthState>((set) => ({
     const roleDef = CANONICAL_ROLES[roleId];
     if (!roleDef) return;
 
-    storageService.set(STORAGE_KEY_ROLE_ID, roleId);
+    // Validación estricta de Segregación de Funciones (SoD):
+    // La identidad activa solo puede conmutar a roles expresamente asignados en allowedRoleIds.
+    set((state) => {
+      if (!state.currentUser.allowedRoleIds.includes(roleId)) {
+        console.warn(
+          `[SoD Security] Intento no autorizado de conmutar al rol ${roleId} para el usuario ${state.currentUser.username}.`
+        );
+        return state;
+      }
 
-    set((state) => ({
-      activeRoleId: roleId,
-      activeRole: roleDef.role,
-      currentUser: {
-        ...state.currentUser,
-        roleId: roleId,
-        role: roleDef.role,
-        roleLabel: roleDef.label,
-      },
-    }));
+      storageService.set(STORAGE_KEY_ROLE_ID, roleId);
+
+      return {
+        activeRoleId: roleId,
+        activeRole: roleDef.role,
+        currentUser: {
+          ...state.currentUser,
+          roleId: roleId,
+          role: roleDef.role,
+          roleLabel: roleDef.label,
+        },
+      };
+    });
   },
 
   login: (user: User) => {

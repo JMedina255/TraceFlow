@@ -4,6 +4,8 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { LoginView } from '../features/auth/LoginView';
 import { DashboardView } from '../features/dashboard/DashboardView';
 import { RfcCreateView } from '../features/rfcs/RfcCreateView';
+import { RfcListView } from '../features/rfcs/RfcListView';
+import { RfcDetailView } from '../features/rfcs/RfcDetailView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -44,44 +46,19 @@ export const AppRouter: React.FC = () => {
             }
           />
 
-          {/* 5. Control de Cambios: Solicitudes (RFC) */}
-          <Route
-            path="/rfcs"
-            element={
-              <ScreenPlaceholder
-                meta={ROUTES_METADATA['/rfcs']}
-                relatedRoutes={[
-                  { label: 'Registrar Nueva RFC (WF-07)', path: '/rfcs/new' },
-                  { label: 'Ver Expediente RFC-2026-0042 (WF-06)', path: '/rfcs/RFC-2026-0042' },
-                ]}
-              />
-            }
-          />
+          {/* 5. Control de Cambios: Solicitudes (RFC) - SCREEN-05 y SCREEN-06 */}
+          <Route path="/rfcs" element={<RfcListView />} />
           <Route path="/rfcs/new" element={<RfcCreateView />} />
+          <Route path="/rfcs/:rfcId" element={<RfcDetailView />} />
 
-          <Route
-            path="/rfcs/:rfcId"
-            element={
-              <ScreenPlaceholder
-                meta={ROUTES_METADATA['/rfcs/:rfcId']}
-                relatedRoutes={[
-                  { label: 'Subsanación de RFC (WF-07)', path: '/rfcs/RFC-2026-0042/edit' },
-                  { label: 'Análisis de Impacto Técnico (WF-08)', path: '/rfcs/RFC-2026-0042/impact-analysis' },
-                  { label: 'Sala de Deliberación CCB (WF-09)', path: '/rfcs/RFC-2026-0042/ccb-deliberation' },
-                  { label: 'Autorización Cambio Menor (WF-10)', path: '/rfcs/RFC-2026-0042/minor-approval' },
-                  { label: 'Suscripción Acta UAT (WF-16)', path: '/rfcs/RFC-2026-0042/uat' },
-                  { label: 'Validación QA / No Conformidades (WF-15)', path: '/qa/validation/RFC-2026-0042' },
-                ]}
-              />
-            }
-          />
           <Route
             path="/rfcs/:rfcId/edit"
             element={
               <ScreenPlaceholder
                 meta={ROUTES_METADATA['/rfcs/:rfcId/edit']}
                 relatedRoutes={[
-                  { label: 'Volver a Expediente 360°', path: '/rfcs/RFC-2026-0042' },
+                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
+                  { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
                 ]}
               />
             }
@@ -92,8 +69,9 @@ export const AppRouter: React.FC = () => {
               <ScreenPlaceholder
                 meta={ROUTES_METADATA['/rfcs/:rfcId/impact-analysis']}
                 relatedRoutes={[
-                  { label: 'Volver a Expediente 360°', path: '/rfcs/RFC-2026-0042' },
-                  { label: 'Pasar a Deliberación CCB', path: '/rfcs/RFC-2026-0042/ccb-deliberation' },
+                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
+                  { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
+                  { label: 'Pasar a Deliberación CCB', path: '/rfcs/RFC-2026-0001/ccb-deliberation' },
                 ]}
               />
             }
@@ -104,8 +82,9 @@ export const AppRouter: React.FC = () => {
               <ScreenPlaceholder
                 meta={ROUTES_METADATA['/rfcs/:rfcId/ccb-deliberation']}
                 relatedRoutes={[
-                  { label: 'Volver a Expediente 360°', path: '/rfcs/RFC-2026-0042' },
-                  { label: 'Ver Orden Emitida (ECN-2026-0015)', path: '/ecns/ECN-2026-0015' },
+                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
+                  { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
+                  { label: 'Ver Orden Emitida (ECN-2026-0001)', path: '/ecns/ECN-2026-0001' },
                 ]}
               />
             }
@@ -116,7 +95,8 @@ export const AppRouter: React.FC = () => {
               <ScreenPlaceholder
                 meta={ROUTES_METADATA['/rfcs/:rfcId/minor-approval']}
                 relatedRoutes={[
-                  { label: 'Volver a Expediente 360°', path: '/rfcs/RFC-2026-0042' },
+                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
+                  { label: 'Ver Expediente RFC-2026-0002', path: '/rfcs/RFC-2026-0002' },
                 ]}
               />
             }
@@ -127,7 +107,8 @@ export const AppRouter: React.FC = () => {
               <ScreenPlaceholder
                 meta={ROUTES_METADATA['/rfcs/:rfcId/uat']}
                 relatedRoutes={[
-                  { label: 'Volver a Expediente 360°', path: '/rfcs/RFC-2026-0042' },
+                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
+                  { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
                   { label: 'Ir a Operaciones SCM (Check-In)', path: '/scm/operations' },
                 ]}
               />

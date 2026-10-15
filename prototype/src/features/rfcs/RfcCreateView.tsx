@@ -20,6 +20,7 @@ import {
   ExternalLink,
   ShieldCheck,
   Info,
+  Inbox,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useProjectStore } from '../../store/useProjectStore';
@@ -1032,27 +1033,34 @@ export const RfcCreateView: React.FC = () => {
             </div>
 
             {/* Botones de Acción Posterior */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2">
               <Link
                 to={`/rfcs/${createdRfc.id}`}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                <span>Ver Expediente</span>
+                <span>Ver Expediente 360°</span>
               </Link>
               <Link
-                to="/dashboard"
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs"
+                to="/rfcs"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-upt-primary text-xs font-semibold border border-blue-200 transition-colors shadow-2xs"
               >
-                <span>Ir al Dashboard</span>
+                <Inbox className="w-3.5 h-3.5" />
+                <span>Ir a la Bandeja RFC</span>
               </Link>
               <button
                 type="button"
                 onClick={handleResetForm}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs cursor-pointer"
               >
                 <span>Registrar Otra</span>
               </button>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-upt-bg/60 text-upt-text-secondary text-xs font-medium border border-upt-border transition-colors shadow-xs"
+              >
+                <span>Ir al Dashboard</span>
+              </Link>
             </div>
           </div>
         </div>

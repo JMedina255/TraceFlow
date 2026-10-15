@@ -6,6 +6,7 @@ import { DashboardView } from '../features/dashboard/DashboardView';
 import { RfcCreateView } from '../features/rfcs/RfcCreateView';
 import { RfcListView } from '../features/rfcs/RfcListView';
 import { RfcDetailView } from '../features/rfcs/RfcDetailView';
+import { RfcEditView } from '../features/rfcs/RfcEditView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -50,19 +51,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/rfcs" element={<RfcListView />} />
           <Route path="/rfcs/new" element={<RfcCreateView />} />
           <Route path="/rfcs/:rfcId" element={<RfcDetailView />} />
-
-          <Route
-            path="/rfcs/:rfcId/edit"
-            element={
-              <ScreenPlaceholder
-                meta={ROUTES_METADATA['/rfcs/:rfcId/edit']}
-                relatedRoutes={[
-                  { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
-                  { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
-                ]}
-              />
-            }
-          />
+          <Route path="/rfcs/:rfcId/edit" element={<RfcEditView />} />
           <Route
             path="/rfcs/:rfcId/impact-analysis"
             element={

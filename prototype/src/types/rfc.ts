@@ -170,6 +170,16 @@ export interface RFC {
   status: RFCStatus;
   classification?: ChangeClassification;
   subsanacionNotes?: string;
+  admissionNotes?: string;
+  admittedBy?: string;
+  admittedAt?: string;
+  observedBy?: string;
+  observedAt?: string;
+  dismissalReason?: string;
+  dismissedBy?: string;
+  dismissedAt?: string;
+  subsanacionResponseNotes?: string;
+  subsanatedAt?: string;
   rejectionReason?: string;
   cancellationReason?: string;
   technicalImpact?: TechnicalImpactAssessment;
@@ -190,4 +200,16 @@ export interface CreateRfcDTO {
   category: ChangeCategory;
   affectedEcsId: string;
   attachments?: string[];
+}
+
+export interface SubsanarRfcDTO {
+  title: string;
+  description: string;
+  justification: string;
+  proposedSolution?: string;
+  priority: Priority;
+  category: ChangeCategory;
+  affectedEcsId: string;
+  attachments?: string[];
+  subsanacionResponseNotes?: string;
 }

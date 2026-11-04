@@ -1,5 +1,5 @@
 /**
- * Definiciones de Autenticación, Usuarios y Roles Canónicos
+ * Definiciones de Autenticación, Cuentas de Usuario y Roles Canónicos
  * Basado en: FD03 (TB-09), FD04 (Sección 3.4), FD05 (Sección 20)
  */
 
@@ -35,7 +35,7 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
     role: 'SOLICITANTE',
     label: 'Solicitante',
     technicalLevel: 'Básico',
-    description: 'Registra RFCs, subsana observaciones y valida la aceptación final (UAT).',
+    description: 'Registra solicitudes de cambio, subsana observaciones y valida la aceptación final (UAT).',
   },
   'PU-02': {
     id: 'PU-02',
@@ -49,14 +49,14 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
     role: 'ARQUITECTO',
     label: 'Arquitecto / Especialista Técnico',
     technicalLevel: 'Experto',
-    description: 'Elabora el informe de impacto técnico y cataloga nuevos ECS.',
+    description: 'Elabora el informe de impacto técnico y cataloga nuevos elementos de configuración (ECS).',
   },
   'PU-04': {
     id: 'PU-04',
     role: 'CCB',
     label: 'Comité de Control de Cambios (CCB)',
     technicalLevel: 'Avanzado',
-    description: 'Órgano decisional colegiado; aprueba o rechaza Cambios Mayores y emite ECNs.',
+    description: 'Órgano decisional colegiado; aprueba o rechaza Cambios Mayores y emite órdenes ECN.',
   },
   'PU-05': {
     id: 'PU-05',
@@ -70,7 +70,7 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
     role: 'DESARROLLADOR',
     label: 'Ingeniero de Software / Desarrollador',
     technicalLevel: 'Medio',
-    description: 'Implementa cambios sobre ECS en la Biblioteca de Trabajo y corre pruebas unitarias.',
+    description: 'Implementa cambios sobre ECS en la Biblioteca de Trabajo y corre pruebas locales.',
   },
   'PU-07': {
     id: 'PU-07',
@@ -81,15 +81,41 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
   },
 };
 
-export interface User {
-  id: string;
-  username: string;
+/**
+ * Representa la identidad / cuenta de un usuario en la organización
+ */
+export interface UserAccount {
+  id: string; // Ej. "USR-001"
+  username: string; // Ej. "jmedina"
   fullName: string;
   email: string;
-  roleId: CanonicalRoleId;
-  role: CanonicalRole;
-  roleLabel: string;
-  avatarUrl?: string;
   organization: string; // Ej. "ÉXODO S.A.C."
+  position?: string; // Cargo institucional
+  cargo?: string; // Alias de cargo institucional
+  avatarUrl?: string;
   isActive: boolean;
+  assignedRoleIds: CanonicalRoleId[]; // Lista de roles que tiene autorizados ejercer
+  primaryRoleId: CanonicalRoleId; // Rol canónico principal por defecto
+  assignedProjectIds: string[]; // Proyectos autorizados para este usuario (multitenant)
+}
+
+/**
+ * Representa al usuario en el contexto de una sesión activa, con un único rol efectivo
+ */
+export interface User extends UserAccount {
+  roleId: CanonicalRoleId; // Rol efectivo activo en la sesión
+  role: CanonicalRole; // Enum del rol efectivo
+  roleLabel: string; // Etiqueta descriptiva del rol efectivo
+  allowedRoleIds: CanonicalRoleId[]; // Alias de compatibilidad hacia assignedRoleIds
+}
+
+/**
+ * Metadatos de la sesión activa
+ */
+export interface UserSession {
+  user: UserAccount;
+  effectiveRoleId: CanonicalRoleId;
+  effectiveRole: CanonicalRole;
+  effectiveRoleLabel: string;
+  startedAt: string;
 }

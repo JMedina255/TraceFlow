@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   GitBranch, 
@@ -10,7 +10,9 @@ import {
   ChevronDown, 
   RotateCcw,
   Check,
-  Users
+  Shield,
+  Briefcase,
+  Layers
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useProjectStore } from '../../store/useProjectStore';
@@ -27,10 +29,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
   const navigate = useNavigate();
   const { 
     currentUser, 
-    availableDemoUsers, 
     activeRoleId, 
-    switchUser, 
-    switchRole, 
     logout 
   } = useAuthStore();
 
@@ -42,6 +41,19 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showProjectMenu, setShowProjectMenu] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+
+  // Filtrar proyectos según los asignados a la cuenta del usuario actual (Aislamiento de acceso)
+  const userAssignedProjectIds = currentUser?.assignedProjectIds || [];
+  const authorizedProjects = projects.filter((p) => 
+    userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id)
+  );
+
+  // Asegurar que el proyecto activo pertenezca a los proyectos autorizados del usuario
+  useEffect(() => {
+    if (authorizedProjects.length > 0 && !authorizedProjects.some((p) => p.id === activeProject.id)) {
+      setActiveProject(authorizedProjects[0].id);
+    }
+  }, [authorizedProjects, activeProject.id, setActiveProject]);
 
   // Derivar notificaciones contextuales del proyecto activo
   const projectRfcs = getRfcsByProject(activeProject.id);
@@ -59,6 +71,8 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
     logout();
     navigate('/login');
   };
+
+  const activeRoleDef = activeRoleId ? CANONICAL_ROLES[activeRoleId] : null;
 
   return (
     <header className="h-16 bg-upt-institutional border-b border-upt-primary/60 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-sm">
@@ -93,12 +107,12 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Separador */}
         <div className="hidden lg:block h-6 w-px bg-white/20 mx-1" />
 
-        {/* Selector Interactivo de Proyecto Activo (Aislamiento Multitenant) */}
+        {/* Selector Interactivo de Proyecto Activo (Aislamiento Autorizado) */}
         <div className="relative">
           <button
             onClick={() => setShowProjectMenu(!showProjectMenu)}
             className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-upt-primary/70 border border-white/15 hover:border-white/30 text-xs transition-colors cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-upt-bright text-white"
-            title="Cambiar proyecto activo"
+            title="Cambiar proyecto activo (restringido a proyectos autorizados)"
           >
             <FolderGit2 className="w-3.5 h-3.5 text-upt-yellow shrink-0" />
             <div className="hidden sm:block">
@@ -116,11 +130,14 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
           {/* Menú Desplegable de Selección de Proyecto */}
           {showProjectMenu && (
             <div className="absolute left-0 mt-2 w-72 bg-upt-surface border border-upt-border rounded-xl shadow-xl p-2 z-50 text-upt-text">
-              <div className="px-2 py-1.5 border-b border-upt-border mb-1 text-[11px] font-semibold text-upt-text-secondary uppercase tracking-wider">
-                Seleccionar Proyecto Aislado
+              <div className="px-2 py-1.5 border-b border-upt-border mb-1 text-[11px] font-semibold text-upt-text-secondary uppercase tracking-wider flex items-center justify-between">
+                <span>Proyectos Autorizados</span>
+                <span className="font-mono text-[10px] bg-upt-bg px-1.5 py-0.5 rounded">
+                  {authorizedProjects.length} asignados
+                </span>
               </div>
               <div className="space-y-1">
-                {projects.map((proj) => {
+                {authorizedProjects.map((proj) => {
                   const isSelected = proj.id === activeProject.id;
                   return (
                     <button
@@ -156,7 +173,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         </div>
       </div>
 
-      {/* Lado Derecho: Restablecer Demo + Notificaciones + Selector de Usuario */}
+      {/* Lado Derecho: Restablecer Demo + Notificaciones + Perfil de Sesión */}
       <div className="flex items-center space-x-2 sm:space-x-3">
         {/* Botón de Restablecimiento de Datos Demo */}
         <button
@@ -235,12 +252,12 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Separador */}
         <div className="h-6 w-px bg-white/20" />
 
-        {/* Selector de Usuario e Identidad Demo (C-SharkTeam) */}
+        {/* Perfil de Usuario y Sesión Activa (Sin cambio arbitrario de rol o usuario) */}
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2.5 p-1.5 sm:px-2.5 rounded-lg hover:bg-white/10 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-upt-bright cursor-pointer"
-            aria-label="Menú de usuario"
+            aria-label="Menú de perfil y sesión de usuario"
           >
             <div className="w-8 h-8 rounded-full bg-upt-bright border border-white/30 flex items-center justify-center font-bold text-xs text-white shrink-0">
               {currentUser?.fullName.charAt(0) || 'U'}
@@ -248,11 +265,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
 
             <div className="hidden md:block">
               <p className="text-xs font-semibold text-white leading-tight">
-                {currentUser?.fullName}
+                {currentUser?.fullName || 'Sesión no iniciada'}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-[10px] text-blue-200 truncate max-w-[150px]">
-                  {CANONICAL_ROLES[activeRoleId]?.label || currentUser?.roleLabel}
+                  {activeRoleDef?.label || currentUser?.roleLabel || 'Sin rol activo'}
                 </span>
               </div>
             </div>
@@ -260,78 +277,83 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
             <ChevronDown className="w-3.5 h-3.5 text-blue-200 hidden sm:block" />
           </button>
 
-          {/* Menú Desplegable de Conmutación de Usuario y Rol Demo */}
-          {showUserMenu && (
+          {/* Menú Desplegable Informativo de Cuenta y Cierre de Sesión */}
+          {showUserMenu && currentUser && (
             <div className="absolute right-0 mt-2 w-80 bg-upt-surface border border-upt-border rounded-xl shadow-xl p-3 z-50 text-upt-text">
-              <div className="pb-3 border-b border-upt-border mb-2">
+              {/* Información de Identidad */}
+              <div className="pb-3 border-b border-upt-border mb-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase font-bold text-upt-muted tracking-wider">
-                    Identidad Activa
+                    Identidad Corporativa
                   </span>
-                  <span className="text-[10px] text-upt-primary font-mono font-semibold">ÉXODO S.A.C.</span>
+                  <span className="text-[10px] text-upt-primary font-mono font-semibold">
+                    {currentUser.organization || 'ÉXODO S.A.C.'}
+                  </span>
                 </div>
-                <p className="text-xs font-bold text-upt-text mt-1">{currentUser?.fullName}</p>
-                <p className="text-[11px] text-upt-muted">{currentUser?.email}</p>
+                <p className="text-xs font-bold text-upt-text mt-1">{currentUser.fullName}</p>
+                <p className="text-[11px] text-upt-muted font-mono">{currentUser.email}</p>
+                {currentUser.cargo && (
+                  <div className="mt-1 flex items-center gap-1 text-[11px] text-upt-text-secondary">
+                    <Briefcase className="w-3 h-3 text-upt-muted shrink-0" />
+                    <span>{currentUser.cargo}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Conmutador de Rol Autorizado para esta Identidad */}
-              <div className="py-2 border-b border-upt-border mb-2">
-                <span className="text-[10px] font-semibold text-upt-text-secondary block mb-1.5">
-                  Cambiar rol activo:
-                </span>
-                <div className="grid grid-cols-2 gap-1.5">
+              {/* Rol Efectivo en Sesión Actual */}
+              <div className="py-2 px-2.5 bg-blue-50/60 rounded-lg border border-blue-200/70 mb-2.5 text-xs">
+                <div className="flex items-center gap-1 text-[10px] font-bold text-upt-primary uppercase tracking-wider mb-1">
+                  <Shield className="w-3 h-3 text-upt-bright shrink-0" />
+                  <span>Rol Efectivo en Sesión</span>
+                </div>
+                <div className="font-semibold text-upt-text text-xs">
+                  {activeRoleDef?.role} — {activeRoleDef?.label}
+                </div>
+                <p className="text-[10px] text-upt-muted mt-1 leading-snug">
+                  Operando bajo la política de Segregación de Funciones (SoD).
+                </p>
+              </div>
+
+              {/* Roles Autorizados Asignados a la Cuenta (Informativo) */}
+              <div className="pb-2.5 border-b border-upt-border mb-2.5">
+                <div className="flex items-center justify-between mb-1 text-[10px] font-semibold text-upt-text-secondary">
+                  <span className="flex items-center gap-1">
+                    <Layers className="w-3 h-3 text-upt-muted" />
+                    Roles asignados a su cuenta:
+                  </span>
+                  <span className="font-mono text-upt-muted">
+                    {currentUser.allowedRoleIds.length}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-1">
                   {currentUser.allowedRoleIds.map((rId) => {
                     const rDef = CANONICAL_ROLES[rId];
-                    const isSelected = activeRoleId === rId;
+                    const isCurrent = rId === activeRoleId;
                     return (
-                      <button
+                      <span
                         key={rId}
-                        onClick={() => switchRole(rId)}
-                        className={`px-2 py-1.5 rounded text-left text-xs transition-colors cursor-pointer border ${
-                          isSelected
-                            ? 'bg-upt-primary border-upt-primary text-white font-medium shadow-xs'
-                            : 'bg-upt-bg/50 border-upt-border text-upt-text hover:bg-upt-bg'
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                          isCurrent
+                            ? 'bg-upt-institutional text-white font-bold'
+                            : 'bg-upt-bg text-upt-text-secondary border border-upt-border'
                         }`}
+                        title={rDef?.label}
                       >
-                        <div className={`text-xs font-semibold ${isSelected ? 'text-white' : 'text-upt-text'}`}>{rDef.role}</div>
-                        <div className={`truncate text-[10px] ${isSelected ? 'text-blue-100' : 'text-upt-muted'}`}>{rDef.label}</div>
-                      </button>
+                        {rId} {rDef?.role}
+                      </span>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Conmutador de Identidad (4 Integrantes) */}
-              <div className="py-2 border-b border-upt-border mb-2">
-                <span className="text-[10px] font-semibold text-upt-text-secondary flex items-center gap-1 mb-1.5">
-                  <Users className="w-3 h-3 text-upt-primary" /> Cambiar de usuario:
-                </span>
-                <div className="space-y-1">
-                  {availableDemoUsers.map((u) => {
-                    const isCurrentUser = u.id === currentUser.id;
-                    return (
-                      <button
-                        key={u.id}
-                        onClick={() => switchUser(u.id)}
-                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-xs text-left transition-colors cursor-pointer ${
-                          isCurrentUser
-                            ? 'bg-blue-50 text-upt-primary border border-upt-bright/30 font-medium'
-                            : 'text-upt-text hover:bg-upt-bg'
-                        }`}
-                      >
-                        <span className="truncate">{u.fullName}</span>
-                        {isCurrentUser && <Check className="w-3 h-3 text-upt-bright" />}
-                      </button>
-                    );
-                  })}
-                </div>
+                <p className="text-[10px] text-upt-muted mt-1.5 italic">
+                  Para operar con otro rol asignado, cierre sesión e inicie con el perfil correspondiente.
+                </p>
               </div>
 
               {/* Cerrar Sesión */}
               <div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-upt-error hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer font-medium"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer font-medium border border-red-200"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Cerrar Sesión</span>

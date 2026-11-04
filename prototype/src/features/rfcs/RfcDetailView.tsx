@@ -44,7 +44,7 @@ export const RfcDetailView: React.FC = () => {
   const { admitRfc, observeRfc, dismissRfc } = useRfcStore();
   const rfcs = useRfcStore((state) => state.rfcs);
   const { activeProject, setActiveProject } = useProjectStore();
-  const { currentUser, activeRoleId, switchRole } = useAuthStore();
+  const { currentUser, activeRoleId } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<DetailTab>('resumen');
 
@@ -67,7 +67,7 @@ export const RfcDetailView: React.FC = () => {
 
   // Handlers para las 3 decisiones de CU-05
   const handleAdmit = () => {
-    if (!rfc) return;
+    if (!rfc || !currentUser) return;
     setActionError(null);
     try {
       admitRfc(rfc.id, admissionNotes, currentUser);
@@ -79,7 +79,7 @@ export const RfcDetailView: React.FC = () => {
   };
 
   const handleObserve = () => {
-    if (!rfc) return;
+    if (!rfc || !currentUser) return;
     setActionError(null);
     const trimmed = observationNotes.trim();
     if (!trimmed || trimmed.length < 10) {
@@ -96,7 +96,7 @@ export const RfcDetailView: React.FC = () => {
   };
 
   const handleDismiss = () => {
-    if (!rfc) return;
+    if (!rfc || !currentUser) return;
     setActionError(null);
     const trimmed = dismissalReason.trim();
     if (!trimmed || trimmed.length < 10) {
@@ -138,6 +138,8 @@ export const RfcDetailView: React.FC = () => {
   }, [rfc]);
 
   // =========================================================================
+  if (!currentUser) return null;
+
   // CASO 1: EXPEDIENTE NO ENCONTRADO
   // =========================================================================
   if (!rfc) {
@@ -673,15 +675,14 @@ export const RfcDetailView: React.FC = () => {
                   <p className="text-upt-text-secondary leading-relaxed">
                     Esta solicitud está a la espera de validación formal de completitud por parte del Gestor de Cambios. Su rol activo es <strong>{currentUser.roleLabel}</strong>.
                   </p>
-                  {currentUser.allowedRoleIds.includes('PU-02') && (
-                    <button
-                      type="button"
-                      onClick={() => switchRole('PU-02')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors cursor-pointer mt-1"
-                    >
-                      <User className="w-3.5 h-3.5" />
-                      <span>Asumir rol de Gestor</span>
-                    </button>
+                  {currentUser.allowedRoleIds.includes('PU-02') ? (
+                    <p className="text-[11px] text-upt-muted italic mt-1">
+                      Su cuenta tiene asignado el rol de Gestor. Para evaluar esta solicitud, cierre sesión e inicie con dicho perfil.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-upt-muted italic mt-1">
+                      Su cuenta no tiene asignado el perfil de Gestor.
+                    </p>
                   )}
                 </div>
               )}
@@ -728,13 +729,9 @@ export const RfcDetailView: React.FC = () => {
                       * La subsanación debe ser efectuada por el Solicitante ({rfc.requesterName}).
                     </span>
                     {currentUser.allowedRoleIds.includes('PU-01') && (
-                      <button
-                        type="button"
-                        onClick={() => switchRole('PU-01')}
-                        className="text-[11px] font-bold text-amber-950 underline hover:text-amber-800 cursor-pointer"
-                      >
-                        Asumir rol de Solicitante
-                      </button>
+                      <span className="text-[11px] font-medium text-amber-950 italic">
+                        (Su cuenta tiene asignado el rol de Solicitante. Inicie sesión con dicho perfil para subsanar).
+                      </span>
                     )}
                   </div>
                 )}

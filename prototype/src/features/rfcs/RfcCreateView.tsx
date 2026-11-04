@@ -64,7 +64,7 @@ const SUGGESTED_ATTACHMENTS = [
 
 export const RfcCreateView: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, activeRoleId, switchRole, switchUser } = useAuthStore();
+  const { currentUser, activeRoleId } = useAuthStore();
   const { activeProject, projects, setActiveProject } = useProjectStore();
   const { createRfc } = useRfcStore();
 
@@ -80,6 +80,8 @@ export const RfcCreateView: React.FC = () => {
   const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
   const [draftSavedToast, setDraftSavedToast] = useState<boolean>(false);
   const [customAttachment, setCustomAttachment] = useState<string>('');
+
+  if (!currentUser) return null;
 
   // Sincronizar projectId si el proyecto activo cambia externamente desde el Topbar
   if (activeProject.id !== prevActiveProjectId) {
@@ -333,30 +335,16 @@ export const RfcCreateView: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-amber-200">
             {currentUser.allowedRoleIds.includes('PU-01') ? (
-              <button
-                type="button"
-                onClick={() => switchRole('PU-01')}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
-              >
-                <Check className="w-4 h-4" />
-                <span>Asumir rol de Solicitante</span>
-              </button>
+              <span className="text-xs text-amber-900 font-medium">
+                Su cuenta tiene asignado el rol de Solicitante. Para crear una RFC, cierre sesión e inicie con dicho perfil.
+              </span>
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  // Cambiar a Joan Medina con PU-01
-                  switchUser('USR-001');
-                  switchRole('PU-01');
-                }}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
-              >
-                <Check className="w-4 h-4" />
-                <span>Cambiar a usuario Solicitante</span>
-              </button>
+              <span className="text-xs text-amber-900 font-medium">
+                Su cuenta no tiene asignado el perfil de Solicitante. Contacte al administrador si requiere permisos.
+              </span>
             )}
             <span className="text-[11px] text-amber-800/90 font-medium">
-              * El servicio y el formulario bloquearán el envío hasta que actives el rol Solicitante.
+              * El servicio y el formulario bloquean el registro hasta operar bajo el perfil de Solicitante.
             </span>
           </div>
         </div>

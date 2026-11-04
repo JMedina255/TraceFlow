@@ -35,7 +35,7 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20];
 export const RfcListView: React.FC = () => {
   const { activeProject } = useProjectStore();
   const { rfcs } = useRfcStore();
-  const { activeRoleId, currentUser, switchRole } = useAuthStore();
+  const { activeRoleId, currentUser } = useAuthStore();
 
   // Estados locales para filtros y paginación
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -102,7 +102,7 @@ export const RfcListView: React.FC = () => {
 
   // Validación de autorización SoD para la acción "+ Nueva RFC" (Exclusivo PU-01 Solicitante)
   const isAuthorizedToCreate = activeRoleId === 'PU-01';
-  const canSwitchToSolicitante = currentUser.allowedRoleIds.includes('PU-01');
+  const canSwitchToSolicitante = currentUser?.allowedRoleIds?.includes('PU-01') ?? false;
 
   // Renderizador de badge de prioridad
   const renderPriorityBadge = (priority: Priority) => {
@@ -227,15 +227,14 @@ export const RfcListView: React.FC = () => {
                     <p className="text-[11px] text-upt-muted leading-tight">
                       La creación de solicitudes está reservada para el rol de <strong className="text-upt-text">Solicitante</strong>.
                     </p>
-                    {canSwitchToSolicitante && (
-                      <button
-                        type="button"
-                        onClick={() => switchRole('PU-01')}
-                        className="mt-1 text-[11px] font-bold text-upt-bright hover:underline cursor-pointer flex items-center gap-1"
-                      >
-                        <span>Asumir rol de Solicitante</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </button>
+                    {canSwitchToSolicitante ? (
+                      <p className="mt-1 text-[11px] text-upt-muted italic">
+                        Su cuenta tiene asignado el rol de Solicitante. Para crear una RFC, inicie sesión con dicho perfil.
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-[11px] text-upt-muted italic">
+                        Su cuenta no tiene asignado este perfil.
+                      </p>
                     )}
                   </div>
                 </div>

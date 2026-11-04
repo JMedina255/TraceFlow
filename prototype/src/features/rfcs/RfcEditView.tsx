@@ -11,7 +11,6 @@ import {
   ShieldAlert,
   XCircle,
   Info,
-  User,
   Lock,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -31,9 +30,10 @@ export const RfcEditView: React.FC = () => {
   const { rfcId } = useParams<{ rfcId: string }>();
   const navigate = useNavigate();
 
-  const { currentUser, activeRoleId, switchRole } = useAuthStore();
+  const { currentUser, activeRoleId } = useAuthStore();
   const { activeProject, setActiveProject } = useProjectStore();
   const { getRfcById, subsanarRfc, dismissRfc } = useRfcStore();
+
 
   // Buscar el expediente
   const rfc = rfcId ? getRfcById(rfcId) : undefined;
@@ -64,6 +64,8 @@ export const RfcEditView: React.FC = () => {
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
   // =========================================================================
+  if (!currentUser) return null;
+
   // CASO 1: EXPEDIENTE NO ENCONTRADO (404)
   // =========================================================================
   if (!rfc) {
@@ -206,15 +208,14 @@ export const RfcEditView: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-red-200">
-            {currentUser.allowedRoleIds.includes('PU-01') && (
-              <button
-                type="button"
-                onClick={() => switchRole('PU-01')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
-              >
-                <User className="w-4 h-4" />
-                <span>Asumir rol de Solicitante</span>
-              </button>
+            {currentUser.allowedRoleIds.includes('PU-01') ? (
+              <p className="text-xs text-red-950 italic">
+                Su cuenta tiene asignado el rol de Solicitante. Inicie sesión con dicho perfil para efectuar la subsanación.
+              </p>
+            ) : (
+              <p className="text-xs text-red-950 italic">
+                Su cuenta no tiene permisos para realizar subsanaciones.
+              </p>
             )}
             <Link
               to={`/rfcs/${rfc.id}`}
@@ -316,6 +317,7 @@ export const RfcEditView: React.FC = () => {
 
   // Desistimiento voluntario (CU-04.1 A1) (EN_SUBSANACION -> DESESTIMADA)
   const handleConfirmWithdraw = () => {
+    if (!rfc || !currentUser) return;
     setWithdrawError(null);
     const trimmedReason = withdrawReason.trim();
     if (!trimmedReason || trimmedReason.length < 10) {

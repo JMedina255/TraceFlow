@@ -50,9 +50,7 @@ export const DashboardView: React.FC = () => {
   const implementedRfcs = projectRfcs.filter((r) => r.status === 'IMPLEMENTADA');
 
   // Mis solicitudes (para Solicitante PU-01)
-  const myRfcs = projectRfcs.filter((r) => 
-    r.requesterId === currentUser?.id || r.requesterName === currentUser?.fullName
-  );
+  const myRfcs = projectRfcs.filter((r) => r.requesterId === currentUser?.id);
   const mySubsanaciones = myRfcs.filter((r) => r.status === 'EN_SUBSANACION');
 
   // Configuración contextual de métricas según rol efectivo
@@ -240,9 +238,9 @@ export const DashboardView: React.FC = () => {
           },
           {
             id: 'm-pu05-3',
-            label: 'Integridad SHA-256',
-            value: 'Activa',
-            sub: 'Bitácora Forense Append-Only',
+            label: 'Registro de Auditoría',
+            value: 'Activo (Demo)',
+            sub: 'Eventos locales demostrativos',
             icon: History,
             color: 'text-upt-success',
             bg: 'border-emerald-200/80',

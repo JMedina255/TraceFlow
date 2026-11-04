@@ -247,4 +247,78 @@ assert.strictEqual(newRfc.requesterId, 'USR-001');
 assert.strictEqual(newRfc.requesterName, 'Joan Cristian Medina Quispe');
 console.log(`✅ Registro de RFC exitoso con rol efectivo PU-01: ${newRfc.code} (${newRfc.title}).\n`);
 
-console.log('🎉 TODAS LAS PRUEBAS DE FASE 02 PASARON SATISFACTORIAMENTE (8/8).');
+
+// ============================================================================
+// TEST 9: Validación Estricta de Propiedad de RFC (CU-04.1 / Inmutable requesterId)
+// ============================================================================
+console.log('Test 9: Validación estricta de propiedad de RFC en subsanación y desistimiento');
+
+// Gestor observa RFC creada en Test 8
+const observedRfc = rfcService.observe(
+  newRfc.id,
+  'Observación formal de prueba: Se requiere ampliar la justificación técnica de impacto.',
+  gestorSessionUser
+);
+assert.strictEqual(observedRfc.status, 'EN_SUBSANACION', 'RFC debe transicionar a EN_SUBSANACION');
+
+// Otro usuario (ej. USR-002 con rol PU-01 simulado) intenta subsanar la RFC de USR-001
+const impostorUser = {
+  ...accounts[1], // USR-002 Renzo Antayhua
+  roleId: 'PU-01',
+  role: 'SOLICITANTE',
+  roleLabel: 'Solicitante',
+  allowedRoleIds: ['PU-01'],
+};
+
+// Intento de subsanación ajena debe ser rechazado por coincidencia de requesterId
+assert.throws(
+  () => {
+    rfcService.subsanar(
+      observedRfc.id,
+      {
+        title: observedRfc.title,
+        description: observedRfc.description,
+        justification: 'Justificación ampliada pero emitida por un usuario diferente.',
+        priority: observedRfc.priority,
+        category: observedRfc.category,
+        affectedEcsId: observedRfc.affectedEcsId,
+      },
+      impostorUser
+    );
+  },
+  /Acceso denegado \(Propiedad\)/,
+  'El servicio debe rechazar que un solicitante subsane una RFC de otro solicitante'
+);
+
+// Intento de desistimiento por solicitante que no es el autor debe ser rechazado
+assert.throws(
+  () => {
+    rfcService.dismiss(
+      observedRfc.id,
+      'Desistimiento no autorizado por usuario ajeno al expediente.',
+      impostorUser
+    );
+  },
+  /Acceso denegado \(Propiedad\)/,
+  'El servicio debe rechazar que un solicitante desista una RFC ajena'
+);
+
+// Solicitante legítimo (USR-001) subsana exitosamente su propio expediente
+const subsanatedRfc = rfcService.subsanar(
+  observedRfc.id,
+  {
+    title: observedRfc.title,
+    description: observedRfc.description,
+    justification: 'Justificación ampliada y fundamentada por el autor original USR-001.',
+    priority: observedRfc.priority,
+    category: observedRfc.category,
+    affectedEcsId: observedRfc.affectedEcsId,
+  },
+  solicitanteSessionUser
+);
+
+assert.strictEqual(subsanatedRfc.status, 'REGISTRADA', 'RFC debe retornar a REGISTRADA tras subsanación legítima');
+assert.strictEqual(subsanatedRfc.requesterId, 'USR-001');
+console.log('✅ Validación estricta de propiedad de RFC validada exitosamente (rechazo a terceros, aceptación al autor).\n');
+
+console.log('🎉 TODAS LAS PRUEBAS DE INTEGRIDAD Y AUTENTICACIÓN PASARON SATISFACTORIAMENTE (9/9).');

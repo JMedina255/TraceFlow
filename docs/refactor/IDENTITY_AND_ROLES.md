@@ -99,7 +99,7 @@ Para las evaluaciones del prototipo, se definen las 4 cuentas oficiales asignada
 | **`USR-001`** | Joan Cristian Medina Quispe | `jmedina@exodo.pe` | Director de Calidad y Procesos | `PU-02` (Gestor - Rol Primario)<br>`PU-01` (Solicitante) | `PRJ-001`, `PRJ-002`, `PRJ-003` |
 | **`USR-002`** | Renzo Antonio Antayhua Mamani | `rantayhua@exodo.pe` | Arquitecto de Software Principal | `PU-03` (Arquitecto - Rol Primario)<br>`PU-06` (Desarrollador) | `PRJ-001`, `PRJ-002`, `PRJ-003` |
 | **`USR-003`** | Augusto Joaquin Rivera Muñoz | `arivera@exodo.pe` | Jefe de SCM y Aseguramiento | `PU-05` (Bibliotecario - Rol Primario)<br>`PU-07` (Calidad/Testing) | `PRJ-001`, `PRJ-002`, `PRJ-003` |
-| **`USR-004`** | Renzo Fernando Loyola Vilca Choque | `rloyola@exodo.pe` | Coordinador de Proyectos y CCB | `PU-04` (CCB - Rol Primario)<br>`PU-06` (Desarrollador)<br>`PU-01` (Solicitante) | `PRJ-001`, `PRJ-002` |
+| **`USR-004`** | Renzo Fernando Loyola Vilca Choque | `rloyola@exodo.pe` | Coordinador de Proyectos y CCB | `PU-04` (CCB - Rol Primario) | `PRJ-001`, `PRJ-002` |
 
 ---
 

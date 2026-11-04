@@ -295,6 +295,14 @@ export const rfcService = {
       );
     }
 
+    if (rfc.status === 'EN_SUBSANACION' && user.roleId === 'PU-01') {
+      if (rfc.requesterId && rfc.requesterId !== user.id) {
+        throw new Error(
+          `Acceso denegado (Propiedad): El usuario '${user.fullName}' (${user.id}) no puede desistir una solicitud registrada por '${rfc.requesterName}' (${rfc.requesterId}).`
+        );
+      }
+    }
+
     const nowIso = new Date().toISOString();
     const updatedRfc: RFC = {
       ...rfc,
@@ -335,6 +343,20 @@ export const rfcService = {
     const rfc = this.getById(rfcId);
     if (!rfc) {
       throw new Error(`Solicitud de Cambio no encontrada: '${rfcId}'.`);
+    }
+
+    // Verificación estricta de asignación de proyecto
+    if (!authService.canUserAccessProject(user, rfc.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+      );
+    }
+
+    // Verificación estricta de propiedad (CU-04.1): Solo el Solicitante original puede subsanar su propia solicitud
+    if (rfc.requesterId && rfc.requesterId !== user.id) {
+      throw new Error(
+        `Acceso denegado (Propiedad): El usuario '${user.fullName}' (${user.id}) no es el solicitante original de ${rfc.code} (${rfc.requesterId}) y no tiene autorización para subsanar este expediente.`
+      );
     }
 
     if (rfc.status !== 'EN_SUBSANACION') {

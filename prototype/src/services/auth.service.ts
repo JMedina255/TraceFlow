@@ -1,52 +1,9 @@
-import type { CanonicalRoleId, UserAccount, User } from '../types';
+import type { CanonicalRoleId, UserAccount, User, SystemAction } from '../types';
+import { ACTION_PERMISSIONS, ROUTE_PERMISSIONS } from '../types';
 import { INITIAL_USER_ACCOUNTS, INITIAL_DEMO_USERS, type DemoUserConfig } from '../data/initialUsers';
-import { ROUTE_PERMISSIONS } from '../routes/navigation';
 
-export type SystemAction =
-  | 'REGISTRAR_RFC'           // PU-01
-  | 'SUBSANAR_RFC'           // PU-01
-  | 'VALIDAR_CLASIFICAR_RFC' // PU-02
-  | 'ANALIZAR_IMPACTO'       // PU-03
-  | 'EVALUAR_CCB'            // PU-04
-  | 'AUTORIZAR_CAMBIO_MENOR' // PU-02 + PU-03
-  | 'EMITIR_ECN'             // PU-04 / PU-02
-  | 'CHECK_OUT'              // PU-05
-  | 'CHECK_IN'               // PU-05
-  | 'IMPLEMENTAR_CAMBIO'     // PU-06
-  | 'VALIDACION_QA'          // PU-07
-  | 'SUSCRIBIR_UAT'          // PU-01
-  | 'CONGELAR_BASELINE'      // PU-05
-  | 'EJECUTAR_ROLLBACK'      // PU-05
-  | 'REGISTRAR_INCIDENCIA'   // PU-01
-  | 'DERIVAR_INCIDENCIA'     // PU-02
-  | 'AUDITAR_SISTEMA'        // PU-04, PU-05
-  | 'GESTIONAR_PROYECTOS'    // PU-02
-  | 'GESTIONAR_USUARIOS';    // PU-05
-
-// Matriz de Autorización y Segregación de Funciones (SoD)
-const ACTION_PERMISSIONS: Record<SystemAction, CanonicalRoleId[]> = {
-  REGISTRAR_RFC: ['PU-01'],
-  SUBSANAR_RFC: ['PU-01'],
-  VALIDAR_CLASIFICAR_RFC: ['PU-02'],
-  ANALIZAR_IMPACTO: ['PU-03'],
-  EVALUAR_CCB: ['PU-04'],
-  AUTORIZAR_CAMBIO_MENOR: ['PU-02', 'PU-03'],
-  EMITIR_ECN: ['PU-04', 'PU-02'],
-  CHECK_OUT: ['PU-05'],
-  CHECK_IN: ['PU-05'],
-  IMPLEMENTAR_CAMBIO: ['PU-06'],
-  VALIDACION_QA: ['PU-07'],
-  SUSCRIBIR_UAT: ['PU-01'],
-  CONGELAR_BASELINE: ['PU-05'],
-  EJECUTAR_ROLLBACK: ['PU-05'],
-  REGISTRAR_INCIDENCIA: ['PU-01'],
-  DERIVAR_INCIDENCIA: ['PU-02'],
-  AUDITAR_SISTEMA: ['PU-04', 'PU-05'],
-  GESTIONAR_PROYECTOS: ['PU-02'],
-  GESTIONAR_USUARIOS: ['PU-05'],
-};
-
-export { ROUTE_PERMISSIONS };
+export type { SystemAction };
+export { ACTION_PERMISSIONS, ROUTE_PERMISSIONS };
 
 export const authService = {
   getAccounts(): UserAccount[] {

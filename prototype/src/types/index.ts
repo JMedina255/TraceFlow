@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './permissions';
 export * from './project';
 export * from './ecs';
 export * from './rfc';

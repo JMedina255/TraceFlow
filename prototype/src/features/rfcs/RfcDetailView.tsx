@@ -716,8 +716,7 @@ export const RfcDetailView: React.FC = () => {
               {/* Botón para que el Solicitante subsane */}
               <div className="pt-2 border-t border-amber-200 flex flex-wrap items-center justify-between gap-3">
                 {activeRoleId === 'PU-01' ? (
-                  ((rfc.requesterId && rfc.requesterId === currentUser.id) ||
-                  rfc.requesterName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase()) ? (
+                  (rfc.requesterId === currentUser.id) ? (
                     <Link
                       to={`/rfcs/${rfc.id}/edit`}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
@@ -1567,10 +1566,10 @@ export const RfcDetailView: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
                 <div className="space-y-0.5">
                   <h3 className="text-base font-bold text-upt-primary">
-                    Bitácora Forense de Auditoría SHA-256
+                    Registro de Auditoría y Trazabilidad (Demostrativo)
                   </h3>
                   <p className="text-xs text-upt-muted">
-                    Registro inmutable de transacciones vinculadas a este expediente protegidas por hash SHA-256.
+                    Historial cronológico de eventos vinculados a este expediente. Los identificadores hash operan bajo un modelo demostrativo local.
                   </p>
                 </div>
 

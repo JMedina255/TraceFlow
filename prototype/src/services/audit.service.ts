@@ -1,3 +1,12 @@
+/**
+ * Servicio de Auditoría y Trazabilidad de Eventos Locales (Demostrativo).
+ * 
+ * ALCANCE Y LIMITACIONES:
+ * Este servicio mantiene un registro de eventos locales demostrativos para
+ * trazabilidad funcional en el prototipo. El campo sha256Hash utiliza un algoritmo
+ * determinístico simulado para presentación, por lo que no constituye almacenamiento
+ * forense criptográfico inmutable de producción.
+ */
 import type { AuditEvent } from '../types';
 import { INITIAL_AUDIT_EVENTS } from '../data/initialAudit';
 import { storageService } from './storage.service';

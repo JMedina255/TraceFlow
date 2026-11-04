@@ -234,9 +234,7 @@ export const RfcEditView: React.FC = () => {
   // CASO 4.1: COMPROBACIÓN DE PROPIEDAD (OWNERSHIP)
   // La subsanación está restringida exclusivamente al solicitante original
   // =========================================================================
-  const isOriginalRequester =
-    (rfc.requesterId && rfc.requesterId === currentUser.id) ||
-    rfc.requesterName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase();
+  const isOriginalRequester = rfc.requesterId === currentUser.id;
 
   if (!isOriginalRequester) {
     return (

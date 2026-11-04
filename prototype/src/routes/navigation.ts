@@ -11,38 +11,9 @@ import {
   BarChart3,
 } from 'lucide-react';
 import type { CanonicalRoleId } from '../types';
+import { ROUTE_PERMISSIONS } from '../types';
+export { ROUTE_PERMISSIONS };
 
-/**
- * Matriz Centralizada de Permisos por Ruta (Fuente Única de Verdad - SSOT)
- * Define qué roles canónicos (PU-01 a PU-07) tienen autorización para acceder a cada ruta.
- * Utilizado de manera consistente por Sidebar, AppRouter, RouteGuard y authService.
- */
-export const ROUTE_PERMISSIONS: Record<string, CanonicalRoleId[]> = {
-  '/dashboard': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/projects': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/projects/:projectId': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/rfcs': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/rfcs/new': ['PU-01'], // Exclusivo Solicitante (CU-04)
-  '/rfcs/:rfcId': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/rfcs/:rfcId/edit': ['PU-01'], // Exclusivo Solicitante (CU-04.1)
-  '/rfcs/:rfcId/impact-analysis': ['PU-03'], // Exclusivo Arquitecto (CU-06)
-  '/rfcs/:rfcId/ccb-deliberation': ['PU-04'], // Exclusivo Comité CCB (CU-07)
-  '/rfcs/:rfcId/minor-approval': ['PU-02', 'PU-03'], // Doble llave Gestor + Arquitecto (CU-30)
-  '/rfcs/:rfcId/uat': ['PU-01'], // Exclusivo Solicitante (CU-29)
-  '/ecns': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecns/:ecnId': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs/:ecsId': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs/:ecsId/history': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/scm/operations': ['PU-05'], // Exclusivo Bibliotecario SCM (RN-04)
-  '/baselines': ['PU-05'], // Exclusivo Bibliotecario SCM (RN-02, RN-08)
-  '/qa/validation/:rfcId': ['PU-07'], // Exclusivo Calidad (RN-09)
-  '/incidents': ['PU-01', 'PU-02'], // Solicitante y Gestor (CU-23, CU-24)
-  '/incidents/:incidentId': ['PU-01', 'PU-02'],
-  '/audit': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-27)
-  '/reports': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-28)
-  '/admin/users': ['PU-05'], // Exclusivo Bibliotecario / Admin SCM (CU-01)
-};
 
 export interface RouteMeta {
   path: string;

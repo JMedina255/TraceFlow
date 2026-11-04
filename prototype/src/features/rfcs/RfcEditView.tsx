@@ -231,6 +231,48 @@ export const RfcEditView: React.FC = () => {
   }
 
   // =========================================================================
+  // CASO 4.1: COMPROBACIÓN DE PROPIEDAD (OWNERSHIP)
+  // La subsanación está restringida exclusivamente al solicitante original
+  // =========================================================================
+  const isOriginalRequester =
+    (rfc.requesterId && rfc.requesterId === currentUser.id) ||
+    rfc.requesterName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase();
+
+  if (!isOriginalRequester) {
+    return (
+      <div className="max-w-4xl mx-auto py-10 px-4 space-y-6">
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-3 bg-amber-100 text-amber-800 rounded-xl shrink-0 mt-0.5">
+              <Lock className="w-6 h-6 text-amber-700" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-300">
+                Propiedad del Expediente
+              </span>
+              <h2 className="text-lg sm:text-xl font-bold text-amber-950 pt-1">
+                Subsanación Restringida al Solicitante Original
+              </h2>
+              <p className="text-xs sm:text-sm text-amber-900 leading-relaxed pt-1">
+                Este pliego de observaciones fue emitido para el solicitante original <strong>{rfc.requesterName}</strong>. Aunque operas bajo el rol Solicitante, no puedes subsanar una solicitud registrada por otro colaborador.
+              </p>
+            </div>
+          </div>
+          <div className="pt-3 border-t border-amber-200">
+            <Link
+              to={`/rfcs/${rfc.id}`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 text-xs font-semibold border border-amber-300 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Volver al Expediente</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
   // DATOS OPERATIVOS DEL FORMULARIO
   // =========================================================================
   const projectEcsList = ecsService.getAll(rfc.projectId);

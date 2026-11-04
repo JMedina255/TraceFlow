@@ -716,13 +716,20 @@ export const RfcDetailView: React.FC = () => {
               {/* Botón para que el Solicitante subsane */}
               <div className="pt-2 border-t border-amber-200 flex flex-wrap items-center justify-between gap-3">
                 {activeRoleId === 'PU-01' ? (
-                  <Link
-                    to={`/rfcs/${rfc.id}/edit`}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
-                  >
-                    <FileCode className="w-4 h-4" />
-                    <span>Subsanar Solicitud</span>
-                  </Link>
+                  ((rfc.requesterId && rfc.requesterId === currentUser.id) ||
+                  rfc.requesterName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase()) ? (
+                    <Link
+                      to={`/rfcs/${rfc.id}/edit`}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
+                    >
+                      <FileCode className="w-4 h-4" />
+                      <span>Subsanar Solicitud</span>
+                    </Link>
+                  ) : (
+                    <span className="text-xs text-amber-900 italic">
+                      * Solicitud registrada por {rfc.requesterName}. La subsanación está reservada al autor del expediente.
+                    </span>
+                  )
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[11px] text-amber-900">

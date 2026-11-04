@@ -1,3 +1,4 @@
+import type { TechnicalImpactReport } from './impactAnalysis';
 /**
  * Definiciones de Solicitud de Cambio (RFC) y Ciclo de Vida Oficial
  * Basado en: RF-04, RF-05, RF-06, RF-14, TB-07, DG-11, RN-05, RN-07
@@ -182,7 +183,8 @@ export interface RFC {
   subsanatedAt?: string;
   rejectionReason?: string;
   cancellationReason?: string;
-  technicalImpact?: TechnicalImpactAssessment;
+  impactAnalysisId?: string;
+  technicalImpact?: TechnicalImpactAssessment | TechnicalImpactReport;
   ecnId?: string;
   attachments?: string[];
   createdAt: string;

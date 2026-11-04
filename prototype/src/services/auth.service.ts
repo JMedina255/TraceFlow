@@ -1,5 +1,6 @@
 import type { CanonicalRoleId, UserAccount, User } from '../types';
 import { INITIAL_USER_ACCOUNTS, INITIAL_DEMO_USERS, type DemoUserConfig } from '../data/initialUsers';
+import { ROUTE_PERMISSIONS } from '../routes/navigation';
 
 export type SystemAction =
   | 'REGISTRAR_RFC'           // PU-01
@@ -45,33 +46,7 @@ const ACTION_PERMISSIONS: Record<SystemAction, CanonicalRoleId[]> = {
   GESTIONAR_USUARIOS: ['PU-05'],
 };
 
-// Matriz de Permisos por Ruta para RouteGuard
-const ROUTE_PERMISSIONS: Record<string, CanonicalRoleId[]> = {
-  '/dashboard': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/projects': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/projects/:projectId': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/rfcs': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/rfcs/new': ['PU-01'],
-  '/rfcs/:rfcId': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/rfcs/:rfcId/edit': ['PU-01'],
-  '/rfcs/:rfcId/impact-analysis': ['PU-03'],
-  '/rfcs/:rfcId/ccb-deliberation': ['PU-04'],
-  '/rfcs/:rfcId/minor-approval': ['PU-02', 'PU-03'],
-  '/rfcs/:rfcId/uat': ['PU-01'],
-  '/ecns': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecns/:ecnId': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs/:ecsId': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/ecs/:ecsId/history': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
-  '/scm/operations': ['PU-05'],
-  '/baselines': ['PU-05'],
-  '/qa/validation/:rfcId': ['PU-07'],
-  '/incidents': ['PU-01', 'PU-02'],
-  '/incidents/:incidentId': ['PU-01', 'PU-02'],
-  '/audit': ['PU-04', 'PU-05', 'PU-02'],
-  '/reports': ['PU-04', 'PU-05', 'PU-02'],
-  '/admin/users': ['PU-05'],
-};
+export { ROUTE_PERMISSIONS };
 
 export const authService = {
   getAccounts(): UserAccount[] {

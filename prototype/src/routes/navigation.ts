@@ -10,6 +10,39 @@ import {
   History,
   BarChart3,
 } from 'lucide-react';
+import type { CanonicalRoleId } from '../types';
+
+/**
+ * Matriz Centralizada de Permisos por Ruta (Fuente Única de Verdad - SSOT)
+ * Define qué roles canónicos (PU-01 a PU-07) tienen autorización para acceder a cada ruta.
+ * Utilizado de manera consistente por Sidebar, AppRouter, RouteGuard y authService.
+ */
+export const ROUTE_PERMISSIONS: Record<string, CanonicalRoleId[]> = {
+  '/dashboard': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/projects': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
+  '/projects/:projectId': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
+  '/rfcs': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/rfcs/new': ['PU-01'], // Exclusivo Solicitante (CU-04)
+  '/rfcs/:rfcId': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/rfcs/:rfcId/edit': ['PU-01'], // Exclusivo Solicitante (CU-04.1)
+  '/rfcs/:rfcId/impact-analysis': ['PU-03'], // Exclusivo Arquitecto (CU-06)
+  '/rfcs/:rfcId/ccb-deliberation': ['PU-04'], // Exclusivo Comité CCB (CU-07)
+  '/rfcs/:rfcId/minor-approval': ['PU-02', 'PU-03'], // Doble llave Gestor + Arquitecto (CU-30)
+  '/rfcs/:rfcId/uat': ['PU-01'], // Exclusivo Solicitante (CU-29)
+  '/ecns': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/ecns/:ecnId': ['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/ecs': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
+  '/ecs/:ecsId': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
+  '/ecs/:ecsId/history': ['PU-03', 'PU-05', 'PU-06', 'PU-07'],
+  '/scm/operations': ['PU-05'], // Exclusivo Bibliotecario SCM (RN-04)
+  '/baselines': ['PU-05'], // Exclusivo Bibliotecario SCM (RN-02, RN-08)
+  '/qa/validation/:rfcId': ['PU-07'], // Exclusivo Calidad (RN-09)
+  '/incidents': ['PU-01', 'PU-02'], // Solicitante y Gestor (CU-23, CU-24)
+  '/incidents/:incidentId': ['PU-01', 'PU-02'],
+  '/audit': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-27)
+  '/reports': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-28)
+  '/admin/users': ['PU-05'], // Exclusivo Bibliotecario / Admin SCM (CU-01)
+};
 
 export interface RouteMeta {
   path: string;
@@ -353,18 +386,25 @@ export const ROUTES_METADATA: Record<string, RouteMeta> = {
   },
 };
 
+export interface NavigationItem {
+  label: string;
+  path: string;
+  screenId?: string;
+  allowedRoles: CanonicalRoleId[];
+}
+
 export interface SidebarSection {
   id: string;
   name: string;
-  packageCode: string;
+  packageCode?: string;
   icon: LucideIcon;
-  items: {
-    label: string;
-    path: string;
-    screenId: string;
-  }[];
+  items: NavigationItem[];
 }
 
+/**
+ * Catálogo Canónico Completo de Secciones y Opciones del Menú Lateral
+ * Cada opción define explícitamente sus roles autorizados basándose en ROUTE_PERMISSIONS.
+ */
 export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   {
     id: 'general',
@@ -372,7 +412,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'RESUMEN',
     icon: LayoutDashboard,
     items: [
-      { label: 'Dashboard', path: '/dashboard', screenId: 'SCREEN-02' },
+      {
+        label: 'Dashboard',
+        path: '/dashboard',
+        screenId: 'SCREEN-02',
+        allowedRoles: ROUTE_PERMISSIONS['/dashboard'],
+      },
     ],
   },
   {
@@ -381,7 +426,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_PROJ',
     icon: FolderGit2,
     items: [
-      { label: 'Directorio de Proyectos', path: '/projects', screenId: 'SCREEN-03' },
+      {
+        label: 'Directorio de Proyectos',
+        path: '/projects',
+        screenId: 'SCREEN-03',
+        allowedRoles: ROUTE_PERMISSIONS['/projects'],
+      },
     ],
   },
   {
@@ -390,10 +440,30 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_CHG',
     icon: GitPullRequest,
     items: [
-      { label: 'Bandeja de solicitudes (RFC)', path: '/rfcs', screenId: 'SCREEN-05' },
-      { label: 'Nueva solicitud (RFC)', path: '/rfcs/new', screenId: 'SCREEN-07' },
-      { label: 'Órdenes de Cambio (ECN)', path: '/ecns', screenId: 'SCREEN-11' },
-      { label: 'Validación de calidad (QA)', path: '/qa/validation/RFC-2026-0042', screenId: 'SCREEN-15' },
+      {
+        label: 'Bandeja de solicitudes (RFC)',
+        path: '/rfcs',
+        screenId: 'SCREEN-05',
+        allowedRoles: ROUTE_PERMISSIONS['/rfcs'],
+      },
+      {
+        label: 'Nueva solicitud (RFC)',
+        path: '/rfcs/new',
+        screenId: 'SCREEN-07',
+        allowedRoles: ROUTE_PERMISSIONS['/rfcs/new'],
+      },
+      {
+        label: 'Órdenes de Cambio (ECN)',
+        path: '/ecns',
+        screenId: 'SCREEN-11',
+        allowedRoles: ROUTE_PERMISSIONS['/ecns'],
+      },
+      {
+        label: 'Validación de calidad (QA)',
+        path: '/qa/validation/RFC-2026-0042',
+        screenId: 'SCREEN-15',
+        allowedRoles: ROUTE_PERMISSIONS['/qa/validation/:rfcId'],
+      },
     ],
   },
   {
@@ -402,7 +472,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_ECS',
     icon: FileCode2,
     items: [
-      { label: 'Catálogo de ECS', path: '/ecs', screenId: 'SCREEN-12' },
+      {
+        label: 'Catálogo de ECS',
+        path: '/ecs',
+        screenId: 'SCREEN-12',
+        allowedRoles: ROUTE_PERMISSIONS['/ecs'],
+      },
     ],
   },
   {
@@ -411,8 +486,18 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_LIB',
     icon: Boxes,
     items: [
-      { label: 'Operaciones de biblioteca', path: '/scm/operations', screenId: 'SCREEN-13' },
-      { label: 'Líneas base y reversión', path: '/baselines', screenId: 'SCREEN-17' },
+      {
+        label: 'Operaciones de biblioteca',
+        path: '/scm/operations',
+        screenId: 'SCREEN-13',
+        allowedRoles: ROUTE_PERMISSIONS['/scm/operations'],
+      },
+      {
+        label: 'Líneas base y reversión',
+        path: '/baselines',
+        screenId: 'SCREEN-17',
+        allowedRoles: ROUTE_PERMISSIONS['/baselines'],
+      },
     ],
   },
   {
@@ -421,7 +506,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_SUPP',
     icon: LifeBuoy,
     items: [
-      { label: 'Mesa de Incidencias', path: '/incidents', screenId: 'SCREEN-18' },
+      {
+        label: 'Mesa de Incidencias',
+        path: '/incidents',
+        screenId: 'SCREEN-18',
+        allowedRoles: ROUTE_PERMISSIONS['/incidents'],
+      },
     ],
   },
   {
@@ -430,7 +520,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_AUD',
     icon: History,
     items: [
-      { label: 'Bitácora Forense SHA-256', path: '/audit', screenId: 'SCREEN-19' },
+      {
+        label: 'Bitácora Forense SHA-256',
+        path: '/audit',
+        screenId: 'SCREEN-19',
+        allowedRoles: ROUTE_PERMISSIONS['/audit'],
+      },
     ],
   },
   {
@@ -439,7 +534,12 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_REP',
     icon: BarChart3,
     items: [
-      { label: 'Generador de Reportes', path: '/reports', screenId: 'SCREEN-19' },
+      {
+        label: 'Generador de Reportes',
+        path: '/reports',
+        screenId: 'SCREEN-19',
+        allowedRoles: ROUTE_PERMISSIONS['/reports'],
+      },
     ],
   },
   {
@@ -448,7 +548,40 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     packageCode: 'PKG_GOB',
     icon: Shield,
     items: [
-      { label: 'Usuarios y roles', path: '/admin/users', screenId: 'SCREEN-20' },
+      {
+        label: 'Usuarios y roles',
+        path: '/admin/users',
+        screenId: 'SCREEN-20',
+        allowedRoles: ROUTE_PERMISSIONS['/admin/users'],
+      },
     ],
   },
 ];
+
+/**
+ * Calcula las secciones y opciones de navegación visibles según el rol efectivo en sesión.
+ * Si no hay rol activo o el rol no está autorizado, la opción u sección no se incluye en el menú.
+ */
+export const getNavigationForRole = (roleId: CanonicalRoleId | null): SidebarSection[] => {
+  if (!roleId) return [];
+
+  return SIDEBAR_NAVIGATION.map((section) => {
+    // Filtrar únicamente los ítems que admitan el rol activo
+    const filteredItems = section.items.filter((item) => item.allowedRoles.includes(roleId));
+
+    return {
+      ...section,
+      items: filteredItems,
+    };
+  }).filter((section) => section.items.length > 0); // Excluir secciones que queden vacías
+};
+
+/**
+ * Valida si una ruta está autorizada para un rol canónico dado.
+ */
+export const isRouteAuthorizedForRole = (path: string, roleId: CanonicalRoleId | null): boolean => {
+  if (!roleId) return false;
+  const allowed = ROUTE_PERMISSIONS[path];
+  if (!allowed) return true; // Rutas no listadas son abiertas por defecto
+  return allowed.includes(roleId);
+};

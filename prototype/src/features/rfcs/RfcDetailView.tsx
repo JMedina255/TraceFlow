@@ -190,7 +190,7 @@ export const RfcDetailView: React.FC = () => {
                 Acceso Bloqueado: Expediente de Proyecto Externo
               </h2>
               <p className="text-xs sm:text-sm text-amber-900 leading-relaxed pt-1">
-                Por políticas de gobierno y aislamiento de configuración (FD05 §20.5 / RNF-08), 
+                Por políticas de gobierno y aislamiento de proyectos, 
                 no está permitido consultar solicitudes de cambio pertenecientes a proyectos distintos 
                 al actualmente seleccionado en la sesión activa.
               </p>
@@ -263,7 +263,7 @@ export const RfcDetailView: React.FC = () => {
     if (!classification) {
       return (
         <span className="text-xs text-upt-muted italic bg-upt-bg px-2.5 py-0.5 rounded border border-upt-border">
-          Pendiente de Clasificación Oficial (CU-05)
+          Pendiente de Clasificación
         </span>
       );
     }
@@ -318,9 +318,7 @@ export const RfcDetailView: React.FC = () => {
           <span>Volver a la Bandeja de Solicitudes</span>
         </Link>
 
-        <div className="flex items-center gap-2 text-[11px] font-mono text-upt-muted">
-          <span>Trazabilidad: SCREEN-06 &bull; NAV-06 &bull; PRES-04/07</span>
-        </div>
+        
       </div>
 
       {/* Cabecera Principal del Expediente 360° */}
@@ -369,7 +367,7 @@ export const RfcDetailView: React.FC = () => {
           <div className="p-3 rounded-xl bg-upt-bg/60 border border-upt-border space-y-1">
             <span className="text-[11px] text-upt-muted flex items-center gap-1">
               <User className="w-3.5 h-3.5 text-upt-secondary" />
-              Solicitante (PU-01):
+              Solicitante:
             </span>
             <div className="font-semibold text-upt-text truncate">{rfc.requesterName}</div>
             <div className="text-[10px] font-mono text-upt-muted">{rfc.requesterId}</div>
@@ -388,7 +386,7 @@ export const RfcDetailView: React.FC = () => {
           <div className="p-3 rounded-xl bg-upt-bg/60 border border-upt-border space-y-1">
             <span className="text-[11px] text-upt-muted flex items-center gap-1">
               <FileCheck2 className="w-3.5 h-3.5 text-upt-secondary" />
-              Clasificación (RN-01):
+              Clasificación:
             </span>
             <div>{renderClassificationBadge(rfc.classification)}</div>
           </div>
@@ -409,10 +407,9 @@ export const RfcDetailView: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-200/60 text-upt-primary">
-                    FASE: ADMISIÓN Y FILTRO DE COMPLETITUD (CU-05)
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-200/60 text-upt-primary">
+                    Admisión y Filtro de Completitud
                   </span>
-                  <span className="text-xs text-upt-muted font-medium">Variante WF-06A</span>
                 </div>
                 <h3 className="text-sm font-bold text-upt-primary">
                   {rfc.status === 'REGISTRADA' && 'Solicitud registrada pendiente de evaluación formal de completitud'}
@@ -422,13 +419,13 @@ export const RfcDetailView: React.FC = () => {
                 </h3>
                 <p className="text-xs text-upt-text-secondary leading-relaxed">
                   {rfc.status === 'REGISTRADA' &&
-                    'El Analista de Requerimientos / Gestor (PU-02) verificará la veracidad, completitud de la justificación (RN-01) y pertinencia del ECS antes de admitir, observar o desestimar el cambio.'}
+                    'El Gestor de Cambios verificará la consistencia, completitud de la justificación y pertinencia del elemento de configuración antes de admitir, observar o desestimar la solicitud.'}
                   {rfc.status === 'EN_SUBSANACION' &&
                     `El Gestor registró observaciones formales sobre la solicitud. El Solicitante (${rfc.requesterName}) dispone del plazo para subsanar los datos o formular su descargo técnico.`}
                   {rfc.status === 'CLASIFICADA' &&
-                    'La solicitud ha superado el filtro formal de admisión y está lista para que el Arquitecto de Software elabore el Informe Técnico de Impacto (CU-06).'}
+                    'La solicitud ha superado el filtro formal de admisión y se encuentra lista para la elaboración del informe técnico de impacto.'}
                   {rfc.status === 'DESESTIMADA' &&
-                    'El expediente concluyó de forma anticipada bajo la regla RN-07 y se encuentra en estado terminal. No admite nuevas modificaciones ordinarias.'}
+                    'El expediente ha concluido de forma anticipada y se encuentra cerrado. No admite nuevas modificaciones.'}
                 </p>
               </div>
             </div>
@@ -469,15 +466,15 @@ export const RfcDetailView: React.FC = () => {
                       <ShieldCheck className="w-5 h-5 text-upt-primary" />
                       <div>
                         <h4 className="text-xs sm:text-sm font-bold text-upt-primary">
-                          Consola de Revisión Inicial y Dictamen de Admisión (CU-05)
+                          Revisión Inicial y Dictamen de Admisión
                         </h4>
                         <p className="text-[11px] text-upt-muted">
-                          Acción autorizada para el Analista de Requerimientos / Gestor (PU-02)
+                          Acción exclusiva del Gestor de Cambios
                         </p>
                       </div>
                     </div>
-                    <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-blue-50 text-upt-primary font-bold border border-blue-200 self-start sm:self-auto">
-                      Rol Activo: PU-02
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-upt-primary font-bold border border-blue-200 self-start sm:self-auto">
+                      Rol Activo: Gestor
                     </span>
                   </div>
 
@@ -510,7 +507,7 @@ export const RfcDetailView: React.FC = () => {
                         <span className="text-xs font-bold">Opción A: Admitir RFC</span>
                       </div>
                       <p className="text-[11px] text-upt-muted mt-1 leading-snug">
-                        Transiciona a CLASIFICADA para posterior análisis técnico (CU-06).
+                        Pasa a estado CLASIFICADA para posterior análisis técnico.
                       </p>
                     </button>
 
@@ -552,7 +549,7 @@ export const RfcDetailView: React.FC = () => {
                         <span className="text-xs font-bold">Opción C: Desestimar RFC</span>
                       </div>
                       <p className="text-[11px] text-upt-muted mt-1 leading-snug">
-                        Cierre anticipado formal bajo RN-07. Transiciona a DESESTIMADA.
+                        Cierre formal de la solicitud. Pasa a estado DESESTIMADA.
                       </p>
                     </button>
                   </div>
@@ -575,7 +572,7 @@ export const RfcDetailView: React.FC = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
                         <span className="text-[11px] text-emerald-800">
-                          * La clasificación técnica definitiva en Cambio Mayor o Menor será determinada por el Arquitecto en CU-06.
+                          * La clasificación técnica definitiva será determinada tras el informe de impacto.
                         </span>
                         <button
                           type="button"
@@ -607,7 +604,7 @@ export const RfcDetailView: React.FC = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
                         <span className="text-[11px] text-amber-900">
-                          * La solicitud pasará al estado EN_SUBSANACION para que el Solicitante la rectifique en CU-04.1.
+                          * La solicitud pasará a estado de subsanación para que el solicitante formule sus descargos.
                         </span>
                         <button
                           type="button"
@@ -646,7 +643,7 @@ export const RfcDetailView: React.FC = () => {
                           className="mt-0.5 rounded border-red-300 text-red-600 focus:ring-red-300 cursor-pointer"
                         />
                         <span>
-                          Confirmo la desestimación definitiva de este expediente y su archivo en estado terminal <strong>DESESTIMADA</strong> bajo la regla RN-07.
+                          Confirmo la desestimación definitiva de este expediente y su archivo en estado <strong>DESESTIMADA</strong>.
                         </span>
                       </label>
 
@@ -671,10 +668,10 @@ export const RfcDetailView: React.FC = () => {
                 <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl text-xs space-y-2">
                   <div className="flex items-center gap-2 text-upt-primary font-semibold">
                     <Lock className="w-4 h-4" />
-                    <span>Segregación de Funciones (CU-05 / SoD): Revisión Inicial Reservada al Gestor (PU-02)</span>
+                    <span>Revisión Inicial Reservada al Gestor</span>
                   </div>
                   <p className="text-upt-text-secondary leading-relaxed">
-                    Esta solicitud está a la espera de validación formal de completitud y pertinencia por el Analista de Requerimientos / Gestor (PU-02). Su rol en la sesión activa es <strong>{currentUser.roleLabel} ({activeRoleId})</strong>.
+                    Esta solicitud está a la espera de validación formal de completitud por parte del Gestor de Cambios. Su rol activo es <strong>{currentUser.roleLabel}</strong>.
                   </p>
                   {currentUser.allowedRoleIds.includes('PU-02') && (
                     <button
@@ -683,7 +680,7 @@ export const RfcDetailView: React.FC = () => {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors cursor-pointer mt-1"
                     >
                       <User className="w-3.5 h-3.5" />
-                      <span>Conmutar al rol PU-02 para evaluar esta solicitud</span>
+                      <span>Asumir rol de Gestor</span>
                     </button>
                   )}
                 </div>
@@ -697,7 +694,7 @@ export const RfcDetailView: React.FC = () => {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2 font-bold text-amber-950">
                   <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
-                  <span>PLIEGO DE OBSERVACIONES PENDIENTE DE SUBSANACIÓN (CU-04.1)</span>
+                  <span>Pliego de Observaciones Pendiente de Subsanación</span>
                 </div>
                 <span className="font-mono text-[11px] text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-300">
                   Acción del Solicitante
@@ -723,7 +720,7 @@ export const RfcDetailView: React.FC = () => {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
                   >
                     <FileCode className="w-4 h-4" />
-                    <span>Corregir y Subsanar Solicitud (CU-04.1)</span>
+                    <span>Subsanar Solicitud</span>
                   </Link>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
@@ -736,7 +733,7 @@ export const RfcDetailView: React.FC = () => {
                         onClick={() => switchRole('PU-01')}
                         className="text-[11px] font-bold text-amber-950 underline hover:text-amber-800 cursor-pointer"
                       >
-                        Conmutar al rol PU-01
+                        Asumir rol de Solicitante
                       </button>
                     )}
                   </div>
@@ -750,7 +747,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-xs space-y-2">
               <div className="flex items-center gap-2 font-bold text-emerald-950">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>SOLICITUD ADMITIDA FORMALMENTE (CU-05)</span>
+                <span>Solicitud Admitida Formalmente</span>
               </div>
               <p className="text-emerald-900 leading-relaxed bg-white/80 p-3 rounded-lg border border-emerald-200">
                 {rfc.admissionNotes || 'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'}
@@ -762,7 +759,7 @@ export const RfcDetailView: React.FC = () => {
                 )}
               </div>
               <div className="pt-1 text-[11px] text-emerald-900 font-medium">
-                &bull; Próxima fase: Elaboración del Informe Técnico de Impacto en Arquitectura (CU-06).
+                &bull; Próxima fase: Elaboración del Informe Técnico de Impacto.
               </div>
             </div>
           )}
@@ -772,7 +769,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="p-4 bg-gray-100 border border-gray-300 rounded-xl text-xs space-y-2">
               <div className="flex items-center gap-2 font-bold text-gray-900">
                 <XCircle className="w-4 h-4 text-gray-600 shrink-0" />
-                <span>SOLICITUD DESESTIMADA — ESTADO TERMINAL (RN-07)</span>
+                <span>Solicitud Desestimada</span>
               </div>
               <p className="text-gray-700 leading-relaxed bg-white/80 p-3 rounded-lg border border-gray-200">
                 <strong>Fundamentación del cierre:</strong> {rfc.dismissalReason || 'Cierre formal anticipado por falta de sustento técnico o desistimiento voluntario.'}
@@ -789,7 +786,7 @@ export const RfcDetailView: React.FC = () => {
           {/* Footer de Estado */}
           <div className="pt-2 border-t border-blue-200/80 flex items-center justify-between text-xs text-upt-muted">
             <span className="text-[11px]">
-              Trazabilidad de Admisión y Subsanación: CU-05 / CU-04.1
+              Fase de admisión y subsanación de la solicitud
             </span>
             <span className="font-mono text-[11px] text-upt-secondary font-semibold">
               Estado Actual: {rfc.status}
@@ -808,23 +805,22 @@ export const RfcDetailView: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-200/70 text-purple-900">
-                    FASE: EVALUACIÓN DE IMPACTO Y DICTAMEN (CU-06 / CU-07 / CU-30)
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-200/70 text-purple-900">
+                    Evaluación de Impacto y Dictamen
                   </span>
-                  <span className="text-xs text-upt-muted font-medium">Variante WF-06B</span>
                 </div>
                 <h3 className="text-sm font-bold text-purple-950">
                   {rfc.status === 'EN_ANALISIS_TECNICO'
-                    ? 'Evaluación Técnica de Arquitectura en Curso (CU-06)'
-                    : 'Deliberación Colegiada y Votación de Dictamen (CU-07 / CU-30)'}
+                    ? 'Evaluación Técnica de Impacto en Curso'
+                    : 'Deliberación Colegiada y Dictamen'}
                 </h3>
                 <p className="text-xs text-purple-900 leading-relaxed">
                   {rfc.status === 'EN_ANALISIS_TECNICO'
                     ? 'El Arquitecto está evaluando la afectación a la Triple Restricción (Alcance, Tiempo, Costo) y el nivel de riesgo técnico para ratificar la clasificación.'
                     : `La solicitud cuenta con informe técnico de impacto y está siendo evaluada por ${
                         rfc.classification === 'CAMBIO_MAYOR'
-                          ? 'el Comité de Control de Cambios (CCB) en sesión colegiada (CU-07)'
-                          : 'la Autoridad Operativa Delegada (Doble Llave Gestor + Arquitecto) bajo CU-30'
+                          ? 'el Comité de Control de Cambios (CCB)'
+                          : 'la Autoridad Operativa Delegada (Cambio Menor)'
                       }.`}
                 </p>
               </div>
@@ -838,7 +834,7 @@ export const RfcDetailView: React.FC = () => {
 
           <div className="pt-2 border-t border-purple-200/80 flex items-center justify-between text-xs text-purple-800">
             <span className="text-[11px]">
-              * Las operaciones de votación CCB (CU-07) y autorización de Cambio Menor (CU-30) se habilitarán en la Fase V.3.
+              * Las operaciones de dictamen colegiado se gestionan a través del comité de cambios.
             </span>
             <span className="font-mono text-[11px] font-semibold">{rfc.status}</span>
           </div>
@@ -855,10 +851,9 @@ export const RfcDetailView: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-200/70 text-emerald-900">
-                    FASE: EJECUCIÓN, QA Y CIERRE DE CONFIGURACIÓN
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-200/70 text-emerald-900">
+                    Ejecución, Calidad y Cierre de Configuración
                   </span>
-                  <span className="text-xs text-upt-muted font-medium">Variante WF-06C</span>
                 </div>
                 <h3 className="text-sm font-bold text-emerald-950">
                   {rfc.status === 'IMPLEMENTADA'
@@ -867,7 +862,7 @@ export const RfcDetailView: React.FC = () => {
                 </h3>
                 <p className="text-xs text-emerald-900 leading-relaxed">
                   {rfc.status === 'IMPLEMENTADA'
-                    ? 'La modificación fue incorporada a la Biblioteca Maestra (CU-12), se congeló la nueva Línea Base con hash SHA-256 (CU-20) y se formalizó el cierre del cambio.'
+                    ? 'La modificación fue incorporada a la Biblioteca Maestra, se congeló la nueva Línea Base con firma SHA-256 y se formalizó el cierre del cambio.'
                     : `El expediente avanza a través de las fases de implementación, verificación de calidad en Biblioteca de Soporte y suscripción formal de Acta UAT.`}
                 </p>
               </div>
@@ -903,13 +898,13 @@ export const RfcDetailView: React.FC = () => {
         {/* Barra de Pestañas */}
         <div className="flex items-center overflow-x-auto border-b border-upt-border bg-upt-bg/30 px-3 scrollbar-none select-none">
           {[
-            { id: 'resumen', label: '1. Resumen y Justificación' },
-            { id: 'ecs', label: '2. ECS Afectados' },
-            { id: 'impacto', label: '3. Análisis de Impacto' },
-            { id: 'dictamen', label: '4. Evaluación y Dictamen' },
-            { id: 'ecn', label: '5. Orden ECN/ECO' },
-            { id: 'qa', label: '6. Calidad y UAT' },
-            { id: 'auditoria', label: '7. Historial y Auditoría' },
+            { id: 'resumen', label: 'Resumen y justificación' },
+            { id: 'ecs', label: 'Elementos afectados (ECS)' },
+            { id: 'impacto', label: 'Análisis de impacto' },
+            { id: 'dictamen', label: 'Evaluación y dictamen' },
+            { id: 'ecn', label: 'Orden de cambio (ECN)' },
+            { id: 'qa', label: 'Calidad y pruebas' },
+            { id: 'auditoria', label: 'Historial y auditoría' },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -939,7 +934,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="space-y-6 animate-in fade-in">
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-upt-primary">
-                  Descripción y Justificación de Negocio (CU-04 / RN-01)
+                  Descripción y Justificación de Negocio
                 </h3>
                 <p className="text-xs text-upt-muted">
                   Fundamentación operativa y técnica radicada por el Solicitante para la apertura del expediente.
@@ -969,7 +964,7 @@ export const RfcDetailView: React.FC = () => {
               <div className="space-y-1.5">
                 <span className="text-xs font-semibold text-upt-text flex items-center gap-1.5">
                   <Building2 className="w-4 h-4 text-upt-secondary" />
-                  Justificación de Negocio / Valor Agregado (Mandatoria bajo RN-01):
+                  Justificación de Negocio / Valor Agregado:
                 </span>
                 <div className="p-4 rounded-xl bg-white border border-upt-border text-xs sm:text-sm text-upt-text leading-relaxed whitespace-pre-line shadow-2xs">
                   {rfc.justification}
@@ -989,16 +984,16 @@ export const RfcDetailView: React.FC = () => {
                 </div>
               ) : (
                 <div className="p-3.5 rounded-xl bg-upt-bg/40 border border-upt-border text-xs text-upt-muted italic">
-                  No se registró propuesta técnica preliminar por el Solicitante. La solución arquitectural será formulada por el especialista técnico en CU-06.
+                  No se registró propuesta técnica preliminar. La solución técnica será formulada en la fase de análisis de impacto.
                 </div>
               )}
 
-              {/* Notas de Descargo y Subsanación (CU-04.1) */}
+              {/* Notas de Descargo y Subsanación */}
               {rfc.subsanacionResponseNotes && (
                 <div className="space-y-1.5 p-4 rounded-xl bg-blue-50/70 border border-blue-200">
                   <span className="text-xs font-semibold text-upt-primary flex items-center gap-1.5">
                     <FileCheck2 className="w-4 h-4 text-upt-secondary" />
-                    Notas de Descargo / Subsanación formuladas por el Solicitante (CU-04.1):
+                    Notas de Descargo y Subsanación formuladas por el Solicitante:
                   </span>
                   <div className="p-3 rounded-lg bg-white border border-blue-100 text-xs sm:text-sm text-upt-text leading-relaxed whitespace-pre-line shadow-2xs">
                     {rfc.subsanacionResponseNotes}
@@ -1088,7 +1083,7 @@ export const RfcDetailView: React.FC = () => {
                       {ecsInfo.lock?.isLocked && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-red-50 text-red-900 border border-red-300">
                           <Lock className="w-3 h-3" />
-                          Bloqueado (RN-06)
+                          Bloqueado
                         </span>
                       )}
                     </div>
@@ -1121,7 +1116,7 @@ export const RfcDetailView: React.FC = () => {
                     <div className="p-3 bg-red-50/70 border border-red-200 rounded-xl text-xs space-y-1">
                       <div className="font-semibold text-red-900 flex items-center gap-1.5">
                         <Lock className="w-3.5 h-3.5 text-red-700" />
-                        <span>Bloqueo de Sincronización Activo (Regla de Negocio RN-06)</span>
+                        <span>Bloqueo de Sincronización Activo</span>
                       </div>
                       <p className="text-red-800 text-[11px]">
                         Bloqueado por <strong className="font-semibold">{ecsInfo.lock.lockedByUserName || 'Administrador SCM'}</strong> para la orden{' '}
@@ -1167,7 +1162,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="space-y-6 animate-in fade-in">
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-upt-primary">
-                  Informe Técnico de Impacto Arquitectural (CU-06 / RN-05)
+                  Informe Técnico de Impacto
                 </h3>
                 <p className="text-xs text-upt-muted">
                   Evaluación de viabilidad, dependencias y afectación a la Triple Restricción emitida por Arquitectura.
@@ -1180,7 +1175,7 @@ export const RfcDetailView: React.FC = () => {
                   <div className="p-5 rounded-2xl bg-white border border-upt-border shadow-xs space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
                       <div>
-                        <span className="text-[11px] text-upt-muted font-mono block">Especialista Evaluador (PU-03):</span>
+                        <span className="text-[11px] text-upt-muted font-mono block">Especialista Evaluador:</span>
                         <div className="font-bold text-upt-primary text-sm">
                           {rfc.technicalImpact.architectName}
                         </div>
@@ -1242,7 +1237,7 @@ export const RfcDetailView: React.FC = () => {
 
                     {/* Indicador de Triple Restricción */}
                     <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200 text-xs flex flex-wrap items-center justify-between gap-3">
-                      <span className="font-semibold text-upt-primary">Afectación de la Triple Restricción (RN-05):</span>
+                      <span className="font-semibold text-upt-primary">Afectación de Alcance, Tiempo y Costo:</span>
                       <div className="flex items-center gap-3 text-[11px]">
                         <span className={rfc.technicalImpact.tripleConstraintImpact.scopeAffected ? 'text-upt-primary font-bold' : 'text-upt-muted'}>
                           {rfc.technicalImpact.tripleConstraintImpact.scopeAffected ? '✓ Alcance Afectado' : '✗ Alcance No Afectado'}
@@ -1263,14 +1258,14 @@ export const RfcDetailView: React.FC = () => {
                   <Clock className="w-8 h-8 text-upt-muted mx-auto" />
                   <div className="max-w-md mx-auto space-y-1">
                     <h4 className="text-sm font-bold text-upt-text">
-                      Informe Técnico de Impacto Pendiente (CU-06)
+                      Informe Técnico de Impacto Pendiente
                     </h4>
                     <p className="text-xs text-upt-muted leading-relaxed">
                       Esta solicitud aún no cuenta con informe técnico de impacto registrado. Conforme al flujo oficial, el Arquitecto de Software emitirá este dictamen una vez admitida la solicitud.
                     </p>
                   </div>
                   <span className="inline-block text-[11px] font-mono font-medium text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
-                    Estado Actual: {rfc.status} &bull; Próxima Acción: CU-06
+                    Estado actual: {rfc.status} &bull; Pendiente de análisis técnico
                   </span>
                 </div>
               )}
@@ -1284,7 +1279,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="space-y-6 animate-in fade-in">
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-upt-primary">
-                  Evaluación Colegiada y Dictamen de Decisión (CU-07 / CU-30)
+                  Evaluación Colegiada y Dictamen de Decisión
                 </h3>
                 <p className="text-xs text-upt-muted">
                   Resolución emitida por el Comité de Control de Cambios (CCB) o por la Autoridad Delegada (Doble Llave).
@@ -1301,7 +1296,7 @@ export const RfcDetailView: React.FC = () => {
                       </span>
                     </div>
                     <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                      {rfc.classification === 'CAMBIO_MAYOR' ? 'Aprobación CCB (CU-07)' : 'Autorización Delegada (CU-30)'}
+                      {rfc.classification === 'CAMBIO_MAYOR' ? 'Aprobación del Comité (CCB)' : 'Autorización Delegada'}
                     </span>
                   </div>
 
@@ -1328,7 +1323,7 @@ export const RfcDetailView: React.FC = () => {
                 <div className="p-5 rounded-2xl bg-red-50 border border-red-300 shadow-xs space-y-3">
                   <div className="flex items-center gap-2 text-red-900 font-bold">
                     <XCircle className="w-5 h-5 text-upt-error" />
-                    <span>DICTAMEN NEGATIVO / CAMBIO RECHAZADO (CU-07 / CU-30)</span>
+                    <span>Dictamen Negativo / Cambio Rechazado</span>
                   </div>
                   <p className="text-xs text-red-800 leading-relaxed">
                     {rfc.rejectionReason || 'El cambio fue rechazado por el Comité debido a inviabilidad operativa en ventana de producción.'}
@@ -1338,7 +1333,7 @@ export const RfcDetailView: React.FC = () => {
                 <div className="p-5 rounded-2xl bg-gray-100 border border-gray-300 text-xs space-y-3">
                   <div className="flex items-center gap-2 font-bold text-gray-900">
                     <XCircle className="w-5 h-5 text-gray-700" />
-                    <span>SOLICITUD DESESTIMADA EN REVISIÓN INICIAL (RN-07)</span>
+                    <span>Solicitud Desestimada en Revisión Inicial</span>
                   </div>
                   <p className="text-gray-800 leading-relaxed bg-white/80 p-3 rounded-lg border border-gray-200">
                     {rfc.dismissalReason || 'Cierre formal anticipado por falta de sustento técnico o desistimiento voluntario.'}
@@ -1354,7 +1349,7 @@ export const RfcDetailView: React.FC = () => {
                 <div className="p-5 rounded-2xl bg-blue-50 border border-blue-300 text-xs space-y-3">
                   <div className="flex items-center gap-2 font-bold text-upt-primary">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span>DICTAMEN PRELIMINAR DE ADMISIÓN (CU-05)</span>
+                    <span>Dictamen Preliminar de Admisión</span>
                   </div>
                   <p className="text-upt-text-secondary leading-relaxed bg-white/90 p-3 rounded-lg border border-blue-200">
                     {rfc.admissionNotes || 'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'}
@@ -1366,7 +1361,7 @@ export const RfcDetailView: React.FC = () => {
                     )}
                   </div>
                   <div className="pt-1 text-[11px] text-upt-primary font-semibold">
-                    * El dictamen colegiado definitivo (CU-07 / CU-30) se emitirá tras la elaboración del Informe Técnico de Impacto en Arquitectura (CU-06).
+                    * El dictamen definitivo se emitirá tras la elaboración del informe técnico de impacto.
                   </div>
                 </div>
               ) : (
@@ -1378,7 +1373,7 @@ export const RfcDetailView: React.FC = () => {
                       Evaluación Formal y Dictamen Pendientes
                     </h4>
                     <p className="text-xs text-upt-muted leading-relaxed">
-                      El expediente aún no ha alcanzado la fase de deliberación y votación de dictamen. Las operaciones CU-07 y CU-30 se ejecutarán tras la emisión del informe técnico de impacto.
+                      El expediente aún no ha alcanzado la fase de deliberación y votación de dictamen. Esta acción se habilitará tras la emisión del informe técnico.
                     </p>
                   </div>
                   <span className="inline-block text-[11px] font-mono font-medium text-upt-muted bg-white px-3 py-1 rounded-lg border border-upt-border">
@@ -1396,7 +1391,7 @@ export const RfcDetailView: React.FC = () => {
             <div className="space-y-6 animate-in fade-in">
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-upt-primary">
-                  Orden de Cambio de Ingeniería (ECN/ECO — CU-08)
+                  Orden de Cambio de Ingeniería (ECN/ECO)
                 </h3>
                 <p className="text-xs text-upt-muted">
                   Instrumento contractual y normativo que autoriza la asignación de recursos y el Check-Out en SCM.
@@ -1457,7 +1452,7 @@ export const RfcDetailView: React.FC = () => {
                       Orden de Cambio (ECN) Pendiente de Emisión
                     </h4>
                     <p className="text-xs text-upt-muted leading-relaxed">
-                      No se ha emitido orden de cambio formal para esta solicitud. La ECN será generada mediante CU-08 una vez obtenido el dictamen aprobatorio correspondiente.
+                      No se ha emitido orden de cambio formal para esta solicitud. La orden se generará una vez obtenido el dictamen aprobatorio.
                     </p>
                   </div>
                   <span className="inline-block text-[11px] font-mono font-medium text-upt-muted bg-white px-3 py-1 rounded-lg border border-upt-border">
@@ -1478,7 +1473,7 @@ export const RfcDetailView: React.FC = () => {
                   Aseguramiento de Calidad (QA) y Aceptación de Usuario (UAT)
                 </h3>
                 <p className="text-xs text-upt-muted">
-                  Verificación en Biblioteca de Soporte (CU-16/17) y suscripción de Acta UAT por el Solicitante (CU-29).
+                  Verificación técnica de calidad y suscripción de acta de conformidad (UAT).
                 </p>
               </div>
 
@@ -1489,7 +1484,7 @@ export const RfcDetailView: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         <span className="font-bold text-sm text-emerald-950">
-                          CERTIFICACIÓN TÉCNICA DE CALIDAD CONFORME (CU-17 / RN-09)
+                          Certificación Técnica de Calidad Conforme
                         </span>
                       </div>
                       <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
@@ -1507,7 +1502,7 @@ export const RfcDetailView: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         <span className="font-bold text-sm text-emerald-950">
-                          ACTA DE ACEPTACIÓN UAT SUSCRITA (CU-29)
+                          Acta de Aceptación (UAT) Suscrita
                         </span>
                       </div>
                       <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
@@ -1524,17 +1519,17 @@ export const RfcDetailView: React.FC = () => {
                 <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-300 shadow-xs space-y-3">
                   <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
                     <Activity className="w-5 h-5 text-amber-700" />
-                    <span>SUITE DE PRUEBAS DE INTEGRACIÓN EN EJECUCIÓN (CU-16)</span>
+                    <span>Pruebas de Integración en Ejecución</span>
                   </div>
                   <p className="text-xs text-amber-800 leading-relaxed">
-                    El ECS modificado se encuentra en la Biblioteca de Soporte para la ejecución de pruebas por el Equipo de Calidad (PU-07). Pendiente de emisión del Certificado de Conformidad Técnica.
+                    El elemento modificado se encuentra en validación por el equipo de calidad. Pendiente de emisión del certificado de conformidad.
                   </p>
                 </div>
               ) : rfc.status === 'EN_ACEPTACION' ? (
                 <div className="p-5 rounded-2xl bg-blue-50/70 border border-blue-300 shadow-xs space-y-3">
                   <div className="flex items-center gap-2 text-upt-primary font-bold text-sm">
                     <FileCheck2 className="w-5 h-5 text-upt-secondary" />
-                    <span>CERTIFICADO QA CONFORME &bull; PENDIENTE DE SUSCRIPCIÓN ACTA UAT (CU-29)</span>
+                    <span>Certificado de Calidad Conforme &bull; Pendiente de Acta UAT</span>
                   </div>
                   <p className="text-xs text-upt-text-secondary leading-relaxed">
                     Las pruebas de QA concluyeron exitosamente. Se encuentra pendiente la suscripción formal del Acta de Aceptación por el Solicitante ({rfc.requesterName}) para habilitar el Check-In a Biblioteca Maestra.
@@ -1549,7 +1544,7 @@ export const RfcDetailView: React.FC = () => {
                       Aseguramiento de Calidad y UAT Pendientes
                     </h4>
                     <p className="text-xs text-upt-muted leading-relaxed">
-                      El cambio aún no ha concluido la fase de desarrollo e implementación en la Biblioteca de Trabajo. La entrega a QA (CU-16) se habilitará una vez finalizadas las modificaciones por el desarrollador.
+                      El cambio aún no ha concluido la fase de implementación. La entrega a calidad se habilitará al finalizar las modificaciones.
                     </p>
                   </div>
                   <span className="inline-block text-[11px] font-mono font-medium text-upt-muted bg-white px-3 py-1 rounded-lg border border-upt-border">
@@ -1568,7 +1563,7 @@ export const RfcDetailView: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
                 <div className="space-y-0.5">
                   <h3 className="text-base font-bold text-upt-primary">
-                    Bitácora Forense de Auditoría Append-Only (IEEE 828 / CU-27)
+                    Bitácora Forense de Auditoría SHA-256
                   </h3>
                   <p className="text-xs text-upt-muted">
                     Registro inmutable de transacciones vinculadas a este expediente protegidas por hash SHA-256.

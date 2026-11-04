@@ -31,10 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
       {/* Encabezado del Menú Lateral */}
       <div className="h-16 flex items-center px-4 border-b border-white/10 justify-between bg-upt-primary">
         <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
-          Módulos del Sistema (DG-04)
-        </span>
-        <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-upt-institutional text-upt-yellow border border-white/10">
-          8 Paquetes
+          Módulos del sistema
         </span>
       </div>
 
@@ -85,19 +82,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
                         }`
                       }
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span className="truncate">{item.label}</span>
-                          <span
-                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded transition-colors ${
-                              isActive
-                                ? 'bg-upt-primary text-white font-bold'
-                                : 'text-blue-200/80 bg-white/10'
-                            }`}
-                          >
-                            {item.screenId.replace('SCREEN-', 'S')}
-                          </span>
-                        </>
+                      {() => (
+                        <span className="truncate">{item.label}</span>
                       )}
                     </NavLink>
                   ))}

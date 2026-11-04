@@ -173,17 +173,8 @@ export const RfcListView: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-upt-border pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-blue-50 text-upt-primary border border-blue-200">
-              CU-04..08, CU-30
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-text-secondary border border-upt-border">
-              SCREEN-05 / WF-05
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-muted border border-upt-border">
-              Patrón PRES-03
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-blue-900 bg-blue-50 border border-blue-200">
-              14 Estados Oficiales (TB-07)
+            <span className="px-2.5 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-upt-primary border border-blue-200">
+              Control de Cambios
             </span>
           </div>
 
@@ -209,7 +200,7 @@ export const RfcListView: React.FC = () => {
             <Link
               to="/rfcs/new"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm cursor-pointer"
-              title="Registrar una nueva Solicitud de Cambio (CU-04)"
+              title="Registrar una nueva Solicitud de Cambio"
             >
               <Plus className="w-4 h-4 text-upt-yellow" />
               <span>+ Nueva Solicitud RFC</span>
@@ -223,9 +214,7 @@ export const RfcListView: React.FC = () => {
               >
                 <Plus className="w-4 h-4 text-upt-muted/60" />
                 <span>+ Nueva Solicitud RFC</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300">
-                  PU-01
-                </span>
+                
               </button>
               {/* Tooltip explicativo de Segregación de Funciones */}
               <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-upt-surface border border-upt-border rounded-xl shadow-xl text-left hidden group-hover:block z-30 animate-in fade-in">
@@ -233,10 +222,10 @@ export const RfcListView: React.FC = () => {
                   <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="text-xs font-semibold text-upt-text">
-                      Restricción de Rol (SoD)
+                      Permiso Requerido
                     </p>
                     <p className="text-[11px] text-upt-muted leading-tight">
-                      La creación de RFC (CU-04) está reservada exclusivamente para el rol <strong className="text-upt-text">Solicitante (PU-01)</strong>.
+                      La creación de solicitudes está reservada para el rol de <strong className="text-upt-text">Solicitante</strong>.
                     </p>
                     {canSwitchToSolicitante && (
                       <button
@@ -244,7 +233,7 @@ export const RfcListView: React.FC = () => {
                         onClick={() => switchRole('PU-01')}
                         className="mt-1 text-[11px] font-bold text-upt-bright hover:underline cursor-pointer flex items-center gap-1"
                       >
-                        <span>Conmutar a mi rol Solicitante</span>
+                        <span>Asumir rol de Solicitante</span>
                         <ArrowRight className="w-3 h-3" />
                       </button>
                     )}
@@ -347,7 +336,7 @@ export const RfcListView: React.FC = () => {
               }}
               className="w-full pl-9 pr-8 py-2 rounded-xl bg-white border border-upt-border text-xs sm:text-sm text-upt-text focus:outline-none focus:ring-2 focus:ring-upt-bright appearance-none cursor-pointer"
             >
-              <option value="TODOS">Todos los Estados (14 de TB-07)</option>
+              <option value="TODOS">Todos los estados</option>
               {Object.values(RFC_STATUS_CATALOG).map((meta) => (
                 <option key={meta.status} value={meta.status}>
                   {meta.label} {meta.isTerminal ? '(Terminal)' : ''}
@@ -412,7 +401,7 @@ export const RfcListView: React.FC = () => {
                   <th className="py-3 px-4 min-w-[260px]">Título y Justificación Resumida</th>
                   <th className="py-3 px-3 text-center">Prioridad</th>
                   <th className="py-3 px-3 text-center">Clasificación</th>
-                  <th className="py-3 px-3 text-center">Estado Oficial (TB-07)</th>
+                  <th className="py-3 px-3 text-center">Estado</th>
                   <th className="py-3 px-4 min-w-[140px]">Solicitante</th>
                   <th className="py-3 px-3 font-mono text-[11px]">Fecha</th>
                   <th className="py-3 px-4 text-center">Acción</th>
@@ -534,7 +523,7 @@ export const RfcListView: React.FC = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-semibold transition-colors shadow-sm"
                 >
                   <Plus className="w-4 h-4 text-upt-yellow" />
-                  <span>Registrar la Primera RFC (CU-04)</span>
+                  <span>Registrar la primera Solicitud</span>
                 </Link>
               ) : null}
             </div>
@@ -604,10 +593,10 @@ export const RfcListView: React.FC = () => {
         <AlertCircle className="w-5 h-5 text-upt-secondary shrink-0 mt-0.5" />
         <div className="space-y-1">
           <div className="font-semibold text-upt-primary">
-            Gobernanza del Ciclo de Vida de Configuración (IEEE 828 / TB-07)
+            Control y Trazabilidad del Ciclo de Vida de Cambios
           </div>
           <p className="text-[11px] leading-relaxed text-upt-muted">
-            Cada solicitud mostrada en esta bandeja está vinculada a un Elemento de Configuración de Software (ECS) y controlada por la matriz de transición formal DG-11. Las acciones de avance de estado requieren la intervención colegiada de los roles canónicos autorizados según las reglas de negocio RN-01 a RN-09.
+            Cada solicitud en esta bandeja está vinculada a un Elemento de Configuración de Software (ECS) y cuenta con un flujo estructurado de revisión, aprobación y despliegue según las políticas corporativas de gestión de cambios.
           </p>
         </div>
       </div>

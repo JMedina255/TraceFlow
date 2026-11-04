@@ -151,7 +151,7 @@ export const RfcCreateView: React.FC = () => {
 
       const trimmedJust = formData.justification.trim();
       if (!trimmedJust) {
-        errors.justification = 'La justificación de negocio es obligatoria (Excepción E1 del SRS).';
+        errors.justification = 'La justificación de negocio es obligatoria.';
       } else if (trimmedJust.length < 15) {
         errors.justification = 'La justificación debe contener al menos 15 caracteres de fundamentación.';
       }
@@ -279,17 +279,8 @@ export const RfcCreateView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-upt-border pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-blue-50 text-upt-primary border border-blue-200">
-              CU-04 / RF-04
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-text-secondary border border-upt-border">
-              SCREEN-07 / WF-07
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-upt-bg text-upt-muted border border-upt-border">
-              Patrón PRES-06
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200">
-              Correlativo Proyectado: {nextRfcCodePreview}
+            <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200">
+              Código Proyectado: {nextRfcCodePreview}
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-upt-primary flex items-center gap-2">
@@ -329,13 +320,13 @@ export const RfcCreateView: React.FC = () => {
             <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <h2 className="text-sm font-semibold text-amber-900">
-                Restricción de Segregación de Funciones (SoD / RBAC)
+                Permiso Requerido
               </h2>
               <p className="text-xs text-amber-800 leading-relaxed">
-                El caso de uso <strong className="text-amber-950 font-bold">CU-04: Registrar Solicitud de Cambio</strong> está reservado exclusivamente al rol{' '}
-                <strong className="text-amber-950 font-bold">Solicitante (PU-01)</strong> conforme a la gobernanza oficial de TraceFlow SCM (FD03 §TB-09 / DG-05). 
+                No tienes permisos para registrar solicitudes de cambio. Esta acción está reservada al perfil de{' '}
+                <strong className="text-amber-950 font-bold">Solicitante</strong>. Contacta con el administrador si necesitas acceso.
                 Actualmente estás operando como <strong className="text-amber-950 font-bold">{currentUser.fullName}</strong> con el rol{' '}
-                <strong className="text-amber-950 font-bold">{currentUser.roleLabel} ({activeRoleId})</strong>.
+                <strong className="text-amber-950 font-bold">{currentUser.roleLabel}</strong>.
               </p>
             </div>
           </div>
@@ -348,7 +339,7 @@ export const RfcCreateView: React.FC = () => {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
                 <Check className="w-4 h-4" />
-                <span>Asumir mi Rol Solicitante (PU-01)</span>
+                <span>Asumir rol de Solicitante</span>
               </button>
             ) : (
               <button
@@ -361,7 +352,7 @@ export const RfcCreateView: React.FC = () => {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-upt-text font-bold text-xs transition-colors shadow-sm cursor-pointer"
               >
                 <Check className="w-4 h-4" />
-                <span>Cambiar a Usuario Demo con Rol Solicitante (PU-01)</span>
+                <span>Cambiar a usuario Solicitante</span>
               </button>
             )}
             <span className="text-[11px] text-amber-800/90 font-medium">
@@ -586,7 +577,7 @@ export const RfcCreateView: React.FC = () => {
                 Paso 2: Justificación y Descripción Detallada
               </h2>
               <p className="text-xs text-upt-muted mt-1">
-                Conforme a la regla de completitud del SRS (RN-01 / CU-04), la justificación y descripción deben ser sustantivas para evitar la desestimación en el filtro del Gestor.
+                Proporciona una justificación clara y detallada de la necesidad del cambio para facilitar su evaluación técnica.
               </p>
             </div>
 
@@ -646,7 +637,7 @@ export const RfcCreateView: React.FC = () => {
                 <label htmlFor="rfc-proposedSolution" className="block text-xs font-semibold text-upt-text">
                   Propuesta Técnica Sugerida / Beneficio Esperado <span className="text-upt-muted">(Opcional)</span>
                 </label>
-                <span className="text-[11px] text-upt-muted">Evaluada por el Arquitecto en CU-06</span>
+                <span className="text-[11px] text-upt-muted">Sujeta a evaluación técnica</span>
               </div>
               <textarea
                 id="rfc-proposedSolution"
@@ -688,7 +679,7 @@ export const RfcCreateView: React.FC = () => {
 
               {projectEcsList.length === 0 ? (
                 <div className="p-4 rounded-xl bg-upt-bg border border-upt-border text-center text-upt-muted text-xs">
-                  No se encontraron ECS registrados para este proyecto. Contacte al Administrador SCM (CU-09).
+                  No se encontraron elementos de configuración registrados para este proyecto. Contacte al Administrador SCM.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1">
@@ -719,9 +710,9 @@ export const RfcCreateView: React.FC = () => {
                               {ecs.currentLibrary}
                             </span>
                             {ecs.lock?.isLocked && (
-                              <span className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-mono bg-red-50 text-red-800 border border-red-200" title="Bloqueado bajo RN-06">
+                              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-800 border border-red-200" title="Elemento bloqueado por cambio en curso">
                                 <Lock className="w-2.5 h-2.5" />
-                                RN-06
+                                Bloqueado
                               </span>
                             )}
                           </div>
@@ -851,7 +842,7 @@ export const RfcCreateView: React.FC = () => {
                   <span className="font-semibold text-upt-text">{activeProject.name} ({activeProject.code})</span>
                 </div>
                 <div>
-                  <span className="text-upt-muted block">Solicitante Responsable (PU-01):</span>
+                  <span className="text-upt-muted block">Solicitante Responsable:</span>
                   <span className="font-semibold text-upt-text">{currentUser.fullName} ({currentUser.email})</span>
                 </div>
                 <div>
@@ -973,7 +964,7 @@ export const RfcCreateView: React.FC = () => {
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>Radicar Solicitud formalmente (CU-04)</span>
+                <span>Enviar Solicitud de Cambio</span>
               </button>
             )}
           </div>
@@ -1005,7 +996,7 @@ export const RfcCreateView: React.FC = () => {
                 <span className="font-bold text-emerald-700 text-sm">{createdRfc.code}</span>
               </div>
               <div className="flex items-center justify-between border-b border-upt-border/80 pb-2">
-                <span className="text-upt-muted">Estado Oficial (TB-07):</span>
+                <span className="text-upt-muted">Estado Inicial:</span>
                 <span className="px-2 py-0.5 rounded text-[11px] bg-blue-50 text-upt-secondary border border-blue-200 font-semibold">
                   {createdRfc.status}
                 </span>
@@ -1028,7 +1019,7 @@ export const RfcCreateView: React.FC = () => {
             <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-[11px] text-upt-text-secondary flex items-start gap-2.5">
               <Info className="w-4 h-4 text-upt-secondary shrink-0 mt-0.5" />
               <div>
-                <strong>Trazabilidad y Notificaciones:</strong> Se ha emitido la firma de auditoría forense con hash SHA-256 y se ha puesto a disposición del <strong>Analista de Requerimientos / Gestor (PU-02)</strong> para su validación de completitud y clasificación (CU-05).
+                <strong>Trazabilidad y Notificaciones:</strong> Se ha generado el registro de auditoría con firma SHA-256 y la solicitud ha sido derivada al equipo de gestión para su validación.
               </div>
             </div>
 
@@ -1077,7 +1068,7 @@ export const RfcCreateView: React.FC = () => {
               <h3 className="text-base font-bold text-upt-primary">¿Descartar registro de solicitud?</h3>
             </div>
             <p className="text-xs text-upt-text-secondary leading-relaxed">
-              Conforme al flujo alternativo A2 del SRS, si cancelas el registro los datos no guardados se perderán y no se emitirá ninguna transacción en el catálogo ni en auditoría.
+              Si cancelas el registro, los datos ingresados no se guardarán en el sistema.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button

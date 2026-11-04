@@ -251,10 +251,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
                 {currentUser?.fullName}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-[10px] font-mono text-upt-yellow font-medium">
-                  {activeRoleId}
-                </span>
-                <span className="text-[10px] text-blue-200 truncate max-w-[130px]">
+                <span className="text-[10px] text-blue-200 truncate max-w-[150px]">
                   {CANONICAL_ROLES[activeRoleId]?.label || currentUser?.roleLabel}
                 </span>
               </div>
@@ -269,9 +266,9 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               <div className="pb-3 border-b border-upt-border mb-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase font-bold text-upt-muted tracking-wider">
-                    Identidad Activa (Demo)
+                    Identidad Activa
                   </span>
-                  <span className="text-[10px] text-upt-primary font-mono font-semibold">C-SharkTeam</span>
+                  <span className="text-[10px] text-upt-primary font-mono font-semibold">ÉXODO S.A.C.</span>
                 </div>
                 <p className="text-xs font-bold text-upt-text mt-1">{currentUser?.fullName}</p>
                 <p className="text-[11px] text-upt-muted">{currentUser?.email}</p>
@@ -280,7 +277,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               {/* Conmutador de Rol Autorizado para esta Identidad */}
               <div className="py-2 border-b border-upt-border mb-2">
                 <span className="text-[10px] font-semibold text-upt-text-secondary block mb-1.5">
-                  Cambiar Rol Activo (SoD):
+                  Cambiar rol activo:
                 </span>
                 <div className="grid grid-cols-2 gap-1.5">
                   {currentUser.allowedRoleIds.map((rId) => {
@@ -296,8 +293,8 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
                             : 'bg-upt-bg/50 border-upt-border text-upt-text hover:bg-upt-bg'
                         }`}
                       >
-                        <div className={`font-mono text-[10px] font-bold ${isSelected ? 'text-upt-yellow' : 'text-upt-secondary'}`}>{rId}</div>
-                        <div className="truncate text-[11px]">{rDef.role}</div>
+                        <div className={`text-xs font-semibold ${isSelected ? 'text-white' : 'text-upt-text'}`}>{rDef.role}</div>
+                        <div className={`truncate text-[10px] ${isSelected ? 'text-blue-100' : 'text-upt-muted'}`}>{rDef.label}</div>
                       </button>
                     );
                   })}
@@ -307,7 +304,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               {/* Conmutador de Identidad (4 Integrantes) */}
               <div className="py-2 border-b border-upt-border mb-2">
                 <span className="text-[10px] font-semibold text-upt-text-secondary flex items-center gap-1 mb-1.5">
-                  <Users className="w-3 h-3 text-upt-primary" /> Cambiar Integrante (Demo):
+                  <Users className="w-3 h-3 text-upt-primary" /> Cambiar de usuario:
                 </span>
                 <div className="space-y-1">
                   {availableDemoUsers.map((u) => {

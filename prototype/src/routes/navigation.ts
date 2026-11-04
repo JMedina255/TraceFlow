@@ -377,7 +377,7 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'projects',
-    name: '2. Gestión de Proyectos',
+    name: 'Gestión de proyectos',
     packageCode: 'PKG_PROJ',
     icon: FolderGit2,
     items: [
@@ -386,19 +386,19 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'changes',
-    name: '5. Control de Cambios',
+    name: 'Control de cambios',
     packageCode: 'PKG_CHG',
     icon: GitPullRequest,
     items: [
-      { label: 'Bandeja de RFCs', path: '/rfcs', screenId: 'SCREEN-05' },
-      { label: 'Nueva Solicitud (RFC)', path: '/rfcs/new', screenId: 'SCREEN-07' },
+      { label: 'Bandeja de solicitudes (RFC)', path: '/rfcs', screenId: 'SCREEN-05' },
+      { label: 'Nueva solicitud (RFC)', path: '/rfcs/new', screenId: 'SCREEN-07' },
       { label: 'Órdenes de Cambio (ECN)', path: '/ecns', screenId: 'SCREEN-11' },
-      { label: 'Validación QA / No Conf.', path: '/qa/validation/RFC-2026-0042', screenId: 'SCREEN-15' },
+      { label: 'Validación de calidad (QA)', path: '/qa/validation/RFC-2026-0042', screenId: 'SCREEN-15' },
     ],
   },
   {
     id: 'ecs',
-    name: '3. Gestión de Configuración',
+    name: 'Gestión de configuración',
     packageCode: 'PKG_ECS',
     icon: FileCode2,
     items: [
@@ -407,17 +407,17 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'libraries',
-    name: '4. Gestión de Bibliotecas',
+    name: 'Gestión de bibliotecas',
     packageCode: 'PKG_LIB',
     icon: Boxes,
     items: [
-      { label: 'Operaciones Check-Out/In', path: '/scm/operations', screenId: 'SCREEN-13' },
-      { label: 'Líneas Base y Rollback', path: '/baselines', screenId: 'SCREEN-17' },
+      { label: 'Operaciones de biblioteca', path: '/scm/operations', screenId: 'SCREEN-13' },
+      { label: 'Líneas base y reversión', path: '/baselines', screenId: 'SCREEN-17' },
     ],
   },
   {
     id: 'support',
-    name: '6. Soporte e Incidencias',
+    name: 'Soporte e incidencias',
     packageCode: 'PKG_SUPP',
     icon: LifeBuoy,
     items: [
@@ -426,7 +426,7 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'audit',
-    name: '7. Trazabilidad y Auditoría',
+    name: 'Trazabilidad y auditoría',
     packageCode: 'PKG_AUD',
     icon: History,
     items: [
@@ -435,7 +435,7 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'reports',
-    name: '8. Reportes SCM',
+    name: 'Reportes del sistema',
     packageCode: 'PKG_REP',
     icon: BarChart3,
     items: [
@@ -444,11 +444,11 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
   },
   {
     id: 'governance',
-    name: '1. Gobernanza y Seguridad',
+    name: 'Administración y seguridad',
     packageCode: 'PKG_GOB',
     icon: Shield,
     items: [
-      { label: 'Usuarios y Roles (RBAC)', path: '/admin/users', screenId: 'SCREEN-20' },
+      { label: 'Usuarios y roles', path: '/admin/users', screenId: 'SCREEN-20' },
     ],
   },
 ];

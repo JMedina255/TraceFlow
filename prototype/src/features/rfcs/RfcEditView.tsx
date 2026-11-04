@@ -155,13 +155,13 @@ export const RfcEditView: React.FC = () => {
             </div>
             <div className="space-y-1">
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-upt-primary bg-blue-100 px-2 py-0.5 rounded border border-blue-200">
-                Estado Incompatible para Subsanación (CU-04.1)
+                Estado no compatible para subsanación
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-upt-text pt-1">
                 La solicitud {rfc.code} no se encuentra en estado &quot;EN_SUBSANACION&quot;
               </h2>
               <p className="text-xs sm:text-sm text-upt-text-secondary leading-relaxed pt-1">
-                Esta solicitud se encuentra actualmente en estado <strong>{rfc.status}</strong>. Conforme al ciclo de vida normativo DG-11, únicamente las solicitudes observadas en estado <strong>EN_SUBSANACION</strong> admiten corrección y descargo formal.
+                Esta solicitud se encuentra actualmente en estado <strong>{rfc.status}</strong>. Únicamente las solicitudes en estado <strong>EN_SUBSANACION</strong> admiten corrección y subsanación formal.
               </p>
             </div>
           </div>
@@ -194,13 +194,13 @@ export const RfcEditView: React.FC = () => {
             </div>
             <div className="space-y-1">
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-red-900 bg-red-100 px-2 py-0.5 rounded border border-red-200">
-                Segregación de Funciones (SoD) &bull; CU-04.1
+                Permiso Requerido
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-red-950 pt-1">
-                Acceso Denegado: Subsanación Reservada al Solicitante (PU-01)
+                Acceso Denegado: Subsanación Reservada al Solicitante
               </h2>
               <p className="text-xs sm:text-sm text-red-900 leading-relaxed pt-1">
-                Conforme a la norma IEEE 828 y las reglas de negocio del SRS, la subsanación de una solicitud observada es atribución exclusiva del rol <strong>Solicitante (PU-01)</strong>. Su rol activo en este momento es <strong>{currentUser.roleLabel} ({activeRoleId})</strong>.
+                La subsanación de una solicitud observada es atribución exclusiva del rol <strong>Solicitante</strong>. Su rol activo en este momento es <strong>{currentUser.roleLabel}</strong>.
               </p>
             </div>
           </div>
@@ -213,7 +213,7 @@ export const RfcEditView: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
               >
                 <User className="w-4 h-4" />
-                <span>Conmutar al rol Solicitante (PU-01)</span>
+                <span>Asumir rol de Solicitante</span>
               </button>
             )}
             <Link
@@ -285,7 +285,7 @@ export const RfcEditView: React.FC = () => {
 
     const trimmedJust = formData.justification.trim();
     if (!trimmedJust) {
-      errors.justification = 'La justificación de negocio es mandatoria (RN-01).';
+      errors.justification = 'La justificación de negocio es obligatoria.';
     } else if (trimmedJust.length < 15) {
       errors.justification = 'La justificación debe contener al menos 15 caracteres de fundamentación.';
     }
@@ -349,9 +349,7 @@ export const RfcEditView: React.FC = () => {
           <span>Volver al Expediente {rfc.code}</span>
         </Link>
 
-        <div className="flex items-center gap-2 text-[11px] font-mono text-upt-muted">
-          <span>Proceso: CU-04.1 &bull; WF-07 &bull; DG-11</span>
-        </div>
+        
       </div>
 
       {/* Cabecera Principal */}
@@ -368,7 +366,7 @@ export const RfcEditView: React.FC = () => {
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-upt-text pt-1">
-              Subsanación y Descargo de Solicitud de Cambio (CU-04.1)
+              Subsanación de Solicitud de Cambio
             </h1>
           </div>
 
@@ -383,7 +381,7 @@ export const RfcEditView: React.FC = () => {
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 font-bold text-amber-950 text-sm">
               <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
-              <span>Pliego Formal de Observaciones formulado por el Gestor (CU-05)</span>
+              <span>Observaciones formuladas por el Gestor</span>
             </div>
             <span className="font-mono text-[11px] text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded border border-amber-300 shrink-0">
               Mandatorio Subsanar
@@ -528,7 +526,7 @@ export const RfcEditView: React.FC = () => {
             {/* Justificación de Negocio */}
             <div className="space-y-1.5">
               <label htmlFor="justification" className="text-xs font-semibold text-upt-text flex items-center justify-between">
-                <span>Justificación Operativa / Valor Agregado (Mandatoria bajo RN-01) *</span>
+                <span>Justificación Operativa / Valor Agregado *</span>
                 <span className="font-mono text-[10px] text-upt-muted">Mínimo 15 caracteres</span>
               </label>
               <textarea
@@ -749,10 +747,10 @@ export const RfcEditView: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-red-950">
-                  Confirmar Desistimiento de la Solicitud (CU-04.1 A1)
+                  Confirmar Desistimiento de la Solicitud
                 </h3>
                 <p className="text-xs text-red-800 leading-relaxed">
-                  El desistimiento cerrará formalmente la solicitud <strong>{rfc.code}</strong> transicionándola al estado terminal <strong>DESESTIMADA</strong> bajo la regla RN-07. Esta acción es irrevocable.
+                  El desistimiento cerrará formalmente la solicitud <strong>{rfc.code}</strong> y la archivará como <strong>DESESTIMADA</strong>. Esta acción es irrevocable.
                 </p>
               </div>
             </div>
@@ -785,7 +783,7 @@ export const RfcEditView: React.FC = () => {
                 className="mt-0.5 rounded border-upt-border text-upt-institutional focus:ring-upt-bright cursor-pointer"
               />
               <span>
-                Confirmo que deseo desistir y que el expediente sea archivado en estado terminal <strong>DESESTIMADA</strong>.
+                Confirmo que deseo desistir y que el expediente sea archivado como <strong>DESESTIMADA</strong>.
               </span>
             </label>
 
@@ -824,13 +822,13 @@ export const RfcEditView: React.FC = () => {
 
             <div className="space-y-1">
               <span className="font-mono text-xs px-2.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold">
-                Transición Exitosa: EN_SUBSANACION &rarr; REGISTRADA
+                Solicitud Actualizada: EN_SUBSANACION &rarr; REGISTRADA
               </span>
               <h3 className="text-lg font-bold text-emerald-950 pt-1">
                 Solicitud Reingresada Satisfactoriamente
               </h3>
               <p className="text-xs text-emerald-900 leading-relaxed">
-                El expediente <strong>{rfc.code}</strong> ha retornado formalmente al estado <strong>REGISTRADA</strong> conforme a la máquina de estados DG-11. El Gestor (PU-02) evaluará los descargos y datos subsanados.
+                El expediente <strong>{rfc.code}</strong> ha retornado formalmente al estado <strong>REGISTRADA</strong>. El equipo de gestión evaluará los descargos y datos subsanados.
               </p>
             </div>
 

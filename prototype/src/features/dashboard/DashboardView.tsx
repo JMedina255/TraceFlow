@@ -19,7 +19,7 @@ import { SIDEBAR_NAVIGATION } from '../../routes/navigation';
 import { RFC_STATUS_CATALOG } from '../../types';
 
 export const DashboardView: React.FC = () => {
-  const { currentUser, activeRoleId } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { activeProject } = useProjectStore();
   const { getRfcsByProject } = useRfcStore();
 
@@ -76,13 +76,13 @@ export const DashboardView: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-upt-primary border border-blue-200">
             <Sparkles className="w-3.5 h-3.5 text-upt-bright" />
-            <span>Fase V — CU-04 Registro de Solicitud de Cambio (RFC)</span>
+            <span>Panel de Control SCM</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-upt-primary">
             Bienvenido, {currentUser?.fullName}
           </h1>
           <p className="text-sm text-upt-text-secondary max-w-2xl leading-relaxed">
-            Operando como <strong className="text-upt-secondary font-semibold">{currentUser?.roleLabel}</strong> ({activeRoleId}) en el proyecto{' '}
+            Operando como <strong className="text-upt-secondary font-semibold">{currentUser?.roleLabel}</strong> en el proyecto{' '}
             <strong className="text-upt-primary font-bold">{activeProject.name}</strong> (<span className="font-mono text-xs text-upt-secondary font-bold">{activeProject.code}</span>).
           </p>
         </div>
@@ -215,14 +215,14 @@ export const DashboardView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-upt-primary tracking-tight">
-              Módulos del Sistema (Arquitectura DG-04)
+              Módulos del sistema
             </h2>
             <p className="text-xs text-upt-muted">
-              Acceso a las herramientas operativas de los 8 paquetes arquitecturales de TraceFlow SCM.
+              Acceso a las herramientas operativas del sistema de gestión de configuración.
             </p>
           </div>
           <span className="text-xs font-mono text-upt-secondary bg-blue-50 px-2.5 py-1 rounded border border-blue-200 font-medium">
-            8 Paquetes Formalizados
+            Módulos activos
           </span>
         </div>
 
@@ -242,9 +242,7 @@ export const DashboardView: React.FC = () => {
                     <div className="p-2 rounded-lg bg-upt-bg group-hover:bg-blue-100/80 text-upt-secondary group-hover:text-upt-bright transition-colors">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-mono text-upt-muted group-hover:text-upt-secondary">
-                      {section.packageCode}
-                    </span>
+                    
                   </div>
 
                   <h3 className="font-semibold text-sm text-upt-text group-hover:text-upt-primary transition-colors">

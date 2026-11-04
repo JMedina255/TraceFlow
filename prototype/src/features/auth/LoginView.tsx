@@ -109,18 +109,18 @@ export const LoginView: React.FC = () => {
         {/* Metadatos de Demostración */}
         <div className="pt-2 border-t border-upt-border text-center">
           <p className="text-[11px] text-upt-muted">
-            Credenciales de prueba preconfiguradas para demostración académica.
+            Ambiente de evaluación y control de cambios corporativo.
           </p>
           <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-upt-secondary font-medium">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Autenticación institucional simulada (ADR-006)</span>
+            <span>Control de acceso y autenticación corporativa</span>
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <footer className="mt-8 text-center text-xs text-upt-muted">
-        TraceFlow SCM &copy; 2026 — EPIS / Universidad Privada de Tacna
+        TraceFlow SCM &copy; 2026 — Plataforma de Gestión de Configuración (ÉXODO S.A.C.)
       </footer>
     </div>
   );

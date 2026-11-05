@@ -186,6 +186,8 @@ export interface RFC {
   authorizedBy?: string;
   authorizedAt?: string;
   impactAnalysisId?: string;
+  ccbSessionId?: string;
+  ccbResolutionId?: string;
   technicalImpact?: TechnicalImpactAssessment | TechnicalImpactReport;
   ecnId?: string;
   attachments?: string[];

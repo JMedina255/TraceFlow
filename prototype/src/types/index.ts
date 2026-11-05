@@ -4,6 +4,7 @@ export * from './project';
 export * from './ecs';
 export * from './rfc';
 export * from './impactAnalysis';
+export * from './minorApproval';
 export * from './ecn';
 export * from './baseline';
 export * from './qa';

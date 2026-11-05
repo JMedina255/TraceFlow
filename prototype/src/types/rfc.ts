@@ -183,6 +183,8 @@ export interface RFC {
   subsanatedAt?: string;
   rejectionReason?: string;
   cancellationReason?: string;
+  authorizedBy?: string;
+  authorizedAt?: string;
   impactAnalysisId?: string;
   technicalImpact?: TechnicalImpactAssessment | TechnicalImpactReport;
   ecnId?: string;

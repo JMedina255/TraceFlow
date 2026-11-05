@@ -476,9 +476,9 @@ const { report: minorReport, updatedRfc: minorRfc } = impactAnalysisService.regi
 
 assert.strictEqual(minorReport.classification, 'CAMBIO_MENOR');
 assert.strictEqual(minorRfc.classification, 'CAMBIO_MENOR');
-assert.strictEqual(minorRfc.status, 'EN_ANALISIS_TECNICO', 'Cambio Menor debe permanecer en EN_ANALISIS_TECNICO para CU-30');
+assert.strictEqual(minorRfc.status, 'EN_EVALUACION', 'Toda RFC con informe técnico completado transiciona a EN_EVALUACION (TB-07)');
 assert.notStrictEqual(minorRfc.status, 'AUTORIZADA', 'El análisis técnico NO debe auto-aprobar la solicitud');
-console.log(`✅ Cambio Menor clasificado correctamente en estado EN_ANALISIS_TECNICO listo para CU-30.\n`);
+console.log(`✅ Cambio Menor clasificado correctamente en estado EN_EVALUACION listo para CU-30.\n`);
 
 // ============================================================================
 // TEST 8: Consulta y Persistencia del Informe Emitido

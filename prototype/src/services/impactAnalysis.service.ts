@@ -106,17 +106,17 @@ export const impactAnalysisService = {
       );
     }
 
-    // 5. Precondición de estado del ciclo de vida (DG-11 / TB-07)
-    if (rfc.status !== 'CLASIFICADA' && rfc.status !== 'EN_ANALISIS_TECNICO') {
-      throw new Error(
-        `Transición inválida: La solicitud ${rfc.code} se encuentra en estado '${rfc.status}'. Solo solicitudes formalmente admitidas en estado 'CLASIFICADA' o 'EN_ANALISIS_TECNICO' pueden ser evaluadas técnicamente mediante CU-06.`
-      );
-    }
-
-    // 6. Integridad del dictamen: No duplicar análisis sobre expedientes que ya cuentan con informe formal
+    // 5. Integridad del dictamen: No duplicar análisis sobre expedientes que ya cuentan con informe formal
     if (rfc.impactAnalysisId) {
       throw new Error(
         `El expediente ${rfc.code} ya cuenta con un Informe Técnico de Impacto emitido y congelado (${rfc.impactAnalysisId}).`
+      );
+    }
+
+    // 6. Precondición de estado del ciclo de vida (DG-11 / TB-07)
+    if (rfc.status !== 'CLASIFICADA' && rfc.status !== 'EN_ANALISIS_TECNICO') {
+      throw new Error(
+        `Transición inválida: La solicitud ${rfc.code} se encuentra en estado '${rfc.status}'. Solo solicitudes formalmente admitidas en estado 'CLASIFICADA' o 'EN_ANALISIS_TECNICO' pueden ser evaluadas técnicamente mediante CU-06.`
       );
     }
 
@@ -210,10 +210,12 @@ export const impactAnalysisService = {
       status: 'COMPLETADO',
     };
 
-    // 10. Determinación de la transición canónica en máquina de estados DG-11
-    // Cambio Mayor -> EN_EVALUACION (Comité CCB, CU-07)
-    // Cambio Menor -> EN_ANALISIS_TECNICO (Clasificado para Doble Llave Delegada, CU-30)
-    const nextStatus = dto.proposedClassification === 'CAMBIO_MAYOR' ? 'EN_EVALUACION' : 'EN_ANALISIS_TECNICO';
+    // 10. Transición canónica en máquina de estados DG-11 y TB-07
+    // Toda solicitud con informe técnico emitido transiciona a EN_EVALUACION (TB-07, Estado 5).
+    // La clasificación determina la vía evaluadora:
+    // - CAMBIO_MAYOR: Deliberación colegiada en Comité CCB (CU-07)
+    // - CAMBIO_MENOR: Evaluación y autorización delegada en Doble Llave Gestor + Arquitecto (CU-30)
+    const nextStatus = 'EN_EVALUACION';
 
     const updatedRfc: RFC = {
       ...rfc,

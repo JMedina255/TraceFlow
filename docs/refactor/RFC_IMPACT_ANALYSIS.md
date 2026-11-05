@@ -72,29 +72,29 @@ El informe técnico culmina con un dictamen profesional emitido por el Arquitect
 2. **`PROCEDE_MAYOR`:** El cambio es viable pero introduce modificaciones sustanciales en contratos de API, esquema de base de datos, seguridad, costos elevados o retraso en cronograma crítico. Requiere deliberación colegiada del CCB.
 3. **`RECHAZO_TECNICO`:** El cambio no es factible técnicamente, viola restricciones arquitectónicas institucionales o introduce riesgos inaceptables.
 
-### 5.2. Clasificación Técnica y Transición en Máquina de Estados (DG-11)
+### 5.2. Clasificación Técnica y Transición en Máquina de Estados (DG-11 / TB-07)
 
 ```mermaid
 flowchart TD
     CLAS[RFC: CLASIFICADA<br>Admitida por Gestor CU-05] --> CU06[CU-06: Análisis de Impacto Técnico<br>Actor: PU-03 Arquitecto]
     
-    CU06 -->| proposedClassification = CAMBIO_MENOR | MENOR[RFC: EN_ANALISIS_TECNICO<br>Clasificada como Cambio Menor<br>Informe de Impacto congelado]
-    CU06 -->| proposedClassification = CAMBIO_MAYOR | MAYOR[RFC: EN_EVALUACION<br>Clasificada como Cambio Mayor<br>Informe de Impacto congelado]
+    CU06 --> EVAL[RFC: EN_EVALUACION<br>Informe de Impacto congelado]
     
-    MENOR -->|Derivación delegada| CU30[CU-30: Doble Llave Gestor + Arquitecto<br>Fase 04B]
-    MAYOR -->|Derivación colegiada| CU07[CU-07: Deliberación Colegiada en CCB<br>Fase 04C]
+    EVAL -->| classification = CAMBIO_MENOR | CU30[CU-30: Autoridad Delegada<br>Doble Llave Gestor + Arquitecto]
+    EVAL -->| classification = CAMBIO_MAYOR | CU07[CU-07: Comité CCB<br>Deliberación Colegiada]
 ```
 
-* **Ruta de Cambio Menor:**
-  * Clasificación asignada: `CAMBIO_MENOR`.
-  * Estado: La solicitud queda en `EN_ANALISIS_TECNICO` con el informe de impacto adjunto y la clasificación asignada.
-  * Destino posterior: Queda habilitada para el flujo de autorización por **Doble Llave Delegada (CU-30)** entre Gestor (`PU-02`) y Arquitecto (`PU-03`).
-  * **Regla estricta:** El análisis NO aprueba automáticamente el cambio ni emite la ECN en esta fase.
+Conforme a la tabla normativa **TB-07 (Estado 5: En Evaluación)**, toda Solicitud de Cambio con Informe Técnico de Impacto emitido transiciona canónicamente a **`EN_EVALUACION`**, independientemente de su clasificación. La clasificación dictaminada por el Arquitecto determina la autoridad y el procedimiento de evaluación aplicable:
 
-* **Ruta de Cambio Mayor:**
-  * Clasificación asignada: `CAMBIO_MAYOR`.
-  * Estado: Transiciona canónicamente a **`EN_EVALUACION`**.
-  * Destino posterior: Queda en la bandeja del **Comité de Control de Cambios (`PU-04` / CCB)** para deliberación formal mediante `CU-07`.
+* **Ruta de Cambio Menor (`classification: 'CAMBIO_MENOR'`):**
+  * Estado canónico: **`EN_EVALUACION`**.
+  * Procedimiento asignado: Habilitación de la vía de autorización delegada por **Doble Llave Compartida (`CU-30`)** entre el Gestor (`PU-02`) y el Arquitecto (`PU-03`).
+  * **Regla estricta:** La emisión del análisis técnico NO aprueba automáticamente la solicitud ni genera una Orden de Cambio (ECN/ECO). Permanece en evaluación hasta la suscripción compartida.
+
+* **Ruta de Cambio Mayor (`classification: 'CAMBIO_MAYOR'`):**
+  * Estado canónico: **`EN_EVALUACION`**.
+  * Procedimiento asignado: Derivación a la bandeja de deliberación colegiada del **Comité de Control de Cambios (`PU-04` / CCB)** mediante el caso de uso **`CU-07`**.
+  * **Regla estricta:** Requiere quorum y dictamen colegiado formal del CCB para su resolución.
 
 ---
 

@@ -21,6 +21,7 @@ import {
   CheckCircle,
   XCircle,
   ShieldCheck,
+  Users,
   X,
 } from 'lucide-react';
 import { useRfcStore } from '../../store/useRfcStore';
@@ -29,6 +30,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { ecsService } from '../../services/ecs.service';
 import { auditService } from '../../services/audit.service';
 import { minorApprovalService } from '../../services/minorApproval.service';
+import { ccbService } from '../../services/ccb.service';
 import { INITIAL_ECNS } from '../../data/initialEcns';
 import {
   RFC_STATUS_CATALOG,
@@ -72,6 +74,32 @@ export const RfcDetailView: React.FC = () => {
     if (!rfc) return null;
     return minorApprovalService.getDelegatedStatus(rfc.id);
   }, [rfc]);
+
+  // Sesión y votos del Comité CCB (CU-07: Cambio Mayor)
+  const ccbSession = useMemo(() => {
+    if (!rfc) return undefined;
+    return ccbService.getSessionByRfcId(rfc.id);
+  }, [rfc]);
+
+  const ccbVotes = useMemo(() => {
+    if (!ccbSession) return [];
+    return ccbService.getVotesBySessionId(ccbSession.id);
+  }, [ccbSession]);
+
+  const ccbTally = useMemo(() => {
+    if (!ccbSession) return { approve: 0, reject: 0, abstain: 0, total: 0 };
+    return ccbService.getVoteTally(ccbSession.id);
+  }, [ccbSession]);
+
+  // Historial de autorizaciones previas y eventual reescalamiento
+  const minorApprovals = useMemo(() => {
+    if (!rfc) return [];
+    return minorApprovalService.getByRfcId(rfc.id);
+  }, [rfc]);
+
+  const reescalationRecord = useMemo(() => {
+    return minorApprovals.find((a) => a.escalateToCcb);
+  }, [minorApprovals]);
 
   // Handlers para las 3 decisiones de CU-05
   const handleAdmit = () => {
@@ -892,6 +920,25 @@ export const RfcDetailView: React.FC = () => {
             </div>
           )}
 
+          {rfc.status === 'EN_EVALUACION' && rfc.classification === 'CAMBIO_MAYOR' && (
+            <div className="pt-2 border-t border-purple-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-purple-900">
+              <span className="font-medium">
+                {ccbSession
+                  ? `Deliberación colegiada del CCB en curso (${ccbTally.total} voto(s) registrado(s)).`
+                  : 'Expediente a la espera de convocatoria y deliberación del Comité de Control de Cambios.'}
+              </span>
+              {activeRoleId === 'PU-04' && (
+                <Link
+                  to={`/rfcs/${rfc.id}/ccb-deliberation`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-xs shrink-0"
+                >
+                  <Users className="w-4 h-4" />
+                  Acceder a la Sala CCB
+                </Link>
+              )}
+            </div>
+          )}
+
           <div className="pt-2 border-t border-purple-200/80 flex items-center justify-between text-xs text-purple-800">
             <span className="text-[11px]">
               * Las operaciones de dictamen colegiado se gestionan a través del comité de cambios.
@@ -1586,6 +1633,135 @@ export const RfcDetailView: React.FC = () => {
                       Su rol actual ({activeRoleId || 'Sin rol'}) no posee atribuciones de firma delegada. Este flujo es gestionado por Gestor SCM (PU-02) y Arquitecto (PU-03).
                     </div>
                   )}
+                </div>
+              ) : rfc.status === 'EN_EVALUACION' && rfc.classification === 'CAMBIO_MAYOR' ? (
+                /* Proceso Activo de Deliberación Colegiada del CCB (CU-07) */
+                <div className="p-6 rounded-2xl bg-white border border-purple-200 shadow-xs space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-upt-border pb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-5 h-5 text-purple-700" />
+                        <h4 className="text-base font-bold text-upt-primary">
+                          Deliberación Colegiada del Comité de Control de Cambios (CCB)
+                        </h4>
+                      </div>
+                      <p className="text-xs text-upt-muted mt-1 leading-relaxed">
+                        Este cambio mayor requiere la evaluación integral colegiada y registro de votos de los miembros del CCB sobre la Triple Restricción y riesgos.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-start sm:self-auto font-mono text-xs font-bold">
+                      <span className="px-2.5 py-0.5 rounded bg-purple-50 text-purple-900 border border-purple-200">
+                        {ccbSession?.id || 'Sesión en Convocatoria'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Alerta si vino de reescalamiento */}
+                  {reescalationRecord && (
+                    <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1">
+                      <span className="font-bold flex items-center gap-1.5 text-amber-900">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        Expediente Reescalado desde Cambio Menor
+                      </span>
+                      <p className="text-amber-900">
+                        La Autoridad Delegada determinó que este requerimiento encubre impactos mayores y fue elevado al CCB.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Panel de escrutinio / votos registrados */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-upt-primary">Escrutinio de Votos Emitidos:</span>
+                      <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          {ccbTally.approve} Favor
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-red-50 text-red-800 border border-red-200">
+                          {ccbTally.reject} Contra
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-800 border border-gray-200">
+                          {ccbTally.abstain} Abst.
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-200">
+                          {ccbTally.total} Total
+                        </span>
+                      </div>
+                    </div>
+
+                    {ccbVotes.length === 0 ? (
+                      <div className="p-4 rounded-xl bg-upt-bg/40 border border-upt-border text-center text-xs text-upt-muted space-y-1">
+                        <p className="font-semibold text-upt-text">Aún no se han emitido votos en el comité</p>
+                        <p>Los integrantes autorizados registrarán sus decisiones en la Sala de Deliberación.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {ccbVotes.map((v) => (
+                          <div
+                            key={v.id}
+                            className="p-3 rounded-xl border border-upt-border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs"
+                          >
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-upt-text">{v.voterUserName}</span>
+                                <span className="text-[10px] font-mono text-purple-800 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                                  {v.voterRoleId}
+                                </span>
+                              </div>
+                              <p className="text-xs text-upt-text-secondary italic">"{v.justification}"</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${
+                                  v.decision === 'APROBAR'
+                                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                                    : v.decision === 'RECHAZAR'
+                                    ? 'bg-red-100 text-red-900 border border-red-200'
+                                    : 'bg-gray-100 text-gray-900 border border-gray-200'
+                                }`}
+                              >
+                                {v.decision}
+                              </span>
+                              <span className="text-[10px] text-upt-muted font-mono block mt-0.5">
+                                {new Date(v.votedAt).toLocaleTimeString('es-PE')}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Acciones para miembros del CCB */}
+                  {activeRoleId === 'PU-04' ? (
+                    <div className="p-4 rounded-xl bg-purple-50/60 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs font-bold text-purple-950 block">Sesión Colegiada Disponible</span>
+                        <p className="text-xs text-purple-900 leading-relaxed">
+                          Como Miembro del CCB, puede acceder a la sala para emitir su voto fundamentado y revisar el acta de sesión.
+                        </p>
+                      </div>
+                      <Link
+                        to={`/rfcs/${rfc.id}/ccb-deliberation`}
+                        className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-xs"
+                      >
+                        <Users className="w-4 h-4" />
+                        Acceder a la Sala CCB
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-lg bg-upt-bg border border-upt-border text-xs text-upt-muted">
+                      Su rol actual ({activeRoleId || 'Sin rol'}) no pertenece al Comité de Control de Cambios (PU-04). Las deliberaciones y votos son gestionados por los miembros del comité.
+                    </div>
+                  )}
+
+                  {/* Cartel de gobernanza */}
+                  <div className="p-3 rounded-lg bg-amber-50/80 border border-amber-200 text-[11px] text-amber-950 leading-relaxed flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Aviso de Gobernanza:</strong> La resolución definitiva de este expediente se encuentra salvaguardada a la espera de la reglamentación formal de cuórum y mayorías por la Dirección del Proyecto. La solicitud permanece custodiada en estado <strong>En Evaluación</strong>.
+                    </div>
+                  </div>
                 </div>
               ) : (
                 /* Estado Pendiente Real */

@@ -11,6 +11,7 @@ import { RfcDetailView } from '../features/rfcs/RfcDetailView';
 import { RfcEditView } from '../features/rfcs/RfcEditView';
 import { RfcImpactAnalysisView } from '../features/rfcs/RfcImpactAnalysisView';
 import { RfcMinorApprovalView } from '../features/rfcs/RfcMinorApprovalView';
+import { RfcCcbDeliberationView } from '../features/rfcs/RfcCcbDeliberationView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -88,16 +89,7 @@ export const AppRouter: React.FC = () => {
             <Route element={<RoleGuard allowedRoles={['PU-04']} moduleName="Deliberación Colegiada del CCB" />}>
               <Route
                 path="/rfcs/:rfcId/ccb-deliberation"
-                element={
-                  <ScreenPlaceholder
-                    meta={ROUTES_METADATA['/rfcs/:rfcId/ccb-deliberation']}
-                    relatedRoutes={[
-                      { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
-                      { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
-                      { label: 'Ver Orden Emitida (ECN-2026-0001)', path: '/ecns/ECN-2026-0001' },
-                    ]}
-                  />
-                }
+                element={<RfcCcbDeliberationView />}
               />
             </Route>
 

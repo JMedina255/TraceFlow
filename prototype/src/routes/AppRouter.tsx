@@ -9,6 +9,7 @@ import { RfcCreateView } from '../features/rfcs/RfcCreateView';
 import { RfcListView } from '../features/rfcs/RfcListView';
 import { RfcDetailView } from '../features/rfcs/RfcDetailView';
 import { RfcEditView } from '../features/rfcs/RfcEditView';
+import { RfcImpactAnalysisView } from '../features/rfcs/RfcImpactAnalysisView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -78,16 +79,7 @@ export const AppRouter: React.FC = () => {
             <Route element={<RoleGuard allowedRoles={['PU-03']} moduleName="Análisis de Impacto Técnico" />}>
               <Route
                 path="/rfcs/:rfcId/impact-analysis"
-                element={
-                  <ScreenPlaceholder
-                    meta={ROUTES_METADATA['/rfcs/:rfcId/impact-analysis']}
-                    relatedRoutes={[
-                      { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
-                      { label: 'Ver Expediente RFC-2026-0001', path: '/rfcs/RFC-2026-0001' },
-                      { label: 'Pasar a Deliberación CCB', path: '/rfcs/RFC-2026-0001/ccb-deliberation' },
-                    ]}
-                  />
-                }
+                element={<RfcImpactAnalysisView />}
               />
             </Route>
 

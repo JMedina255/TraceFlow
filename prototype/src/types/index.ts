@@ -5,7 +5,7 @@ export * from './ecs';
 export * from './rfc';
 export * from './impactAnalysis';
 export * from './ecn';
-export * from './scm';
+export * from './baseline';
 export * from './qa';
 export * from './incident';
 export * from './audit';

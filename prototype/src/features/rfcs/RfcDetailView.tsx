@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
+  Sparkles,
   FileText,
   ArrowLeft,
   ShieldAlert,
@@ -745,12 +746,17 @@ export const RfcDetailView: React.FC = () => {
             </div>
           )}
 
-          {/* CASO 3: RFC CLASIFICADA TRAS ADMISIÓN */}
-          {rfc.status === 'CLASIFICADA' && (
-            <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-xs space-y-2">
-              <div className="flex items-center gap-2 font-bold text-emerald-950">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Solicitud Admitida Formalmente</span>
+          {/* CASO 3: RFC CLASIFICADA O EN ANALISIS TECNICO TRAS ADMISIÓN */}
+          {(rfc.status === 'CLASIFICADA' || rfc.status === 'EN_ANALISIS_TECNICO') && !rfc.technicalImpact && (
+            <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-xs space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 font-bold text-emerald-950">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Solicitud Admitida Formalmente — Pendiente de Dictamen de Arquitectura</span>
+                </div>
+                <span className="font-mono text-[11px] text-emerald-800 bg-emerald-200/60 px-2 py-0.5 rounded border border-emerald-300">
+                  Fase CU-06
+                </span>
               </div>
               <p className="text-emerald-900 leading-relaxed bg-white/80 p-3 rounded-lg border border-emerald-200">
                 {rfc.admissionNotes || 'Solicitud admitida formalmente tras verificación de completitud y pertinencia.'}
@@ -761,8 +767,33 @@ export const RfcDetailView: React.FC = () => {
                   <span>Fecha: {new Date(rfc.admittedAt).toLocaleString('es-PE')}</span>
                 )}
               </div>
-              <div className="pt-1 text-[11px] text-emerald-900 font-medium">
-                &bull; Próxima fase: Elaboración del Informe Técnico de Impacto.
+
+              {/* Botón de acción contextual para Arquitecto (PU-03) */}
+              <div className="pt-2 border-t border-emerald-200 flex flex-wrap items-center justify-between gap-3">
+                {activeRoleId === 'PU-03' ? (
+                  rfc.requesterId !== currentUser.id ? (
+                    <Link
+                      to={`/rfcs/${rfc.id}/impact-analysis`}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-upt-primary hover:bg-upt-primary-hover text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>Realizar Análisis de Impacto Técnico (CU-06)</span>
+                    </Link>
+                  ) : (
+                    <span className="text-xs text-amber-900 italic font-medium">
+                      * Incompatibilidad SoD: Usted registró esta solicitud como Solicitante y tiene prohibido evaluarla técnicamente (RN-05).
+                    </span>
+                  )
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-emerald-900">
+                    <span>* El análisis de impacto técnico debe ser elaborado por el Arquitecto / Especialista Técnico (PU-03).</span>
+                    {currentUser.allowedRoleIds.includes('PU-03') && (
+                      <span className="font-semibold text-emerald-950 italic">
+                        (Su cuenta tiene asignado el rol de Arquitecto. Inicie sesión con dicho perfil para evaluar).
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1159,17 +1190,24 @@ export const RfcDetailView: React.FC = () => {
           )}
 
           {/* ===================================================================== */}
-          {/* PESTAÑA 3: ANÁLISIS DE IMPACTO TÉCNICO */}
+          {/* PESTAÑA 3: ANÁLISIS DE IMPACTO TÉCNICO (CU-06) */}
           {/* ===================================================================== */}
           {activeTab === 'impacto' && (
             <div className="space-y-6 animate-in fade-in">
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-upt-primary">
-                  Informe Técnico de Impacto
-                </h3>
-                <p className="text-xs text-upt-muted">
-                  Evaluación de viabilidad, dependencias y afectación a la Triple Restricción emitida por Arquitectura.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
+                <div className="space-y-0.5">
+                  <h3 className="text-base font-bold text-upt-primary">
+                    Informe Técnico de Impacto (CU-06)
+                  </h3>
+                  <p className="text-xs text-upt-muted">
+                    Evaluación de viabilidad, dependencias y afectación a la Triple Restricción emitida por Arquitectura (RN-05).
+                  </p>
+                </div>
+                {rfc.technicalImpact && (
+                  <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-300 self-start sm:self-auto">
+                    Dictamen Congelado
+                  </span>
+                )}
               </div>
 
               {rfc.technicalImpact ? (
@@ -1178,17 +1216,27 @@ export const RfcDetailView: React.FC = () => {
                   <div className="p-5 rounded-2xl bg-white border border-upt-border shadow-xs space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
                       <div>
-                        <span className="text-[11px] text-upt-muted font-mono block">Especialista Evaluador:</span>
-                        <div className="font-bold text-upt-primary text-sm">
-                          {rfc.technicalImpact.architectName}
+                        <span className="text-[11px] text-upt-muted font-mono block">Especialista Evaluador (Arquitecto PU-03):</span>
+                        <div className="font-bold text-upt-primary text-sm flex items-center gap-2">
+                          <span>{rfc.technicalImpact.architectName}</span>
+                          <span className="text-[10px] font-mono text-upt-muted">({rfc.technicalImpact.architectId})</span>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="text-[11px] text-upt-muted font-mono block">Fecha de Emisión:</span>
-                        <span className="font-mono text-xs text-upt-text font-semibold">
-                          {new Date(rfc.technicalImpact.reportDate).toLocaleDateString('es-PE')}
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-xl border ${
+                          (rfc.classification || rfc.technicalImpact.classification) === 'CAMBIO_MAYOR'
+                            ? 'bg-purple-50 text-purple-900 border-purple-200'
+                            : 'bg-blue-50 text-blue-900 border-blue-200'
+                        }`}>
+                          {(rfc.classification || rfc.technicalImpact.classification) === 'CAMBIO_MAYOR' ? 'Cambio Mayor (CCB)' : 'Cambio Menor (Doble Llave)'}
                         </span>
+                        <div className="text-right text-[11px] text-upt-muted font-mono">
+                          <span>Fecha: </span>
+                          <span className="text-upt-text font-semibold">
+                            {new Date(rfc.technicalImpact.reportDate).toLocaleDateString('es-PE')}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -1253,23 +1301,62 @@ export const RfcDetailView: React.FC = () => {
                         </span>
                       </div>
                     </div>
+
+                    {/* ECS Afectados y Plan de Contingencia */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
+                      <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="font-bold text-upt-primary block">ECS Involucrados:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {rfc.technicalImpact.affectedEcsIds.map((id) => (
+                            <span key={id} className="font-mono text-[10px] px-2 py-0.5 rounded bg-white border border-slate-300 font-semibold text-slate-800">
+                              {id}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="font-bold text-upt-primary block">Plan de Contingencia / Rollback:</span>
+                        <p className="text-upt-muted text-[11px] leading-relaxed">
+                          {(rfc.technicalImpact as any).rollbackPlan || 'Restauración de versión anterior desde Biblioteca Maestra y rollback de scripts.'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
-                /* Estado Pendiente Real */
-                <div className="p-6 rounded-2xl bg-upt-bg/50 border border-upt-border text-center space-y-3">
-                  <Clock className="w-8 h-8 text-upt-muted mx-auto" />
-                  <div className="max-w-md mx-auto space-y-1">
+                /* Estado Pendiente Real con Acción Contextual */
+                <div className="p-8 rounded-2xl bg-upt-bg/50 border border-upt-border text-center space-y-4">
+                  <Clock className="w-10 h-10 text-upt-secondary mx-auto" />
+                  <div className="max-w-md mx-auto space-y-1.5">
                     <h4 className="text-sm font-bold text-upt-text">
                       Informe Técnico de Impacto Pendiente
                     </h4>
                     <p className="text-xs text-upt-muted leading-relaxed">
-                      Esta solicitud aún no cuenta con informe técnico de impacto registrado. Conforme al flujo oficial, el Arquitecto de Software emitirá este dictamen una vez admitida la solicitud.
+                      Esta solicitud aún no cuenta con informe técnico de impacto registrado. Conforme a RN-05, el Arquitecto de Software emitirá este dictamen una vez admitida la solicitud.
                     </p>
                   </div>
-                  <span className="inline-block text-[11px] font-mono font-medium text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
-                    Estado actual: {rfc.status} &bull; Pendiente de análisis técnico
-                  </span>
+                  <div className="flex flex-col items-center gap-3 pt-2">
+                    <span className="text-[11px] font-mono font-medium text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+                      Estado actual: {rfc.status} &bull; Requiere evaluación técnica
+                    </span>
+
+                    {(rfc.status === 'CLASIFICADA' || rfc.status === 'EN_ANALISIS_TECNICO') && activeRoleId === 'PU-03' && (
+                      rfc.requesterId !== currentUser.id ? (
+                        <Link
+                          to={`/rfcs/${rfc.id}/impact-analysis`}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-upt-primary hover:bg-upt-primary-hover text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>Realizar Análisis de Impacto Técnico (CU-06)</span>
+                        </Link>
+                      ) : (
+                        <span className="text-xs text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
+                          Incompatibilidad SoD: Usted registró esta solicitud y no puede evaluar su impacto técnico.
+                        </span>
+                      )
+                    )}
+                  </div>
                 </div>
               )}
             </div>

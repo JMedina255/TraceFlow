@@ -10,6 +10,7 @@ import { RfcListView } from '../features/rfcs/RfcListView';
 import { RfcDetailView } from '../features/rfcs/RfcDetailView';
 import { RfcEditView } from '../features/rfcs/RfcEditView';
 import { RfcImpactAnalysisView } from '../features/rfcs/RfcImpactAnalysisView';
+import { RfcMinorApprovalView } from '../features/rfcs/RfcMinorApprovalView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -104,15 +105,7 @@ export const AppRouter: React.FC = () => {
             <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-03']} moduleName="Aprobación de Cambio Menor" />}>
               <Route
                 path="/rfcs/:rfcId/minor-approval"
-                element={
-                  <ScreenPlaceholder
-                    meta={ROUTES_METADATA['/rfcs/:rfcId/minor-approval']}
-                    relatedRoutes={[
-                      { label: 'Volver a Bandeja de RFCs', path: '/rfcs' },
-                      { label: 'Ver Expediente RFC-2026-0002', path: '/rfcs/RFC-2026-0002' },
-                    ]}
-                  />
-                }
+                element={<RfcMinorApprovalView />}
               />
             </Route>
 

@@ -28,6 +28,7 @@ import { useProjectStore } from '../../store/useProjectStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { ecsService } from '../../services/ecs.service';
 import { auditService } from '../../services/audit.service';
+import { minorApprovalService } from '../../services/minorApproval.service';
 import { INITIAL_ECNS } from '../../data/initialEcns';
 import {
   RFC_STATUS_CATALOG,
@@ -65,6 +66,12 @@ export const RfcDetailView: React.FC = () => {
     if (!rfcId) return undefined;
     return rfcs.find((r) => r.id === rfcId || r.code === rfcId);
   }, [rfcId, rfcs]);
+
+  // Estado del flujo de autorización delegada (CU-30: Cambio Menor)
+  const delegatedStatus = useMemo(() => {
+    if (!rfc) return null;
+    return minorApprovalService.getDelegatedStatus(rfc.id);
+  }, [rfc]);
 
   // Handlers para las 3 decisiones de CU-05
   const handleAdmit = () => {
@@ -866,6 +873,25 @@ export const RfcDetailView: React.FC = () => {
             </div>
           </div>
 
+          {rfc.status === 'EN_EVALUACION' && rfc.classification === 'CAMBIO_MENOR' && (
+            <div className="pt-2 border-t border-purple-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-purple-900">
+              <span className="font-medium">
+                {delegatedStatus?.overallStatus === 'PENDIENTE' && (delegatedStatus.gestorApproval || delegatedStatus.architectApproval)
+                  ? 'Autorización delegada en curso: 1 de 2 firmas registradas.'
+                  : 'Autorización delegada pendiente: requiere la doble firma de Gestor SCM y Arquitecto.'}
+              </span>
+              {['PU-02', 'PU-03'].includes(activeRoleId || '') && (
+                <Link
+                  to={`/rfcs/${rfc.id}/minor-approval`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-xs shrink-0"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  Gestionar Autorización Delegada
+                </Link>
+              )}
+            </div>
+          )}
+
           <div className="pt-2 border-t border-purple-200/80 flex items-center justify-between text-xs text-purple-800">
             <span className="text-[11px]">
               * Las operaciones de dictamen colegiado se gestionan a través del comité de cambios.
@@ -1407,6 +1433,18 @@ export const RfcDetailView: React.FC = () => {
                       <span className="text-upt-muted block text-[11px]">Habilitación Operativa:</span>
                       <span className="font-semibold text-emerald-800">Emisión de ECN / Check-Out de ECS</span>
                     </div>
+                    {rfc.authorizedBy && (
+                      <div>
+                        <span className="text-upt-muted block text-[11px]">Autorizado por:</span>
+                        <span className="font-semibold text-upt-text">{rfc.authorizedBy}</span>
+                      </div>
+                    )}
+                    {rfc.authorizedAt && (
+                      <div>
+                        <span className="text-upt-muted block text-[11px]">Fecha de Autorización:</span>
+                        <span className="font-semibold text-upt-text">{new Date(rfc.authorizedAt).toLocaleString('es-PE')}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : rfc.status === 'RECHAZADA' ? (
@@ -1453,6 +1491,101 @@ export const RfcDetailView: React.FC = () => {
                   <div className="pt-1 text-[11px] text-upt-primary font-semibold">
                     * El dictamen definitivo se emitirá tras la elaboración del informe técnico de impacto.
                   </div>
+                </div>
+              ) : rfc.status === 'EN_EVALUACION' && rfc.classification === 'CAMBIO_MENOR' ? (
+                /* Proceso Activo de Autorización Delegada (CU-30: Doble Llave) */
+                <div className="p-6 rounded-2xl bg-white border border-purple-200 shadow-xs space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-upt-border pb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-purple-700" />
+                        <h4 className="text-base font-bold text-upt-primary">
+                          Autorización Delegada Compartida (Doble Llave)
+                        </h4>
+                      </div>
+                      <p className="text-xs text-upt-muted mt-1 leading-relaxed">
+                        Este cambio menor requiere la concurrencia independiente de dos vistos buenos (Gestor SCM y Arquitecto de Software) con cuentas de usuario distintas.
+                      </p>
+                    </div>
+                    <span className="shrink-0 self-start sm:self-auto font-mono text-xs font-bold text-purple-900 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+                      {delegatedStatus?.gestorApproval && delegatedStatus?.architectApproval
+                        ? '2 de 2 Firmas'
+                        : delegatedStatus?.gestorApproval || delegatedStatus?.architectApproval
+                        ? '1 de 2 Firmas'
+                        : '0 de 2 Firmas'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Llave 1: Gestor SCM */}
+                    <div className={`p-4 rounded-xl border ${delegatedStatus?.gestorApproval ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} space-y-2`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-upt-primary">Visto Bueno de Viabilidad Operativa</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${delegatedStatus?.gestorApproval ? 'bg-emerald-200/80 text-emerald-900' : 'bg-amber-200/80 text-amber-900'}`}>
+                          {delegatedStatus?.gestorApproval ? 'FIRMADO (GESTOR)' : 'PENDIENTE (GESTOR)'}
+                        </span>
+                      </div>
+                      {delegatedStatus?.gestorApproval ? (
+                        <div className="space-y-1.5 text-xs text-upt-text">
+                          <p className="font-semibold text-emerald-950">{delegatedStatus.gestorApproval.userName}</p>
+                          <p className="text-[11px] text-upt-muted font-mono">{new Date(delegatedStatus.gestorApproval.decidedAt).toLocaleString('es-PE')}</p>
+                          <p className="text-xs text-upt-text-secondary italic bg-white/70 p-2 rounded border border-emerald-100">
+                            "{delegatedStatus.gestorApproval.justification}"
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-amber-900 leading-relaxed">
+                          Pendiente de evaluación y visto bueno por un Gestor de Configuración de Software.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Llave 2: Arquitecto de Software */}
+                    <div className={`p-4 rounded-xl border ${delegatedStatus?.architectApproval ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} space-y-2`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-upt-primary">Visto Bueno de Viabilidad Técnica</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${delegatedStatus?.architectApproval ? 'bg-emerald-200/80 text-emerald-900' : 'bg-amber-200/80 text-amber-900'}`}>
+                          {delegatedStatus?.architectApproval ? 'FIRMADO (ARQUITECTO)' : 'PENDIENTE (ARQUITECTO)'}
+                        </span>
+                      </div>
+                      {delegatedStatus?.architectApproval ? (
+                        <div className="space-y-1.5 text-xs text-upt-text">
+                          <p className="font-semibold text-emerald-950">{delegatedStatus.architectApproval.userName}</p>
+                          <p className="text-[11px] text-upt-muted font-mono">{new Date(delegatedStatus.architectApproval.decidedAt).toLocaleString('es-PE')}</p>
+                          <p className="text-xs text-upt-text-secondary italic bg-white/70 p-2 rounded border border-emerald-100">
+                            "{delegatedStatus.architectApproval.justification}"
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-amber-900 leading-relaxed">
+                          Pendiente de evaluación y visto bueno por un Arquitecto de Software.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Acciones para roles autorizados */}
+                  {['PU-02', 'PU-03'].includes(activeRoleId || '') ? (
+                    <div className="p-4 rounded-xl bg-purple-50/60 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs font-bold text-purple-950 block">Espacio de Decisión Delegada Disponible</span>
+                        <p className="text-xs text-purple-900 leading-relaxed">
+                          Como {activeRoleId === 'PU-02' ? 'Gestor SCM' : 'Arquitecto de Software'}, puede emitir su voto, solicitar reescalamiento al CCB o denegar el cambio.
+                        </p>
+                      </div>
+                      <Link
+                        to={`/rfcs/${rfc.id}/minor-approval`}
+                        className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-xs"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        Acceder a la Doble Llave
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-lg bg-upt-bg border border-upt-border text-xs text-upt-muted">
+                      Su rol actual ({activeRoleId || 'Sin rol'}) no posee atribuciones de firma delegada. Este flujo es gestionado por Gestor SCM (PU-02) y Arquitecto (PU-03).
+                    </div>
+                  )}
                 </div>
               ) : (
                 /* Estado Pendiente Real */

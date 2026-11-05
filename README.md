@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Documento Maestro](https://img.shields.io/badge/Documento-SRS%20V1.0-blue.svg)](FD03-EPIS-Informe_SRS.md)
+[![Documento Maestro](https://img.shields.io/badge/Documento-SRS%20V1.0-blue.svg)](docs/FD03-EPIS-Informe_SRS.md)
 [![Estado del Proyecto](https://img.shields.io/badge/Fase-FD03%20Requerimientos%20%26%20Diseño%20Lógico-success.svg)](#etapa-actual-del-proyecto)
 [![Gobernanza SSOT](https://img.shields.io/badge/Gobernanza-SSOT%20Activa-orange.svg)](docs/DOCUMENTATION_RULES.md)
 [![Diagramas PlantUML](https://img.shields.io/badge/Diagramas-41%20Aprobados-brightgreen.svg)](docs/DIAGRAMS.md)
@@ -98,9 +98,11 @@ La documentación de TraceFlow SCM adopta el principio de **Fuente Única de Ver
 
 ```
 TraceFlow/
-├── FD03-EPIS-Informe_SRS.md     # Documento maestro consolidado de Requerimientos de Software (SRS)
+├── prototype/                   # Código y componentes del prototipo navegable
 ├── README.md                    # Presentación técnica, resumen ejecutivo y estado del proyecto
 ├── docs/
+│   ├── FD01-EPIS-Informe_Factibilidad.md # Informes de Factibilidad y Arquitectura (FD01 a FD05)
+│   ├── FD03-EPIS-Informe_SRS.md     # Documento maestro consolidado de Requerimientos (SRS)
 │   ├── DOCUMENTATION_RULES.md   # Marco normativo de gobernanza, convenciones (RF, RN, CU, DG) y versionamiento
 │   ├── TABLES.md                # SSOT de tablas estructuradas, catálogos funcionales y matrices de trazabilidad
 │   └── DIAGRAMS.md              # Catálogo oficial SSOT de 41 diagramas en código PlantUML con metadatos
@@ -108,11 +110,13 @@ TraceFlow/
 ```
 
 ### Índice de Referencia Documental
-- **Documento Maestro SRS:** [FD03-EPIS-Informe_SRS.md](file:///c:/Users/HP/Desktop/proyecto/FD03-EPIS-Informe_SRS.md)
-- **Reglas de Gobernanza y Convenciones:** [docs/DOCUMENTATION_RULES.md](file:///c:/Users/HP/Desktop/proyecto/docs/DOCUMENTATION_RULES.md)
-- **Tablas y Matrices de Trazabilidad:** [docs/TABLES.md](file:///c:/Users/HP/Desktop/proyecto/docs/TABLES.md)
-- **Catálogo Centralizado de Diagramas:** [docs/DIAGRAMS.md](file:///c:/Users/HP/Desktop/proyecto/docs/DIAGRAMS.md)
-- **Artefactos Visuales:** [assets/](file:///c:/Users/HP/Desktop/proyecto/assets)
+- **Documento Maestro SRS:** [docs/FD03-EPIS-Informe_SRS.md](docs/FD03-EPIS-Informe_SRS.md)
+- **Reglas de Gobernanza y Convenciones:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md)
+- **Tablas y Matrices de Trazabilidad:** [docs/TABLES.md](docs/TABLES.md)
+- **Catálogo Centralizado de Diagramas:** [docs/DIAGRAMS.md](docs/DIAGRAMS.md)
+- **Artefactos Visuales:** [assets/](assets/)
+- **Documentación de Fases (FD01 a FD05):** [docs/](docs/)
+- **Prototipo Navegable:** [prototype/](prototype/)
 
 ---
 

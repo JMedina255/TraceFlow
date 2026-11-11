@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import type { Project } from '../types';
+import type { Project, User } from '../types';
 import { INITIAL_PROJECTS } from '../data/initialProjects';
 import { storageService } from '../services/storage.service';
+import { useAuthStore } from './useAuthStore';
 
 interface ProjectState {
   projects: Project[];
   activeProject: Project;
-  setActiveProject: (projectId: string) => void;
+  setActiveProject: (projectId: string, user?: User) => void;
   reloadProjects: () => void;
 }
 
@@ -32,8 +33,18 @@ export const useProjectStore = create<ProjectState>((set) => ({
   projects: initialProjects,
   activeProject: getInitialActiveProject(initialProjects),
 
-  setActiveProject: (projectId: string) => {
+  setActiveProject: (projectId: string, user?: User) => {
     set((state) => {
+      const targetUser = user || useAuthStore.getState().currentUser;
+      if (targetUser && targetUser.assignedProjectIds && targetUser.assignedProjectIds.length > 0) {
+        if (!targetUser.assignedProjectIds.includes(projectId)) {
+          console.warn(
+            `[Multitenancy Security] Intento no autorizado de conmutar al proyecto ${projectId} por el usuario ${targetUser.fullName}.`
+          );
+          return state; // Rechazar conmutación no autorizada
+        }
+      }
+
       const selected = state.projects.find((p) => p.id === projectId);
       if (!selected) return state;
 

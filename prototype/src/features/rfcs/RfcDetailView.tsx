@@ -251,16 +251,22 @@ export const RfcDetailView: React.FC = () => {
 
           {/* Opciones de Solución */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-amber-200">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveProject(rfc.projectId);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-xs transition-colors shadow-xs cursor-pointer"
-            >
-              <FolderGit2 className="w-4 h-4" />
-              <span>Conmutar al proyecto &quot;{rfc.projectName}&quot; y abrir expediente</span>
-            </button>
+            {currentUser.assignedProjectIds.includes(rfc.projectId) ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveProject(rfc.projectId);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-xs transition-colors shadow-xs cursor-pointer"
+              >
+                <FolderGit2 className="w-4 h-4" />
+                <span>Conmutar al proyecto &quot;{rfc.projectName}&quot; y abrir expediente</span>
+              </button>
+            ) : (
+              <span className="text-xs text-red-900 font-semibold bg-red-100 px-3 py-1.5 rounded-lg border border-red-300">
+                Acceso denegado: Su cuenta no tiene asignado el proyecto &quot;{rfc.projectName}&quot;.
+              </span>
+            )}
 
             <Link
               to="/rfcs"
@@ -268,6 +274,44 @@ export const RfcDetailView: React.FC = () => {
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Regresar a la Bandeja de mi Proyecto</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // CASO 2B: RESTRICCIÓN DE PROPIEDAD PARA SOLICITANTE (PU-01)
+  // =========================================================================
+  const isUnauthorizedRequesterAccess = activeRoleId === 'PU-01' && rfc.requesterId !== currentUser.id;
+  if (isUnauthorizedRequesterAccess) {
+    return (
+      <div className="max-w-4xl mx-auto py-10 px-4 space-y-6">
+        <div className="bg-amber-50 border-2 border-amber-400 rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-3 bg-amber-500 text-upt-text rounded-xl shrink-0 mt-0.5">
+              <ShieldAlert className="w-6 h-6 text-amber-950" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-300">
+                Restricción de Propiedad &bull; Política de Privacidad RFC
+              </span>
+              <h2 className="text-lg sm:text-xl font-bold text-amber-950 pt-1">
+                Acceso Restringido: Expediente de Otro Solicitante
+              </h2>
+              <p className="text-xs sm:text-sm text-amber-900 leading-relaxed pt-1">
+                Como <strong>Solicitante</strong>, solo tiene autorización para consultar los expedientes de Solicitud de Cambio de los cuales sea el titular o autor original. No puede visualizar expedientes pertenecientes a otros usuarios.
+              </p>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-amber-300 flex items-center gap-3">
+            <Link
+              to="/rfcs"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Volver a Mis Solicitudes</span>
             </Link>
           </div>
         </div>
@@ -790,7 +834,7 @@ export const RfcDetailView: React.FC = () => {
                   <span>Solicitud Admitida Formalmente — Pendiente de Dictamen de Arquitectura</span>
                 </div>
                 <span className="font-mono text-[11px] text-emerald-800 bg-emerald-200/60 px-2 py-0.5 rounded border border-emerald-300">
-                  Fase CU-06
+                  Evaluación Técnica
                 </span>
               </div>
               <p className="text-emerald-900 leading-relaxed bg-white/80 p-3 rounded-lg border border-emerald-200">
@@ -812,7 +856,7 @@ export const RfcDetailView: React.FC = () => {
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-upt-primary hover:bg-upt-primary-hover text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
-                      <span>Realizar Análisis de Impacto Técnico (CU-06)</span>
+                      <span>Realizar Análisis de Impacto Técnico</span>
                     </Link>
                   ) : (
                     <span className="text-xs text-amber-900 italic font-medium">
@@ -1270,7 +1314,7 @@ export const RfcDetailView: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-upt-border pb-3">
                 <div className="space-y-0.5">
                   <h3 className="text-base font-bold text-upt-primary">
-                    Informe Técnico de Impacto (CU-06)
+                    Informe Técnico de Impacto
                   </h3>
                   <p className="text-xs text-upt-muted">
                     Evaluación de viabilidad, dependencias y afectación a la Triple Restricción emitida por Arquitectura (RN-05).
@@ -1421,7 +1465,7 @@ export const RfcDetailView: React.FC = () => {
                           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-upt-primary hover:bg-upt-primary-hover text-white text-xs font-bold transition-all shadow-md cursor-pointer"
                         >
                           <Sparkles className="w-4 h-4" />
-                          <span>Realizar Análisis de Impacto Técnico (CU-06)</span>
+                          <span>Realizar Análisis de Impacto Técnico</span>
                         </Link>
                       ) : (
                         <span className="text-xs text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">

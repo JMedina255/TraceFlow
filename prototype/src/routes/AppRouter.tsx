@@ -30,31 +30,33 @@ export const AppRouter: React.FC = () => {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardView />} />
 
-            {/* 2. Gestión de Proyectos */}
-            <Route
-              path="/projects"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/projects']}
-                  relatedRoutes={[
-                    { label: 'Ver Ficha de Proyecto (PRJ-001)', path: '/projects/PRJ-001' },
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/projects/:projectId"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/projects/:projectId']}
-                  relatedRoutes={[
-                    { label: 'Volver a Directorio de Proyectos', path: '/projects' },
-                  ]}
-                />
-              }
-            />
+            {/* 2. Gestión de Proyectos (PU-02, PU-03, PU-04, PU-05) */}
+            <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-03', 'PU-04', 'PU-05']} moduleName="Gestión de Proyectos" />}>
+              <Route
+                path="/projects"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/projects']}
+                    relatedRoutes={[
+                      { label: 'Ver Ficha de Proyecto (PRJ-001)', path: '/projects/PRJ-001' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/projects/:projectId"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/projects/:projectId']}
+                    relatedRoutes={[
+                      { label: 'Volver a Directorio de Proyectos', path: '/projects' },
+                    ]}
+                  />
+                }
+              />
+            </Route>
 
-            {/* 5. Control de Cambios: Bandeja y Expediente de RFCs */}
+            {/* 5. Control de Cambios: Bandeja y Expediente de RFCs (Abierto a perfiles autorizados con control contextual) */}
             <Route path="/rfcs" element={<RfcListView />} />
             <Route path="/rfcs/:rfcId" element={<RfcDetailView />} />
 
@@ -101,30 +103,32 @@ export const AppRouter: React.FC = () => {
               />
             </Route>
 
-            {/* 5. Control de Cambios: Órdenes (ECN) */}
-            <Route
-              path="/ecns"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/ecns']}
-                  relatedRoutes={[
-                    { label: 'Ver Ficha de Orden ECN-2026-0015', path: '/ecns/ECN-2026-0015' },
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/ecns/:ecnId"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/ecns/:ecnId']}
-                  relatedRoutes={[
-                    { label: 'Volver a Bandeja de Órdenes', path: '/ecns' },
-                    { label: 'Ejecutar Check-Out en SCM', path: '/scm/operations' },
-                  ]}
-                />
-              }
-            />
+            {/* 5. Control de Cambios: Órdenes (ECN) (PU-02, PU-04, PU-05, PU-06, PU-07) */}
+            <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-04', 'PU-05', 'PU-06', 'PU-07']} moduleName="Órdenes de Cambio (ECN)" />}>
+              <Route
+                path="/ecns"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/ecns']}
+                    relatedRoutes={[
+                      { label: 'Ver Ficha de Orden ECN-2026-0015', path: '/ecns/ECN-2026-0015' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/ecns/:ecnId"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/ecns/:ecnId']}
+                    relatedRoutes={[
+                      { label: 'Volver a Bandeja de Órdenes', path: '/ecns' },
+                      { label: 'Ejecutar Check-Out en SCM', path: '/scm/operations' },
+                    ]}
+                  />
+                }
+              />
+            </Route>
 
             {/* Rutas Restringidas: Exclusivo Aseguramiento de Calidad QA (PU-07) */}
             <Route element={<RoleGuard allowedRoles={['PU-07']} moduleName="Validación y Pruebas QA" />}>
@@ -142,42 +146,44 @@ export const AppRouter: React.FC = () => {
               />
             </Route>
 
-            {/* 3. Gestión de Configuración (ECS) */}
-            <Route
-              path="/ecs"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/ecs']}
-                  relatedRoutes={[
-                    { label: 'Ver Ficha de ECS-001', path: '/ecs/ECS-001' },
-                    { label: 'Ver Historial y Diff de ECS-001', path: '/ecs/ECS-001/history' },
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/ecs/:ecsId"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/ecs/:ecsId']}
-                  relatedRoutes={[
-                    { label: 'Historial de Versiones y Diff', path: '/ecs/ECS-001/history' },
-                    { label: 'Volver al Catálogo de ECS', path: '/ecs' },
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/ecs/:ecsId/history"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/ecs/:ecsId/history']}
-                  relatedRoutes={[
-                    { label: 'Volver a Ficha del ECS', path: '/ecs/ECS-001' },
-                  ]}
-                />
-              }
-            />
+            {/* 3. Gestión de Configuración (ECS) (PU-03, PU-05, PU-06, PU-07) */}
+            <Route element={<RoleGuard allowedRoles={['PU-03', 'PU-05', 'PU-06', 'PU-07']} moduleName="Gestión de Configuración (ECS)" />}>
+              <Route
+                path="/ecs"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/ecs']}
+                    relatedRoutes={[
+                      { label: 'Ver Ficha de ECS-001', path: '/ecs/ECS-001' },
+                      { label: 'Ver Historial y Diff de ECS-001', path: '/ecs/ECS-001/history' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/ecs/:ecsId"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/ecs/:ecsId']}
+                    relatedRoutes={[
+                      { label: 'Historial de Versiones y Diff', path: '/ecs/ECS-001/history' },
+                      { label: 'Volver al Catálogo de ECS', path: '/ecs' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/ecs/:ecsId/history"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/ecs/:ecsId/history']}
+                    relatedRoutes={[
+                      { label: 'Volver a Ficha del ECS', path: '/ecs/ECS-001' },
+                    ]}
+                  />
+                }
+              />
+            </Route>
 
             {/* Rutas Restringidas: Exclusivo Bibliotecario SCM (PU-05) */}
             <Route element={<RoleGuard allowedRoles={['PU-05']} moduleName="Operaciones SCM y Líneas Base" />}>
@@ -214,55 +220,57 @@ export const AppRouter: React.FC = () => {
               />
             </Route>
 
-            {/* 6. Soporte e Incidencias */}
-            <Route
-              path="/incidents"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/incidents']}
-                  relatedRoutes={[
-                    { label: 'Ver Ficha de Incidencia INC-2026-0008', path: '/incidents/INC-2026-0008' },
-                  ]}
-                />
-              }
-            />
-            <Route
-              path="/incidents/:incidentId"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/incidents/:incidentId']}
-                  relatedRoutes={[
-                    { label: 'Volver a Mesa de Incidencias', path: '/incidents' },
-                  ]}
-                />
-              }
-            />
+            {/* 6. Soporte e Incidencias (PU-01, PU-02) */}
+            <Route element={<RoleGuard allowedRoles={['PU-01', 'PU-02']} moduleName="Mesa de Incidencias" />}>
+              <Route
+                path="/incidents"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/incidents']}
+                    relatedRoutes={[
+                      { label: 'Ver Ficha de Incidencia INC-2026-0008', path: '/incidents/INC-2026-0008' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/incidents/:incidentId"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/incidents/:incidentId']}
+                    relatedRoutes={[
+                      { label: 'Volver a Mesa de Incidencias', path: '/incidents' },
+                    ]}
+                  />
+                }
+              />
+            </Route>
 
-            {/* 7. Trazabilidad y Auditoría */}
-            <Route
-              path="/audit"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/audit']}
-                  relatedRoutes={[
-                    { label: 'Generador de Reportes SCM', path: '/reports' },
-                  ]}
-                />
-              }
-            />
-
-            {/* 8. Reportes */}
-            <Route
-              path="/reports"
-              element={
-                <ScreenPlaceholder
-                  meta={ROUTES_METADATA['/reports']}
-                  relatedRoutes={[
-                    { label: 'Bitácora Forense SHA-256', path: '/audit' },
-                  ]}
-                />
-              }
-            />
+            {/* 7. Trazabilidad y Auditoría (PU-02, PU-04, PU-05) */}
+            <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-04', 'PU-05']} moduleName="Trazabilidad y Auditoría" />}>
+              <Route
+                path="/audit"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/audit']}
+                    relatedRoutes={[
+                      { label: 'Generador de Reportes SCM', path: '/reports' },
+                    ]}
+                  />
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ScreenPlaceholder
+                    meta={ROUTES_METADATA['/reports']}
+                    relatedRoutes={[
+                      { label: 'Bitácora Forense SHA-256', path: '/audit' },
+                    ]}
+                  />
+                }
+              />
+            </Route>
 
             {/* Ruta 404 para cualquier ruta no mapeada dentro del Layout */}
             <Route path="*" element={<NotFoundView />} />

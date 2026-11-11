@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  GitBranch, 
-  Bell, 
-  LogOut, 
-  FolderGit2, 
-  Menu, 
-  X, 
-  ChevronDown, 
-  RotateCcw,
+import {
+  GitBranch,
+  Bell,
+  LogOut,
+  FolderGit2,
+  Menu,
+  X,
+  ChevronDown,
   Check,
   Shield,
   Briefcase,
@@ -17,7 +16,6 @@ import {
 import { useAuthStore } from '../../store/useAuthStore';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useRfcStore } from '../../store/useRfcStore';
-import { useDemoStore } from '../../store/useDemoStore';
 import { CANONICAL_ROLES } from '../../types';
 
 interface TopbarProps {
@@ -27,24 +25,22 @@ interface TopbarProps {
 
 export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }) => {
   const navigate = useNavigate();
-  const { 
-    currentUser, 
-    activeRoleId, 
-    logout 
+  const {
+    currentUser,
+    activeRoleId,
+    logout
   } = useAuthStore();
 
   const { projects, activeProject, setActiveProject } = useProjectStore();
   const { getRfcsByProject } = useRfcStore();
-  const { resetAllDemoData } = useDemoStore();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showProjectMenu, setShowProjectMenu] = useState(false);
-  const [resetSuccess, setResetSuccess] = useState(false);
 
   // Filtrar proyectos según los asignados a la cuenta del usuario actual (Aislamiento de acceso)
   const userAssignedProjectIds = currentUser?.assignedProjectIds || [];
-  const authorizedProjects = projects.filter((p) => 
+  const authorizedProjects = projects.filter((p) =>
     userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id)
   );
 
@@ -57,15 +53,9 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
 
   // Derivar notificaciones contextuales del proyecto activo
   const projectRfcs = getRfcsByProject(activeProject.id);
-  const pendingRfcs = projectRfcs.filter((r) => 
+  const pendingRfcs = projectRfcs.filter((r) =>
     ['REGISTRADA', 'EN_ANALISIS_TECNICO', 'EN_EVALUACION', 'EN_PRUEBAS'].includes(r.status)
   );
-
-  const handleResetDemo = () => {
-    resetAllDemoData();
-    setResetSuccess(true);
-    setTimeout(() => setResetSuccess(false), 2500);
-  };
 
   const handleLogout = () => {
     logout();
@@ -173,24 +163,8 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         </div>
       </div>
 
-      {/* Lado Derecho: Restablecer Demo + Notificaciones + Perfil de Sesión */}
+      {/* Lado Derecho: Notificaciones + Perfil de Sesión */}
       <div className="flex items-center space-x-2 sm:space-x-3">
-        {/* Botón de Restablecimiento de Datos Demo */}
-        <button
-          onClick={handleResetDemo}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs border transition-all cursor-pointer ${
-            resetSuccess
-              ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200 font-semibold'
-              : 'bg-upt-primary/70 border border-white/15 text-blue-100 hover:text-white hover:border-white/30'
-          }`}
-          title="Restablecer todos los datos simulados al estado inicial"
-        >
-          <RotateCcw className={`w-3.5 h-3.5 ${resetSuccess ? 'animate-spin' : ''}`} />
-          <span className="hidden xl:inline">
-            {resetSuccess ? '¡Datos Reiniciados!' : 'Reset Demo'}
-          </span>
-        </button>
-
         {/* Notificaciones Reales del Proyecto */}
         <div className="relative">
           <button
@@ -252,7 +226,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Separador */}
         <div className="h-6 w-px bg-white/20" />
 
-        {/* Perfil de Usuario y Sesión Activa (Sin cambio arbitrario de rol o usuario) */}
+        {/* Perfil de Usuario y Sesión Activa */}
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -304,22 +278,22 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               <div className="py-2 px-2.5 bg-blue-50/60 rounded-lg border border-blue-200/70 mb-2.5 text-xs">
                 <div className="flex items-center gap-1 text-[10px] font-bold text-upt-primary uppercase tracking-wider mb-1">
                   <Shield className="w-3 h-3 text-upt-bright shrink-0" />
-                  <span>Rol Efectivo en Sesión</span>
+                  <span>Perfil Activo en Sesión</span>
                 </div>
                 <div className="font-semibold text-upt-text text-xs">
-                  {activeRoleDef?.role} — {activeRoleDef?.label}
+                  {activeRoleDef?.label}
                 </div>
                 <p className="text-[10px] text-upt-muted mt-1 leading-snug">
                   Operando bajo la política de Segregación de Funciones (SoD).
                 </p>
               </div>
 
-              {/* Roles Autorizados Asignados a la Cuenta (Informativo) */}
+              {/* Roles Asignados a la Cuenta */}
               <div className="pb-2.5 border-b border-upt-border mb-2.5">
                 <div className="flex items-center justify-between mb-1 text-[10px] font-semibold text-upt-text-secondary">
                   <span className="flex items-center gap-1">
                     <Layers className="w-3 h-3 text-upt-muted" />
-                    Roles asignados a su cuenta:
+                    Roles autorizados en su cuenta:
                   </span>
                   <span className="font-mono text-upt-muted">
                     {currentUser.allowedRoleIds.length}
@@ -332,20 +306,20 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
                     return (
                       <span
                         key={rId}
-                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${
                           isCurrent
                             ? 'bg-upt-institutional text-white font-bold'
                             : 'bg-upt-bg text-upt-text-secondary border border-upt-border'
                         }`}
                         title={rDef?.label}
                       >
-                        {rId} {rDef?.role}
+                        {rDef?.label || rId}
                       </span>
                     );
                   })}
                 </div>
                 <p className="text-[10px] text-upt-muted mt-1.5 italic">
-                  Para operar con otro rol asignado, cierre sesión e inicie con el perfil correspondiente.
+                  Para operar con otro de sus roles asignados, cierre sesión e inicie seleccionando dicho perfil.
                 </p>
               </div>
 

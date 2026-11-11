@@ -101,16 +101,58 @@ npm run build
 
 Los artefactos optimizados se generarán en la carpeta `dist/`.
 
-### 5.4. Vista previa de la compilación
+### 5.5. Verificación de Código y Calidad (Lint & Build)
 
 ```bash
-npm run preview
+# Análisis estático rápido (0 warnings, 0 errors)
+npm run lint
+
+# Verificación de tipos TypeScript y empaquetado de producción
+npm run build
 ```
+
+### 5.6. Ejecución de Suites de Pruebas Automatizadas
+
+TraceFlow cuenta con 9 suites de pruebas unitarias y de integración que verifican las máquinas de estado, reglas SoD, permisos RBAC e integridad criptográfica:
+
+```bash
+npm test
+```
+
+Suites incluidas en el runner oficial:
+1. `rfc.service.spec.mjs`: Registro formal de RFC (`CU-04`) y restricciones SoD.
+2. `rfc.views.spec.mjs`: Bandeja y expediente 360°, aislamiento multitenant.
+3. `rfc.validation.spec.mjs`: Admisión formal (`CU-05`) y subsanación (`CU-04.1`).
+4. `auth.spec.mjs`: Validación de credenciales y protección de rutas.
+5. `navigation.spec.mjs`: Matriz de navegación lateral contextual por rol.
+6. `impactAnalysis.spec.mjs`: Dictamen e informe técnico de impacto (`CU-06`).
+7. `minorApproval.spec.mjs`: Doble llave delegada en cambios menores (`CU-30`).
+8. `ccb.spec.mjs`: Deliberación colegiada del CCB (`CU-07`).
+9. `enterprise.rbac.spec.mjs`: Suite de seguridad empresarial, Default-Deny y SoD.
 
 ---
 
-## 6. Próximo Paso (Fase III)
+## 6. Autenticación y Cuentas Institucionales
 
-- Construcción del **Shell Global corporativo** conforme a `DG-UWE-PRES-01`.
-- Implementación de la barra superior (**Topbar**) con conmutador de usuario de demostración y notificaciones.
-- Implementación del menú lateral (**Sidebar**) persistente estructurado según los **8 paquetes arquitecturales de DG-04**.
+El acceso al sistema requiere correo institucional y contraseña, eliminando la selección pública de identidades:
+
+| ID Usuario | Nombre | Correo Institucional | Rol Principal | Rol Secundario | Proyectos Asignados |
+| :---: | :--- | :--- | :---: | :---: | :---: |
+| **USR-001** | Joan Cristian Medina Quispe | `jmedina@exodo.pe` | **PU-02** (Gestor) | **PU-01** (Solicitante) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-002** | Renzo Antonio Antayhua Mamani | `rantayhua@exodo.pe` | **PU-03** (Arquitecto) | **PU-06** (Desarrollador) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-003** | Augusto Joaquin Rivera Muñoz | `arivera@exodo.pe` | **PU-05** (Bibliotecario)| **PU-07** (Calidad/QA) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-004** | Renzo Fernando Loyola Vilca Choque | `rloyola@exodo.pe` | **PU-04** (CCB) | *(Ninguno)* | PRJ-001, PRJ-002 *(Veto: PRJ-003)* |
+
+* **Aprovisionamiento Seguro de Credenciales:** El repositorio no publica contraseñas ni hashes en texto claro. La configuración y actualización de credenciales para entorno local se realiza mediante el procedimiento seguro de aprovisionamiento (`authService.setLocalPassword`).
+* **Políticas clave:**
+  * **Un solo rol efectivo por sesión:** Si una cuenta posee más de un rol asignado, el usuario debe seleccionar el rol con el que operará al momento de autenticar.
+  * **Default-Deny:** Toda ruta no asignada explícitamente queda bloqueada por defecto.
+  * **Aislamiento Multitenant:** `USR-004` tiene vetado el acceso a `PRJ-003`.
+  * **Ownership en Solicitudes:** Los solicitantes (`PU-01`) solo pueden ver sus propios expedientes.
+  * **Doble Llave:** Cambios menores requieren firmas obligatorias de Gestor (`PU-02`) y Arquitecto (`PU-03`) emitidas por dos identidades físicas diferentes.
+
+---
+
+## 7. Aviso de Dependencia de Backend para Producción
+
+La presente versión corresponde a una aplicación de cliente enriquecido (React SPA). Los controles de acceso, hash criptográfico y SoD operan rigurosamente en la capa de servicios y Zustand en el cliente. Para despliegues en producción real con valor legal y auditoría regulatoria, se requiere integrar un backend confiable con tokens firmados por servidor (`HttpOnly`), base de datos relacional y persistencia inmutable en base de datos.

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { User, UserAccount, CanonicalRole, CanonicalRoleId } from '../types';
 import { CANONICAL_ROLES } from '../types';
 import { INITIAL_USER_ACCOUNTS, INITIAL_DEMO_USERS, type DemoUserConfig } from '../data/initialUsers';
+import { authService } from '../services/auth.service';
 import { storageService } from '../services/storage.service';
 
 interface AuthState {
@@ -9,17 +10,19 @@ interface AuthState {
   activeRole: CanonicalRole | null;
   activeRoleId: CanonicalRoleId | null;
   isAuthenticated: boolean;
-  availableDemoAccounts: UserAccount[];
-  availableDemoUsers: DemoUserConfig[]; // Alias de compatibilidad
-  loginWithAccount: (account: UserAccount | DemoUserConfig, effectiveRoleId?: CanonicalRoleId) => void;
+  loginWithCredentials: (
+    email: string,
+    password: string,
+    requestedRoleId?: CanonicalRoleId
+  ) => Promise<void>;
   logout: () => void;
+  // Métodos de compatibilidad para suites de prueba automatizadas
+  availableDemoAccounts: UserAccount[];
+  availableDemoUsers: DemoUserConfig[];
+  loginWithAccount: (account: UserAccount | DemoUserConfig, effectiveRoleId?: CanonicalRoleId) => void;
   switchUser: (userId: string) => void;
-  switchRole: (roleId: CanonicalRoleId) => void;
   login: (user: User) => void;
 }
-
-const STORAGE_KEY_USER_ID = 'active_demo_user_id';
-const STORAGE_KEY_ROLE_ID = 'active_demo_role_id';
 
 const getInitialSession = (): {
   user: User | null;
@@ -27,36 +30,16 @@ const getInitialSession = (): {
   roleId: CanonicalRoleId | null;
   isAuthenticated: boolean;
 } => {
-  const savedUserId = storageService.get<string | null>(STORAGE_KEY_USER_ID, null);
-  const savedRoleId = storageService.get<CanonicalRoleId | null>(STORAGE_KEY_ROLE_ID, null);
-
-  if (savedUserId) {
-    const account = INITIAL_USER_ACCOUNTS.find((u) => u.id === savedUserId);
-    if (account) {
-      const effectiveRoleId =
-        savedRoleId && account.assignedRoleIds.includes(savedRoleId)
-          ? savedRoleId
-          : account.primaryRoleId || account.assignedRoleIds[0];
-      const roleDef = CANONICAL_ROLES[effectiveRoleId];
-
-      const sessionUser: User = {
-        ...account,
-        roleId: effectiveRoleId,
-        role: roleDef.role,
-        roleLabel: roleDef.label,
-        allowedRoleIds: account.assignedRoleIds,
-      };
-
-      return {
-        user: sessionUser,
-        role: roleDef.role,
-        roleId: effectiveRoleId,
-        isAuthenticated: true,
-      };
-    }
+  const persisted = authService.validatePersistedSession();
+  if (persisted) {
+    return {
+      user: persisted.user,
+      role: persisted.user.role,
+      roleId: persisted.roleId,
+      isAuthenticated: true,
+    };
   }
 
-  // Estado por defecto: Si no hay sesión guardada previa, requerir login
   return {
     user: null,
     role: null,
@@ -69,14 +52,44 @@ const initialSession = getInitialSession();
 
 export const useAuthStore = create<AuthState>((set) => ({
   currentUser: initialSession.user,
-  availableDemoAccounts: INITIAL_USER_ACCOUNTS,
-  availableDemoUsers: INITIAL_DEMO_USERS,
   activeRole: initialSession.role,
   activeRoleId: initialSession.roleId,
   isAuthenticated: initialSession.isAuthenticated,
+  availableDemoAccounts: INITIAL_USER_ACCOUNTS,
+  availableDemoUsers: INITIAL_DEMO_USERS,
 
+  /**
+   * Inicio de sesión formal empresarial con correo institucional y contraseña.
+   * Valida credenciales con hash SHA-256 y establece un único rol efectivo por sesión.
+   */
+  loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId) => {
+    const result = await authService.authenticate(email, password, requestedRoleId);
+    set({
+      currentUser: result.sessionUser,
+      activeRoleId: result.effectiveRoleId,
+      activeRole: result.sessionUser.role,
+      isAuthenticated: true,
+    });
+  },
+
+  /**
+   * Cierre formal de sesión activa y revocación de tokens.
+   */
+  logout: () => {
+    authService.logout();
+    set({
+      currentUser: null,
+      activeRoleId: null,
+      activeRole: null,
+      isAuthenticated: false,
+    });
+  },
+
+  /**
+   * Adaptador de compatibilidad para suites de pruebas y fixtures controlados.
+   * Aplica la regla SoD: Si el rol solicitado no está en assignedRoleIds, se fuerza el rol primario.
+   */
   loginWithAccount: (account: UserAccount | DemoUserConfig, effectiveRoleId?: CanonicalRoleId) => {
-    // Si no se especifica rol, tomar el primario o el primer rol asignado
     const selectedRoleId =
       effectiveRoleId && account.assignedRoleIds.includes(effectiveRoleId)
         ? effectiveRoleId
@@ -85,9 +98,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     const roleDef = CANONICAL_ROLES[selectedRoleId];
     if (!roleDef) return;
 
-    storageService.set(STORAGE_KEY_USER_ID, account.id);
-    storageService.set(STORAGE_KEY_ROLE_ID, selectedRoleId);
+    storageService.set('active_demo_user_id', account.id);
+    storageService.set('active_demo_role_id', selectedRoleId);
 
+    // Actualiza persistencia
     const sessionUser: User = {
       ...account,
       roleId: selectedRoleId,
@@ -104,65 +118,27 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  logout: () => {
-    storageService.remove(STORAGE_KEY_USER_ID);
-    storageService.remove(STORAGE_KEY_ROLE_ID);
-    set({
-      currentUser: null,
-      activeRoleId: null,
-      activeRole: null,
-      isAuthenticated: false,
-    });
-  },
-
-  // Métodos de compatibilidad y testing controlado
   switchUser: (userId: string) => {
-    const user = INITIAL_DEMO_USERS.find((u) => u.id === userId);
-    if (!user) return;
-    const defaultRoleId = user.primaryRoleId || user.allowedRoleIds[0];
-    const defaultRole = CANONICAL_ROLES[defaultRoleId];
+    const account = INITIAL_USER_ACCOUNTS.find((u) => u.id === userId);
+    if (!account) return;
+    const defaultRoleId = account.primaryRoleId || account.assignedRoleIds[0];
+    const roleDef = CANONICAL_ROLES[defaultRoleId];
+    if (!roleDef) return;
 
-    storageService.set(STORAGE_KEY_USER_ID, user.id);
-    storageService.set(STORAGE_KEY_ROLE_ID, defaultRoleId);
+    storageService.set('active_demo_user_id', account.id);
+    storageService.set('active_demo_role_id', defaultRoleId);
 
     set({
       currentUser: {
-        ...user,
+        ...account,
         roleId: defaultRoleId,
-        role: defaultRole.role,
-        roleLabel: defaultRole.label,
+        role: roleDef.role,
+        roleLabel: roleDef.label,
+        allowedRoleIds: account.assignedRoleIds,
       },
       activeRoleId: defaultRoleId,
-      activeRole: defaultRole.role,
+      activeRole: roleDef.role,
       isAuthenticated: true,
-    });
-  },
-
-  switchRole: (roleId: CanonicalRoleId) => {
-    const roleDef = CANONICAL_ROLES[roleId];
-    if (!roleDef) return;
-
-    set((state) => {
-      if (!state.currentUser) return state;
-      if (!state.currentUser.assignedRoleIds.includes(roleId)) {
-        console.warn(
-          `[SoD Security] Intento no autorizado de conmutar al rol ${roleId} para el usuario ${state.currentUser.username}.`
-        );
-        return state;
-      }
-
-      storageService.set(STORAGE_KEY_ROLE_ID, roleId);
-
-      return {
-        activeRoleId: roleId,
-        activeRole: roleDef.role,
-        currentUser: {
-          ...state.currentUser,
-          roleId: roleId,
-          role: roleDef.role,
-          roleLabel: roleDef.label,
-        },
-      };
     });
   },
 
@@ -174,9 +150,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       primaryRoleId: user.roleId,
       allowedRoleIds: [user.roleId],
     };
-
-    storageService.set(STORAGE_KEY_USER_ID, matched.id);
-    storageService.set(STORAGE_KEY_ROLE_ID, matched.roleId);
 
     set({
       currentUser: matched,

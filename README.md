@@ -120,7 +120,47 @@ TraceFlow/
 
 ---
 
-## 6. Etapa Actual del Proyecto
+## 6. Refactorización Empresarial (Rama `feat/traceflow-enterprise-rbac-ux`)
+
+La aplicación ha sido sometida a una refactorización integral para convertir el prototipo navegable en una plataforma empresarial operativa:
+
+### 6.1. Acceso Institucional y Cuentas de Evaluación
+El acceso se realiza mediante correo institucional corporativo y contraseña con verificación criptográfica SHA-256 + salt de sistema (`traceflow:exodo:scm:auth:v1`).
+
+| ID Usuario | Colaborador | Correo Corporativo | Rol Principal | Rol Secundario | Proyectos Asignados |
+| :---: | :--- | :--- | :---: | :---: | :---: |
+| **USR-001** | Joan Cristian Medina Quispe | `jmedina@exodo.pe` | **PU-02** (Gestor) | **PU-01** (Solicitante) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-002** | Renzo Antonio Antayhua Mamani | `rantayhua@exodo.pe` | **PU-03** (Arquitecto) | **PU-06** (Desarrollador) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-003** | Augusto Joaquin Rivera Muñoz | `arivera@exodo.pe` | **PU-05** (Bibliotecario)| **PU-07** (Calidad/QA) | PRJ-001, PRJ-002, PRJ-003 |
+| **USR-004** | Renzo Fernando Loyola Vilca Choque | `rloyola@exodo.pe` | **PU-04** (CCB) | *(Ninguno)* | PRJ-001, PRJ-002 *(Veto: PRJ-003)* |
+
+* **Aprovisionamiento Seguro de Credenciales:** El sistema no publica contraseñas en texto claro ni secretos en el repositorio. Para evaluaciones locales, las credenciales se administran de forma aislada mediante el procedimiento documentado en [AUTH_IMPLEMENTATION_REPORT.md](docs/refactor/AUTH_IMPLEMENTATION_REPORT.md) o mediante `authService.setLocalPassword()`.
+* **Política de Sesión:** Un solo rol efectivo por sesión activa (`effectiveRoleId`).
+* **Política de Rutas:** Denegación estricta por defecto (**Default-Deny**).
+* **Segregación de Funciones (SoD):** Antiautoevaluación del Solicitante, Doble Llave con dos identidades físicas distintas en cambios menores y veto de `USR-004` sobre `PRJ-003`.
+
+### 6.2. Documentación Técnica de Refactorización
+- **Auditoría y Diagnóstico Consolidado:** [docs/refactor/ENTERPRISE_REFACTOR_AUDIT.md](docs/refactor/ENTERPRISE_REFACTOR_AUDIT.md)
+- **Matriz de Control de Acceso (RBAC & SoD):** [docs/refactor/RBAC_ACCESS_MATRIX.md](docs/refactor/RBAC_ACCESS_MATRIX.md)
+- **Guía de Experiencia de Usuario Empresarial:** [docs/refactor/ENTERPRISE_UX_GUIDELINES.md](docs/refactor/ENTERPRISE_UX_GUIDELINES.md)
+- **Reporte Criptográfico de Autenticación:** [docs/refactor/AUTH_IMPLEMENTATION_REPORT.md](docs/refactor/AUTH_IMPLEMENTATION_REPORT.md)
+
+### 6.3. Verificación Automatizada y Calidad de Código
+Desde el directorio `prototype/`:
+```bash
+# 1. Análisis estático (Linter)
+npm run lint
+
+# 2. Compilación de tipos y empaquetado
+npm run build
+
+# 3. Ejecución de las 9 suites de pruebas unitarias y de integración
+npm test
+```
+
+---
+
+## 7. Etapa Actual del Proyecto
 
 Actualmente, el proyecto se encuentra en la etapa:
 

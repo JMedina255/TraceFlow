@@ -27,15 +27,43 @@ const ALLOWED_TRANSITIONS: Record<RFCStatus, RFCStatus[]> = {
 };
 
 export const rfcService = {
-  getAll(projectId?: string): RFC[] {
-    const all = storageService.get<RFC[]>(STORAGE_KEY, INITIAL_RFCS);
-    if (!projectId) return all;
-    return all.filter((r) => r.projectId === projectId);
+  getAll(projectId?: string, user?: User): RFC[] {
+    let all = storageService.get<RFC[]>(STORAGE_KEY, INITIAL_RFCS);
+    if (projectId) {
+      all = all.filter((r) => r.projectId === projectId);
+    }
+    if (user) {
+      if (user.assignedProjectIds && user.assignedProjectIds.length > 0) {
+        all = all.filter((r) => user.assignedProjectIds.includes(r.projectId));
+      }
+      if (user.roleId === 'PU-01') {
+        all = all.filter((r) => r.requesterId === user.id);
+      }
+    }
+    return all;
   },
 
-  getById(id: string): RFC | undefined {
-    const all = this.getAll();
-    return all.find((r) => r.id === id || r.code === id);
+  getById(id: string, user?: User): RFC | undefined {
+    const all = storageService.get<RFC[]>(STORAGE_KEY, INITIAL_RFCS);
+    const rfc = all.find((r) => r.id === id || r.code === id);
+    if (!rfc) return undefined;
+
+    if (user) {
+      if (user.assignedProjectIds && user.assignedProjectIds.length > 0) {
+        if (!user.assignedProjectIds.includes(rfc.projectId)) {
+          throw new Error(
+            `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+          );
+        }
+      }
+      if (user.roleId === 'PU-01' && rfc.requesterId !== user.id) {
+        throw new Error(
+          `Acceso denegado (Propiedad): Como Solicitante solo puede consultar expedientes de los cuales sea autor original.`
+        );
+      }
+    }
+
+    return rfc;
   },
 
   isTransitionAllowed(fromStatus: RFCStatus, toStatus: RFCStatus): boolean {
@@ -74,8 +102,14 @@ export const rfcService = {
       );
     }
 
-    // 2. Validación de proyecto activo existente
-    const project = projectService.getById(dto.projectId);
+    // 2. Validación de proyecto activo existente y asignado al usuario
+    if (!authService.canUserAccessProject(user, dto.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${dto.projectId}' para registrar solicitudes.`
+      );
+    }
+
+    const project = projectService.getById(dto.projectId, user);
     if (!project) {
       throw new Error(`Proyecto inválido o no encontrado: '${dto.projectId}'.`);
     }
@@ -170,6 +204,12 @@ export const rfcService = {
       throw new Error(`Solicitud de Cambio no encontrada: '${rfcId}'.`);
     }
 
+    if (!authService.canUserAccessProject(user, rfc.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+      );
+    }
+
     if (rfc.status !== 'REGISTRADA') {
       throw new Error(
         `Transición inválida: La solicitud ${rfc.code} está en estado '${rfc.status}' y no puede ser admitida. Solo solicitudes en estado 'REGISTRADA' pueden admitirse mediante CU-05.`
@@ -226,6 +266,12 @@ export const rfcService = {
       throw new Error(`Solicitud de Cambio no encontrada: '${rfcId}'.`);
     }
 
+    if (!authService.canUserAccessProject(user, rfc.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+      );
+    }
+
     if (rfc.status !== 'REGISTRADA') {
       throw new Error(
         `Transición inválida: La solicitud ${rfc.code} está en estado '${rfc.status}'. Solo solicitudes en estado 'REGISTRADA' pueden ser observadas.`
@@ -274,6 +320,12 @@ export const rfcService = {
     const rfc = this.getById(rfcId);
     if (!rfc) {
       throw new Error(`Solicitud de Cambio no encontrada: '${rfcId}'.`);
+    }
+
+    if (!authService.canUserAccessProject(user, rfc.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+      );
     }
 
     if (!['REGISTRADA', 'EN_SUBSANACION'].includes(rfc.status)) {
@@ -343,6 +395,12 @@ export const rfcService = {
     const rfc = this.getById(rfcId);
     if (!rfc) {
       throw new Error(`Solicitud de Cambio no encontrada: '${rfcId}'.`);
+    }
+
+    if (!authService.canUserAccessProject(user, rfc.projectId)) {
+      throw new Error(
+        `Acceso denegado (Proyecto): El usuario '${user.fullName}' no tiene asignado el proyecto '${rfc.projectId}' de esta solicitud.`
+      );
     }
 
     // Verificación estricta de asignación de proyecto

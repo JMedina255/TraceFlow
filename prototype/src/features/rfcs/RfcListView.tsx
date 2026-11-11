@@ -45,9 +45,14 @@ export const RfcListView: React.FC = () => {
   const [pageSize, setPageSize] = useState<number>(5);
 
   // Obtener todas las RFCs pertenecientes al proyecto activo (Aislamiento Multitenant)
+  // Para el rol Solicitante (PU-01), se restringe estrictamente a expedientes propios
   const projectRfcs = useMemo(() => {
-    return rfcs.filter((r) => r.projectId === activeProject.id);
-  }, [rfcs, activeProject.id]);
+    const list = rfcs.filter((r) => r.projectId === activeProject.id);
+    if (activeRoleId === 'PU-01') {
+      return list.filter((r) => r.requesterId === currentUser?.id);
+    }
+    return list;
+  }, [rfcs, activeProject.id, activeRoleId, currentUser?.id]);
 
   // Aplicar filtros de búsqueda, estado y clasificación
   const filteredRfcs = useMemo(() => {

@@ -153,7 +153,7 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 **CU relacionados:** CU-01  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 2.4 (Págs. 7-8)  
 
-![DG-01](../assets/DG-01.png)
+![DG-01](assets/diagramas/render/generales/DG-01.svg)
 
 ```plantuml
 @startuml
@@ -245,7 +245,7 @@ DEV ..> CLIENT : Provee plataforma TraceFlow SCM
 **CU relacionados:** N/A  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 3.6 (Pág. 17) y Sección 4.1 (Pág. 17)  
 
-![DG-02](../assets/DG-02.png)
+![DG-02](assets/diagramas/render/generales/DG-02.svg)
 
 ```plantuml
 @startuml
@@ -329,7 +329,7 @@ endif
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y actualización TO-BE v2  
 
-![DG-03](../assets/DG-03.png)
+![DG-03](assets/diagramas/render/generales/DG-03.svg)
 
 ```plantuml
 @startuml
@@ -686,7 +686,7 @@ stop
 **CU relacionados:** CU-01 a CU-30  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32) y actualización TO-BE v2  
 
-![DG-04](../assets/DG-04.png)
+![DG-04](assets/diagramas/render/generales/DG-04.svg)
 
 ```plantuml
 @startuml
@@ -775,7 +775,7 @@ PKG_REP ..> PKG_LIB : consulta inventario
 **CU relacionados:** CU-01 a CU-30  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33), `TB-10` y actualización TO-BE v2  
 
-![DG-05](../assets/DG-05.png)
+![DG-05](assets/diagramas/render/generales/DG-05.svg)
 
 ```plantuml
 @startuml
@@ -905,7 +905,7 @@ ACT_ADM --> UC28
 **CU relacionados:** CU-01, CU-02, CU-03  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)  
 
-![DG-06](../assets/DG-06.png)
+![DG-06](assets/diagramas/render/generales/DG-06.svg)
 
 ```plantuml
 @startuml
@@ -955,7 +955,7 @@ UC02 ..> ACT_ADM : <<secundario>>
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25, CU-30  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34) y actualización TO-BE v2  
 
-![DG-07](../assets/DG-07.png)
+![DG-07](assets/diagramas/render/generales/DG-07.svg)
 
 ```plantuml
 @startuml
@@ -1023,7 +1023,7 @@ UC30 ..> UC08 : <<include>> (si autoriza)
 **CU relacionados:** CU-09, CU-10, CU-11, CU-12, CU-13, CU-20, CU-21, CU-22  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)  
 
-![DG-08](../assets/DG-08.png)
+![DG-08](assets/diagramas/render/generales/DG-08.svg)
 
 ```plantuml
 @startuml
@@ -1077,7 +1077,7 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 **CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-29  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35) y actualización TO-BE v2  
 
-![DG-09](../assets/DG-09.png)
+![DG-09](assets/diagramas/render/generales/DG-09.svg)
 
 ```plantuml
 @startuml
@@ -1136,7 +1136,7 @@ UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
 **CU relacionados:** CU-26, CU-27, CU-28  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 36)  
 
-![DG-10](../assets/DG-10.png)
+![DG-10](assets/diagramas/render/generales/DG-10.svg)
 
 ```plantuml
 @startuml
@@ -1182,7 +1182,7 @@ UC28 ..> UC_EXP : <<extend>>
 **CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
 **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27), `TB-07` y actualización TO-BE v2  
 
-![DG-11](../assets/DG-11.png)
+![DG-11](assets/diagramas/render/generales/DG-11.svg)
 
 ```plantuml
 @startuml
@@ -1293,10 +1293,14 @@ Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 
 # DG-12 — Diagrama de Clases del Dominio TraceFlow SCM
 
+> [!NOTE]
+> **Nota de Auditoría SCM (Etapa 07 — Hallazgo DOC-030):**
+> Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Comparte el identificador canónico `DG-12` con el *Modelo Conceptual del Dominio* (Fase de Análisis). Las especificaciones de diseño y análisis consumen preferentemente el modelo conceptual (`analisis/DG-12.svg`). Se mantiene bajo revisión técnica y propuesta de reclasificación ante el CCB como `DG-12-HIST` o `DG-CLASS-01`.
+
 **ID:** DG-12 | **Tipo:** Clases | **Estado:** APROBADO | **Versión:** 1.0  
 **RF:** RF-01 a RF-18 | **RN:** RN-01 a RN-09 | **CU:** CU-01 a CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2
 
-![DG-12](../assets/DG-12.png)
+![DG-12](assets/diagramas/render/generales/DG-12.svg)
 
 ```plantuml
 @startuml
@@ -1471,7 +1475,7 @@ RegistroAuditoria "*" --> "1" Usuario : generado por
 **ID:** DG-13 | **Tipo:** Componentes / Arquitectura Física | **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD) | **Versión:** 1.0  
 **RF:** RNF-01 a RNF-09 | **RN:** RN-01 a RN-09 | **CU:** Todos | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2
 
-![DG-13](../assets/DG-13.png)
+![DG-13](assets/diagramas/render/generales/DG-13.svg)
 
 ```plantuml
 @startuml
@@ -1561,7 +1565,7 @@ Los diagramas de secuencia modelan la interacción temporal y sincrónica entre 
 **ID:** DG-SEQ-01 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-01 | **RN:** RN-01 | **CU:** CU-01 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-01](../assets/DG-SEQ-01.png)
+![DG-SEQ-01](assets/diagramas/render/analisis/DG-SEQ-01.svg)
 
 ```plantuml
 @startuml DG-SEQ-01
@@ -1603,7 +1607,7 @@ end
 **ID:** DG-SEQ-02 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-02 | **RN:** RN-01 | **CU:** CU-02 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-02](../assets/DG-SEQ-02.png)
+![DG-SEQ-02](assets/diagramas/render/analisis/DG-SEQ-02.svg)
 
 ```plantuml
 @startuml DG-SEQ-02
@@ -1641,7 +1645,7 @@ end
 **ID:** DG-SEQ-03 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-02 | **RN:** RN-01 | **CU:** CU-03 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-03](../assets/DG-SEQ-03.png)
+![DG-SEQ-03](assets/diagramas/render/analisis/DG-SEQ-03.svg)
 
 ```plantuml
 @startuml DG-SEQ-03
@@ -1676,7 +1680,7 @@ end
 **ID:** DG-SEQ-04 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-04 | **RN:** RN-01 | **CU:** CU-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-04](../assets/DG-SEQ-04.png)
+![DG-SEQ-04](assets/diagramas/render/analisis/DG-SEQ-04.svg)
 
 ```plantuml
 @startuml DG-SEQ-04
@@ -1713,7 +1717,7 @@ end
 **ID:** DG-SEQ-04.1 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-04 | **RN:** RN-01 | **CU:** CU-04.1 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-04.1](../assets/DG-SEQ-04.1.png)
+![DG-SEQ-04.1](assets/diagramas/render/analisis/DG-SEQ-04.1.svg)
 
 ```plantuml
 @startuml DG-SEQ-04.1
@@ -1745,7 +1749,7 @@ Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
 **ID:** DG-SEQ-05 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-04, RF-05 | **RN:** RN-01, RN-07 | **CU:** CU-05 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-05](../assets/DG-SEQ-05.png)
+![DG-SEQ-05](assets/diagramas/render/analisis/DG-SEQ-05.svg)
 
 ```plantuml
 @startuml DG-SEQ-05
@@ -1787,7 +1791,7 @@ end
 **ID:** DG-SEQ-06 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-05 | **RN:** RN-01, RN-05 | **CU:** CU-06 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-06](../assets/DG-SEQ-06.png)
+![DG-SEQ-06](assets/diagramas/render/analisis/DG-SEQ-06.svg)
 
 ```plantuml
 @startuml DG-SEQ-06
@@ -1818,7 +1822,7 @@ Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CC
 **ID:** DG-SEQ-07 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-06 | **RN:** RN-01, RN-05, RN-07 | **CU:** CU-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-07](../assets/DG-SEQ-07.png)
+![DG-SEQ-07](assets/diagramas/render/analisis/DG-SEQ-07.svg)
 
 ```plantuml
 @startuml DG-SEQ-07
@@ -1857,7 +1861,7 @@ end
 **ID:** DG-SEQ-08 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-07 | **RN:** RN-01 | **CU:** CU-08 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-08](../assets/DG-SEQ-08.png)
+![DG-SEQ-08](assets/diagramas/render/analisis/DG-SEQ-08.svg)
 
 ```plantuml
 @startuml DG-SEQ-08
@@ -1890,7 +1894,7 @@ Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
 **ID:** DG-SEQ-09 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-03 | **RN:** RN-01, RN-02, RN-04 | **CU:** CU-09 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-09](../assets/DG-SEQ-09.png)
+![DG-SEQ-09](assets/diagramas/render/analisis/DG-SEQ-09.svg)
 
 ```plantuml
 @startuml DG-SEQ-09
@@ -1922,7 +1926,7 @@ Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de ca
 **ID:** DG-SEQ-10 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-08, RF-09 | **RN:** RN-01, RN-06 | **CU:** CU-10 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-10](../assets/DG-SEQ-10.png)
+![DG-SEQ-10](assets/diagramas/render/analisis/DG-SEQ-10.svg)
 
 ```plantuml
 @startuml DG-SEQ-10
@@ -1954,7 +1958,7 @@ Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de activi
 **ID:** DG-SEQ-11 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-09 | **RN:** RN-06 | **CU:** CU-11 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-11](../assets/DG-SEQ-11.png)
+![DG-SEQ-11](assets/diagramas/render/analisis/DG-SEQ-11.svg)
 
 ```plantuml
 @startuml DG-SEQ-11
@@ -1984,7 +1988,7 @@ Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en
 **ID:** DG-SEQ-12 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-08, RF-09, RF-10 | **RN:** RN-01, RN-02, RN-04, RN-06, RN-09 | **CU:** CU-12 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-12](../assets/DG-SEQ-12.png)
+![DG-SEQ-12](assets/diagramas/render/analisis/DG-SEQ-12.svg)
 
 ```plantuml
 @startuml DG-SEQ-12
@@ -2016,7 +2020,7 @@ Sistema --> CCB: 6. Notificar integración exitosa habilitando la creación de l
 **ID:** DG-SEQ-13 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-09, RF-16 | **RN:** RN-02, RN-03 | **CU:** CU-13 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-13](../assets/DG-SEQ-13.png)
+![DG-SEQ-13](assets/diagramas/render/analisis/DG-SEQ-13.svg)
 
 ```plantuml
 @startuml DG-SEQ-13
@@ -2051,7 +2055,7 @@ end
 **ID:** DG-SEQ-14 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-07, RF-09 | **RN:** RN-01, RN-03 | **CU:** CU-14 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-14](../assets/DG-SEQ-14.png)
+![DG-SEQ-14](assets/diagramas/render/analisis/DG-SEQ-14.svg)
 
 ```plantuml
 @startuml DG-SEQ-14
@@ -2081,7 +2085,7 @@ Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pru
 **ID:** DG-SEQ-15 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-10 | **RN:** RN-01, RN-03 | **CU:** CU-15 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-15](../assets/DG-SEQ-15.png)
+![DG-SEQ-15](assets/diagramas/render/analisis/DG-SEQ-15.svg)
 
 ```plantuml
 @startuml DG-SEQ-15
@@ -2111,7 +2115,7 @@ Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a prueb
 **ID:** DG-SEQ-16 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-16 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-16](../assets/DG-SEQ-16.png)
+![DG-SEQ-16](assets/diagramas/render/analisis/DG-SEQ-16.svg)
 
 ```plantuml
 @startuml DG-SEQ-16
@@ -2141,7 +2145,7 @@ Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certifi
 **ID:** DG-SEQ-17 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-17 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-17](../assets/DG-SEQ-17.png)
+![DG-SEQ-17](assets/diagramas/render/analisis/DG-SEQ-17.svg)
 
 ```plantuml
 @startuml DG-SEQ-17
@@ -2174,7 +2178,7 @@ Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
 **ID:** DG-SEQ-18 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-10, RF-11 | **RN:** RN-08 | **CU:** CU-18 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-18](../assets/DG-SEQ-18.png)
+![DG-SEQ-18](assets/diagramas/render/analisis/DG-SEQ-18.svg)
 
 ```plantuml
 @startuml DG-SEQ-18
@@ -2205,7 +2209,7 @@ Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Bibliote
 **ID:** DG-SEQ-19 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-11 | **RN:** RN-08 | **CU:** CU-19 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-19](../assets/DG-SEQ-19.png)
+![DG-SEQ-19](assets/diagramas/render/analisis/DG-SEQ-19.svg)
 
 ```plantuml
 @startuml DG-SEQ-19
@@ -2243,7 +2247,7 @@ end
 **ID:** DG-SEQ-20 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-13, RF-14 | **RN:** RN-02, RN-04, RN-07, RN-09 | **CU:** CU-20 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-20](../assets/DG-SEQ-20.png)
+![DG-SEQ-20](assets/diagramas/render/analisis/DG-SEQ-20.svg)
 
 ```plantuml
 @startuml DG-SEQ-20
@@ -2277,7 +2281,7 @@ Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
 **ID:** DG-SEQ-21 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-12 | **RN:** RN-06, RN-08 | **CU:** CU-21 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-21](../assets/DG-SEQ-21.png)
+![DG-SEQ-21](assets/diagramas/render/analisis/DG-SEQ-21.svg)
 
 ```plantuml
 @startuml DG-SEQ-21
@@ -2311,7 +2315,7 @@ Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de
 **ID:** DG-SEQ-22 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-12, RF-14 | **RN:** RN-07, RN-08 | **CU:** CU-22 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-22](../assets/DG-SEQ-22.png)
+![DG-SEQ-22](assets/diagramas/render/analisis/DG-SEQ-22.svg)
 
 ```plantuml
 @startuml DG-SEQ-22
@@ -2344,7 +2348,7 @@ Sistema --> CCB: 6. Notificar resolución formal de cancelación de la orden
 **ID:** DG-SEQ-23 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-15 | **RN:** RN-01 | **CU:** CU-23 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-23](../assets/DG-SEQ-23.png)
+![DG-SEQ-23](assets/diagramas/render/analisis/DG-SEQ-23.svg)
 
 ```plantuml
 @startuml DG-SEQ-23
@@ -2376,7 +2380,7 @@ Sistema --> Analista: 6. Notificar nuevo ticket de incidencia para evaluación y
 **ID:** DG-SEQ-24 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-15 | **RN:** RN-01 | **CU:** CU-24 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-24](../assets/DG-SEQ-24.png)
+![DG-SEQ-24](assets/diagramas/render/analisis/DG-SEQ-24.svg)
 
 ```plantuml
 @startuml DG-SEQ-24
@@ -2406,7 +2410,7 @@ Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones
 **ID:** DG-SEQ-25 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-04, RF-15 | **RN:** RN-01 | **CU:** CU-25 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-25](../assets/DG-SEQ-25.png)
+![DG-SEQ-25](assets/diagramas/render/analisis/DG-SEQ-25.svg)
 
 ```plantuml
 @startuml DG-SEQ-25
@@ -2438,7 +2442,7 @@ Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimi
 **ID:** DG-SEQ-26 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-17 | **RN:** RN-04, RN-09 | **CU:** CU-26 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-26](../assets/DG-SEQ-26.png)
+![DG-SEQ-26](assets/diagramas/render/analisis/DG-SEQ-26.svg)
 
 ```plantuml
 @startuml DG-SEQ-26
@@ -2474,7 +2478,7 @@ end
 **ID:** DG-SEQ-27 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-16, RF-17 | **RN:** RN-01, RN-07 | **CU:** CU-27 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-27](../assets/DG-SEQ-27.png)
+![DG-SEQ-27](assets/diagramas/render/analisis/DG-SEQ-27.svg)
 
 ```plantuml
 @startuml DG-SEQ-27
@@ -2504,7 +2508,7 @@ CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de 
 **ID:** DG-SEQ-28 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-18 | **RN:** RN-01, RN-07 | **CU:** CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-28](../assets/DG-SEQ-28.png)
+![DG-SEQ-28](assets/diagramas/render/analisis/DG-SEQ-28.svg)
 
 ```plantuml
 @startuml DG-SEQ-28
@@ -2536,7 +2540,7 @@ Sistema --> CCB: 6. Remitir reporte consolidado oficial a dirección de proyecto
 **ID:** DG-SEQ-29 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-29 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-29](../assets/DG-SEQ-29.png)
+![DG-SEQ-29](assets/diagramas/render/analisis/DG-SEQ-29.svg)
 
 ```plantuml
 @startuml DG-SEQ-29
@@ -2574,7 +2578,7 @@ end
 **ID:** DG-SEQ-30 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
 **RF:** RF-05, RF-07 | **RN:** RN-01, RN-05, RN-07 | **CU:** CU-30 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
-![DG-SEQ-30](../assets/DG-SEQ-30.png)
+![DG-SEQ-30](assets/diagramas/render/analisis/DG-SEQ-30.svg)
 
 ```plantuml
 @startuml DG-SEQ-30
@@ -4060,6 +4064,11 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 - **Resolución:** Reconstruido y formalizado a nivel de análisis conceptual (1:1 frente a CU-03) con correspondencia estricta de 6 pasos.
 
 ### DG-12 — Modelo Conceptual del Dominio TraceFlow SCM
+
+> [!NOTE]
+> **Nota de Auditoría SCM (Etapa 07 — Consumo Canónico):**
+> Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1). Propuesto formalmente al CCB como único titular canónico del identificador `DG-12`.
+
 - **ID:** DG-12  
 - **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM  
 - **Tipo:** Clases Conceptuales (Fase de Análisis)  
@@ -4069,6 +4078,8 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 - **CU relacionados:** CU-01 a CU-30 y CU-04.1  
 - **Fuente:** Derivado formalmente de los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`) en `docs/DIAGRAMS.md` y `FD03-EPIS-Informe_SRS.md`, Sección 6.2.3.  
 - **Resolución Técnica:** Reconstruido a nivel conceptual puro según `docs/DOCUMENTATION_RULES.md` Sección 8: sin tipos técnicos de datos (`Long`, `String`), sin firmas de métodos de implementación, sin claves foráneas ni dependencias de frameworks/ORM. Modela exclusivamente los conceptos esenciales del negocio SCM, sus atributos semánticos, multiplicidades y asociaciones reales.
+
+![DG-12](assets/diagramas/render/analisis/DG-12.svg)
 
 ```plantuml
 @startuml DG-12
@@ -4447,7 +4458,7 @@ M_AUD <-- M_BASE : "registra congelamientos y reversiones"
 **ID:** DG-D01 | **Tipo:** Componentes / Arquitectura Física | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-001 a ADR-010 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 3.2
 
-![DG-D01](../assets/DG-D01.png)
+![DG-D01](assets/diagramas/render/diseno/DG-D01.svg)
 
 ```plantuml
 @startuml
@@ -4516,7 +4527,7 @@ BackupService -right-> RemoteBackups : Transferencia Segura\\nPaquete Maestro (.
 **ID:** DG-D02 | **Tipo:** Componentes / Modularidad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** MOD-01 a MOD-09, ADR-001, ADR-003 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 4.4
 
-![DG-D02](../assets/DG-D02.png)
+![DG-D02](assets/diagramas/render/diseno/DG-D02.svg)
 
 ```plantuml
 @startuml
@@ -4626,7 +4637,7 @@ S07 .left.> M09 : Emite evento de congelación LB
 **ID:** DG-D03 | **Tipo:** Entidad-Relación / Lógico | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** Derivado de DG-12, ADR-004, ADR-007 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 7.2
 
-![DG-D03](../assets/DG-D03.png)
+![DG-D03](assets/diagramas/render/diseno/DG-D03.svg)
 
 ```plantuml
 @startuml
@@ -4910,7 +4921,7 @@ app_user ||--o{ change_authorization : "suscribe"
 **ID:** DG-D04 | **Tipo:** Componentes / Almacenamiento | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-005, RN-04, RN-08, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 8.3
 
-![DG-D04](../assets/DG-D04.png)
+![DG-D04](assets/diagramas/render/diseno/DG-D04.svg)
 
 ```plantuml
 @startuml
@@ -4975,7 +4986,7 @@ F_Trabajo .[#red].> F_Trabajo : Rollback purga copia de trabajo (RN-08)
 **ID:** DG-D05 | **Tipo:** Interacción / Seguridad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-006, RN-01, RN-04, SoD | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 10.3
 
-![DG-D05](../assets/DG-D05.png)
+![DG-D05](assets/diagramas/render/diseno/DG-D05.svg)
 
 ```plantuml
 @startuml
@@ -5040,7 +5051,7 @@ end
 **ID:** DG-D06 | **Tipo:** Despliegue / Nodos OCI | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** ADR-010, RNF-02, RNF-08, RNF-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 13.2
 
-![DG-D06](../assets/DG-D06.png)
+![DG-D06](assets/diagramas/render/diseno/DG-D06.svg)
 
 ```plantuml
 @startuml
@@ -5113,7 +5124,7 @@ BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
 **ID:** DG-DSEQ-04 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-04, RF-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-04](../assets/DG-DSEQ-04.png)
+![DG-DSEQ-04](assets/diagramas/render/diseno/DG-DSEQ-04.svg)
 
 ```plantuml
 @startuml
@@ -5162,7 +5173,7 @@ UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 **ID:** DG-DSEQ-08 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-08, RF-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-08](../assets/DG-DSEQ-08.png)
+![DG-DSEQ-08](assets/diagramas/render/diseno/DG-DSEQ-08.svg)
 
 ```plantuml
 @startuml
@@ -5213,7 +5224,7 @@ UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 **ID:** DG-DSEQ-10 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-10, CU-11, RF-08, RF-09, RN-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-10](../assets/DG-DSEQ-10.png)
+![DG-DSEQ-10](assets/diagramas/render/diseno/DG-DSEQ-10.svg)
 
 ```plantuml
 @startuml
@@ -5273,7 +5284,7 @@ end
 **ID:** DG-DSEQ-12 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-12, RF-08, RF-09, RNF-03, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-12](../assets/DG-DSEQ-12.png)
+![DG-DSEQ-12](assets/diagramas/render/diseno/DG-DSEQ-12.svg)
 
 ```plantuml
 @startuml
@@ -5367,7 +5378,7 @@ end
 **ID:** DG-DSEQ-17 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-17, RF-10, SoD Dinámico | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-17](../assets/DG-DSEQ-17.png)
+![DG-DSEQ-17](assets/diagramas/render/diseno/DG-DSEQ-17.svg)
 
 ```plantuml
 @startuml
@@ -5426,7 +5437,7 @@ end
 **ID:** DG-DSEQ-20 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-20, RF-13, RN-02, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-20](../assets/DG-DSEQ-20.png)
+![DG-DSEQ-20](assets/diagramas/render/diseno/DG-DSEQ-20.svg)
 
 ```plantuml
 @startuml
@@ -5489,7 +5500,7 @@ end
 **ID:** DG-DSEQ-21 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-21, RF-12, RN-08 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-21](../assets/DG-DSEQ-21.png)
+![DG-DSEQ-21](assets/diagramas/render/diseno/DG-DSEQ-21.svg)
 
 ```plantuml
 @startuml
@@ -5548,7 +5559,7 @@ UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberad
 **ID:** DG-DSEQ-29 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-29, RF-10, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-29](../assets/DG-DSEQ-29.png)
+![DG-DSEQ-29](assets/diagramas/render/diseno/DG-DSEQ-29.svg)
 
 ```plantuml
 @startuml
@@ -5604,7 +5615,7 @@ end
 **ID:** DG-DSEQ-30 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
 **Trazabilidad:** CU-30, RF-07, RN-01, RN-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
-![DG-DSEQ-30](../assets/DG-DSEQ-30.png)
+![DG-DSEQ-30](assets/diagramas/render/diseno/DG-DSEQ-30.svg)
 
 ```plantuml
 @startuml
@@ -5678,7 +5689,7 @@ end
 **ID:** DG-UWE-NAV-01 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-01 a CU-30, CU-04.1, RF-01 a RF-18, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.3
 
-![DG-UWE-NAV-01](../assets/DG-UWE-NAV-01.png)
+![DG-UWE-NAV-01](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)
 
 ```plantuml
 @startuml
@@ -5798,7 +5809,7 @@ NAV02 --> NAV28 : Seguridad / IAM
 **ID:** DG-UWE-NAV-02 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-03, CU-04, CU-04.1, CU-13, CU-23, CU-24, CU-29 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.1
 
-![DG-UWE-NAV-02](../assets/DG-UWE-NAV-02.png)
+![DG-UWE-NAV-02](assets/diagramas/render/uwe/DG-UWE-NAV-02.svg)
 
 ```plantuml
 @startuml
@@ -5853,7 +5864,7 @@ NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
 **ID:** DG-UWE-NAV-03 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-02, CU-03, CU-05, CU-07, CU-08, CU-13, CU-22, CU-24, CU-25, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.2
 
-![DG-UWE-NAV-03](../assets/DG-UWE-NAV-03.png)
+![DG-UWE-NAV-03](assets/diagramas/render/uwe/DG-UWE-NAV-03.svg)
 
 ```plantuml
 @startuml
@@ -5916,7 +5927,7 @@ NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
 **ID:** DG-UWE-NAV-04 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-03, CU-06, CU-07, CU-09, CU-13, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.3
 
-![DG-UWE-NAV-04](../assets/DG-UWE-NAV-04.png)
+![DG-UWE-NAV-04](assets/diagramas/render/uwe/DG-UWE-NAV-04.svg)
 
 ```plantuml
 @startuml
@@ -5972,7 +5983,7 @@ NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
 **ID:** DG-UWE-NAV-05 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-03, CU-07, CU-13, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.4
 
-![DG-UWE-NAV-05](../assets/DG-UWE-NAV-05.png)
+![DG-UWE-NAV-05](assets/diagramas/render/uwe/DG-UWE-NAV-05.svg)
 
 ```plantuml
 @startuml
@@ -6025,7 +6036,7 @@ NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
 **ID:** DG-UWE-NAV-06 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-01, CU-02, CU-03, CU-09, CU-13, CU-20, CU-21, CU-26, CU-27, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.5
 
-![DG-UWE-NAV-06](../assets/DG-UWE-NAV-06.png)
+![DG-UWE-NAV-06](assets/diagramas/render/uwe/DG-UWE-NAV-06.svg)
 
 ```plantuml
 @startuml
@@ -6092,7 +6103,7 @@ NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
 **ID:** DG-UWE-NAV-07 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-03, CU-10, CU-11, CU-12, CU-13, CU-14, CU-15, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.6
 
-![DG-UWE-NAV-07](../assets/DG-UWE-NAV-07.png)
+![DG-UWE-NAV-07](assets/diagramas/render/uwe/DG-UWE-NAV-07.svg)
 
 ```plantuml
 @startuml
@@ -6140,7 +6151,7 @@ NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
 **ID:** DG-UWE-NAV-08 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** CU-03, CU-13, CU-16, CU-17, CU-18, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.7
 
-![DG-UWE-NAV-08](../assets/DG-UWE-NAV-08.png)
+![DG-UWE-NAV-08](assets/diagramas/render/uwe/DG-UWE-NAV-08.svg)
 
 ```plantuml
 @startuml
@@ -6185,7 +6196,7 @@ NAV20 ..> NAV19 : Reevaluar y re-testear tras corrección (CU-19)
 **ID:** DG-UWE-PRES-01 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-01 a NAV-28, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.3
 
-![DG-UWE-PRES-01](../assets/DG-UWE-PRES-01.png)
+![DG-UWE-PRES-01](assets/diagramas/render/uwe/DG-UWE-PRES-01.svg)
 
 ```plantuml
 @startuml
@@ -6280,7 +6291,7 @@ WorkArea *-- ContextualBar : Inferior contextual
 **ID:** DG-UWE-PRES-02 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-01, PRES-01, ADR-006, MOD-01 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.1
 
-![DG-UWE-PRES-02](../assets/DG-UWE-PRES-02.png)
+![DG-UWE-PRES-02](assets/diagramas/render/uwe/DG-UWE-PRES-02.svg)
 
 ```plantuml
 @startuml
@@ -6348,7 +6359,7 @@ Card *-- Feedback
 **ID:** DG-UWE-PRES-03 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-02, PRES-02, TB-09, MOD-01 a MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.2
 
-![DG-UWE-PRES-03](../assets/DG-UWE-PRES-03.png)
+![DG-UWE-PRES-03](assets/diagramas/render/uwe/DG-UWE-PRES-03.svg)
 
 ```plantuml
 @startuml
@@ -6419,7 +6430,7 @@ Dashboard *-- ActivityFeed
 **ID:** DG-UWE-PRES-04 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-06, PRES-04, CU-04 a CU-08, CU-30, TB-07, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.4
 
-![DG-UWE-PRES-04](../assets/DG-UWE-PRES-04.png)
+![DG-UWE-PRES-04](assets/diagramas/render/uwe/DG-UWE-PRES-04.svg)
 
 ```plantuml
 @startuml
@@ -6490,7 +6501,7 @@ Container *-- Actions
 **ID:** DG-UWE-PRES-05 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-07, NAV-08, PRES-05, PRES-06, CU-04, CU-04.1, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.5
 
-![DG-UWE-PRES-05](../assets/DG-UWE-PRES-05.png)
+![DG-UWE-PRES-05](assets/diagramas/render/uwe/DG-UWE-PRES-05.svg)
 
 ```plantuml
 @startuml
@@ -6580,7 +6591,7 @@ Container *-- Controls
 **ID:** DG-UWE-PRES-06 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-10, PRES-07, CU-07, RN-01, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.A
 
-![DG-UWE-PRES-06](../assets/DG-UWE-PRES-06.png)
+![DG-UWE-PRES-06](assets/diagramas/render/uwe/DG-UWE-PRES-06.svg)
 
 ```plantuml
 @startuml
@@ -6652,7 +6663,7 @@ CCB *-- Resolution
 **ID:** DG-UWE-PRES-07 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-11, PRES-07, CU-30, RN-01, RN-05, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.B
 
-![DG-UWE-PRES-07](../assets/DG-UWE-PRES-07.png)
+![DG-UWE-PRES-07](assets/diagramas/render/uwe/DG-UWE-PRES-07.svg)
 
 ```plantuml
 @startuml
@@ -6718,7 +6729,7 @@ Container *-- FinalState
 **ID:** DG-UWE-PRES-08 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-14, NAV-15, PRES-08, CU-09, CU-14, CU-26, RN-02, RN-06, MOD-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.7
 
-![DG-UWE-PRES-08](../assets/DG-UWE-PRES-08.png)
+![DG-UWE-PRES-08](assets/diagramas/render/uwe/DG-UWE-PRES-08.svg)
 
 ```plantuml
 @startuml
@@ -6787,7 +6798,7 @@ Explorer *-- ECSCard
 **ID:** DG-UWE-PRES-09 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-16, NAV-17, PRES-08, CU-10, CU-11, CU-12, RN-06, RNF-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.8
 
-![DG-UWE-PRES-09](../assets/DG-UWE-PRES-09.png)
+![DG-UWE-PRES-09](assets/diagramas/render/uwe/DG-UWE-PRES-09.svg)
 
 ```plantuml
 @startuml
@@ -6846,7 +6857,7 @@ ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
 **ID:** DG-UWE-PRES-10 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-19, NAV-20, PRES-05, PRES-08, CU-16, CU-17, CU-18, CU-19, RN-09, SoD Dinámico, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.9
 
-![DG-UWE-PRES-10](../assets/DG-UWE-PRES-10.png)
+![DG-UWE-PRES-10](assets/diagramas/render/uwe/DG-UWE-PRES-10.svg)
 
 ```plantuml
 @startuml
@@ -6911,7 +6922,7 @@ QAContainer *-- DecisionBar
 **ID:** DG-UWE-PRES-11 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-21, PRES-07, CU-29, RN-09, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.10
 
-![DG-UWE-PRES-11](../assets/DG-UWE-PRES-11.png)
+![DG-UWE-PRES-11](assets/diagramas/render/uwe/DG-UWE-PRES-11.svg)
 
 ```plantuml
 @startuml
@@ -6974,7 +6985,7 @@ UAT *-- Signature
 **ID:** DG-UWE-PRES-12 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-22, NAV-23, PRES-08, CU-20, CU-21, RN-02, RN-08, MOD-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.11
 
-![DG-UWE-PRES-12](../assets/DG-UWE-PRES-12.png)
+![DG-UWE-PRES-12](assets/diagramas/render/uwe/DG-UWE-PRES-12.svg)
 
 ```plantuml
 @startuml
@@ -7042,7 +7053,7 @@ Gov *-- RollbackZone
 **ID:** DG-UWE-PRES-13 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
 **Trazabilidad:** NAV-26, NAV-27, PRES-03, PRES-10, CU-27, CU-28, RF-16, RF-17, RF-18, RNF-01, RNF-03, MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.13
 
-![DG-UWE-PRES-13](../assets/DG-UWE-PRES-13.png)
+![DG-UWE-PRES-13](assets/diagramas/render/uwe/DG-UWE-PRES-13.svg)
 
 ```plantuml
 @startuml

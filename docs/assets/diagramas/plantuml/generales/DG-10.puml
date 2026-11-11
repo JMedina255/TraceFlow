@@ -1,0 +1,27 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Trazabilidad, Auditoría e Integridad</b>
+
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+actor "Comité de Control de Cambios (CCB)" as ACT_CCB
+
+rectangle "Trazabilidad, Auditoría y Reportes" {
+    usecase "CU-26: Validar integridad (checksum SHA-256)" as UC26
+    usecase "CU-27: Auditar acciones del sistema" as UC27
+    usecase "CU-28: Generar reportes de estado" as UC28
+
+    usecase "Verificar hash del ECS" as UC_HASH
+    usecase "Exportar acta de cambios" as UC_EXP
+}
+
+ACT_ADM --> UC26
+ACT_CCB --> UC27
+ACT_ADM --> UC28
+
+UC26 ..> UC_HASH : <<include>>
+UC28 ..> UC_EXP : <<extend>>
+@enduml

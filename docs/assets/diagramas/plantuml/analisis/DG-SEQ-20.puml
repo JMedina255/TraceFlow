@@ -1,0 +1,23 @@
+@startuml DG-SEQ-20
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-20: Crear y congelar línea base (CU-20)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Comité de Control de Cambios (CCB)" as CCB
+actor "Solicitante" as Solicitante
+
+Admin -> Sistema: 1. Acceder al módulo de Líneas Base y seleccionar ECS tras Check-In
+Sistema --> Admin: 2. Presentar inventario con versiones integradas y doble conformidad
+Admin -> Sistema: 3. Asignar etiqueta formal de versionamiento y solicitar congelamiento
+Sistema -> Sistema: 4. Validar estándar de versiones y pertenencia a Biblioteca Maestra (RN-02, RN-04)
+Sistema -> Sistema: 5. Congelar Línea Base contra edición, registrar firma y actualizar a 'Implementada'
+Sistema --> Admin: 6. Expedir Certificado formal de nueva Línea Base congelada
+Sistema --> CCB: 6. Notificar cierre exitoso del cambio en estado Implementada (RF-14, RN-07)
+Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
+
+@enduml

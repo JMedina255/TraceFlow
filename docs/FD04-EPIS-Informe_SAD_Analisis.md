@@ -311,7 +311,11 @@ A continuación se presenta el diagrama conceptual de contexto que modela la fro
 
 > [!NOTE]
 > **Especificación Gráfica y Estado del Diagrama (DOC-007):**  
-> El modelo conceptual `DG-SAD-A01` está plenamente especificado mediante la sintaxis PlantUML declarada abajo y en `DIAGRAMS.md`. Su renderizado gráfico en formato `.png` está programado para la Etapa 05 bajo la ruta canónica `docs/assets/diagramas/render/analisis/DG-SAD-A01.png`. Se ratifica su vigencia como modelo de análisis de primer orden.
+**Figura DG-SAD-A01. Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)**
+
+![Figura DG-SAD-A01 — Contexto Arquitectónico](assets/diagramas/render/analisis/DG-SAD-A01.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-SAD-A01.*
 
 ```plantuml
 @startuml DG-SAD-A01
@@ -405,7 +409,11 @@ A continuación se reproduce el diagrama de paquetes arquitecturales `DG-SAD-A02
 
 > [!NOTE]
 > **Especificación Gráfica y Estado del Diagrama (DOC-007):**  
-> El modelo conceptual `DG-SAD-A02` está plenamente especificado mediante la sintaxis PlantUML declarada abajo y en `DIAGRAMS.md`. Su renderizado gráfico en formato `.png` está programado para la Etapa 05 bajo la ruta canónica `docs/assets/diagramas/render/analisis/DG-SAD-A02.png`. Se ratifica su vigencia como representación lógica canónica para la descomposición modular del sistema.
+**Figura DG-SAD-A02. Arquitectura Lógica Conceptual de TraceFlow SCM**
+
+![Figura DG-SAD-A02 — Arquitectura Lógica Conceptual](assets/diagramas/render/analisis/DG-SAD-A02.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-SAD-A02.*
 
 ```plantuml
 @startuml DG-SAD-A02
@@ -712,6 +720,12 @@ En esta sección se detalla la especificación rigurosa de cada uno de los 9 mó
 El modelo conceptual del dominio de **TraceFlow SCM** representa los conceptos esenciales del negocio, sus atributos semánticos significativos y sus asociaciones estructurales. En estricto cumplimiento del nivel de análisis (`DOCUMENTATION_RULES.md` Sección 8), este modelo prescinde deliberadamente de tipos de datos técnicos de bases de datos, métodos de controladores, llaves foráneas y dependencias de persistencia.
 
 A continuación se reproduce el diagrama conceptual maestro **`DG-12`**, formalizado y aprobado en el cierre de la baseline del SRS:
+
+**Figura DG-12. Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)**
+
+![Figura DG-12 — Modelo Conceptual del Dominio](assets/diagramas/render/analisis/DG-12.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-12.*
 
 ```plantuml
 @startuml DG-12
@@ -1394,7 +1408,7 @@ Alcance de la Revisión v1.2:
 - Conciliación de los 31 casos de uso (CU-01 a CU-30, incluyendo CU-04.1) y catálogo BCE (DG-AO-01..30).
 - Delimitación técnica tripartita: Arquitectura de Análisis vs. Objetivo (Enterprise) vs. Prototipo (20 pantallas).
 - Integración de la matriz operacional de transiciones de los 14 estados oficiales de la RFC (TB-07).
-- Ratificación de los modelos DG-SAD-A01 y DG-SAD-A02 (renderizado programado para Etapa 05).
+- Integración de recursos gráficos renderizados SVG/PNG de DG-SAD-A01, DG-SAD-A02 y DG-12 (Etapa 06).
 - Reafirmación del dictamen de obsolescencia de DG-13 para el nivel de análisis conceptual.
 - Corrección de enlaces relativos a TABLES.md, DIAGRAMS.md y DOCUMENTATION_RULES.md (DOC-008, DOC-026).
 

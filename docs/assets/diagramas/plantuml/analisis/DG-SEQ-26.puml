@@ -1,0 +1,25 @@
+@startuml DG-SEQ-26
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-26: Validar integridad (checksum) (CU-26)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+
+Admin -> Sistema: 1. Solicitar validar la integridad del artefacto de software
+Sistema -> Sistema: 2. Recuperar artefacto de biblioteca y consultar firma oficial almacenada
+Sistema -> Sistema: 3. Calcular firma de comprobación actual sobre el contenido del artefacto
+Sistema -> Sistema: 4. Validar equivalencia exacta entre firma calculada y firma oficial (RN-04)
+Sistema -> Sistema: 5. Dictaminar conformidad de integridad y asentar estampa en auditoría
+Sistema --> Admin: 6. Confirmar integridad del ECS autorizando prosecución de operaciones (RN-09)
+
+alt E1: Discrepancia en la validación de integridad (Firma alterada)
+  Sistema -> Sistema: Declarar no conformidad por alteración o corrupción
+  Sistema -> Sistema: Bloquear extracción o integración del artefacto corrupto
+  Sistema --> Admin: Alertar riesgo de seguridad y registrar anomalía crítica
+end
+
+@enduml

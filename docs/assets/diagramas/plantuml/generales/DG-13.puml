@@ -1,0 +1,73 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+
+title <b>DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM</b>
+
+package "Capa de Presentación (Frontend Web SPA)" {
+    component [Módulo de Autenticación y Perfiles] as UI_AUTH
+    component [Módulo de Gestión de Proyectos] as UI_PROJ
+    component [Módulo de Registro y Control de RFC] as UI_RFC
+    component [Módulo de Operaciones SCM (Check-In/Out)] as UI_SCM
+    component [Módulo de QA y Certificación] as UI_QA
+    component [Módulo de Auditoría y Reportes] as UI_AUDIT
+}
+
+package "Capa de Servicios y Negocio (Backend API REST)" {
+    component [Controlador de Autenticación / RBAC] as CTRL_AUTH
+    component [Controlador de Proyectos] as CTRL_PROJ
+    component [Controlador de Flujo RFC / CCB] as CTRL_RFC
+    component [Motor de Control de Versiones SCM] as SCM_ENGINE
+    component [Gestor de Bloqueos de Concurrencia] as LOCK_MGR
+    component [Servicio de QA y Conformidad] as QA_SRV
+    component [Validador de Integridad SHA-256] as HASH_VAL
+    component [Servicio de Auditoría y Trazabilidad] as AUDIT_SRV
+}
+
+package "Capa de Almacenamiento y Persistencia" {
+    database "Base de Datos Relacional\n(PostgreSQL / TraceFlow DB)" as DB {
+        [Usuarios / Roles]
+        [Proyectos / Clientes]
+        [Metadatos RFC y ECN]
+        [Inventario ECS / Baselines]
+        [Registro de Auditoría]
+    }
+    
+    storage "Almacén de Archivos y Bibliotecas SCM" as STORAGE {
+        folder "Biblioteca de Trabajo (Work)" as LIB_WORK
+        folder "Biblioteca de Soporte (Support)" as LIB_SUPPORT
+        folder "Biblioteca Maestra (Master)" as LIB_MASTER
+    }
+}
+
+UI_AUTH --> CTRL_AUTH : HTTPS / JSON
+UI_PROJ --> CTRL_PROJ : HTTPS / JSON
+UI_RFC --> CTRL_RFC : HTTPS / JSON
+UI_SCM --> SCM_ENGINE : HTTPS / JSON
+UI_QA --> QA_SRV : HTTPS / JSON
+UI_AUDIT --> AUDIT_SRV : HTTPS / JSON
+
+CTRL_RFC --> SCM_ENGINE : Autoriza ECN
+SCM_ENGINE --> LOCK_MGR : Solicita / Libera Lock
+SCM_ENGINE --> HASH_VAL : Calcula y Valida Checksum
+SCM_ENGINE --> QA_SRV : Notifica Check-Out/Check-In
+
+CTRL_AUTH ..> AUDIT_SRV : Audita
+CTRL_PROJ ..> AUDIT_SRV : Audita
+CTRL_RFC ..> AUDIT_SRV : Audita
+SCM_ENGINE ..> AUDIT_SRV : Audita
+
+CTRL_AUTH --> DB
+CTRL_PROJ --> DB
+CTRL_RFC --> DB
+QA_SRV --> DB
+AUDIT_SRV --> DB
+SCM_ENGINE --> DB
+
+SCM_ENGINE --> STORAGE : Transferencia controlada
+LOCK_MGR --> LIB_WORK : Bloqueo de escritura
+HASH_VAL --> STORAGE : Verificación hash
+
+@enduml

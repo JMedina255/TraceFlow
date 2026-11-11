@@ -1,0 +1,28 @@
+@startuml DG-AO-11
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Bloqueos de Sincronización" as B
+control "Control de Bloqueo de Sincronización" as C
+
+entity "Bloqueo de Sincronización" as E_LOCK
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita restricción de concurrencia"
+B --> C : "aplica política de bloqueo exclusivo"
+C --> E_LOCK : "establece restricción activa"
+C --> E_ECS : "marca ítem protegido contra modificaciones"
+C --> E_ECN : "asocia orden responsable del bloqueo"
+C --> E_AUD : "registra imposición del bloqueo"
+E_LOCK --> E_ECS : "inmoviliza versión de"
+E_LOCK --> E_ECN : "amparado en"
+E_LOCK --> E_AUD : "registrado en"
+
+@enduml

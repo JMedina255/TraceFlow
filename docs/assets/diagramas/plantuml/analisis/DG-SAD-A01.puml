@@ -1,0 +1,57 @@
+@startuml DG-SAD-A01
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SAD-A01: Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)</b>
+
+actor "Solicitante" as ACT_SOL
+actor "Analista de Requerimientos\n/ Gestor" as ACT_ANA
+actor "Arquitecto\n/ Especialista Técnico" as ACT_ARQ
+actor "Comité de Control\nde Cambios (CCB)" as ACT_CCB
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT_ADM
+actor "Ingeniero de Software\n/ Desarrollador" as ACT_DEV
+actor "Equipo de Calidad\n/ Testing" as ACT_QA
+
+rectangle "TraceFlow SCM\n(Sistema de Gestión de Configuración de Software)" as SYS #E8F0FE {
+    rectangle "Gobernanza y Control de Acceso" as SUB_GOB
+    rectangle "Gestión de Proyectos y ECS" as SUB_PROJ
+    rectangle "Control de Cambios (RFC / ECN)" as SUB_CHG
+    rectangle "Gestión de Bibliotecas y Versionamiento" as SUB_LIB
+    rectangle "Implementación, QA y Aceptación (UAT)" as SUB_QA
+    rectangle "Trazabilidad, Auditoría y Reportes" as SUB_AUD
+}
+
+' Interacciones de Actores Canónicos
+ACT_SOL --> SUB_CHG : "Registra RFC y subsana datos (CU-04, CU-04.1)"
+ACT_SOL --> SUB_QA : "Valida aceptación funcional UAT (CU-29)"
+ACT_SOL --> SUB_AUD : "Registra incidencias y consulta estado (CU-23, CU-24)"
+
+ACT_ANA --> SUB_PROJ : "Crea y administra proyectos (CU-02, CU-03)"
+ACT_ANA --> SUB_CHG : "Valida y clasifica solicitudes (CU-05)"
+ACT_ANA --> SUB_CHG : "Co-autoriza Cambios Menores bajo autoridad delegada (CU-30)"
+ACT_ANA --> SUB_AUD : "Deriva incidencias a RFC (CU-25)"
+
+ACT_ARQ --> SUB_PROJ : "Registra y clasifica nuevos ECS (CU-09)"
+ACT_ARQ --> SUB_CHG : "Realiza análisis de impacto técnico (CU-06)"
+ACT_ARQ --> SUB_CHG : "Co-autoriza Cambios Menores bajo autoridad delegada (CU-30)"
+
+ACT_CCB --> SUB_CHG : "Evalúa y aprueba/rechaza Cambios Mayores (CU-07)"
+ACT_CCB --> SUB_CHG : "Emite Órdenes de Cambio mayores ECN/ECO (CU-08)"
+ACT_CCB --> SUB_AUD : "Audita acciones y trazabilidad integral (CU-27)"
+
+ACT_ADM --> SUB_GOB : "Gestiona usuarios, roles y permisos RBAC (CU-01)"
+ACT_ADM --> SUB_LIB : "Opera Check-Out y Check-In entre bibliotecas (CU-10, CU-12)"
+ACT_ADM --> SUB_LIB : "Aplica y libera bloqueos de sincronización (CU-11)"
+ACT_ADM --> SUB_LIB : "Congela Líneas Base y ejecuta Rollback (CU-20, CU-21, CU-22)"
+ACT_ADM --> SUB_AUD : "Valida integridad SHA-256 y genera reportes (CU-26, CU-28)"
+
+ACT_DEV --> SUB_QA : "Implementa cambios autorizados en Trabajo (CU-14)"
+ACT_DEV --> SUB_QA : "Ejecuta pruebas unitarias locales (CU-15)"
+
+ACT_QA --> SUB_QA : "Ejecuta pruebas de integración (CU-16)"
+ACT_QA --> SUB_QA : "Certifica conformidad del cambio (CU-17)"
+ACT_QA --> SUB_QA : "Reporta no conformidades y re-testea (CU-18, CU-19)"
+
+@enduml

@@ -1,0 +1,25 @@
+@startuml DG-AO-04.1
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Subsanación de Solicitud de Cambio" as B
+control "Control de Subsanación de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Observación de Solicitud" as E_OBS
+entity "Historial de Estado RFC" as E_HIST
+
+ACT --> B : "ingresa aclaraciones y sustentos"
+B --> C : "solicita subsanación formal"
+C --> E_RFC : "reabre a estado 'Registrada'"
+C --> E_OBS : "marca observaciones subsanadas"
+C --> E_HIST : "registra evento de reingreso"
+E_RFC "1" *-- "1..*" E_OBS : "contiene"
+E_RFC "1" *-- "1..*" E_HIST : "registra evolución"
+
+@enduml

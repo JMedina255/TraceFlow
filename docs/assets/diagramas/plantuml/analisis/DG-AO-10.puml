@@ -1,0 +1,28 @@
+@startuml DG-AO-10
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Check-Out" as B
+control "Control de Check-Out" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Copia de Trabajo" as E_COPIA
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "solicita extracción controlada"
+B --> C : "instruye Check-Out Soporte → Trabajo"
+C --> E_ECN : "verifica validez de orden"
+C --> E_ECS : "obtiene versión autorizada"
+C --> E_COPIA : "genera réplica en Biblioteca de Trabajo"
+C --> E_LOCK : "aplica bloqueo de sincronización"
+E_ECN --> E_ECS : "autoriza extracción de"
+E_ECS "1" *-- "1" E_COPIA : "deriva en"
+E_ECS "1" *-- "1" E_LOCK : "protegido mediante"
+
+@enduml

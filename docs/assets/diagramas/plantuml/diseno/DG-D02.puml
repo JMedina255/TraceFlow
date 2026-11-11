@@ -1,0 +1,98 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-D02: Componentes del Monolito Modular Backend (MOD-01 a MOD-09)</b>
+
+package "TraceFlow SCM Backend Application" {
+
+    package "MOD-01: AuthModule" as M01 {
+        [AuthController] as C01
+        [AuthService] as S01
+        [UserRepositoryPort] as R01
+        C01 -down-> S01
+        S01 -down-> R01
+    }
+
+    package "MOD-02: ProjectModule" as M02 {
+        [ProjectController] as C02
+        [ProjectService] as S02
+        [ProjectRepositoryPort] as R02
+        C02 -down-> S02
+        S02 -down-> R02
+    }
+
+    package "MOD-03: ConfigItemModule" as M03 {
+        [ConfigItemController] as C03
+        [ConfigItemService] as S03
+        [ConfigItemRepositoryPort] as R03
+        C03 -down-> S03
+        S03 -down-> R03
+    }
+
+    package "MOD-04: ChangeRequestModule" as M04 {
+        [ChangeRequestController] as C04
+        [ChangeRequestService] as S04
+        [ChangeRequestRepositoryPort] as R04
+        C04 -down-> S04
+        S04 -down-> R04
+    }
+
+    package "MOD-05: VersionControlModule" as M05 {
+        [VersionControlController] as C05
+        [VersionControlService] as S05
+        [VersionRepositoryPort] as R05
+        [SyncLockRepositoryPort] as RLock
+        C05 -down-> S05
+        S05 -down-> R05
+        S05 -down-> RLock
+    }
+
+    package "MOD-06: QualityModule" as M06 {
+        [QualityController] as C06
+        [QualityService] as S06
+        [QualityRepositoryPort] as R06
+        C06 -down-> S06
+        S06 -down-> R06
+    }
+
+    package "MOD-07: BaselineModule" as M07 {
+        [BaselineController] as C07
+        [BaselineService] as S07
+        [BaselineRepositoryPort] as R07
+        C07 -down-> S07
+        S07 -down-> R07
+    }
+
+    package "MOD-08: IncidentModule" as M08 {
+        [IncidentController] as C08
+        [IncidentService] as S08
+        [IncidentRepositoryPort] as R08
+        C08 -down-> S08
+        S08 -down-> R08
+    }
+
+    package "MOD-09: AuditModule" as M09 {
+        [AuditController] as C09
+        [AuditService] as S09
+        [AuditRepositoryPort] as R09
+        C09 -down-> S09
+        S09 -down-> R09
+    }
+}
+
+' Relaciones públicas autorizadas entre servicios
+S04 .down.> S03 : Consulta metadatos ECS
+S04 .down.> S05 : Notifica ECN para Check-Out
+S05 .down.> S03 : Actualiza estado ECS
+S06 .down.> S05 : Verifica ECS en Soporte
+S07 .down.> S05 : Congela versión en Maestra
+S08 .down.> S04 : Deriva ticket a RFC
+S01 .up.> M09 : Emite evento de login/logout
+S04 .right.> M09 : Emite evento de cambio RFC/ECN
+S05 .right.> M09 : Emite evento de Check-In/Lock
+S07 .left.> M09 : Emite evento de congelación LB
+
+@enduml

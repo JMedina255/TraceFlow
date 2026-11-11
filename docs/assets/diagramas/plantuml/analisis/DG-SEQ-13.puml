@@ -1,0 +1,24 @@
+@startuml DG-SEQ-13
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-13: Consultar historial de versiones (CU-13)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+
+Admin -> Sistema: 1. Seleccionar ECS en el catálogo y solicitar consulta de historial
+Sistema -> Sistema: 2. Recuperar historial de versiones y bitácora de transacciones del elemento
+Sistema --> Admin: 3. Presentar lista cronológica de versiones, autor, fecha, ECN/ECO y biblioteca
+Admin -> Sistema: 4. Seleccionar versión específica para inspeccionar detalles
+Sistema --> Admin: 5. Presentar memoria descriptiva, firmas de auditoría e integridad (RN-03)
+Sistema --> Admin: 6. Habilitar comparación conceptual de diferencias entre versiones
+
+opt A1: Comparación de diferencias entre dos versiones históricas
+  Admin -> Sistema: Seleccionar dos versiones y solicitar comparación
+  Sistema --> Admin: Presentar vista comparativa de diferencias conceptuales
+end
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml DG-AO-30
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT_ANALISTA
+actor "Arquitecto\n/ Especialista Técnico" as ACT_ARQUITECTO
+
+boundary "Autorización Delegada de Cambio Menor" as B
+control "Control de Autorización de Cambio Menor" as C
+
+entity "Dictamen de Cambio Menor" as E_DICT
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Informe Técnico de Impacto" as E_INF
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT_ANALISTA --> B : "emite visto bueno operativo delegado"
+ACT_ARQUITECTO --> B : "emite visto bueno técnico delegado"
+B --> C : "solicita autorización concurrente delegada"
+C --> E_DICT : "emite dictamen conjunto favorable"
+C --> E_RFC : "transiciona estado oficial a 'Autorizada'"
+C --> E_INF : "verifica no rebasamiento de límites delegados"
+C --> E_ECS : "habilita emisión delegada de ECN/ECO"
+E_DICT --> E_RFC : "autoriza formalmente"
+E_DICT --> E_INF : "amparado en"
+E_DICT --> E_ECS : "habilita intervención sobre"
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml DG-AO-20
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Líneas Base" as B
+control "Control de Línea Base" as C
+
+entity "Línea Base" as E_LB
+entity "Proyecto" as E_PROY
+entity "Versión de ECS" as E_VER
+entity "Acta de Congelamiento" as E_ACTA
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita congelamiento formal"
+B --> C : "instruye fijación de línea base"
+C --> E_LB : "crea hito inmutable"
+C --> E_PROY : "asocia al proyecto"
+C --> E_VER : "vincula versiones aprobadas en Maestra"
+C --> E_ACTA : "genera acta formal de congelamiento"
+C --> E_AUD : "registra evento oficial SCM"
+E_LB --> E_PROY : "pertenece a"
+E_LB "1" o-- "1..*" E_VER : "consolida"
+E_LB "1" *-- "1" E_ACTA : "formalizada mediante"
+E_LB --> E_AUD : "registrada en"
+
+@enduml

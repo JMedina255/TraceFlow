@@ -1,0 +1,26 @@
+@startuml DG-AO-25
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Derivación de Incidencia a RFC" as B
+control "Control de Transición Incidencia-RFC" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Dictamen de Derivación" as E_DICT
+
+ACT --> B : "analiza causa raíz y determina necesidad SCM"
+B --> C : "instruye promoción a cambio formal"
+C --> E_INC : "actualiza estado a 'Derivado a RFC'"
+C --> E_RFC : "crea nueva RFC con trazabilidad de origen"
+C --> E_DICT : "asienta justificación técnica del triaje"
+E_DICT --> E_INC : "resuelve tratamiento de"
+E_DICT --> E_RFC : "origina formalmente"
+E_INC --> E_RFC : "trazable hacia"
+
+@enduml

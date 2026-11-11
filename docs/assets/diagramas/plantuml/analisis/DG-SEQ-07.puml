@@ -1,0 +1,28 @@
+@startuml DG-SEQ-07
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)</b>
+
+actor "Comité de Control de Cambios (CCB)" as CCB
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+CCB -> Sistema: 1. Acceder al expediente de Cambio Mayor en estado 'En Evaluación'
+Sistema --> CCB: 2. Presentar expediente integral, Informe de Impacto y Triple Restricción
+CCB -> Sistema: 3. Deliberar colegiadamente sobre viabilidad técnica, contractual y económica
+CCB -> Sistema: 4. Registrar votación formal y emitir acta resolutiva aprobatoria (RN-01, RN-05)
+Sistema -> Sistema: 5. Validar cuórum legal, registrar acta formal y actualizar estado a 'Autorizada'
+Sistema --> Solicitante: 6. Notificar formalmente la resolución aprobatoria del CCB
+Sistema --> Admin: 6. Notificar habilitación para emisión de la Orden de Cambio (ECN/ECO)
+
+alt A1: Dictamen de rechazo colegiado del Cambio Mayor
+  CCB -> Sistema: Registrar votación denegatoria y fundamentar causales en acta
+  Sistema -> Sistema: Transicionar estado de RFC a 'Rechazada' (RN-07)
+  Sistema --> Solicitante: Notificar resolución de rechazo formal fundamentado
+end
+
+@enduml

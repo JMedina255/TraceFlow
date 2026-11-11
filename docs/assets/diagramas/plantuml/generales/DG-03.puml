@@ -1,0 +1,338 @@
+@startuml
+title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)</b>
+
+' =========================================================
+' CONFIGURACIÓN GENERAL
+' =========================================================
+skinparam ActivityMaxWidth 220
+skinparam ranksep 22
+skinparam nodesep 18
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+' =========================================================
+' ACTORES / SWIMLANES CANÓNICOS
+' =========================================================
+|#E8F4F8|Solicitante|
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#E8F8F5|Arquitecto / Especialista Técnico|
+|#FEF9E7|Comité de Control de Cambios (CCB)|
+|#F5EEF8|Administrador de Configuración / Bibliotecario|
+|#EAEDED|Ingeniero de Software / Desarrollador|
+|#FDEDEC|Equipo de Calidad / Testing|
+
+' =========================================================
+' FASE 1 - REGISTRO DE LA RFC
+' =========================================================
+|Solicitante|
+start
+:<color:white><b>FASE 1\nRegistro de Solicitud de Cambio (RFC)</b></color>; <<#34495E>>
+
+:Identificar necesidad o defecto;
+
+:Registrar RFC con justificación,
+prioridad y ECS afectado (CU-04);
+
+note left
+<b>RFC [Estado: Registrada]</b>
+- Descripción de necesidad
+- Justificación de negocio
+- Nivel de prioridad inicial
+- ECS y versión base afectada
+end note
+
+' =========================================================
+' FASE 2 - VALIDACIÓN Y CLASIFICACIÓN INICIAL
+' =========================================================
+|Analista de Requerimientos / Gestor|
+:<color:white><b>FASE 2\nValidación y Clasificación Inicial</b></color>; <<#34495E>>
+
+:Recepcionar y evaluar completitud
+de la RFC (CU-05);
+
+if (¿Información suficiente y consistente?) then (No)
+    :Registrar observaciones (CU-05);
+    note right: RFC pasa a [En Subsanación]
+
+    |Solicitante|
+    if (¿Solicitante subsana dentro del plazo?) then (Sí)
+        :Subsanar información requerida;
+        |Analista de Requerimientos / Gestor|
+        :Reevaluar información subsanada;
+    else (No)
+        |Analista de Requerimientos / Gestor|
+        :Emitir dictamen de no conformidad
+        inicial y desestimar solicitud;
+        
+        |Solicitante|
+        :Recibir notificación de desestimación;
+        note left
+            <b>Estado Terminal 1:</b>
+            <b>DESESTIMADA</b>
+            (Filtro inicial no superado)
+        end note
+        stop
+    endif
+endif
+
+|Analista de Requerimientos / Gestor|
+:Validar consistencia de la RFC;
+note right: RFC pasa a [Clasificada]
+
+' =========================================================
+' FASE 3 - ANÁLISIS DE IMPACTO TÉCNICO
+' =========================================================
+|Arquitecto / Especialista Técnico|
+:<color:white><b>FASE 3\nAnálisis de Impacto Técnico</b></color>; <<#34495E>>
+note right: RFC pasa a [En Análisis Técnico]
+
+:Analizar impacto sobre arquitectura,
+dependencias y trazabilidad (CU-06);
+
+:Evaluar afectación a la Triple Restricción
+(Alcance, Tiempo y Costo);
+
+:Elaborar Informe Técnico de Impacto (CU-06);
+
+if (¿Afecta alcance, tiempo o costo?) then (Sí)
+    :Clasificar como <b>CAMBIO MAYOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        Afecta al menos 1 dimensión
+        de la Triple Restricción.
+        Requiere aprobación del CCB.
+    end note
+    
+    ' =========================================================
+    ' FASE 4A - EVALUACIÓN COLEGIADA CCB (CAMBIO MAYOR)
+    ' =========================================================
+    |Comité de Control de Cambios (CCB)|
+    :<color:white><b>FASE 4A\nEvaluación Colegiada en CCB (Cambio Mayor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
+
+    :Evaluar Informe Técnico, riesgos,
+    viabilidad y conveniencia (CU-07);
+
+    if (¿Cambio Mayor Aprobado por CCB?) then (Sí)
+        :Aprobar formalmente el cambio (CU-07);
+        note right: RFC pasa a [Autorizada]
+
+        :Emitir Orden de Cambio
+        formal (ECN / ECO) (CU-08);
+        note right: RFC pasa a [Orden Emitida]
+    else (No)
+        :Registrar dictamen formal
+        de rechazo (técnico o de gestión);
+
+        |Solicitante|
+        :Recibir notificación con fundamentación;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Dictamen formal negativo del CCB)
+        end note
+        stop
+    endif
+
+else (No)
+    :Clasificar como <b>CAMBIO MENOR</b>;
+    note right
+        <b>Criterio Normativo:</b>
+        NO afecta alcance, tiempo ni costo.
+        Ruta operativa delegada sin CCB.
+    end note
+
+    ' =========================================================
+    ' FASE 4B - AUTORIZACIÓN OPERATIVA DELEGADA (CAMBIO MENOR)
+    ' =========================================================
+    |Analista de Requerimientos / Gestor|
+    :<color:white><b>FASE 4B\nAutorización Operativa Delegada (Cambio Menor)</b></color>; <<#34495E>>
+    note right: RFC pasa a [En Evaluación]
+
+    :Revisar impacto operativo del Cambio Menor (CU-30);
+
+    |Arquitecto / Especialista Técnico|
+    :Revisar viabilidad técnica del Cambio Menor (CU-30);
+
+    if (¿Conformidad de ambas autoridades delegadas?) then (Sí)
+        :Autorizar Cambio Menor conjuntamente (CU-30);
+        note right: RFC pasa a [Autorizada]
+
+        :Emitir Orden de Cambio (ECN/ECO)
+        bajo autoridad operativa delegada (CU-08/CU-30);
+        note right: RFC pasa a [Orden Emitida]
+    else (No)
+        :Registrar dictamen de no autorización;
+
+        |Solicitante|
+        :Recibir notificación de rechazo operativo;
+        note left
+            <b>Estado Terminal 2:</b>
+            <b>RECHAZADA</b>
+            (Rechazo bajo autoridad delegada)
+        end note
+        stop
+    endif
+endif
+
+' =========================================================
+' FASE 5 - CHECK-OUT Y CONTROL DE CONCURRENCIA
+' =========================================================
+|Administrador de Configuración / Bibliotecario|
+:<color:white><b>FASE 5\nCheck-Out y Bloqueo de Sincronización</b></color>; <<#34495E>>
+
+:Verificar validez formal de la ECN/ECO;
+
+:Efectuar Check-Out del ECS desde
+Biblioteca de Soporte hacia Trabajo (CU-10);
+
+:Aplicar bloqueo de sincronización
+exclusivo sobre el ECS (CU-11);
+note right: RFC pasa a [En Implementación]
+
+' =========================================================
+' FASE 6 - IMPLEMENTACIÓN Y PRUEBAS UNITARIAS
+' =========================================================
+|Ingeniero de Software / Desarrollador|
+:<color:white><b>FASE 6\nImplementación y Pruebas Unitarias</b></color>; <<#34495E>>
+
+:Recibir ECN/ECO y espacio en
+Biblioteca de Trabajo;
+
+:Modificar ECS según especificación (CU-14);
+
+:Ejecutar pruebas unitarias locales (CU-15);
+
+if (¿Pruebas unitarias conformes?) then (No)
+    :Corregir defectos en código local;
+    :Reejecutar pruebas unitarias locales;
+endif
+
+:Poner ECS a disposición para validación QA;
+
+' =========================================================
+' FASE 7 - VALIDACIÓN TÉCNICA DE CALIDAD (QA)
+' =========================================================
+|Equipo de Calidad / Testing|
+:<color:white><b>FASE 7\nValidación Técnica de Calidad (QA)</b></color>; <<#34495E>>
+note right: RFC pasa a [En Pruebas]
+
+:Ejecutar pruebas de integración
+y verificación técnica funcional (CU-16);
+
+if (¿Defectos o no conformidades identificadas?) then (Sí)
+    :Registrar reporte de no conformidad (CU-18);
+
+    |Ingeniero de Software / Desarrollador|
+    :Corregir defectos reportados;
+
+    |Equipo de Calidad / Testing|
+    :Reevaluar y re-testear (CU-19);
+
+    if (¿Fallo técnico no subsanado?) then (Sí)
+        |Administrador de Configuración / Bibliotecario|
+        :Ejecutar Rollback en Biblioteca de Trabajo (CU-21);
+        :Liberar bloqueo de sincronización;
+        :Cancelar Orden de Cambio (ECN/ECO) (CU-22);
+
+        |Solicitante|
+        :Recibir notificación de cancelación;
+        note left
+            <b>Estado Terminal 3:</b>
+            <b>CANCELADA</b>
+            (Rollback por fallo no subsanado)
+        end note
+        stop
+    endif
+endif
+
+|Equipo de Calidad / Testing|
+:Emitir Certificación Técnica
+de Conformidad (CU-17);
+
+' =========================================================
+' FASE 8 - VALIDACIÓN Y ACEPTACIÓN POR EL USUARIO (UAT)
+' =========================================================
+|Solicitante|
+:<color:white><b>FASE 8\nValidación y Aceptación por el Usuario (UAT)</b></color>; <<#34495E>>
+note left: RFC pasa a [En Aceptación]
+
+:Ejecutar pruebas de aceptación en
+entorno de validación (CU-29);
+
+if (¿Comportamiento y necesidad plenamente conformes?) then (No)
+    :Registrar observaciones de aceptación;
+    |Ingeniero de Software / Desarrollador|
+    :Ajustar implementación según observaciones;
+    |Equipo de Calidad / Testing|
+    :Revalidar técnicamente la corrección;
+    |Solicitante|
+    :Reejecutar pruebas de aceptación (CU-29);
+endif
+
+:Emitir y suscribir Aceptación
+Formal del Usuario (CU-29);
+
+' =========================================================
+' FASE 9 - CHECK-IN, LÍNEA BASE Y DESBLOQUEO
+' =========================================================
+|Administrador de Configuración / Bibliotecario|
+:<color:white><b>FASE 9\nCheck-In, Nueva Línea Base y Desbloqueo</b></color>; <<#34495E>>
+
+:Verificar Certificación QA y Aceptación UAT;
+
+:Efectuar Check-In del ECS hacia
+Biblioteca Maestra y de Soporte (CU-12);
+
+:Registrar nueva versión identificada unívocamente;
+
+:Crear y congelar nueva Línea Base (CU-20);
+
+:Liberar bloqueo de sincronización del ECS;
+
+:Actualizar catálogo e inventario de configuración;
+
+' =========================================================
+' FASE 10 - CIERRE FORMAL Y NOTIFICACIÓN
+' =========================================================
+|Comité de Control de Cambios (CCB)|
+:<color:white><b>FASE 10\nCierre Formal Administrativo</b></color>; <<#34495E>>
+
+:Registrar cierre administrativo formal (RF-14);
+
+:Consolidar trazabilidad completa
+(RFC - ECN/ECO - ECS - QA - UAT - Baseline);
+
+|Solicitante|
+:Recibir notificación de cambio implementado y cerrado;
+
+note left
+    <b>Estado Terminal 4:</b>
+    <b>IMPLEMENTADA</b>
+    (Cambio validado, promovido a Maestra,
+    congelado en Baseline y cerrado formalmente)
+end note
+
+stop
+@enduml

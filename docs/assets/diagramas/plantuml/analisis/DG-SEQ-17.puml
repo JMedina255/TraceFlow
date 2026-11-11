@@ -1,0 +1,22 @@
+@startuml DG-SEQ-17
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-17: Certificar conformidad del cambio (CU-17)</b>
+
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+QA -> Sistema: 1. Seleccionar RFC con pruebas de integración conformes en estado 'En Pruebas'
+Sistema --> QA: 2. Presentar consolidado de resultados, informe de cobertura y ausencia de defectos
+QA -> Sistema: 3. Suscribir formalmente el dictamen técnico de Certificación de Conformidad
+Sistema -> Sistema: 4. Validar criterios técnicos de aceptación y ausencia de incidencias (RN-09)
+Sistema -> Sistema: 5. Registrar Certificado Técnico de Conformidad y actualizar estado a 'En Aceptación'
+Sistema --> Solicitante: 6. Notificar formalmente para validación de aceptación funcional (UAT)
+Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
+
+@enduml

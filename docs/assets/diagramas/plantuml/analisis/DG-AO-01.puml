@@ -1,0 +1,28 @@
+@startuml DG-AO-01
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Gestión de Usuarios y Roles" as B
+control "Control de Usuarios y Roles" as C
+
+entity "Usuario" as E_USR
+entity "Rol" as E_ROL
+entity "Permiso" as E_PERM
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "interactúa"
+B --> C : "solicita gestión"
+C --> E_USR : "crea / modifica / inhabilita"
+C --> E_ROL : "asigna / revoca"
+C --> E_AUD : "asienta evento de auditoría"
+E_USR "1" *-- "1..*" E_ROL : "posee"
+E_ROL "1" *-- "1..*" E_PERM : "incluye"
+E_USR --> E_AUD : "registrado en"
+
+@enduml

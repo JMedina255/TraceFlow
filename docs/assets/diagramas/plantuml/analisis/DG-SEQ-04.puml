@@ -1,0 +1,26 @@
+@startuml DG-SEQ-04
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+
+Solicitante -> Sistema: 1. Seleccionar registrar nueva Solicitud de Cambio (RFC)
+Sistema --> Solicitante: 2. Presentar formulario de captura y catálogo de ECS activos
+Solicitante -> Sistema: 3. Ingresar título, descripción, justificación, prioridad y seleccionar ECS
+Sistema -> Sistema: 4. Validar completitud de campos mandatorios y vigencia de ECS (RN-01)
+Sistema -> Sistema: 5. Registrar RFC asignando código correlativo en estado 'Registrada'
+Sistema --> Solicitante: 6. Emitir comprobante de recepción formal
+Sistema --> Analista: 6. Notificar nueva RFC registrada para revisión de completitud
+
+opt A1: Adjuntar documentación técnica de respaldo
+  Solicitante -> Sistema: Adjuntar archivos de soporte técnico
+  Sistema -> Sistema: Validar formato y tamaño de documentos vinculándolos a la RFC
+end
+
+@enduml

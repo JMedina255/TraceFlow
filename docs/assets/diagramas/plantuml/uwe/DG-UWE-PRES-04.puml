@@ -1,0 +1,59 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-04: Detalle y Expediente 360° de RFC (NAV-06 / PRES-04)</b>
+
+skinparam class {
+    BackgroundColor<<record>> #F7FAFC
+    BorderColor<<record>> #2B6CB0
+    BackgroundColor<<tab>> #FFFFFF
+    BorderColor<<tab>> #3182CE
+    BackgroundColor<<action>> #FFF5F5
+    BorderColor<<action>> #E53E3E
+}
+
+class "RFCRecordContainer (NAV-06)" as Container <<record>> {
+    +headerCode: TypographyH1 ("RFC-2026-0042")
+    +projectNameTag: Badge ("Proyecto: Pasarela de Pagos")
+    +officialStateBadge: StateBadge ("Estado: EN_EVALUACION - TB-07")
+    +requesterInfo: Chip ("Solicitante: Juan Pérez")
+    +creationDate: Text ("Fecha: 2026-10-01 10:30")
+}
+
+class "ProgressiveTabNavigation (Pestañas según Avance)" as Tabs <<tab>> {
+    +tab1_Summary: "1. Resumen y Justificación"
+    +tab2_AffectedECS: "2. ECS Afectados"
+    +tab3_TechnicalImpact: "3. Informe de Impacto Técnico"
+    +tab4_CCBorMinorDecision: "4. Dictamen / Autorización"
+    +tab5_ChangeOrder: "5. Orden de Cambio (ECN/ECO)"
+    +tab6_QualityQA: "6. Aseguramiento de Calidad"
+    +tab7_UATAcceptance: "7. Aceptación de Usuario (UAT)"
+    +tab8_TimelineAudit: "8. Trazabilidad e Historial"
+}
+
+class "ActiveTabContentRegion" as TabContent <<tab>> {
+    +renderedDetails: EmbeddedView (Según pestaña seleccionada)
+    -- Regla de Visibilidad --
+    Las pestañas 3 a 7 se habilitan conforme la RFC transiciona
+    por los estados oficiales de TB-07 (visibilidad progresiva).
+}
+
+class "ContextualActionsDrawer (Acciones por Actor + Estado)" as Actions <<action>> {
+    -- Matriz de Botones Habilitados --
+    * Solicitante + OBSERVADA: Botón "Subsanar Observaciones" (NAV-08)
+    * Gestor + REGISTRADA: Botón "Validar y Clasificar" (CU-05)
+    * Arquitecto + EN_ANALISIS_TECNICO: Botón "Emitir Informe de Impacto" (NAV-09)
+    * CCB + EN_DELIBERACION (Mayor): Botón "Acceder a Deliberación CCB" (NAV-10)
+    * Gestor/Arq + EVALUADA (Menor): Botón "Autorizar Cambio Menor" (NAV-11)
+    * Gestor + AUTORIZADA: Botón "Emitir Orden ECN" (NAV-12)
+    * Solicitante + CERTIFICADA: Botón "Suscribir Acta UAT" (NAV-21)
+}
+
+Container *-- Tabs
+Container *-- TabContent
+Container *-- Actions
+
+@enduml

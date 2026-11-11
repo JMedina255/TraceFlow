@@ -1,0 +1,82 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RN-09)</b>
+
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+participant "React SPA" as UI
+participant "VersionControlController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "VersionControlService" as Service
+participant "StoragePort" as Storage
+participant "VersionRepoPort" as VersionRepo
+participant "SyncLockRepoPort" as LockRepo
+database "PostgreSQL" as DB
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Selecciona tipo de Check-In (Técnico a Soporte o Definitivo a Maestra)
+UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-in (Multipart Stream + CheckInDto)
+Ctrl -> Guard : 3. Valida sesión y rol canónico BIBLIOTECARIO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. executeCheckIn(ecsId, fileStream, dto)
+
+== Etapa 1: Custodia Temporal en Staging y Cómputo SHA-256 (RNF-03 / RF-17) ==
+Service -> Storage : 6. storeTemporary(tempId, fileStream, expectedHash)
+Storage --> Service : 7. tempPath almacenado + shaCalculado
+
+alt Checksum no coincide con el hash declarado (Fallo RNF-03)
+    Service -> Storage : Compensación: removeTemporary(tempPath)
+    Service --> Ctrl : 400 Bad Request: Checksum SHA-256 Inválido
+    Ctrl --> UI : 400 Bad Request
+    UI --> Actor : Alerta de fallo de integridad
+else Checksum Válido y Conforme
+    == Etapa 2: Pre-registro Transaccional en Base de Datos ==
+    Service -> VersionRepo : 8. Inicia Transacción BD 1
+    VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, storage_status='PENDING_STORAGE', ...)
+    VersionRepo -> DB : 10. COMMIT Transacción 1
+    
+    alt Variante A: Check-In Técnico (Trabajo -> Soporte para Pruebas QA)
+        Service -> Storage : 11a. promote(tempPath, 'soporte', verifiedSha)
+        Storage --> Service : Archivo promovido a /storage/soporte/
+        Service -> VersionRepo : 12a. Inicia Transacción BD 2
+        VersionRepo -> DB : 13a. UPDATE ecs_version SET storage_status='COMMITTED'
+        VersionRepo -> DB : 14a. UPDATE config_item SET current_library='SOPORTE'
+        VersionRepo -> DB : 15a. UPDATE change_request SET status='EN_PRUEBAS'
+        VersionRepo -> DB : 16a. COMMIT Transacción 2
+        Service -> Audit : 17a. logEvent('CHECK_IN_TECHNICAL_COMMITTED', ecsId, userId)
+        Audit -> DB : 18a. INSERT INTO audit_log (...)
+        Service --> Ctrl : 19a. CheckInResponseDto (Puesto a disposición de QA)
+        Ctrl --> UI : 20a. 201 Created (Entrega a Soporte conforme)
+        UI --> Actor : 21a. Notifica entrega lista para pruebas de QA (CU-16)
+        
+    else Variante B: Check-In Definitivo (Soporte -> Maestra con Doble Conformidad RN-09)
+        Service -> DB : 11b. Valida Certificación QA (CU-17) y Acta UAT (CU-29) (RN-09)
+        alt Falta Certificación QA o Acta UAT
+            Service -> Storage : Compensación: removeTemporary(tempPath)
+            Service -> DB : UPDATE ecs_version SET storage_status='STORAGE_FAILED'
+            Service --> Ctrl : 400 Bad Request: "Exige Doble Conformidad (QA + UAT) según RN-09"
+            Ctrl --> UI : 400 Bad Request
+            UI --> Actor : Bloqueo: No se puede integrar a Maestra sin doble conformidad
+        else Doble Conformidad Conforme
+            Service -> Storage : 12b. promote(tempPath, 'maestra', verifiedSha)
+            Storage --> Service : Archivo inmovilizado en /storage/maestra/ (Solo Lectura)
+            Service -> VersionRepo : 13b. Inicia Transacción BD 2
+            VersionRepo -> DB : 14b. UPDATE ecs_version SET storage_status='COMMITTED'
+            VersionRepo -> DB : 15b. UPDATE config_item SET current_library='MAESTRA', is_locked=false
+            VersionRepo -> LockRepo : 16b. UPDATE sync_lock SET status='RELEASED', release_reason='CHECK_IN'
+            LockRepo -> DB : 17b. Libera bloqueo de sincronización (RN-06)
+            VersionRepo -> DB : 18b. UPDATE change_order SET status='CERRADA'
+            VersionRepo -> DB : 19b. UPDATE change_request SET status='IMPLEMENTADA'
+            VersionRepo -> DB : 20b. COMMIT Transacción 2
+            Service -> Audit : 21b. logEvent('CHECK_IN_MASTER_COMMITTED', ecsId, userId)
+            Audit -> DB : 22b. INSERT INTO audit_log (...)
+            Service --> Ctrl : 23b. CheckInResponseDto (Integración Exitosa)
+            Ctrl --> UI : 24b. 201 Created (Check-In Definitivo)
+            UI --> Actor : 25b. Confirma integración definitiva en Maestra y liberación de lock
+        end
+    end
+end
+
+@enduml

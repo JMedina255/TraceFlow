@@ -1,0 +1,19 @@
+@startuml DG-SEQ-11
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+
+Admin -> Sistema: 1. Solicitar aplicación de bloqueo de sincronización sobre ECS
+Sistema -> Sistema: 2. Consultar estado actual de concurrencia del ECS en el catálogo
+Sistema -> Sistema: 3. Validar ausencia de bloqueo activo preexistente sobre el ECS (RN-06)
+Sistema -> Sistema: 4. Registrar bloqueo exclusivo asociando Desarrollador, ECN/ECO y estampa temporal
+Sistema -> Sistema: 5. Actualizar catálogo impidiendo nuevas operaciones de Check-Out a terceros
+Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en auditoría
+
+@enduml

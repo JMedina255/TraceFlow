@@ -1,0 +1,54 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-07: Autorización Delegada de Cambio Menor — Doble Llave (NAV-11 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F0FFF4
+    BorderColor<<container>> #276749
+    BackgroundColor<<keycard>> #FFFFFF
+    BorderColor<<keycard>> #38A169
+    BackgroundColor<<final>> #FFFFFF
+    BorderColor<<final>> #2F855A
+}
+
+class "MinorChangeAuthContainer (NAV-11)" as Container <<container>> {
+    +rfcHeader: RFCReferenceCard ("RFC-2026-0055 | Clasificación: CAMBIO MENOR")
+    +impactSummaryText: Text ("Impacto técnico acotado a 1 ECS. No altera arquitectura.")
+}
+
+class "KeyCard1_Architect (Llave 1: Evaluación Técnica)" as Key1 <<keycard>> {
+    +actorLabel: Text ("Arquitecto / Especialista Técnico (RN-05)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +technicalComments: TextArea ("Dictamen de Viabilidad e Impacto")
+    +btnApproveTechnical: Button ("Aprobar Viabilidad Técnica")
+    +btnRejectTechnical: Button ("Rechazar Viabilidad Técnica")
+}
+
+class "KeyCard2_Manager (Llave 2: Visto Bueno de Gestión)" as Key2 <<keycard>> {
+    +actorLabel: Text ("Analista de Requerimientos / Gestor (RN-01)")
+    +statusIndicator: StatusBadge ([PENDIENTE] / [APROBADA] / [RECHAZADA])
+    +managementComments: TextArea ("Evaluación de Planificación, Plazos y Recursos")
+    +btnApproveManagement: Button ("Aprobar Visto Bueno de Gestión")
+    +btnRejectManagement: Button ("Rechazar Visto Bueno de Gestión")
+}
+
+class "FinalAuthorizationState" as FinalState <<final>> {
+    +authorizationBanner: StateBanner
+    -- Regla de Negocio Transaccional --
+    * Si Key1 = APROBADA Y Key2 = APROBADA:
+      Estado final: **AUTORIZADA** (Habilita emisión de ECN en NAV-12)
+    * Si cualquiera = RECHAZADA:
+      Estado final: **RECHAZADA**
+    * Si alguna = PENDIENTE:
+      Estado final: **EN_EVALUACION**
+}
+
+Container *-- Key1
+Container *-- Key2
+Container *-- FinalState
+
+@enduml

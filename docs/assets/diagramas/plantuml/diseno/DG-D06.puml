@@ -1,0 +1,61 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-D06: Diagrama de Despliegue de TraceFlow SCM (Docker / Compose)</b>
+
+node "Dispositivo Cliente" as ClientNode <<Device>> {
+    component [Navegador Web\n(HTML5 / React SPA)] as WebClient
+}
+
+node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostServer <<Node>> {
+    
+    node "Red Interna Docker: tf_network (Bridge)" as DockerNet {
+        
+        node "Contenedor: nginx_proxy" as NginxNode <<Container>> {
+            component [Nginx Reverse Proxy\n& SSL Terminator] as NginxComp
+            folder "/usr/share/nginx/html\n(Activos Estáticos SPA)" as StaticSPA
+            NginxComp --> StaticSPA : Entrega local
+        }
+
+        node "Contenedor: backend_replica_a" as BackendANode <<Container>> {
+            component [NestJS Monolith (Instance A)\nNode.js 24 LTS] as BackendA
+        }
+
+        node "Contenedor: backend_replica_b" as BackendBNode <<Container>> {
+            component [NestJS Monolith (Instance B)\nNode.js 24 LTS] as BackendB
+        }
+
+        node "Contenedor: postgresql_db" as DBNode <<Container>> {
+            database "PostgreSQL Server 16+\n(Esquema Relacional + JSONB)" as PGServer
+        }
+
+        node "Contenedor: backup_worker" as BackupNode <<Container>> {
+            component [Backup Cron Service\n(Snapshot DB + Storage + Manifest)] as BackupWorker
+        }
+    }
+
+    folder "Volumen Host: tf_pg_data" as PGVolume <<Disk Volume>>
+    folder "Volumen Host: tf_ecs_storage" as StorageVolume <<Disk Volume>>
+    
+    PGServer -down-> PGVolume : Persistencia de Datos
+    BackendA -down-> StorageVolume : LocalStorageAdapter
+    BackendB -down-> StorageVolume : LocalStorageAdapter
+    
+    BackupWorker -up-> PGServer : pg_dump (TCP 5432)
+    BackupWorker -up-> StorageVolume : Empaquetado tar.gz
+}
+
+node "Servidor de Respaldo Secundario / Cloud S3" as RemoteBackupNode <<External System>> {
+    folder "/remote_backups/traceflow\n(Paquetes Maestros .pkg Cifrados AES-256)" as RemoteDisk
+}
+
+WebClient --> NginxComp : HTTPS (443)\nTLS 1.3 / Cookie HttpOnly
+NginxComp --> BackendA : HTTP Proxy (Balanceo Round-Robin)
+NginxComp --> BackendB : HTTP Proxy (Balanceo Round-Robin)
+BackendA --> PGServer : TCP (Pool SQL)
+BackendB --> PGServer : TCP (Pool SQL)
+BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
+
+@enduml

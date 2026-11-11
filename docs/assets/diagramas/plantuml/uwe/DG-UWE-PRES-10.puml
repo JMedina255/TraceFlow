@@ -1,0 +1,53 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-10: Consola QA y Gestión de No Conformidades (NAV-19, 20 / PRES-08, 05)</b>
+
+skinparam class {
+    BackgroundColor<<qa>> #FFFFF0
+    BorderColor<<qa>> #B7791F
+    BackgroundColor<<panel>> #FFFFFF
+    BorderColor<<panel>> #D69E2E
+    BackgroundColor<<action>> #FFFFFF
+    BorderColor<<action>> #E53E3E
+}
+
+class "QAConsoleContainer (NAV-19 / CU-16, 17, 19)" as QAContainer <<qa>> {
+    +ecnUnderTestingBanner: ECNHeaderCard ("ECN-2026-0018 | Versión en Biblioteca de Soporte")
+    +soDComplianceBadge: SecurityBadge ("SoD Verificado: Evaluador QA independiente de PU-06")
+}
+
+class "IntegrationTestSuitePanel" as TestPanel <<panel>> {
+    +suiteExecutionTable: Table
+    -- Columnas de Suite --
+    * ID Prueba | Caso de Prueba | Tipo (Integración / Regresión) | Resultado (PASS / FAIL) | Duración
+    +btnExecuteIntegrationSuite: ActionButton ("Ejecutar Suite Automatizada")
+    +logViewerRegion: LogConsole (Salida estructurada de ejecución)
+}
+
+class "NonConformityFormView (NAV-20 / CU-18)" as NCView <<panel>> {
+    +defectTitleInput: TextInput ("Título del defecto o no conformidad")
+    +severityDropdown: Dropdown (Crítico, Mayor, Menor)
+    +stepsToReproduceText: TextArea ("Pasos detallados para reproducir")
+    +expectedVsActualText: TextArea ("Comportamiento esperado vs obtenido")
+    +evidenceAttachment: FileUpload (Capturas, logs, stack traces)
+    +btnSubmitNonConformity: ActionButton ("Reportar No Conformidad (ECN pasa a RE-TEST)")
+}
+
+class "QACertificationDecisionBar" as DecisionBar <<action>> {
+    +btnReportDefect: DangerButton ("Reportar No Conformidad (CU-18)")
+    +btnCertifyConformity: PrimaryButton ("Certificar Conformidad QA con SoD (CU-17)")
+    -- Efecto de Certificación --
+    * Valida que no existan no conformidades abiertas
+    * Emite qa_certification en BD
+    * Habilita suscripción de Acta UAT por el Solicitante (NAV-21)
+}
+
+QAContainer *-- TestPanel
+QAContainer *-- NCView
+QAContainer *-- DecisionBar
+
+@enduml

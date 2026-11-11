@@ -1,0 +1,28 @@
+@startuml DG-AO-02
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Administración de Proyectos" as B
+control "Control de Proyectos" as C
+
+entity "Proyecto" as E_PROY
+entity "Plan de Gestión SCM" as E_PLAN
+entity "Usuario" as E_USR
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "interactúa"
+B --> C : "solicita creación / ajuste"
+C --> E_PROY : "registra / actualiza"
+C --> E_PLAN : "asocia directrices SCM"
+C --> E_USR : "asigna equipo"
+C --> E_AUD : "asienta trazabilidad"
+E_PROY "1" *-- "1" E_PLAN : "normado por"
+E_PROY "1" o-- "1..*" E_USR : "cuenta con miembros"
+E_PROY --> E_AUD : "registrado en"
+
+@enduml

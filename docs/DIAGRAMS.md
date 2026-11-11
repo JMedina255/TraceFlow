@@ -4914,6 +4914,7 @@ app_user ||--o{ change_authorization : "suscribe"
 
 ```plantuml
 @startuml
+allowmixing
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial

@@ -1,0 +1,21 @@
+@startuml DG-SEQ-09
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-09: Registrar ECS (CU-09)</b>
+
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+Arquitecto -> Sistema: 1. Seleccionar opción de registrar nuevo Elemento de Configuración (ECS)
+Sistema --> Arquitecto: 2. Presentar formulario de catalogación y jerarquía de componentes
+Arquitecto -> Sistema: 3. Ingresar nombre, clasificación, versión inicial, dependencias y archivo base
+Sistema -> Sistema: 4. Validar unicidad de nombre, estándar mayor.menor.parche y suma de integridad (RN-02)
+Sistema -> Sistema: 5. Registrar ECS con código unívoco y depositar en biblioteca designada (RN-04)
+Sistema --> Arquitecto: 6. Emitir confirmación de catalogación formal del nuevo ECS
+Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de cambios
+
+@enduml

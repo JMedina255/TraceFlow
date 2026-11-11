@@ -1,0 +1,21 @@
+@startuml DG-SEQ-25
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-25: Derivar incidencia a RFC (CU-25)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Solicitante" as Solicitante
+
+Analista -> Sistema: 1. Seleccionar incidencia abierta y dictaminar que requiere modificación
+Sistema --> Analista: 2. Presentar opción de derivación formal hacia flujo de Solicitudes de Cambio
+Analista -> Sistema: 3. Confirmar derivación identificando ECS preliminar y fundamentando causal
+Sistema -> Sistema: 4. Validar no derivación previa y pre-poblar datos enlazando a CU-04
+Sistema -> Sistema: 5. Registrar formalmente RFC según flujo CU-04 en estado 'Registrada' (RN-01)
+Sistema -> Sistema: 6. Actualizar ticket a 'Derivada' y asentar vínculo bidireccional
+Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimiento
+
+@enduml

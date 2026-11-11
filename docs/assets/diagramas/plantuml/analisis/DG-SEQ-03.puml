@@ -1,0 +1,24 @@
+@startuml DG-SEQ-03
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-03: Consultar proyecto (CU-03)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as Actor
+participant "TraceFlow SCM" as Sistema
+
+Actor -> Sistema: 1. Seleccionar opción de consulta de proyectos
+Sistema --> Actor: 2. Presentar catálogo de proyectos accesibles según perfil
+Actor -> Sistema: 3. Seleccionar proyecto específico para inspeccionar
+Sistema -> Sistema: 4. Validar permisos de visualización según matriz RBAC (RN-01)
+Sistema -> Sistema: 5. Consolidar datos generales, equipo, inventario de ECS y estado de RFC
+Sistema --> Actor: 6. Presentar panel de detalle y navegación hacia artefactos
+
+opt A1: Búsqueda y filtrado avanzado
+  Actor -> Sistema: Aplicar filtros por cliente, estado o fecha
+  Sistema --> Actor: Actualizar listado con proyectos coincidentes
+end
+
+@enduml

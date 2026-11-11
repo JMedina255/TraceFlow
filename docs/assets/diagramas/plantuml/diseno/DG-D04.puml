@@ -1,0 +1,53 @@
+@startuml
+allowmixing
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-D04: Arquitectura de Storage y Transición entre las 3 Bibliotecas SCM</b>
+
+package "Capa de Dominio & Aplicación" {
+    interface "StoragePort" as StoragePort {
+        + storeTemporary()
+        + promote()
+        + read()
+        + copy()
+        + removeTemporary()
+        + computeChecksum()
+    }
+    
+    class "VersionControlService" as VersionService
+    VersionService -right-> StoragePort : consume
+}
+
+package "Capa de Infraestructura (Adaptador Físico)" {
+    class "LocalStorageAdapter" as LocalStorage {
+        - basePath : String = "/storage"
+        + storeTemporary()
+        + promote()
+        + read()
+        + copy()
+        + removeTemporary()
+        + computeChecksum()
+    }
+    LocalStorage .up.|> StoragePort : implementa
+}
+
+package "Volumen de Almacenamiento Físico (/storage/)" {
+    folder "staging/ (Temporal)" as F_Staging
+    folder "trabajo/ (Biblioteca de Trabajo)" as F_Trabajo
+    folder "soporte/ (Biblioteca de Soporte)" as F_Soporte
+    folder "maestra/ (Biblioteca Maestra)" as F_Maestra
+}
+
+LocalStorage --> F_Staging : 1. Escribe carga temporal
+LocalStorage --> F_Trabajo : 2. Promueve tras Check-Out / Dev
+LocalStorage --> F_Soporte : 3. Transfiere para pruebas QA (RN-01)
+LocalStorage --> F_Maestra : 4. Congela con Doble Conformidad (RN-09)
+
+F_Trabajo .[#blue].> F_Soporte : Entrega para Testing (Check-In Técnico)
+F_Soporte .[#green].> F_Maestra : Promoción definitiva tras QA + UAT
+F_Trabajo .[#red].> F_Trabajo : Rollback purga copia de trabajo (RN-08)
+
+@enduml

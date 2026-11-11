@@ -1,0 +1,28 @@
+@startuml DG-AO-05
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Validación y Clasificación de RFC" as B
+control "Control de Clasificación de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Clasificación de Cambio" as E_CLAS
+entity "Observación de Solicitud" as E_OBS
+entity "Notificación de Estado" as E_NOTIF
+
+ACT --> B : "evalúa completitud formal"
+B --> C : "solicita triaje y clasificación"
+C --> E_RFC : "actualiza estado ('Aceptada' / 'Observada' / 'Desestimada')"
+C --> E_CLAS : "asigna categoría (Menor / Mayor)"
+C --> E_OBS : "registra omisiones si aplica"
+C --> E_NOTIF : "emite aviso al Solicitante"
+E_RFC "1" *-- "1" E_CLAS : "clasificada mediante"
+E_RFC "1" o-- "0..*" E_OBS : "puede tener"
+E_RFC --> E_NOTIF : "dispara"
+
+@enduml

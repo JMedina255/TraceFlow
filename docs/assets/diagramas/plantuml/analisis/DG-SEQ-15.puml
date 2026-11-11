@@ -1,0 +1,19 @@
+@startuml DG-SEQ-15
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+participant "TraceFlow SCM" as Sistema
+
+Dev -> Sistema: 1. Solicitar ejecución de conjunto de pruebas unitarias sobre ECS modificado
+Sistema --> Dev: 2. Presentar entorno de verificación unitaria y casos de prueba asociados
+Dev -> Sistema: 3. Disparar ejecución de batería de pruebas en Biblioteca de Trabajo
+Sistema -> Sistema: 4. Validar ejecución sin errores y satisfacción de criterios de cobertura (RN-01)
+Sistema -> Sistema: 5. Registrar reporte de resultados unitarios en bitácora de ECN/ECO (RN-03)
+Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a pruebas de integración
+
+@enduml

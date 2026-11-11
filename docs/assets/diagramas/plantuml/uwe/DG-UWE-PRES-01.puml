@@ -1,0 +1,83 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-01: Estructura General de Presentación — Shell Global</b>
+
+skinparam class {
+    BackgroundColor<<shell>> #EDF2F7
+    BorderColor<<shell>> #4A5568
+    BackgroundColor<<header>> #EBF8FF
+    BorderColor<<header>> #3182CE
+    BackgroundColor<<sidebar>> #F7FAFC
+    BorderColor<<sidebar>> #CBD5E0
+    BackgroundColor<<workarea>> #FFFFFF
+    BorderColor<<workarea>> #2B6CB0
+    BackgroundColor<<element>> #FFFFFF
+    BorderColor<<element>> #A0AEC0
+}
+
+class "AppShell Container" as Shell <<shell>> {
+    +viewport: FullWindow
+    +theme: Corporate SCADA/IT
+}
+
+class "TopHeaderBar (Cabecera Global)" as TopHeader <<header>> {
+    +brandLogo: TraceFlow SCM
+    +activeProjectSelector: Dropdown
+    +notificationCenter: Badge + Dropdown
+    +userProfileChip: Avatar + Name
+    +activeRoleIndicator: RoleBadge
+    +logoutButton: ActionButton
+}
+
+class "RoleBasedSidebar (Barra Lateral Adaptativa)" as Sidebar <<sidebar>> {
+    +menuDashboard: NavLink
+    +menuProjects: NavLink (MOD-02)
+    +menuRFC: NavLink (MOD-04)
+    +menuECN: NavLink (MOD-04)
+    +menuConfigItems: NavLink (MOD-03)
+    +menuVersionControl: NavLink (MOD-05)
+    +menuQualityQA: NavLink (MOD-06)
+    +menuBaselines: NavLink (MOD-07)
+    +menuIncidents: NavLink (MOD-08)
+    +menuAuditLogs: NavLink (MOD-09)
+    +menuReports: NavLink (MOD-09)
+    +menuAdminIAM: NavLink (MOD-01)
+}
+
+class "MainWorkArea (Área Principal de Trabajo)" as WorkArea <<workarea>> {
+    +breadcrumbTrail: NavBreadcrumb
+    +viewHeader: HeaderRegion
+    +contentViewport: DynamicContainer (Inyección de PRES)
+    +contextualActionBar: ActionRegion
+}
+
+class "ViewHeaderRegion" as ViewHeader <<element>> {
+    +viewTitle: TypographyH1
+    +statusBadge: RFC/ECN StateBadge (TB-07)
+    +identifierTag: CodeTag (e.g. RFC-2026-0012)
+    +primaryActionSlot: ActionButtonList
+}
+
+class "ContentViewport" as ContentViewport <<element>> {
+    +renderedPattern: PRES-01..10
+}
+
+class "ContextualActionBar" as ContextualBar <<element>> {
+    +backButton: ActionButton
+    +cancelButton: ActionButton
+    +stateTransitionButtons: RoleStateActionList
+}
+
+Shell *-- TopHeader : Superior fijo
+Shell *-- Sidebar : Izquierda adaptativo
+Shell *-- WorkArea : Región central dinámica
+
+WorkArea *-- ViewHeader : Superior de vista
+WorkArea *-- ContentViewport : Cuerpo principal
+WorkArea *-- ContextualBar : Inferior contextual
+
+@enduml

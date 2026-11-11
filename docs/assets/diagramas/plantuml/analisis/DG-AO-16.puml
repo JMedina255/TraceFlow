@@ -1,0 +1,25 @@
+@startuml DG-AO-16
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Ejecución de Pruebas de Integración" as B
+control "Control de Pruebas de Integración" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Batería de Pruebas de Integración" as E_SUITE
+entity "Resultado de Pruebas QA" as E_RES
+
+ACT --> B : "inicia ciclo de pruebas formales"
+B --> C : "coordina ejecución de integración"
+C --> E_ECS : "obtiene paquete de trabajo"
+C --> E_SUITE : "aplica suite de integración y regresión"
+C --> E_RES : "registra coberturas y fallos"
+E_SUITE --> E_ECS : "evalúa interacción de"
+E_SUITE "1" *-- "1..*" E_RES : "genera"
+
+@enduml

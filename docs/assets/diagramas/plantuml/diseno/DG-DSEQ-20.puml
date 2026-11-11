@@ -1,0 +1,51 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)</b>
+
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+participant "React SPA" as UI
+participant "BaselineController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "BaselineService" as Service
+participant "BaselineRepoPort" as BaselineRepo
+database "PostgreSQL" as DB
+participant "NotificationService" as Notify
+participant "AuditService" as Audit
+
+note over Service
+  <b>Delimitación Nítida vs CU-12</b>:
+  La promoción física de archivos a la Biblioteca Maestra fue
+  ejecutada en CU-12 (Variante B). CU-20 formaliza la agrupación
+  lógica, asigna el identificador mayor.menor.parche (RN-02)
+  y congela la Línea Base. No duplica copias de archivos.
+end note
+
+Actor -> UI : 1. Selecciona proyecto y versiones en Maestra para Línea Base
+UI -> Ctrl : 2. POST /api/v1/projects/{id}/baselines (FreezeBaselineDto)
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. freezeBaseline(projectId, dto, userId)
+
+Service -> DB : 6. Valida Doble Conformidad (QA + UAT) de los ECS seleccionados (RN-09)
+alt Algún ECS no cuenta con Certificación QA y Acta UAT
+    Service --> Ctrl : 400 Bad Request: "Requisito RN-09 no satisfecho para todos los ECS"
+    Ctrl --> UI : 400 Bad Request
+    UI --> Actor : Notifica impedimento de congelamiento por falta de conformidad
+else Doble Conformidad Verificada y Conforme
+    Service -> BaselineRepo : 7. Inicia Transacción ACID
+    BaselineRepo -> DB : 8. INSERT INTO baseline (code, version_label, status='CONGELADA', frozen_by, frozen_at)
+    BaselineRepo -> DB : 9. INSERT INTO baseline_item (baseline_id, ecs_version_id)
+    BaselineRepo -> DB : 10. COMMIT Transacción
+    Service -> Notify : 11. notifyBaselineFrozen(baselineId, projectId)
+    Notify --> Service : Notificación a interesados
+    Service -> Audit : 12. logEvent('BASELINE_FROZEN', baselineId, userId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. BaselineResponseDto
+    Ctrl --> UI : 15. 201 Created
+    UI --> Actor : 16. Muestra Línea Base congelada formalmente con estándar RN-02
+end
+
+@enduml

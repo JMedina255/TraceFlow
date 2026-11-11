@@ -1,0 +1,73 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>TraceFlow SCM - Organigrama del Equipo C-SharkTeam y Entorno Cliente</b>
+
+package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
+    class "Joan Cristian Medina Quispe" as JCM {
+        + Dirección, Análisis y Gobernanza SCM
+        --
+        * Coordinación del ciclo de vida
+        * Análisis de requerimientos y SSOT
+        * Modelado de procesos (RFC/ECN)
+        * Políticas de bibliotecas y RBAC
+    }
+
+    class "Renzo Antonio Antayhua Mamani" as RAA {
+        + Backend y Mecanismos SCM
+        --
+        * Lógica de negocio centralizada
+        * Motor de versionamiento
+        * Integridad criptográfica (SHA-256)
+        * Bloqueos de sincronización
+    }
+
+    class "Renzo Fernando Loyola Vilca Choque" as RFL {
+        + Frontend, UX y Mockups
+        --
+        * Interfaz web responsiva
+        * Navegación y diseño de mockups
+        * Tableros de trazabilidad
+        * Consolas para el CCB
+        * Formularios de RFC y subsanación
+    }
+
+    class "Augusto Joaquin Rivera Muñoz" as AJR {
+        + QA, Persistencia y Validación
+        --
+        * Modelado relacional y persistencia
+        * Registro y módulo de auditoría
+        * Suite de pruebas unitarias/integración
+        * Validación técnica de entregables
+    }
+
+    JCM --> RAA : Coordina lógica SCM
+    JCM --> RFL : Coordina interfaces y UX
+    JCM --> AJR : Coordina aseguramiento de calidad
+}
+
+package "Entorno Cliente / Beneficiario (ÉXODO S.A.C.)" as CLIENT {
+    class "Jefes de Proyecto y Administradores SCM" as ADM {
+        * Supervisión de proyectos aislados
+        * Custodia de Bibliotecas Maestras
+    }
+
+    class "Comité de Control de Cambios (CCB)" as CCB {
+        * Evaluación colegiada de RFC
+        * Emisión de Órdenes de Cambio (ECN/ECO)
+    }
+
+    class "Consultores y Desarrolladores de Software" as DEV_CLI {
+        * Ejecución de Check-Out / Check-In
+        * Implementación de modificaciones
+    }
+
+    ADM --> CCB : Consulta decisiones
+    CCB --> DEV_CLI : Emite orden de cambio
+}
+
+DEV ..> CLIENT : Provee plataforma TraceFlow SCM
+@enduml

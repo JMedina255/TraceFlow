@@ -1,0 +1,20 @@
+@startuml DG-SEQ-06
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)</b>
+
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+participant "TraceFlow SCM" as Sistema
+
+Arquitecto -> Sistema: 1. Seleccionar RFC en estado 'Clasificada' desde bandeja de análisis
+Sistema --> Arquitecto: 2. Presentar expediente y actualizar estado a 'En Análisis Técnico'
+Arquitecto -> Sistema: 3. Analizar arquitectura, dependencias de ECS, riesgos, esfuerzo, tiempo y costo
+Arquitecto -> Sistema: 4. Evaluar Triple Restricción y dictaminar Cambio Menor o Mayor (RN-05)
+Sistema -> Sistema: 5. Registrar Informe Técnico de Impacto vinculándolo al expediente
+Sistema -> Sistema: 6. Transicionar estado a 'En Evaluación' y enrutar a instancia resolutiva
+Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CCB o Autoridad Delegada
+
+@enduml

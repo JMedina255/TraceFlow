@@ -1,0 +1,27 @@
+@startuml DG-SEQ-02
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-02: Crear y administrar proyectos (CU-02)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+Analista -> Sistema: 1. Seleccionar registrar nuevo proyecto de software
+Sistema --> Analista: 2. Presentar formulario de configuración y directorio de clientes
+Analista -> Sistema: 3. Ingresar datos del proyecto, cliente, objetivos y equipo técnico
+Sistema -> Sistema: 4. Validar unicidad del nombre y coherencia de plazos contractuales
+Sistema -> Sistema: 5. Crear proyecto, aislar datos de cliente e inicializar bibliotecas (RN-01)
+Sistema --> Analista: 6. Confirmar creación de proyecto en pantalla
+Sistema --> Admin: 6. Notificar creación para inicialización del catálogo de ECS
+
+alt A1: Actualización de parámetros de proyecto existente
+  Analista -> Sistema: Modificar fechas, alcance o equipo técnico
+  Sistema -> Sistema: Actualizar registro conservando historial
+  Sistema --> Analista: Confirmar actualización de proyecto
+end
+
+@enduml

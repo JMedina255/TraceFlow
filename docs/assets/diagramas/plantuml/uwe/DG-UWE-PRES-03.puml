@@ -1,0 +1,59 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-03: Dashboard Adaptativo por Rol Canónico (NAV-02 / PRES-02)</b>
+
+skinparam class {
+    BackgroundColor<<dashboard>> #F7FAFC
+    BorderColor<<dashboard>> #2B6CB0
+    BackgroundColor<<widget>> #FFFFFF
+    BorderColor<<widget>> #3182CE
+    BackgroundColor<<kpi>> #EBF8FF
+    BorderColor<<kpi>> #63B3ED
+    BackgroundColor<<feed>> #FFFFFF
+    BorderColor<<feed>> #CBD5E0
+}
+
+class "DashboardContainer (NAV-02)" as Dashboard <<dashboard>> {
+    +activeProjectBanner: Text + Selector ("Proyecto Activo: Sistema Bancario Core")
+    +userGreeting: Text ("Bienvenido, [Nombre] | Rol: [Rol Canónico]")
+}
+
+class "MetricKPIPanel (Panel de Indicadores)" as Metrics <<kpi>> {
+    +cardPendingTasks: NumberMetric ("Tareas Pendientes de Acción")
+    +cardActiveRFCs: NumberMetric ("Solicitudes en Trámite")
+    +cardActiveLocks: NumberMetric ("Bloqueos Exclusivos (sync_lock)")
+    +cardPendingBaselines: NumberMetric ("Líneas Base en Preparación")
+}
+
+class "ActionItemsList (Bandeja de Tareas Prioritarias)" as Tasks <<widget>> {
+    +taskListTable: Table
+    -- Fuentes por Rol --
+    * Solicitante: RFCs por subsanar (CU-04.1) y Actas UAT pendientes (CU-29)
+    * Gestor: RFCs por clasificar (CU-05) y Cambios Menores (CU-30)
+    * Arquitecto: Evaluaciones de Impacto pendientes (CU-06)
+    * CCB: Sesiones de deliberación convocadas (CU-07)
+    * Bibliotecario: Solicitudes de Check-Out/In y Líneas Base (CU-10, 20)
+    * Desarrollador: ECNs en implementación asignadas (CU-14, 15)
+    * QA: Órdenes en pruebas y re-testeos pendientes (CU-16, 19)
+}
+
+class "QuickAccessPanel (Accesos Directos Autorizados)" as QuickNav <<widget>> {
+    +btnNewRFC: Button ("+ Nueva Solicitud (RFC)")
+    +btnExplorerECS: Button ("Explorar Bibliotecas")
+    +btnIncidentTicket: Button ("Mesa de Incidencias")
+}
+
+class "RecentActivityFeed (Historial Reciente del Proyecto)" as ActivityFeed <<feed>> {
+    +timelineEntries: List (Transiciones recientes de RFC, Check-Ins certificados)
+}
+
+Dashboard *-- Metrics
+Dashboard *-- Tasks
+Dashboard *-- QuickNav
+Dashboard *-- ActivityFeed
+
+@enduml

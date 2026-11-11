@@ -1,0 +1,25 @@
+@startuml DG-AO-27
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Auditoría y Trazabilidad del Sistema" as B
+control "Control de Auditoría y Cumplimiento" as C
+
+entity "Registro de Auditoría" as E_AUD
+entity "Pista de Auditoría (Audit Trail)" as E_TRAIL
+entity "Informe de Auditoría SCM" as E_INF
+
+ACT --> B : "solicita inspección de pistas de auditoría"
+B --> C : "ejecuta consulta de eventos inmutables"
+C --> E_TRAIL : "recupera bitácora cronológica"
+C --> E_AUD : "valida sellos de tiempo y actores"
+C --> E_INF : "emite reporte de cumplimiento normativo"
+E_TRAIL "1" *-- "1..*" E_AUD : "compuesta por"
+E_INF --> E_TRAIL : "consolida y analiza"
+
+@enduml

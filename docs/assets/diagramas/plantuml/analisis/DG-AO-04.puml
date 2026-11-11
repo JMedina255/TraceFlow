@@ -1,0 +1,25 @@
+@startuml DG-AO-04
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Registro de Solicitud de Cambio" as B
+control "Control de Registro de RFC" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT --> B : "ingresa datos del cambio"
+B --> C : "solicita registro formal"
+C --> E_RFC : "crea en estado 'Registrada'"
+C --> E_PROY : "valida pertinencia"
+C --> E_ECS : "asocia ítem afectado"
+E_RFC --> E_PROY : "pertenece a"
+E_RFC --> E_ECS : "afecta a"
+
+@enduml

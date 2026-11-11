@@ -1,0 +1,28 @@
+@startuml DG-AO-08
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Emisión de Orden de Cambio" as B
+control "Control de Emisión ECN/ECO" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita formalización de orden"
+B --> C : "instruye emisión ejecutiva"
+C --> E_ECN : "genera orden formal con alcance y responsable"
+C --> E_RFC : "vincula a RFC aprobada"
+C --> E_ECS : "habilita intervención sobre ECS"
+C --> E_AUD : "asienta emisión de orden ejecutiva"
+E_ECN --> E_RFC : "formaliza autorización de"
+E_ECN --> E_ECS : "autoriza modificación de"
+E_ECN --> E_AUD : "registrada en"
+
+@enduml

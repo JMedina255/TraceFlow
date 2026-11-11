@@ -1,0 +1,47 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-17: Certificar Conformidad del Cambio en QA (CU-17, SoD Dinámico)</b>
+
+actor "Equipo de Calidad / Testing" as Actor
+participant "React SPA" as UI
+participant "QualityController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "SodGuard" as SodGuard
+participant "QualityService" as Service
+participant "ChangeOrderRepoPort" as EcnRepo
+participant "QaCertRepoPort" as CertRepo
+database "PostgreSQL" as DB
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Registra informe de pruebas conformes y certifica
+UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/qa-certification (CertifyQaDto)
+Ctrl -> Guard : 3. Valida sesión y rol canónico EQUIPO_CALIDAD
+Guard --> Ctrl : 4. Permitido
+
+Ctrl -> SodGuard : 5. evaluateSod(ecnId, userId)
+SodGuard -> EcnRepo : 6. findById(ecnId)
+EcnRepo -> DB : 7. SELECT assigned_developer_id FROM change_order WHERE id = ...
+DB --> EcnRepo : Retorna developerId asignado
+
+alt Violación SoD: El evaluador es el mismo desarrollador que implementó el cambio
+    SodGuard --> Ctrl : Excepción SodViolationException
+    Ctrl --> UI : 403 Forbidden: "Violación de SoD: El desarrollador no puede certificar su propio cambio"
+    UI --> Actor : Alerta de bloqueo por Segregación de Funciones
+else Segregación de Funciones Conforme (Evaluador != Desarrollador)
+    SodGuard --> Ctrl : SoD Aprobada
+    Ctrl -> Service : 8. certifyConformity(ecnId, dto, userId)
+    Service -> CertRepo : 9. Inicia Transacción ACID
+    CertRepo -> DB : 10. INSERT INTO qa_certification (result='CONFORME', ...)
+    CertRepo -> DB : 11. UPDATE change_request SET status = 'EN_ACEPTACION'
+    CertRepo -> DB : 12. COMMIT
+    Service -> Audit : 13. logEvent('QA_CERTIFIED_CONFORME', ecnId, userId)
+    Audit -> DB : 14. INSERT INTO audit_log (...)
+    Service --> Ctrl : 15. QaCertResponseDto
+    Ctrl --> UI : 16. 201 Created
+    UI --> Actor : 17. Presenta Certificado de Conformidad y habilita etapa de aceptación UAT
+end
+
+@enduml

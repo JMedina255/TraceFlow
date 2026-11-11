@@ -1,0 +1,19 @@
+@startuml DG-SEQ-14
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-14: Implementar cambio en el ECS (CU-14)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+participant "TraceFlow SCM" as Sistema
+
+Dev -> Sistema: 1. Acceder a Biblioteca de Trabajo y visualizar ECN/ECO asignada
+Sistema --> Dev: 2. Presentar alcance técnico, criterios de aceptación y ECS desbloqueado
+Dev -> Sistema: 3. Realizar modificaciones, adaptaciones o correcciones sobre copia de trabajo
+Sistema -> Sistema: 4. Registrar progreso de cambios vinculándolos a la ECN/ECO (RN-03)
+Dev -> Sistema: 5. Formular memoria descriptiva detallando componentes modificados
+Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pruebas unitarias
+
+@enduml

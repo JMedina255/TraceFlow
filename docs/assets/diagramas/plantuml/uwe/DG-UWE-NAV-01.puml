@@ -1,0 +1,108 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-01: Modelo General de Navegación de TraceFlow SCM (UWE)</b>
+
+' Estereotipos y estilos
+skinparam class {
+    BackgroundColor<<navigationClass>> #E8F4F8
+    BorderColor<<navigationClass>> #2B6CB0
+    BackgroundColor<<index>> #EBF8FF
+    BorderColor<<index>> #3182CE
+    BackgroundColor<<menu>> #EDF2F7
+    BorderColor<<menu>> #4A5568
+    BackgroundColor<<processNode>> #FFF5F5
+    BorderColor<<processNode>> #C53030
+}
+
+package "Acceso y Sesión" {
+    class "NAV-01: Inicio de Sesión" as NAV01 <<navigationClass>>
+    class "NAV-02: Dashboard General" as NAV02 <<menu>>
+    NAV01 -down-> NAV02 : Autenticación Exitosa\n(Cookie HttpOnly)
+}
+
+package "Subsistema Proyectos" {
+    class "NAV-03: Índice de Proyectos" as NAV03 <<index>>
+    class "NAV-04: Detalle de Proyecto" as NAV04 <<navigationClass>>
+    NAV03 -right-> NAV04 : Seleccionar Proyecto
+}
+
+package "Subsistema Solicitudes de Cambio (RFC)" {
+    class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+    class "NAV-06: Detalle de RFC" as NAV06 <<navigationClass>>
+    class "NAV-07: Registrar RFC" as NAV07 <<navigationClass>>
+    class "NAV-08: Subsanar RFC" as NAV08 <<navigationClass>>
+    class "NAV-09: Análisis de Impacto" as NAV09 <<navigationClass>>
+    class "NAV-10: Deliberación CCB" as NAV10 <<processNode>>
+    class "NAV-11: Autorización Menor" as NAV11 <<processNode>>
+    class "NAV-12: Orden de Cambio (ECN)" as NAV12 <<navigationClass>>
+
+    NAV05 -right-> NAV06 : Inspeccionar Expediente
+    NAV05 ..> NAV07 : Nueva Solicitud (Solicitante)
+    NAV06 ..> NAV08 : Subsanación (En Subsanación)
+    NAV06 ..> NAV09 : Registrar Impacto (En Análisis)
+    NAV06 ..> NAV10 : Deliberar (En Evaluación - Mayor)
+    NAV06 ..> NAV11 : Doble Firma (En Evaluación - Menor)
+    NAV06 -down-> NAV12 : Orden Emitida (CU-08)
+}
+
+package "Subsistema Configuración y Bibliotecas SCM" {
+    class "NAV-13: Catálogo ECS" as NAV13 <<index>>
+    class "NAV-14: Detalle ECS" as NAV14 <<navigationClass>>
+    class "NAV-15: Explorador Bibliotecas" as NAV15 <<navigationClass>>
+    class "NAV-16: Consola Check-Out" as NAV16 <<processNode>>
+    class "NAV-17: Consola Check-In" as NAV17 <<processNode>>
+    class "NAV-18: Historial y Diffs" as NAV18 <<index>>
+
+    NAV13 -right-> NAV14 : Seleccionar ECS
+    NAV14 -down-> NAV18 : Ver Versiones
+    NAV12 ..> NAV16 : Iniciar Check-Out (Bibliotecario)
+    NAV16 -down-> NAV15 : Entrega a Trabajo
+    NAV15 ..> NAV17 : Check-In (Técnico / Definitivo)
+}
+
+package "Subsistema Calidad y Aceptación" {
+    class "NAV-19: Validación QA" as NAV19 <<navigationClass>>
+    class "NAV-20: No Conformidades" as NAV20 <<processNode>>
+    class "NAV-21: Aceptación UAT" as NAV21 <<navigationClass>>
+
+    NAV12 ..> NAV19 : Pruebas de Integración (QA)
+    NAV19 ..> NAV20 : Defecto Detectado
+    NAV19 -right-> NAV21 : Certificación Conforme -> UAT
+}
+
+package "Subsistema Líneas Base y Reversión" {
+    class "NAV-22: Consola Líneas Base" as NAV22 <<navigationClass>>
+    class "NAV-23: Consola Rollback" as NAV23 <<processNode>>
+
+    NAV21 ..> NAV22 : Congelar Línea Base (RN-09)
+    NAV19 ..> NAV23 : Fallo Insubsanable (RN-08)
+}
+
+package "Subsistema Incidencias" {
+    class "NAV-24: Bandeja Incidencias" as NAV24 <<index>>
+    class "NAV-25: Detalle Incidencia" as NAV25 <<navigationClass>>
+
+    NAV24 -right-> NAV25 : Ver Ticket
+    NAV25 ..> NAV07 : Derivar a RFC (CU-25)
+}
+
+package "Subsistema Auditoría y Gobernanza" {
+    class "NAV-26: Visor Auditoría" as NAV26 <<index>>
+    class "NAV-27: Generador Reportes" as NAV27 <<navigationClass>>
+    class "NAV-28: Usuarios y Roles" as NAV28 <<navigationClass>>
+}
+
+' Enlaces entre Menú Principal y subsistemas
+NAV02 --> NAV03 : Proyectos
+NAV02 --> NAV05 : Solicitudes
+NAV02 --> NAV13 : Catálogo ECS
+NAV02 --> NAV24 : Incidencias
+NAV02 --> NAV26 : Auditoría
+NAV02 --> NAV27 : Reportes
+NAV02 --> NAV28 : Seguridad / IAM
+
+@enduml

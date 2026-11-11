@@ -1,0 +1,49 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Registro y Evaluación de RFC e Incidencias</b>
+
+actor "Solicitante" as ACT_SOL
+actor "Analista de Requerimientos / Gestor" as ACT_ANA
+actor "Arquitecto / Especialista Técnico" as ACT_ARQ
+actor "Comité de Control de Cambios (CCB)" as ACT_CCB
+
+rectangle "Gestión de Solicitudes e Incidencias" {
+    usecase "CU-23: Registrar incidencia" as UC23
+    usecase "CU-24: Consultar estado de ticket" as UC24
+    usecase "CU-25: Derivar incidencia a RFC" as UC25
+
+    usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
+    usecase "CU-05: Validar y clasificar la solicitud" as UC05
+    usecase "CU-06: Realizar análisis de impacto técnico" as UC06
+    usecase "CU-07: Evaluar Cambio Mayor en CCB" as UC07
+    usecase "CU-30: Autorizar Cambio Menor" as UC30
+    usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
+
+    usecase "Subsanar información de RFC" as UC_SUBSANAR
+}
+
+ACT_SOL --> UC23
+ACT_SOL --> UC24
+ACT_ANA --> UC25
+
+UC25 ..> UC04 : <<triggers>>
+
+ACT_SOL --> UC04
+ACT_ANA --> UC05
+UC05 ..> UC_SUBSANAR : <<extend>> (datos incompletos)
+ACT_SOL --> UC_SUBSANAR
+
+ACT_ARQ --> UC06
+
+' Evaluación y Decisión: Ruta Mayor (CCB) vs Menor (Delegada)
+ACT_CCB --> UC07
+UC07 ..> UC08 : <<include>> (si aprueba)
+
+ACT_ANA --> UC30
+ACT_ARQ --> UC30
+UC30 ..> UC08 : <<include>> (si autoriza)
+@enduml

@@ -1,0 +1,100 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales)</b>
+
+[*] --> Registrada : Solicitante registra RFC (CU-04)
+
+state Registrada {
+    Registrada : Esperando validación de completitud
+}
+
+Registrada --> EnSubsanacion : Analista detecta datos incompletos (CU-05)
+EnSubsanacion --> Registrada : Solicitante entrega datos subsanados
+EnSubsanacion --> Desestimada : Plazo vencido sin subsanación
+
+Registrada --> Clasificada : Analista valida consistencia y completitud (CU-05)
+Registrada --> Desestimada : Solicitud inviable o improcedente (CU-05)
+
+state Clasificada {
+    Clasificada : Lista para análisis de impacto técnico
+}
+
+Clasificada --> EnAnalisisTecnico : Asignada a Arquitecto (CU-06)
+
+state EnAnalisisTecnico {
+    EnAnalisisTecnico : Evaluación de impacto y Triple Restricción
+}
+
+EnAnalisisTecnico --> EnEvaluacion : Informe Técnico generado (CU-06)
+
+state EnEvaluacion {
+    state "Ruta Cambio Mayor (CCB)" as S_MAYOR
+    state "Ruta Cambio Menor (Delegada)" as S_MENOR
+}
+
+EnEvaluacion --> Rechazada : CCB rechaza Mayor (CU-07) o Autoridad Delegada rechaza Menor (CU-30)
+EnEvaluacion --> Autorizada : CCB aprueba Mayor (CU-07) o Autoridad Delegada autoriza Menor (CU-30)
+
+state Autorizada {
+    Autorizada : Dictamen formal aprobatorio registrado
+}
+
+Autorizada --> OrdenEmitida : Emisión formal de ECN/ECO (CU-08 / CU-30)
+
+state OrdenEmitida {
+    OrdenEmitida : ECN/ECO formalmente vigente
+}
+
+OrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out y aplica bloqueo (CU-10, CU-11)
+
+state EnImplementacion {
+    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo\ny ejecuta pruebas unitarias (CU-14, CU-15)
+}
+
+EnImplementacion --> EnPruebas : Pruebas unitarias conformes;\nentrega a QA (CU-16)
+
+state EnPruebas {
+    state "Validación de Integración" as S_INTEG
+    state "Re-testeo por Corrección" as S_RETEST
+    [*] --> S_INTEG
+    S_INTEG --> S_RETEST : Defectos reportados (CU-18) y subsanados
+    S_RETEST --> S_INTEG : Reevaluación (CU-19)
+}
+
+EnPruebas --> Cancelada : Fallo no subsanado; Rollback y cancelación (CU-21, CU-22)
+EnPruebas --> EnAceptacion : QA emite Certificación Técnica de Conformidad (CU-17)
+
+state EnAceptacion {
+    EnAceptacion : Solicitante ejecuta pruebas de aceptación UAT (CU-29)
+}
+
+EnAceptacion --> EnImplementacion : Hallazgo o disconformidad UAT; requiere ajuste
+EnAceptacion --> Implementada : Solicitante valida UAT (CU-29); Administrador ejecuta Check-In a Maestra (CU-12),\ncongela Línea Base (CU-20), libera bloqueo y CCB formaliza cierre (RF-14)
+
+' =========================================================
+' ESTADOS TERMINALES (4 Estados Normativos)
+' =========================================================
+state Desestimada #FFCDD2 {
+    Desestimada : Terminal 1: Filtro inicial no superado
+}
+
+state Rechazada #FFCDD2 {
+    Rechazada : Terminal 2: Dictamen formal negativo (CCB o Delegado)
+}
+
+state Cancelada #FFCDD2 {
+    Cancelada : Terminal 3: Rollback por fallo técnico o desistimiento
+}
+
+state Implementada #C8E6C9 {
+    Implementada : Terminal 4: Promovida a Maestra, congelada en Baseline y cerrada con éxito
+}
+
+Desestimada --> [*] : Cierre formal y notificación
+Rechazada --> [*] : Cierre formal y notificación
+Cancelada --> [*] : Cierre formal y notificación
+Implementada --> [*] : Cierre formal exitoso y trazabilidad total
+@enduml

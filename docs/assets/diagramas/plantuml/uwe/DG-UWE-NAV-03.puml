@@ -1,0 +1,51 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-03: Modelo de Navegación — Analista de Requerimientos / Gestor (PU-02)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Gestor" as NAV02 <<navClass>>
+
+class "NAV-03: Índice de Proyectos\n(CU-02)" as NAV03 <<index>>
+class "NAV-04: Detalle de Proyecto\n(CU-03)" as NAV04 <<navClass>>
+
+class "NAV-05: Bandeja de RFCs" as NAV05 <<index>>
+class "NAV-06: Detalle y Clasificación RFC\n(CU-05, RN-05)" as NAV06 <<navClass>>
+class "NAV-11: Autorización Cambio Menor\n(Doble Llave - CU-30)" as NAV11 <<process>>
+class "NAV-12: Emisión Orden de Cambio\n(ECN/ECO - CU-08)" as NAV12 <<process>>
+
+class "NAV-24: Bandeja de Incidencias" as NAV24 <<index>>
+class "NAV-25: Detalle y Derivación a RFC\n(CU-25)" as NAV25 <<navClass>>
+
+class "NAV-27: Reportes de Configuración\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV03 : Administrar Proyectos
+NAV02 -down-> NAV05 : Gestionar RFCs
+NAV02 -down-> NAV24 : Gestionar Incidencias
+NAV02 -down-> NAV27 : Consultar Reportes
+
+NAV03 -right-> NAV04 : Seleccionar Proyecto
+NAV04 ..> NAV03 : [Acción Contextual: Crear Proyecto]
+
+NAV05 -right-> NAV06 : Inspeccionar y Clasificar RFC
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nVisto Bueno de Gestión
+NAV06 ..> NAV12 : [Condición: Autorizada]\nEmitir Orden ECN
+
+NAV24 -right-> NAV25 : Inspeccionar Ticket
+NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
+
+@enduml

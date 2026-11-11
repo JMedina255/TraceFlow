@@ -1,0 +1,31 @@
+@startuml DG-SEQ-01
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-01: Gestionar usuarios y roles (CU-01)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Usuarios del sistema" as Usuario
+
+Admin -> Sistema: 1. Seleccionar opción de gestión de usuarios y roles
+Sistema --> Admin: 2. Presentar directorio de usuarios y catálogo de roles canónicos
+Admin -> Sistema: 3. Ingresar datos de identidad y seleccionar rol oficial
+Sistema -> Sistema: 4. Validar campos, unicidad de correo y rol oficial (RN-01)
+Sistema -> Sistema: 5. Registrar usuario, asociar permisos RBAC y activar cuenta
+Sistema --> Admin: 6. Confirmar registro exitoso en pantalla
+Sistema --> Usuario: 6. Remitir notificación con credenciales de acceso iniciales
+
+alt A1: Modificación de rol a usuario existente
+  Admin -> Sistema: Solicitar cambio de rol a usuario registrado
+  Sistema -> Sistema: Actualizar privilegios RBAC manteniendo historial
+  Sistema --> Admin: Confirmar actualización de permisos
+else A2: Desactivación lógica de cuenta
+  Admin -> Sistema: Solicitar desactivación de cuenta de usuario
+  Sistema -> Sistema: Bloquear acceso conservando registros históricos
+  Sistema --> Admin: Confirmar desactivación de cuenta
+end
+
+@enduml

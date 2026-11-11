@@ -1,0 +1,22 @@
+@startuml DG-SEQ-08
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
+
+actor "CCB / Autoridad Delegada" as Autoridad
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+
+Autoridad -> Sistema: 1. Seleccionar RFC en estado 'Autorizada'
+Sistema --> Autoridad: 2. Presentar formulario de formalización de ECN/ECO con antecedentes
+Autoridad -> Sistema: 3. Ingresar asignación de Desarrollador, plazos máximos y alcance de cambio
+Sistema -> Sistema: 4. Validar autorización formal vigente y rol activo del Desarrollador (RN-01)
+Sistema -> Sistema: 5. Expedir ECN/ECO con código unívoco y actualizar estado a 'Orden Emitida'
+Sistema --> Admin: 6. Notificar formalmente la emisión de orden para proceder con Check-Out
+Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
+
+@enduml

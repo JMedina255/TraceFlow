@@ -328,7 +328,11 @@ La arquitectura física de TraceFlow SCM adopta una topología de tres capas fí
 ## 3.2 Diagrama DG-D01: Arquitectura Física de TraceFlow SCM
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D01.png` (destinado a `docs/assets/diagramas/render/DG-D01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D01. Arquitectura Física de Software de TraceFlow SCM**
+
+![Figura DG-D01 — Arquitectura Física de Software de TraceFlow SCM](assets/diagramas/render/diseno/DG-D01.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D01.*
 
 ```plantuml
 @startuml
@@ -463,7 +467,11 @@ Para evitar la degradación arquitectónica hacia un monolito enredado (*Big Bal
 ## 4.4 Diagrama DG-D02: Componentes del Monolito Modular
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D02.png` (destinado a `docs/assets/diagramas/render/DG-D02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D02. Componentes del Monolito Modular Backend (MOD-01 a MOD-09)**
+
+![Figura DG-D02 — Componentes del Monolito Modular Backend (MOD-01 a MOD-09)](assets/diagramas/render/diseno/DG-D02.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D02.*
 
 ```plantuml
 @startuml
@@ -724,7 +732,11 @@ No se crea ninguna tabla sin trazabilidad directa a una entidad conceptual o a u
 ## 7.2 Diagrama DG-D03: Modelo Relacional Lógico de TraceFlow SCM
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D03.png` (destinado a `docs/assets/diagramas/render/DG-D03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D03. Modelo Relacional Lógico de Base de Datos - TraceFlow SCM**
+
+![Figura DG-D03 — Modelo Relacional Lógico de Base de Datos - TraceFlow SCM](assets/diagramas/render/diseno/DG-D03.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D03.*
 
 ```plantuml
 @startuml
@@ -1101,10 +1113,15 @@ Una vez que un archivo se promueve a las bibliotecas `soporte` o `maestra`, el a
 ## 8.3 Diagrama DG-D04: Arquitectura de Storage y Bibliotecas
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D04.png` (destinado a `docs/assets/diagramas/render/DG-D04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D04. Arquitectura de Storage y Transición entre las 3 Bibliotecas SCM**
+
+![Figura DG-D04 — Arquitectura de Storage y Transición entre las 3 Bibliotecas SCM](assets/diagramas/render/diseno/DG-D04.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D04.*
 
 ```plantuml
 @startuml
+allowmixing
 skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Arial
@@ -1354,7 +1371,11 @@ Conforme a lo resuelto en **ADR-006**, el sistema implementa sesiones opacas ges
 ## 10.3 Diagrama DG-D05: Flujo Técnico de Autenticación y Autorización
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D05.png` (destinado a `docs/assets/diagramas/render/DG-D05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D05. Flujo Técnico de Autenticación, RBAC y Segregación de Funciones (SoD)**
+
+![Figura DG-D05 — Flujo Técnico de Autenticación, RBAC y Segregación de Funciones (SoD)](assets/diagramas/render/diseno/DG-D05.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D05.*
 
 ```plantuml
 @startuml
@@ -1479,7 +1500,11 @@ En estricta sujeción a las baselines de análisis (`FD03` v1.0, `FD04` v1.1, `T
 ### DG-DSEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-04.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-04. Registrar Solicitud de Cambio (RFC) (CU-04)**
+
+![Figura DG-DSEQ-04 — Registrar Solicitud de Cambio (RFC) (CU-04)](assets/diagramas/render/diseno/DG-DSEQ-04.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-04.*
 
 ```plantuml
 @startuml
@@ -1526,7 +1551,11 @@ UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 ### DG-DSEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-08.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-08. Emitir Orden de Cambio (ECN/ECO) (CU-08)**
+
+![Figura DG-DSEQ-08 — Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/diagramas/render/diseno/DG-DSEQ-08.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-08.*
 
 ```plantuml
 @startuml
@@ -1575,7 +1604,11 @@ UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 ### DG-DSEQ-10: Efectuar Check-Out con Bloqueo de Sincronización (CU-10, CU-11, RN-06)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-10** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-10.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-10.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-10. Efectuar Check-Out y Bloqueo de Sincronización (CU-10, CU-11, RN-06)**
+
+![Figura DG-DSEQ-10 — Efectuar Check-Out y Bloqueo de Sincronización (CU-10, CU-11, RN-06)](assets/diagramas/render/diseno/DG-DSEQ-10.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-10.*
 
 ```plantuml
 @startuml
@@ -1633,7 +1666,11 @@ end
 ### DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RF-17, RN-09)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-12** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-12.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-12.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-12. Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RN-09)**
+
+![Figura DG-DSEQ-12 — Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RN-09)](assets/diagramas/render/diseno/DG-DSEQ-12.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-12.*
 
 ```plantuml
 @startuml
@@ -1725,7 +1762,11 @@ end
 ### DG-DSEQ-17: Certificar Conformidad de Calidad (CU-17, SoD Dinámico)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-17** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-17.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-17.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-17. Certificar Conformidad del Cambio en QA (CU-17, SoD Dinámico)**
+
+![Figura DG-DSEQ-17 — Certificar Conformidad del Cambio en QA (CU-17, SoD Dinámico)](assets/diagramas/render/diseno/DG-DSEQ-17.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-17.*
 
 ```plantuml
 @startuml
@@ -1782,7 +1823,11 @@ end
 ### DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-20** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-20.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-20.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-20. Crear y Congelar Línea Base (CU-20, RN-02, RN-09)**
+
+![Figura DG-DSEQ-20 — Crear y Congelar Línea Base (CU-20, RN-02, RN-09)](assets/diagramas/render/diseno/DG-DSEQ-20.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-20.*
 
 ```plantuml
 @startuml
@@ -1843,7 +1888,11 @@ end
 ### DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-21** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-21.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-21.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-21. Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)**
+
+![Figura DG-DSEQ-21 — Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)](assets/diagramas/render/diseno/DG-DSEQ-21.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-21.*
 
 ```plantuml
 @startuml
@@ -1900,7 +1949,11 @@ UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberad
 ### DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-29** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-29.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-29.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-29. Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)**
+
+![Figura DG-DSEQ-29 — Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)](assets/diagramas/render/diseno/DG-DSEQ-29.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-29.*
 
 ```plantuml
 @startuml
@@ -1954,7 +2007,11 @@ end
 ### DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada Compartida (CU-30, RN-01, RN-05)
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-30** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-30.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-30.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-DSEQ-30. Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05)**
+
+![Figura DG-DSEQ-30 — Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05)](assets/diagramas/render/diseno/DG-DSEQ-30.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-DSEQ-30.*
 
 ```plantuml
 @startuml
@@ -2060,7 +2117,11 @@ El despliegue de TraceFlow SCM adopta el estándar de contenedores OCI mediante 
 ## 13.2 Diagrama DG-D06: Deployment Diagram
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D06.png` (destinado a `docs/assets/diagramas/render/DG-D06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-D06. Diagrama de Despliegue de TraceFlow SCM (Docker / Compose)**
+
+![Figura DG-D06 — Diagrama de Despliegue de TraceFlow SCM (Docker / Compose)](assets/diagramas/render/diseno/DG-D06.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-D06.*
 
 ```plantuml
 @startuml
@@ -2359,7 +2420,11 @@ Se formalizan **28 Nodos Navegacionales Canónicos (`NAV-01` a `NAV-28`)** deriv
 El siguiente diagrama modela el **mapa global de navegación** de TraceFlow SCM, estructurado en **8 subsistemas navegacionales**. Muestra cómo se conectan los accesos perimetrales, los menús de contexto y las transiciones intermodulares sin saturar la vista con detalles internos:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-01.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-01. Modelo General de Navegación de TraceFlow SCM (UWE)**
+
+![Figura DG-UWE-NAV-01 — Modelo General de Navegación de TraceFlow SCM (UWE)](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-01.*
 
 ```plantuml
 @startuml
@@ -2485,7 +2550,11 @@ A continuación se formalizan los **7 modelos de navegación específicos**, mod
 El Solicitante posee un espacio de interacción centrado en originar cambios, subsanar observaciones, verificar tickets de soporte y suscribir la aceptación final (UAT):
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-02.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-02. Modelo de Navegación — Solicitante (PU-01)**
+
+![Figura DG-UWE-NAV-02 — Modelo de Navegación — Solicitante (PU-01)](assets/diagramas/render/uwe/DG-UWE-NAV-02.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-02.*
 
 ```plantuml
 @startuml
@@ -2540,7 +2609,11 @@ NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
 El Analista de Requerimientos / Gestor administra proyectos, clasifica solicitudes, ejerce autorización compartida para Cambios Menores, emite Órdenes de Cambio y deriva incidencias:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-03.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-03. Modelo de Navegación — Analista de Requerimientos / Gestor (PU-02)**
+
+![Figura DG-UWE-NAV-03 — Modelo de Navegación — Analista de Requerimientos / Gestor (PU-02)](assets/diagramas/render/uwe/DG-UWE-NAV-03.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-03.*
 
 ```plantuml
 @startuml
@@ -2603,7 +2676,11 @@ NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
 El Arquitecto / Especialista Técnico cataloga nuevos ECS, elabora el Informe Técnico de Impacto y ejerce la conformidad técnica en la autorización delegada de Cambios Menores:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-04.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-04. Modelo de Navegación — Arquitecto / Especialista Técnico (PU-03)**
+
+![Figura DG-UWE-NAV-04 — Modelo de Navegación — Arquitecto / Especialista Técnico (PU-03)](assets/diagramas/render/uwe/DG-UWE-NAV-04.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-04.*
 
 ```plantuml
 @startuml
@@ -2659,7 +2736,11 @@ NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
 El CCB delibera y vota colegiadamente sobre Cambios Mayores, emite Órdenes de Cambio, audita pistas forenses e inspecciona reportes consolidados:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-05.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-05. Modelo de Navegación — Comité de Control de Cambios (CCB) (PU-04)**
+
+![Figura DG-UWE-NAV-05 — Modelo de Navegación — Comité de Control de Cambios (CCB) (PU-04)](assets/diagramas/render/uwe/DG-UWE-NAV-05.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-05.*
 
 ```plantuml
 @startuml
@@ -2712,7 +2793,11 @@ NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
 El Administrador de Configuración / Bibliotecario es el custodio técnico de las 3 bibliotecas, controla los bloqueos de sincronización (`sync_lock`), ejecuta Check-Out y Check-In, congela Líneas Base, ejecuta rollbacks y gestiona identidades y roles:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-06.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-06. Modelo de Navegación — Administrador de Configuración / Bibliotecario (PU-05)**
+
+![Figura DG-UWE-NAV-06 — Modelo de Navegación — Administrador de Configuración / Bibliotecario (PU-05)](assets/diagramas/render/uwe/DG-UWE-NAV-06.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-06.*
 
 ```plantuml
 @startuml
@@ -2779,7 +2864,11 @@ NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
 El Desarrollador accede a sus órdenes asignadas, obtiene su espacio en la Biblioteca de Trabajo, registra pruebas unitarias locales y corrige defectos reportados por QA:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-07** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-07.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-07.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-07. Modelo de Navegación — Ingeniero de Software / Desarrollador (PU-06)**
+
+![Figura DG-UWE-NAV-07 — Modelo de Navegación — Ingeniero de Software / Desarrollador (PU-06)](assets/diagramas/render/uwe/DG-UWE-NAV-07.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-07.*
 
 ```plantuml
 @startuml
@@ -2827,7 +2916,11 @@ NAV20 ..> NAV15 : Subsanar defecto y preparar versión corregida
 El Equipo de Calidad / Testing valida las órdenes en fase de pruebas sobre la Biblioteca de Soporte, emite certificaciones de conformidad bajo Segregación de Funciones (SoD) y reporta no conformidades:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-08.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-NAV-08. Modelo de Navegación — Equipo de Calidad / Testing (PU-07)**
+
+![Figura DG-UWE-NAV-08 — Modelo de Navegación — Equipo de Calidad / Testing (PU-07)](assets/diagramas/render/uwe/DG-UWE-NAV-08.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-NAV-08.*
 
 ```plantuml
 @startuml
@@ -3008,7 +3101,11 @@ Para garantizar consistencia visual y reutilización arquitectónica, se definen
 El **Shell Global** define el marco estructural envolvente de toda la SPA de TraceFlow SCM. Todas las pantallas autenticadas se alojan dentro de este contenedor compartido, garantizando coherencia de interacción y ergonomía de navegación:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-01.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-01. Estructura General de Presentación — Shell Global**
+
+![Figura DG-UWE-PRES-01 — Estructura General de Presentación — Shell Global](assets/diagramas/render/uwe/DG-UWE-PRES-01.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-01.*
 
 ```plantuml
 @startuml
@@ -3106,7 +3203,11 @@ A continuación se especifica la composición visual interna de los procesos cen
 Derivado del nodo `NAV-01` bajo el patrón `PRES-01`. Representa la ventana de acceso inicial centrada:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-02.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-02. Presentación de Acceso y Autenticación (NAV-01 / PRES-01)**
+
+![Figura DG-UWE-PRES-02 — Presentación de Acceso y Autenticación (NAV-01 / PRES-01)](assets/diagramas/render/uwe/DG-UWE-PRES-02.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-02.*
 
 ```plantuml
 @startuml
@@ -3173,7 +3274,11 @@ Card *-- Feedback
 Derivado del nodo `NAV-02` bajo el patrón `PRES-02`. Adapta sus regiones informativas y tarjetas de acción al rol canónico autenticado:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-03.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-03. Dashboard Adaptativo por Rol Canónico (NAV-02 / PRES-02)**
+
+![Figura DG-UWE-PRES-03 — Dashboard Adaptativo por Rol Canónico (NAV-02 / PRES-02)](assets/diagramas/render/uwe/DG-UWE-PRES-03.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-03.*
 
 ```plantuml
 @startuml
@@ -3263,7 +3368,11 @@ ightarrow$ Ficha de Incidencia (`NAV-25`); Botón "+ Nueva Incidencia" (`CU-23`,
 Derivado del nodo `NAV-06` bajo el patrón `PRES-04`. Constituye el expediente unificado de seguimiento del ciclo de vida de la RFC:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-04.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-04. Detalle y Expediente 360° de RFC (NAV-06 / PRES-04)**
+
+![Figura DG-UWE-PRES-04 — Detalle y Expediente 360° de RFC (NAV-06 / PRES-04)](assets/diagramas/render/uwe/DG-UWE-PRES-04.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-04.*
 
 ```plantuml
 @startuml
@@ -3333,7 +3442,11 @@ Container *-- Actions
 Derivado de los nodos `NAV-07` y `NAV-08` bajo los patrones `PRES-06` (Wizard Multipaso) y `PRES-05` (Formulario Correctivo):
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-05.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-05. Registro y Subsanación de RFC (NAV-07, NAV-08 / PRES-06, PRES-05)**
+
+![Figura DG-UWE-PRES-05 — Registro y Subsanación de RFC (NAV-07, NAV-08 / PRES-06, PRES-05)](assets/diagramas/render/uwe/DG-UWE-PRES-05.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-05.*
 
 ```plantuml
 @startuml
@@ -3426,7 +3539,11 @@ Se establecen patrones de presentación diferenciados para las dos vías decisio
 Derivado de `NAV-10` bajo el patrón `PRES-07`. Modela la consola de deliberación y votación colegiada para Cambios Mayores (`CU-07`):
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-06.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-06. Panel de Deliberación CCB (NAV-10 / PRES-07)**
+
+![Figura DG-UWE-PRES-06 — Panel de Deliberación CCB (NAV-10 / PRES-07)](assets/diagramas/render/uwe/DG-UWE-PRES-06.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-06.*
 
 ```plantuml
 @startuml
@@ -3495,7 +3612,11 @@ CCB *-- Resolution
 Derivado de `NAV-11` bajo el patrón `PRES-07`. Modela el mecanismo de **Doble Llave Operativa** (`CU-30`, `RN-01`, `RN-05`):
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-07** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-07.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-07.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-07. Autorización Delegada de Cambio Menor — Doble Llave (NAV-11 / PRES-07)**
+
+![Figura DG-UWE-PRES-07 — Autorización Delegada de Cambio Menor — Doble Llave (NAV-11 / PRES-07)](assets/diagramas/render/uwe/DG-UWE-PRES-07.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-07.*
 
 ```plantuml
 @startuml
@@ -3560,7 +3681,11 @@ Container *-- FinalState
 Derivado de `NAV-14` y `NAV-15` bajo el patrón `PRES-08`. Estructura visualmente la custodia física entre las 3 bibliotecas:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-08.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-08. Detalle de ECS y Estructura de Bibliotecas SCM (NAV-14, 15 / PRES-08)**
+
+![Figura DG-UWE-PRES-08 — Detalle de ECS y Estructura de Bibliotecas SCM (NAV-14, 15 / PRES-08)](assets/diagramas/render/uwe/DG-UWE-PRES-08.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-08.*
 
 ```plantuml
 @startuml
@@ -3628,7 +3753,11 @@ Explorer *-- ECSCard
 Derivado de `NAV-16` y `NAV-17` bajo el patrón `PRES-08`. Modela las transferencias entre bibliotecas y el control de bloqueos:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-09** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-09.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-09.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-09. Operaciones SCM — Check-Out y Check-In (NAV-16, 17 / PRES-08)**
+
+![Figura DG-UWE-PRES-09 — Operaciones SCM — Check-Out y Check-In (NAV-16, 17 / PRES-08)](assets/diagramas/render/uwe/DG-UWE-PRES-09.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-09.*
 
 ```plantuml
 @startuml
@@ -3686,7 +3815,11 @@ ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
 Derivado de `NAV-19` y `NAV-20` bajo el patrón `PRES-08` y `PRES-05`. Cubre los casos de uso `CU-16`, `CU-17`, `CU-18` y `CU-19`:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-10** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-10.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-10.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-10. Consola QA y Gestión de No Conformidades (NAV-19, 20 / PRES-08, 05)**
+
+![Figura DG-UWE-PRES-10 — Consola QA y Gestión de No Conformidades (NAV-19, 20 / PRES-08, 05)](assets/diagramas/render/uwe/DG-UWE-PRES-10.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-10.*
 
 ```plantuml
 @startuml
@@ -3750,7 +3883,11 @@ QAContainer *-- DecisionBar
 Derivado de `NAV-21` bajo el patrón `PRES-07`. Modela la suscripción del acta por el Solicitante (`CU-29`, `RN-09`):
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-11** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-11.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-11.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-11. Centro de Suscripción de Acta UAT (NAV-21 / PRES-07)**
+
+![Figura DG-UWE-PRES-11 — Centro de Suscripción de Acta UAT (NAV-21 / PRES-07)](assets/diagramas/render/uwe/DG-UWE-PRES-11.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-11.*
 
 ```plantuml
 @startuml
@@ -3812,7 +3949,11 @@ UAT *-- Signature
 Derivado de `NAV-22` y `NAV-23` bajo el patrón `PRES-08`. Separa visual y operativamente el congelamiento de líneas base de la reversión de copias de trabajo:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-12** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-12.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-12.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-12. Gestión de Línea Base y Rollback SCM (NAV-22, 23 / PRES-08)**
+
+![Figura DG-UWE-PRES-12 — Gestión de Línea Base y Rollback SCM (NAV-22, 23 / PRES-08)](assets/diagramas/render/uwe/DG-UWE-PRES-12.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-12.*
 
 ```plantuml
 @startuml
@@ -3887,7 +4028,11 @@ Los nodos `NAV-24` (Bandeja de Incidencias) y `NAV-25` (Detalle de Incidencia) i
 Derivado de `NAV-26` y `NAV-27` bajo los patrones `PRES-03` y `PRES-10`. Garantiza cumplimiento de `RNF-01`, `RNF-03`, `RF-16`, `RF-17` y `RF-18`:
 
 > [!NOTE]
-> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-13** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-13.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-13.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
+**Figura DG-UWE-PRES-13. Auditoría Inmutable y Reportes SCM (NAV-26, 27 / PRES-03, 10)**
+
+![Figura DG-UWE-PRES-13 — Auditoría Inmutable y Reportes SCM (NAV-26, 27 / PRES-03, 10)](assets/diagramas/render/uwe/DG-UWE-PRES-13.svg)
+
+*Fuente: Elaboración propia a partir del modelo PlantUML DG-UWE-PRES-13.*
 
 ```plantuml
 @startuml
@@ -4979,3 +5124,61 @@ La siguiente matriz certifica la **cobertura exhaustiva del 100% de pantallas f�
 > El presente documento se declara formalmente como **FD05 — Documento de Arquitectura de Software (Fase de Diseño) v0.5 (Revisión Candidata — Borrador en Revisión)**.
 > Se certifica la conciliación integral con la Especificación de Requerimientos de Software (SRS v1.1 Candidata), el SAD de Análisis (FD04 v1.2 Candidata) y los 10 registros de decisiones arquitectónicas aprobadas (ADR-001 a ADR-010).
 > **Estado de Aprobación**: Esta revisión constituye un documento de trabajo sujeto a auditoría final y revisión colegiada. **No constituye aprobación formal ni congelamiento oficial como Baseline de Diseño v1.0**, lo cual requerirá la deliberación y resolución expresa del Comité de Control de Cambios (CCB) en la Etapa 07.
+
+
+---
+
+## 21.11 Evidencias Visuales de Implementación en el Prototipo React (Etapa 06)
+
+Como parte de la formalización gráfica y verificación técnica de la Etapa 06, se ejecutó el prototipo React SPA (`prototype/`) en modo preview y se recopiló un catálogo de **17 capturas reales de interfaz** en alta resolución (1440 × 900 píxeles), contrastadas directamente contra los wireframes de baja fidelidad:
+
+| Pantalla | Wireframe | Ruta en Prototipo | Rol Evaluado | Archivo de Captura | Estado de Verificación |
+|---|---|---|---|---|:---:|
+| `SCREEN-01` | `WF-01` | `/login` | Público | [`SCREEN-01_login_institucional.png`](assets/capturas/autenticacion/SCREEN-01_login_institucional.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-01` | [`SCREEN-02_dashboard_solicitante.png`](assets/capturas/dashboard/SCREEN-02_dashboard_solicitante.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-02` | [`SCREEN-02_dashboard_gestor.png`](assets/capturas/dashboard/SCREEN-02_dashboard_gestor.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-04` | [`SCREEN-02_dashboard_ccb.png`](assets/capturas/dashboard/SCREEN-02_dashboard_ccb.png) | ✅ Implementado |
+| `SCREEN-03` | `WF-03` | `/projects` | `PU-02` | [`SCREEN-03_directorio_proyectos_placeholder.png`](assets/capturas/placeholders/SCREEN-03_directorio_proyectos_placeholder.png) | ✅ Implementado |
+| `SCREEN-05` | `WF-05` | `/rfcs` | `PU-02` | [`SCREEN-05_bandeja_general_rfcs.png`](assets/capturas/rfc/SCREEN-05_bandeja_general_rfcs.png) | ✅ Implementado |
+| `SCREEN-06` | `WF-06` | `/rfcs/RFC-2026-0001` | `PU-02` | [`SCREEN-06_expediente_360_rfc.png`](assets/capturas/rfc/SCREEN-06_expediente_360_rfc.png) | ✅ Implementado |
+| `SCREEN-07` | `WF-07` | `/rfcs/new` | `PU-01` | [`SCREEN-07_captura_rfc.png`](assets/capturas/rfc/SCREEN-07_captura_rfc.png) | ✅ Implementado |
+| `SCREEN-07` | `WF-07` | `/rfcs/RFC-2026-0001/edit` | `PU-01` | [`SCREEN-07_subsanacion_rfc.png`](assets/capturas/rfc/SCREEN-07_subsanacion_rfc.png) | ✅ Implementado |
+| `SCREEN-08` | `WF-08` | `/rfcs/RFC-2026-0001/impact-analysis` | `PU-03` | [`SCREEN-08_analisis_impacto_tecnico.png`](assets/capturas/analisis-impacto/SCREEN-08_analisis_impacto_tecnico.png) | ✅ Implementado |
+| `SCREEN-09` | `WF-09` | `/rfcs/RFC-2026-0001/ccb-deliberation` | `PU-04` | [`SCREEN-09_sala_deliberacion_ccb.png`](assets/capturas/ccb/SCREEN-09_sala_deliberacion_ccb.png) | ✅ Implementado |
+| `SCREEN-10` | `WF-10` | `/rfcs/RFC-2026-0002/minor-approval` | `PU-02 / PU-03` | [`SCREEN-10_autorizacion_cambio_menor.png`](assets/capturas/autorizaciones/SCREEN-10_autorizacion_cambio_menor.png) | ✅ Implementado |
+| `SCREEN-12` | `WF-12` | `/ecs` | `PU-05` | [`SCREEN-12_explorador_ecs_placeholder.png`](assets/capturas/placeholders/SCREEN-12_explorador_ecs_placeholder.png) | ✅ Implementado |
+| `SCREEN-13` | `WF-13` | `/scm/operations` | `PU-05` | [`SCREEN-13_operaciones_scm_placeholder.png`](assets/capturas/placeholders/SCREEN-13_operaciones_scm_placeholder.png) | ✅ Implementado |
+| `SCREEN-17` | `WF-17` | `/baselines` | `PU-05` | [`SCREEN-17_lineas_base_placeholder.png`](assets/capturas/placeholders/SCREEN-17_lineas_base_placeholder.png) | ✅ Implementado |
+| `SOPORTE-01` | N/A | `/ruta-inexistente-404` | Multi-rol | [`SOPORTE-01_error_404_not_found.png`](assets/capturas/soporte/SOPORTE-01_error_404_not_found.png) | ✅ Implementado |
+| `SOPORTE-02` | N/A | `/projects` (bajo PU-01) | `PU-01` | [`SOPORTE-02_error_403_access_denied.png`](assets/capturas/soporte/SOPORTE-02_error_403_access_denied.png) | ✅ Implementado |
+
+*Nota:* El índice técnico completo y los metadatos de resolución se encuentran en [`docs/assets/capturas/INDEX.md`](assets/capturas/INDEX.md).
+
+
+---
+
+## 21.11 Evidencias Visuales de Implementación en el Prototipo React (Etapa 06)
+
+Como parte de la formalización gráfica y verificación técnica de la Etapa 06, se ejecutó el prototipo React SPA (`prototype/`) en modo preview y se recopiló un catálogo de **17 capturas reales de interfaz** en alta resolución (1440 × 900 píxeles), contrastadas directamente contra los wireframes de baja fidelidad:
+
+| Pantalla | Wireframe | Ruta en Prototipo | Rol Evaluado | Archivo de Captura | Estado de Verificación |
+|---|---|---|---|---|:---:|
+| `SCREEN-01` | `WF-01` | `/login` | Público | [`SCREEN-01_login_institucional.png`](assets/capturas/autenticacion/SCREEN-01_login_institucional.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-01` | [`SCREEN-02_dashboard_solicitante.png`](assets/capturas/dashboard/SCREEN-02_dashboard_solicitante.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-02` | [`SCREEN-02_dashboard_gestor.png`](assets/capturas/dashboard/SCREEN-02_dashboard_gestor.png) | ✅ Implementado |
+| `SCREEN-02` | `WF-02` | `/dashboard` | `PU-04` | [`SCREEN-02_dashboard_ccb.png`](assets/capturas/dashboard/SCREEN-02_dashboard_ccb.png) | ✅ Implementado |
+| `SCREEN-03` | `WF-03` | `/projects` | `PU-02` | [`SCREEN-03_directorio_proyectos_placeholder.png`](assets/capturas/placeholders/SCREEN-03_directorio_proyectos_placeholder.png) | ✅ Implementado |
+| `SCREEN-05` | `WF-05` | `/rfcs` | `PU-02` | [`SCREEN-05_bandeja_general_rfcs.png`](assets/capturas/rfc/SCREEN-05_bandeja_general_rfcs.png) | ✅ Implementado |
+| `SCREEN-06` | `WF-06` | `/rfcs/RFC-2026-0001` | `PU-02` | [`SCREEN-06_expediente_360_rfc.png`](assets/capturas/rfc/SCREEN-06_expediente_360_rfc.png) | ✅ Implementado |
+| `SCREEN-07` | `WF-07` | `/rfcs/new` | `PU-01` | [`SCREEN-07_captura_rfc.png`](assets/capturas/rfc/SCREEN-07_captura_rfc.png) | ✅ Implementado |
+| `SCREEN-07` | `WF-07` | `/rfcs/RFC-2026-0001/edit` | `PU-01` | [`SCREEN-07_subsanacion_rfc.png`](assets/capturas/rfc/SCREEN-07_subsanacion_rfc.png) | ✅ Implementado |
+| `SCREEN-08` | `WF-08` | `/rfcs/RFC-2026-0001/impact-analysis` | `PU-03` | [`SCREEN-08_analisis_impacto_tecnico.png`](assets/capturas/analisis-impacto/SCREEN-08_analisis_impacto_tecnico.png) | ✅ Implementado |
+| `SCREEN-09` | `WF-09` | `/rfcs/RFC-2026-0001/ccb-deliberation` | `PU-04` | [`SCREEN-09_sala_deliberacion_ccb.png`](assets/capturas/ccb/SCREEN-09_sala_deliberacion_ccb.png) | ✅ Implementado |
+| `SCREEN-10` | `WF-10` | `/rfcs/RFC-2026-0002/minor-approval` | `PU-02 / PU-03` | [`SCREEN-10_autorizacion_cambio_menor.png`](assets/capturas/autorizaciones/SCREEN-10_autorizacion_cambio_menor.png) | ✅ Implementado |
+| `SCREEN-12` | `WF-12` | `/ecs` | `PU-05` | [`SCREEN-12_explorador_ecs_placeholder.png`](assets/capturas/placeholders/SCREEN-12_explorador_ecs_placeholder.png) | ✅ Implementado |
+| `SCREEN-13` | `WF-13` | `/scm/operations` | `PU-05` | [`SCREEN-13_operaciones_scm_placeholder.png`](assets/capturas/placeholders/SCREEN-13_operaciones_scm_placeholder.png) | ✅ Implementado |
+| `SCREEN-17` | `WF-17` | `/baselines` | `PU-05` | [`SCREEN-17_lineas_base_placeholder.png`](assets/capturas/placeholders/SCREEN-17_lineas_base_placeholder.png) | ✅ Implementado |
+| `SOPORTE-01` | N/A | `/ruta-inexistente-404` | Multi-rol | [`SOPORTE-01_error_404_not_found.png`](assets/capturas/soporte/SOPORTE-01_error_404_not_found.png) | ✅ Implementado |
+| `SOPORTE-02` | N/A | `/projects` (bajo PU-01) | `PU-01` | [`SOPORTE-02_error_403_access_denied.png`](assets/capturas/soporte/SOPORTE-02_error_403_access_denied.png) | ✅ Implementado |
+
+*Nota:* El índice técnico completo y los metadatos de resolución se encuentran en [`docs/assets/capturas/INDEX.md`](assets/capturas/INDEX.md).

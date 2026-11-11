@@ -1,0 +1,57 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-08: Detalle de ECS y Estructura de Bibliotecas SCM (NAV-14, 15 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<view>> #FFF5F5
+    BorderColor<<view>> #C53030
+    BackgroundColor<<library>> #FFFFFF
+    BorderColor<<library>> #E53E3E
+    BackgroundColor<<detail>> #FFFFFF
+    BorderColor<<detail>> #4A5568
+}
+
+class "SCMLibrariesExplorer (NAV-15)" as Explorer <<view>> {
+    +projectFilter: ProjectDropdown
+    +searchBar: SearchInput
+}
+
+package "Estructura de las 3 Bibliotecas SCM" as Libs <<library>> {
+    class "Biblioteca de Trabajo (Sandbox)" as LibTrabajo <<library>> {
+        +scope: "Espacio volátil por desarrollador"
+        +isolation: "Copia local de implementación"
+        +itemsListed: Table (ECS en desarrollo activo)
+    }
+
+    class "Biblioteca de Soporte (Staging / QA)" as LibSoporte <<library>> {
+        +scope: "Espacio compartido de pruebas"
+        +stability: "Versiones entregadas para testing"
+        +itemsListed: Table (ECS pendientes de QA / UAT)
+    }
+
+    class "Biblioteca Maestra (Golden Store)" as LibMaestra <<library>> {
+        +scope: "Custodia definitiva inmutable"
+        +stability: "Versiones certificadas en Líneas Base (RN-02)"
+        +itemsListed: Table (ECS congelados y liberados)
+    }
+}
+
+class "ECSDetailCard (Ficha Técnica NAV-14)" as ECSCard <<detail>> {
+    +ecsIdentifier: Text ("ECS-CORE-001 (auth-service.ts)")
+    +ecsCategory: Badge ("Código Fuente Backend")
+    +currentVersion: Badge ("v2.1.0")
+    +currentLibraryBadge: Badge ("Biblioteca de Soporte")
+    +checksumSHA256: CodeTag ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    +lockStatus: LockBadge ("BLOQUEADO (sync_lock: ACTIVE) por PU-06 Dev")
+    +associatedECN: Link ("ECN-2026-0015")
+    +btnViewHistory: ActionButton ("Ver Historial y Diffs (NAV-18)")
+}
+
+Explorer *-- Libs
+Explorer *-- ECSCard
+
+@enduml

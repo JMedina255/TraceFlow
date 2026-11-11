@@ -1,0 +1,44 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)</b>
+
+actor "Solicitante\n(Usuario Final)" as Actor
+participant "React SPA" as UI
+participant "QualityController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "QualityService" as Service
+participant "UatRepoPort" as UatRepo
+database "PostgreSQL" as DB
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Evalúa cambio en entorno controlado de validación y suscribe Acta UAT
+UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/uat-acceptance (SubmitUatDto)
+Ctrl -> Guard : 3. Valida rol canónico SOLICITANTE
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. submitUatAcceptance(ecnId, dto, userId)
+
+Service -> DB : 6. Valida existencia de Certificación QA Conforme previa (RN-09)
+alt Sin certificación previa emitida por Equipo de Calidad
+    Service --> Ctrl : 400 Bad Request: "El cambio no cuenta con certificación QA conforme previa"
+    Ctrl --> UI : 400 Bad Request
+    UI --> Actor : Alerta: No se puede suscribir UAT sin certificación previa de QA
+else Certificación QA Conforme Verificada
+    Service -> UatRepo : 7. Inicia Transacción ACID
+    UatRepo -> DB : 8. INSERT INTO uat_acceptance (change_order_id, result, observations, accepted_by, ...)
+    alt Acta Aceptada Favorablemente
+        Service -> DB : 9a. Persiste conformidad UAT (habilita Check-In definitivo a Maestra)
+    else Acta Rechazada
+        Service -> DB : 9b. Registra rechazo UAT (deriva a re-evaluación o rollback RN-08)
+    end
+    Service -> DB : 10. COMMIT
+    Service -> Audit : 11. logEvent('UAT_REGISTERED', ecnId, userId)
+    Audit -> DB : 12. INSERT INTO audit_log (...)
+    Service --> Ctrl : 13. UatResponseDto
+    Ctrl --> UI : 14. 201 Created
+    UI --> Actor : 15. Presenta Acta de Aceptación suscrita formalmente
+end
+
+@enduml

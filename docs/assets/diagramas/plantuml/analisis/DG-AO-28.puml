@@ -1,0 +1,31 @@
+@startuml DG-AO-28
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Generación de Reportes SCM" as B
+control "Control de Reportes de Configuración" as C
+
+entity "Reporte de Estado de Configuración" as E_REP
+entity "Proyecto" as E_PROY
+entity "Línea Base" as E_LB
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+
+ACT --> B : "selecciona parámetros e indicadores"
+B --> C : "solicita consolidación ejecutiva"
+C --> E_REP : "confecciona reporte formal"
+C --> E_PROY : "recupera métricas de proyecto"
+C --> E_LB : "incluye estado de líneas base"
+C --> E_RFC : "totaliza estados de RFC"
+C --> E_ECN : "analiza órdenes en ejecución"
+E_REP --> E_PROY : "evalúa avance de"
+E_REP o-- "0..*" E_LB : "consolida"
+E_REP o-- "0..*" E_RFC : "reporta estados de"
+E_REP o-- "0..*" E_ECN : "detalla ejecución de"
+
+@enduml

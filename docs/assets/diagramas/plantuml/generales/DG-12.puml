@@ -1,0 +1,161 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+
+class Usuario {
+    - id: Long
+    - nombre: String
+    - email: String
+    - passwordHash: String
+    - rol: RolUsuario
+    - estado: EstadoUsuario
+    + registrar()
+    + autenticar()
+    + asignarRol(rol: RolUsuario)
+}
+
+enum RolUsuario {
+    SOLICITANTE
+    ANALISTA_REQUERIMIENTOS
+    ARQUITECTO
+    CCB
+    ADMIN_CONFIGURACION
+    INGENIERO_SOFTWARE
+    EQUIPO_CALIDAD
+}
+
+class Proyecto {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - descripcion: String
+    - cliente: String
+    - estado: EstadoProyecto
+    - fechaCreacion: DateTime
+    + crearProyecto()
+    + consultarProyecto()
+}
+
+class ElementoConfiguracion {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - tipo: TipoECS
+    - rutaArchivo: String
+    - versionActual: String
+    - checksumSHA256: String
+    - estadoBloqueo: EstadoBloqueo
+    - bibliotecaActual: TipoBiblioteca
+    + registrarECS()
+    + verificarIntegridad(): Boolean
+    + bloquear(ordenId: Long)
+    + liberarBloqueo()
+}
+
+enum TipoBiblioteca {
+    TRABAJO
+    SOPORTE
+    MAESTRA
+}
+
+class SolicitudCambio {
+    - id: Long
+    - codigo: String
+    - descripcion: String
+    - justificacion: String
+    - prioridad: Prioridad
+    - estado: EstadoRFC
+    - fechaRegistro: DateTime
+    + registrarRFC()
+    + validar()
+    + subsanar()
+    + evaluarCCB()
+}
+
+class InformeImpacto {
+    - id: Long
+    - impactoArquitectura: String
+    - esfuerzoHoras: Integer
+    - costoEstimado: Decimal
+    - tiempoEstimadoDias: Integer
+    - nivelRiesgo: NivelRiesgo
+    - fechaElaboracion: DateTime
+    + registrarInforme()
+}
+
+class OrdenCambio {
+    - id: Long
+    - codigo: String
+    - fechaEmision: DateTime
+    - estado: EstadoOrden
+    + emitirOrden()
+    + cancelarOrden(motivo: String)
+    + cerrarOrden()
+}
+
+class CertificadoConformidad {
+    - id: Long
+    - resultado: ResultadoPrueba
+    - observaciones: String
+    - fechaCertificacion: DateTime
+    + emitirCertificado()
+}
+
+class NoConformidad {
+    - id: Long
+    - hallazgos: String
+    - severidad: Severidad
+    - fechaRegistro: DateTime
+    + registrarNoConformidad()
+}
+
+class LineaBase {
+    - id: Long
+    - codigo: String
+    - nombre: String
+    - version: String
+    - estado: EstadoLineaBase
+    - fechaCongelacion: DateTime
+    + crearLineaBase()
+    + congelar()
+}
+
+class TicketIncidencia {
+    - id: Long
+    - codigo: String
+    - titulo: String
+    - descripcion: String
+    - estado: EstadoTicket
+    - fechaRegistro: DateTime
+    + registrarTicket()
+    + derivarARFC(): SolicitudCambio
+}
+
+class RegistroAuditoria {
+    - id: Long
+    - accion: String
+    - modulo: String
+    - ipOrigen: String
+    - timestamp: DateTime
+    - hashRegistro: String
+    + registrarEvento()
+}
+
+Usuario "1" --> "*" Proyecto : administra / participa
+Proyecto "1" *-- "*" ElementoConfiguracion : contiene
+Usuario "1" --> "*" SolicitudCambio : solicita
+SolicitudCambio "1" --> "1" ElementoConfiguracion : afecta
+SolicitudCambio "1" --> "0..1" InformeImpacto : tiene
+SolicitudCambio "1" --> "0..1" OrdenCambio : genera
+OrdenCambio "1" --> "0..1" CertificadoConformidad : valida
+OrdenCambio "1" --> "*" NoConformidad : registra
+Proyecto "1" *-- "*" LineaBase : define
+LineaBase "1" o-- "1..*" ElementoConfiguracion : congela
+TicketIncidencia "0..1" --> "0..1" SolicitudCambio : deriva en
+RegistroAuditoria "*" --> "1" Usuario : generado por
+
+@enduml

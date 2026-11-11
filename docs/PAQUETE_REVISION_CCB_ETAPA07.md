@@ -1,13 +1,13 @@
 # PAQUETE FORMAL DE REVISIÓN DOCUMENTAL PARA EL COMITÉ DE CONTROL DE CAMBIOS (CCB)
 ## Proyecto: TraceFlow SCM — Sistema de Gestión de Configuración de Software
 
-> **Código de Expediente CCB:** `PAQ-CCB-ETAPA07-20261112`
-> **Organización Solicitante:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)
+> **Código de Expediente CCB:** `PAQ-CCB-ETAPA07-20261112` (Revisión Corregida v1.0.1 tras Etapa 07-R)
+> **Organización Solicitante:** C-SharkTeam (Medina Quispe, Antayhua Mamani, Loyola Vilca Choque, Rivera Muñoz)
 > **Organización Cliente / Propietaria:** ÉXODO S.A.C.
 > **Fecha de Emisión del Paquete:** 12 de Noviembre de 2026
 > **Rama Documental Sometida:** `docs/alineacion-srs-sad-2026-11-12`
-> **Commit Base de Referencia:** `c4f95bee30dd119848f6ca41c9a97f08e6754a29`
-> **Estado del Trámite:** **SOLICITUD DE REVISIÓN Y DICTAMEN DE LÍNEA BASE FORMAL (PENDIENTE CCB)**
+> **Commit Base de Referencia:** `f2d2e873c4dc746bfdf3d0d8bfde51b41f82a94f` (`f2d2e87`)
+> **Estado del Trámite:** **EXPEDIENTE PREPARADO Y LISTO PARA DELIBERACIÓN FORMAL DEL CCB (PENDIENTE DE DICTAMEN)**
 > **Clasificación:** Confidencial / Gestión de Configuración de Software (IEEE 828-2012)
 
 ---
@@ -38,10 +38,11 @@
 
 El presente paquete consolida las tres revisiones candidatas resultantes del proceso de auditoría y saneamiento técnico desarrollado a lo largo de las Etapas 01 a 07:
 
-1. **`docs/FD03-EPIS-Informe_SRS.md`**: Especificación de Requerimientos de Software — **Revisión Candidata v1.1**.
-2. **`docs/FD04-EPIS-Informe_SAD_Analisis.md`**: Documento de Arquitectura de Software (Fase de Análisis) — **Revisión Candidata v1.2**.
-3. **`docs/FD05-EPIS-Informe_SAD_Diseno.md`**: Documento de Arquitectura de Software (Fase de Diseño) — **Revisión Candidata v0.5**.
-4. **`docs/MAESTRO_CAMBIOS_SRS_SAD.md`**: Archivo Maestro de Control de Cambios Documentales — **Revisión de Trabajo v0.7.0**.
+1. **`docs/FD03-EPIS-Informe_SRS.md`**: Especificación de Requerimientos de Software — **Revisión Candidata v1.1** (Borrador).
+2. **`docs/FD04-EPIS-Informe_SAD_Analisis.md`**: Documento de Arquitectura de Software (Fase de Análisis) — **Revisión Candidata v1.2** (Borrador).
+3. **`docs/FD05-EPIS-Informe_SAD_Diseno.md`**: Documento de Arquitectura de Software (Fase de Diseño) — **Revisión Candidata v0.5** (Borrador).
+4. **`docs/MAESTRO_CAMBIOS_SRS_SAD.md`**: Archivo Maestro de Control de Cambios Documentales — **Revisión de Trabajo v0.7.1** (Borrador de Trabajo).
+5. **`docs/ADENDA_AUDITORIA_ETAPA07R.md`**: Adenda Técnica de Auditoría Correctiva — **Versión v1.0.0** (Instrumento Aclaratorio).
 
 ---
 
@@ -52,7 +53,8 @@ El presente paquete consolida las tres revisiones candidatas resultantes del pro
 | **SRS (`FD03`)** | v1.0 (16/09/2026) | **v1.1** | Borrador en Revisión CCB | J. Medina, R. Antayhua, R. Loyola, A. Rivera |
 | **SAD Análisis (`FD04`)** | v1.0 (16/09/2026) | **v1.2** | Borrador en Revisión CCB | J. Medina, R. Antayhua, R. Loyola, A. Rivera |
 | **SAD Diseño (`FD05`)** | v0.4 (01/10/2026) | **v0.5** | Borrador en Revisión CCB | J. Medina, R. Antayhua, R. Loyola, A. Rivera |
-| **Maestro de Cambios** | v0.1.0 (12/11/2026) | **v0.7.0** | Instrumento de Trazabilidad | C-SharkTeam |
+| **Maestro de Cambios** | v0.1.0 (12/11/2026) | **v0.7.1** | Instrumento de Trazabilidad (Etapa 07-R) | C-SharkTeam |
+| **Adenda Correctiva** | N/A (Nueva) | **v1.0.0** | Instrumento Aclaratorio y Precisión | C-SharkTeam |
 
 > [!IMPORTANT]
 > **Declaración de No Aprobación Prematura**: Las revisiones candidatas v1.1, v1.2 y v0.5 **NO constituyen una nueva línea base oficial aprobada** hasta que el Comité de Control de Cambios (CCB) emita la resolución formal y suscriba el acta de aprobación correspondiente.
@@ -100,26 +102,34 @@ La siguiente matriz certifica la consistencia bidireccional entre todas las capa
 
 ---
 
-## 6. Resultados de la Auditoría de Configuración Funcional (FCA)
+## 6. Resultados de la Auditoría de Configuración Funcional (FCA) — Alcance Documental y de Trazabilidad
 
-1. **Completitud de Requisitos:** Los 18 RF y 9 RNF se encuentran formalmente especificados en el SRS y descompuestos en responsabilidades conceptuales y módulos técnicos.
-2. **Cobertura de Casos de Uso:** Se cerró la brecha histórica de especificaciones incompletas formalizando fichas canónicas para `CU-04.1` (Subsanación de RFC), `CU-29` (Aceptación UAT) y `CU-30` (Autorización de Cambio Menor por Doble Llave).
+> [!NOTE]
+> **Delimitación Estricta del Alcance FCA**: La Auditoría de Configuración Funcional (FCA) conducida en esta etapa evaluó la **completitud, consistencia y trazabilidad documental y de modelado** entre los requerimientos aprobados y los modelos de análisis y diseño. **No constituye una certificación de ejecución funcional en entorno de producción**, ni acredita cobertura empírica automatizada de pruebas end-to-end de los 31 casos de uso sobre infraestructura desplegada.
+
+1. **Completitud y Trazabilidad de Requisitos:** Los 18 RF y 9 RNF se encuentran formalmente especificados en el SRS y descompuestos conceptualmente en el SAD de Análisis y SAD de Diseño, mapeados 1:1 a casos de uso y pantallas.
+2. **Especificación Canónica de Casos de Uso:** Se cerró la brecha histórica de especificaciones incompletas formalizando fichas canónicas completas para `CU-04.1` (Subsanación de RFC), `CU-29` (Aceptación UAT) y `CU-30` (Autorización de Cambio Menor por Doble Llave).
 3. **Gobernanza y Segregación de Funciones (SoD):** Se verificó que ninguna operación crítica del flujo de cambios pueda ser ejecutada en solitario o por actores no autorizados:
    - Solicitante (`PU-01`) no puede aprobar ni clasificar cambios.
    - Gestor (`PU-02`) requiere concurrencia del Especialista (`PU-03`) para Cambios Menores (`RN-05`).
    - Cambios Mayores exigen deliberación y quórum formal del CCB (`PU-04`, `RN-05`).
    - El Desarrollador (`PU-06`) no puede certificar su propia prueba QA (`RN-07`).
-4. **Delimitación de Alcance:** Queda formalmente delimitada la diferencia entre los requisitos de arquitectura del **Sistema Objetivo** (PostgreSQL, Storage transaccional, Nginx) y las capacidades implementadas en el **Prototipo React SPA** (navegación y UI adaptativa).
+4. **Alcance y Límites de las Evidencias del Prototipo:** Las 17 capturas del prototipo React SPA acreditan el renderizado visual, responsividad y control de navegación client-side (`RoleGuard`) para 8 pantallas interactivas y 12 demostrativas. No sustituyen la verificación de transacciones ACID en PostgreSQL ni la lógica de negocio en backend NestJS.
 
 ---
 
-## 7. Resultados de la Auditoría de Configuración Física (PCA)
+## 7. Resultados de la Auditoría de Configuración Física (PCA) — Inventario Documental y Gráfico
 
-1. **Integridad de Fuentes PlantUML:** 114 especificaciones `.puml` auditadas en disco sin errores de sintaxis, organizadas en `generales` (13), `analisis` (65), `diseno` (15) y `uwe` (21).
-2. **Integridad de Renders:** 228 artefactos gráficos (114 `.svg` y 114 `.png`) verificados en disco con tamaño $>0$ bytes (tasa de completitud: 100.0%).
-3. **Preservación de Archivos con Puntos:** `DG-SEQ-04.1` y `DG-AO-04.1` compilados sin truncamiento en todos los formatos.
-4. **Integridad de Enlaces Markdown:** Se inspeccionaron 195 referencias a `assets/` en los documentos principales; se registraron **0 enlaces rotos**.
-5. **Evidencias del Prototipo:** 17 capturas reales generadas mediante Selenium Headless verificadas en disco (1440x900 px, entre 50 KB y 121 KB cada una).
+> [!NOTE]
+> **Delimitación Estricta del Alcance PCA**: La Auditoría de Configuración Física (PCA) verificó la **integridad física de los recursos documentales, archivos de código PlantUML y artefactos renderizados en disco bajo el directorio `docs/`**. **No constituye una auditoría física de infraestructura de producción**, servidores bare-metal, contenedores en ejecución ni almacenamiento distribuido MinIO/S3.
+
+1. **Integridad de Fuentes PlantUML:** 114 especificaciones físicas `.puml` auditadas en disco sin errores de sintaxis, organizadas en `generales` (13), `analisis` (65), `diseno` (15) y `uwe` (21).
+2. **Identificadores Canónicos Únicos vs. Archivos Físicos:** Se identifican **113 identificadores canónicos únicos**. Existe **1 colisión canónica activa (`DG-12`)** debido a la coexistencia del Diagrama de Clases histórico (`generales/DG-12.puml`) y el Modelo Conceptual de Análisis (`analisis/DG-12.puml`), preservados ambos y elevados al CCB en `DOC-030`.
+3. **Integridad de Renders:** 228 artefactos gráficos (114 `.svg` vectoriales y 114 `.png` matriciales) verificados en disco con tamaño $>0$ bytes (tasa de completitud: 100.0% de los modelos definidos).
+4. **Preservación de Nombres Decimales:** `DG-SEQ-04.1` y `DG-AO-04.1` compilados sin truncamiento en todos los formatos.
+5. **Integridad de Enlaces Markdown:** Se inspeccionaron 195 referencias a `assets/` en los documentos principales; se registraron **0 enlaces rotos**.
+6. **Catálogo de Tablas Canónicas:** Se verificaron en disco 15 tablas físicas estructuradas en `docs/TABLES.md` (rango `TB-01` a `TB-14`, incluyendo el decimal `TB-11.1`).
+7. **Evidencias del Prototipo:** 17 capturas reales de pantalla verificadas en disco (1440 × 900 px, en `docs/assets/capturas/`).
 
 ---
 
@@ -194,25 +204,41 @@ Los siguientes hallazgos requieren una decisión o resolución formal por parte 
 
 ## 11. Conciliación de Decisiones Arquitectónicas (ADR-001 a ADR-010)
 
-Se auditó la totalidad de los diez ADRs aprobados en `docs/adr/`. Se ratifica la plena consistencia entre los ADRs y el SAD de Diseño v0.5:
+Se auditó directamente la totalidad de los diez registros de decisión técnica aprobados en `docs/adr/` (fecha formal de aprobación: 2026-10-01). Se ratifica la plena consistencia entre los ADRs originales y el SAD de Diseño v0.5 (§2.1):
 
-- **ADR-001 (Monolito Modular):** Coherente con `DG-D02` y la descomposición en 9 paquetes (`MOD-01` a `MOD-09`).
-- **ADR-002 (React SPA):** Coherente con los modelos UWE (`DG-UWE-NAV`, `DG-UWE-PRES`) y las 20 pantallas físicas.
-- **ADR-004 (PostgreSQL 16):** Coherente con las 22 tablas relacionales formalizadas en `DG-D03`.
-- **ADR-005 (Integridad SHA-256):** Coherente con `RN-09` y las secuencias técnicas `DG-DSEQ-10/12`.
-- **ADR-006 (Autenticación y Sesiones):** Se ratifica formalmente la resolución de la discrepancia previa: rige el esquema de **sesiones opacas con cookies HttpOnly gestionadas por el backend modular**, manteniendo a Keycloak como una alternativa de migración diferida para la fase enterprise.
-- **ADR-007 (Storage y 3 Bibliotecas):** Coherente con `DG-D04` (`staging`, `shared`, `production`).
-- **ADR-010 (Docker Compose y Respaldo):** Coherente con `DG-D06` y la estrategia de respaldo unificado.
+| Código | Título Oficial Aprobado | Decisión Seleccionada | Consistencia con Modelos de Diseño |
+|:---:|---|---|---|
+| **ADR-001** | Adopción del Estilo Arquitectónico Monolito Modular | Monolito modular en un único proceso desplegable con 9 módulos desacoplados (MOD-01 a MOD-09). | Coherente con `DG-D02` (Estructura de Paquetes en 4 capas Clean Architecture). |
+| **ADR-002** | Adopción de Single Page Application (SPA) con React, TypeScript y Vite | Frontend SPA estático sin SSR para los 7 roles autenticados consumiendo API REST. | Coherente con modelos UWE (`DG-UWE-NAV`, `DG-UWE-PRES`) y las 20 pantallas físicas (§20.5). |
+| **ADR-003** | Adopción de Node.js, TypeScript y NestJS como Framework de Backend | Backend modular en NestJS (Node 24 LTS) con inyección de dependencias y OpenAPI (Express descartado). | Coherente con la arquitectura en capas y controladores REST detallados en §9.4. |
+| **ADR-004** | Adopción de PostgreSQL como Motor de Base de Datos Relacional Principal | RDBMS ACID unificado para metadatos, índices condicionales y JSONB para auditoría. | Coherente con el modelo relacional formalizado en `DG-D03` (22 tablas de persistencia). |
+| **ADR-005** | Estrategia de Custodia Híbrida y Abstracción de Almacenamiento para ECS | Desacoplamiento metadatos-binarios mediante puerto `StoragePort` (tránsito por 3 bibliotecas SCM). | Coherente con el diagrama de despliegue de storage `DG-D04` (Development, Controlled, Static). |
+| **ADR-006** | Mecanismo de Autenticación Segura, Sesiones en Servidor y RBAC / SoD | Sesiones opacas en servidor con cookies `HttpOnly` (`SameSite=Strict`) en PostgreSQL; Keycloak diferido. | Coherente con `FD05` §10.2 y guards RBAC; Keycloak formalmente diferido para fase enterprise. |
+| **ADR-007** | Implementación del Bloqueo Lógico Persistente de Sincronización en BD | Bloqueo pesimista condicional en `scm_locks` liberable únicamente por Check-In, Rollback o Cancelación (RN-06). | Coherente con las secuencias técnicas de bloqueo `DG-DSEQ-03` y `DG-DSEQ-04`. |
+| **ADR-008** | Arquitectura de Registro de Auditoría Append-Only en PostgreSQL | Pistas inmutables sin `UPDATE`/`DELETE` para la aplicación, triggers y encadenamiento criptográfico SHA-256. | Coherente con el esquema relacional de auditoría forense inmutable y requerimiento `RF-18`. |
+| **ADR-009** | Adopción de API RESTful con Cargas Útiles JSON y Especificación OpenAPI 3.0 | Contratos RESTful estructurados, DTOs tipados en TypeScript y especificación Swagger/OpenAPI. | Coherente con la matriz exhaustiva de endpoints REST documentada en `FD05` §9.4. |
+| **ADR-010** | Estrategia de Contenerización Docker, Operación y Respaldo de Unidad Lógica | Docker Compose multi-stage, respaldos automáticos diarios y metas de diseño (RTO $\le$ 2h, RPO $\le$ 24h). | Coherente con `DG-D06` (Diagrama de Despliegue Físico) y procedimiento de Disaster Recovery. |
 
 ---
 
-## 12. Propuestas Formales que Modifican Fuentes Aprobadas
+## 12. Propuestas Formales Sometidas a Resolución del CCB
 
-Se elevan formalmente al CCB las siguientes tres propuestas que involucran modificación de acuerdos o fuentes previas:
+Se elevan formalmente al CCB las siguientes cuatro propuestas para su deliberación y dictamen expreso:
 
-1. **Resolución de DG-12:** Aprobar que el identificador canónico `DG-12` designe exclusivamente al *Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)*, disponiendo el archivo o reidentificación del diagrama de clases preliminar como `DG-12-HIST`.
-2. **Enmienda de Gobernanza SSOT:** Aprobar la Sección 15 de `docs/DOCUMENTATION_RULES.md`, autorizando a `docs/assets/diagramas/plantuml/` como repositorio canónico de autoría modular sincronizado con `docs/DIAGRAMS.md`.
-3. **Formalización de Cierre de Casos de Uso:** Aprobar la incorporación formal de `CU-04.1`, `CU-29` y `CU-30` en el catálogo de casos de uso de la línea base SRS, elevando el conteo oficial a **31 Casos de Uso**.
+1. **Resolución Canónica de DG-12 (DOC-030):**
+   Ratificar que el identificador canónico `DG-12` designe de manera unívoca al *Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)* (`analisis/DG-12.puml`), y autorizar la reclasificación o archivo del Diagrama de Clases preliminar (`generales/DG-12.puml`) como `DG-12-HIST` o `DG-CLASS-01`.
+2. **Aprobación de la Enmienda de Gobernanza SSOT Híbrido (DOC-033):**
+   Aprobar formalmente la Sección 15 de `docs/DOCUMENTATION_RULES.md`, reconociendo a los archivos modulares `.puml` en `docs/assets/diagramas/plantuml/` como fuentes de autoría primaria sincronizadas con el compendio maestro `docs/DIAGRAMS.md`.
+3. **Reconocimiento y Convalidación Formal de Decisión ADR-006 (DOC-029):**
+   Convalidar formalmente que la decisión arquitectónica vigente aprobada en `ADR-006` establece sesiones opacas basadas en cookies `HttpOnly` persistidas en servidor (PostgreSQL) y difiere Keycloak, subsanando definitivamente cualquier mención contradictoria en informes históricos de cierre anteriores.
+4. **Elevación de Revisiones Candidatas a Líneas Base Oficiales Aprobadas:**
+   Deliberar la transición formal de las especificaciones candidatas a líneas base aprobadas del proyecto:
+   - `FD03-EPIS-Informe_SRS.md` v1.1 $
+ightarrow$ Línea Base de Requisitos (`BL-REQ-02`), consolidando formalmente 31 Casos de Uso canónicos.
+   - `FD04-EPIS-Informe_SAD_Analisis.md` v1.2 $
+ightarrow$ Línea Base de Análisis (`BL-ARC-02`).
+   - `FD05-EPIS-Informe_SAD_Diseno.md` v0.5 $
+ightarrow$ Línea Base de Diseño (`BL-DSN-01`).
 
 ---
 
@@ -230,11 +256,12 @@ El CCB dispone de los siguientes artefactos verificables en el repositorio:
 
 ## 14. Limitaciones de Verificación Técnicamente Declaradas
 
-En cumplimiento de los principios de honestidad técnica y rigor de auditoría:
+En cumplimiento de los principios de honestidad técnica y rigor de auditoría de configuración (IEEE 828-2012):
 
-1. **Entorno de Demostración Local:** El prototipo navegable React se ejecutó en servidor local Vite (`http://localhost:4173/`). No se han ejecutado pruebas de carga masiva concurrente ni pruebas de latencia geográfica.
-2. **Inyección de Sesión:** Las capturas certifican la composición de pantalla, el layout responsive y el comportamiento del componente `RoleGuard` ante diferentes roles, pero no sustituyen una auditoría de penetración (pentesting) de autenticación backend.
-3. **Pruebas de Estrés RNF:** La disponibilidad del 99.9% y el tiempo de respuesta sub-segundo quedan registrados como **metas y compromisos de diseño arquitectónico**, supeditados a pruebas de estrés en infraestructura pre-productiva.
+1. **Expediente Preparado para Deliberación ≠ Línea Base Aprobada:** La preparación y entrega de este paquete formal de revisión acredita que el acervo documental está conciliado, validado y apto para deliberación, pero **bajo ninguna circunstancia constituye aprobación formal anticipada ni sustituye el voto colegiado del CCB**.
+2. **Alcance Documental de las Auditorías FCA/PCA:** La FCA realizada acredita trazabilidad y correspondencia entre especificaciones y modelos; la PCA acredita el inventario físico de artefactos bajo `docs/`. Ninguna de ellas sustituye las pruebas de aceptación de software en producción ni la auditoría física de infraestructura de servidores o bases de datos reales.
+3. **Entorno de Demostración del Prototipo:** El prototipo navegable React opera con datos en memoria y `localStorage` en servidor local. No se han ejecutado pruebas de concurrencia masiva, estrés de base de datos ni pruebas de penetración (pentesting).
+4. **Metas de Continuidad y Rendimiento RNF:** La disponibilidad del 99.9% (`RNF-02`), tiempos de respuesta sub-segundo (`RNF-06`) y parámetros RTO $\le 2$h / RPO $\le 24$h son **compromisos y metas de diseño arquitectónico**, cuya verificación empírica deberá ejecutarse en la fase de construcción sobre infraestructura física pre-productiva.
 
 ---
 

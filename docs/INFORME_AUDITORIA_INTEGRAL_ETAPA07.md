@@ -12,8 +12,14 @@
 > **Commit Base Inicial Auditado:** `c4f95bee30dd119848f6ca41c9a97f08e6754a29` (`c4f95be`)
 > **Versión del Informe:** `1.0.0`
 > **Estado:** **DICTAMEN DE AUDITORÍA — PAQUETE PREPARADO Y APTO PARA REVISIÓN FORMAL DEL CCB**
+> **Adenda Vinculante:** [docs/ADENDA_AUDITORIA_ETAPA07R.md](ADENDA_AUDITORIA_ETAPA07R.md) (Etapa 07-R: Saneamiento Residual y Precisión de Alcance)
 
 ---
+
+> [!NOTE]
+> **Adenda Técnica Vinculante (Etapa 07-R):**
+> Para la precisión metodológica del alcance estrictamente documental de las evaluaciones FCA y PCA, la rectificación canónica del catálogo de decisiones arquitectónicas (ADR-001 a ADR-010), la ratificación de las versiones formales aprobadas (
+1.0 de TABLES.md, DIAGRAMS.md y DOCUMENTATION_RULES.md) y el inventario exacto de 15 tablas canónicas (TB-01 a TB-14 incluyendo TB-11.1), consúltese la adenda oficial: [docs/ADENDA_AUDITORIA_ETAPA07R.md](ADENDA_AUDITORIA_ETAPA07R.md).
 
 ```
 ========================================================================================

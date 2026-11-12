@@ -1,16 +1,16 @@
 # ARCHIVO MAESTRO DE CONTROL DE CAMBIOS DOCUMENTALES (SRS Y SAD)
 ## Sistema de Gestión de Configuración de Software — TraceFlow SCM
 
-> **Código de Control:** `MAESTRO-SRS-SAD-001`  
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C.  
-> **Equipo Responsable:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)  
-> **Fecha de Creación:** 12 de Noviembre de 2026  
-> **Última Actualización:** 12 de Noviembre de 2026 (Etapa 02 — Auditoría Detallada y Conciliación)  
-> **Rama de Trabajo:** `docs/alineacion-srs-sad-2026-11-12`  
-> **Commit Base de Sincronización:** `6ff6d7e8912be90807c8911ba25584fb77037370` (`6ff6d7e`)  
-> **Versión del Archivo Maestro:** `0.2.0`  
-> **Estado Documental:** **BORRADOR DE TRABAJO (Conciliación Integral Etapa 02 — Pendiente de Aprobación Formal)**  
+> **Código de Control:** `MAESTRO-SRS-SAD-001`
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C.
+> **Equipo Responsable:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)
+> **Fecha de Creación:** 12 de Noviembre de 2026
+> **Última Actualización:** 12 de Noviembre de 2026 (Etapa 05 — Actualización Integral del SAD de Diseño)
+> **Rama de Trabajo:** `docs/alineacion-srs-sad-2026-11-12`
+> **Commit Base de Sincronización:** `6ff6d7e8912be90807c8911ba25584fb77037370` (`6ff6d7e`)
+> **Versión del Archivo Maestro:** `0.5.0`
+> **Estado Documental:** **BORRADOR DE TRABAJO (Alineamiento SAD Diseño Etapa 05 — Pendiente de Aprobación Formal)**
 
 ---
 
@@ -48,12 +48,12 @@
 | **Título del Documento** | Archivo Maestro de Control de Cambios Documentales (Alineación SRS y SAD) |
 | **Identificador Canónico** | `MAESTRO-SRS-SAD-001` |
 | **Fecha de Creación** | 12 de Noviembre de 2026 |
-| **Fecha de Revisión Vigente**| 12 de Noviembre de 2026 (Etapa 02: Auditoría Detallada y Conciliación Integral) |
+| **Fecha de Revisión Vigente**| 12 de Noviembre de 2026 (Etapa 05: Actualización Integral del SAD de Diseño) |
 | **Rama de Trabajo Activa** | `docs/alineacion-srs-sad-2026-11-12` |
 | **Commit Base Verificado** | `6ff6d7e` (`6ff6d7e8912be90807c8911ba25584fb77037370`) |
 | **Repositorio Remoto Oficial** | `https://github.com/JMedina255/TraceFlow` |
-| **Versión del Maestro** | `0.2.0` |
-| **Condición Documental** | **Borrador de trabajo** *(No constituye aprobación definitiva del CCB ni alteración unilateral de líneas base vigentes)* |
+| **Versión del Maestro** | `0.5.0` |
+| **Condición Documental** | **Borrador de trabajo** *(Alineamiento SAD Diseño Etapa 05 — Pendiente de Aprobación Formal por CCB)* |
 | **Clasificación de Seguridad** | Uso Interno / Control de Configuración de Software |
 
 ---
@@ -71,7 +71,7 @@ El ámbito de aplicación de este archivo abarca:
 4. La definición del inventario de diagramas (especificaciones PlantUML y archivos de imagen) y el diseño normativo para la reestructuración de recursos gráficos.
 5. El plan metodológico de ejecución por etapas para las subsanaciones documentales.
 
-> **Declaración de No Sustitución de Procedimientos Formales SCM:**  
+> **Declaración de No Sustitución de Procedimientos Formales SCM:**
 > Este documento actúa como instrumento técnico de orquestación analítica y planificación de cambios documentales. **Bajo ninguna circunstancia sustituye a las Solicitudes de Cambio (RFC), al formato oficial de autorización de cambios (`R-GCSW002`), a las deliberaciones del Comité de Control de Cambios (CCB) ni a las actas formales de auditoría SCM**. Cualquier modificación sustantiva de la línea base aprobada deberá ser canalizada por el flujo formal correspondiente.
 
 ---
@@ -206,8 +206,8 @@ A continuación se presenta el registro oficial consolidado de cambios documenta
 | **`DOC-006`** | `FD03-EPIS-Informe_SRS.md` | Arquitectura Conceptual | Mención del diagrama `DG-13` sin advertencia de obsolescencia. | `FD03` §5 / `TABLES.md` TB-11. `FD04` §13.2 dictaminó formalmente su reemplazo. | Incluir nota técnica de obsolescencia de `DG-13` referenciando el dictamen de `FD04` §13.2. | **Media** | Implementado (SRS v1.1) |
 | **`DOC-007`** | `FD04-EPIS-Informe_SAD_Analisis.md` | Secciones 3.4 y 4.3 | Diagramas `DG-SAD-A01` y `DG-SAD-A02` incrustados únicamente como código `@startuml` sin enlace a imagen. | Líneas 272 y 362 de `FD04`. Faltan imágenes renderizadas. | Extraer fuentes PlantUML, renderizar imágenes `.png` e insertar enlaces estándar en `FD04`. | **Media** | Implementado (SAD v1.2 — Render Etapa 05) |
 | **`DOC-008`** | `FD04-EPIS-Informe_SAD_Analisis.md` | Enlaces a Tablas y Diagramas | Enlaces apuntan a `docs/TABLES.md` y `docs/DIAGRAMS.md` como si `FD04` estuviera en la raíz. | Enlaces de navegación interna en `FD04` hacia `docs/...`. | Corregir rutas relativas internas entre documentos vecinos dentro del directorio `docs/`. | **Baja** | Implementado (SAD v1.2) |
-| **`DOC-009`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Secciones 3 a 20 | 36 enlaces a diagramas de diseño (`DG-D*`, `DG-DSEQ-*`, `DG-UWE-*`) apuntan a archivos `.png` inexistentes. | `FD05` líneas 285, 419, etc. Verificación en disco reporta 36 archivos faltantes. | Renderizar los 36 diagramas a partir del catálogo oficial `docs/DIAGRAMS.md` y alojarlos en recursos. | **Alta** | Confirmado |
-| **`DOC-010`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 1.3 / Arquitectura Física | Contraste entre la arquitectura cliente-servidor formalizada (Node+Postgres) y el prototipo React SPA. | `FD05` §3 vs código en `prototype/src/`. | Aclarar en el SAD que el prototipo React SPA implementa la lógica de interfaz y reglas de la Fase 1/2. | **Media** | Confirmado |
+| **`DOC-009`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Secciones 3 a 20 | 36 enlaces a diagramas de diseño (`DG-D*`, `DG-DSEQ-*`, `DG-UWE-*`) apuntaban a archivos `.png` inexistentes. | `FD05` líneas 285, 419, etc. 36 archivos ausentes. | Inserción de avisos editoriales estandarizados en `FD05` preservando identificadores y PlantUML; inventario preparado para generación en Etapa 06. | **Alta** | Editorialmente Atendido en FD05 v0.5 / Render Pendiente en Etapa 06 |
+| **`DOC-010`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 1.6 / Arquitectura Física | Contraste entre la arquitectura cliente-servidor formalizada (Node+Postgres) y el prototipo React SPA. | `FD05` §1.6 vs código en `prototype/src/`. | Incorporada Sección 1.6 delimitando formalmente la Arquitectura Conceptual, Arquitectura Objetivo y Prototipo Implementado. | **Media** | Implementado (FD05 v0.5) |
 | **`DOC-011`** | `docs/DOCUMENTATION_RULES.md` | Sección 2 | Rutas de archivos en la matriz SSOT desfasadas tras el traslado de documentos FD a `docs/`. | Tabla de responsabilidades de archivo en `DOCUMENTATION_RULES.md` lista `FD03-EPIS...` en raíz. | Actualizar tabla de estructura documental reflejando que los documentos FD residen bajo `docs/`. | **Baja** | Confirmado |
 | **`DOC-012`** | `docs/TABLES.md` | Control de Versiones | Falta registrar las últimas transiciones de los documentos FD y la incorporación del prototipo y auditorías. | Tabla `TB-01`. Último registro asociado a la emisión de diseño v0.4. | Actualizar `TB-01` incorporando las actas `AUD-GCSW-001`, `DIAG-GCSW-001` y la rama de refactor enterprise. | **Media** | Confirmado |
 | **`DOC-013`** | `docs/DIAGRAMS.md` | Organización de Fuentes | 114 diagramas residen en un único archivo Markdown masivo sin archivos `.puml` individuales. | `docs/DIAGRAMS.md` tiene más de 7,000 líneas y 114 bloques `@startuml`. | Modularizar y exportar los diagramas a archivos individuales `.puml` organizados por tipo y documento. | **Alta** | Confirmado |
@@ -221,11 +221,12 @@ A continuación se presenta el registro oficial consolidado de cambios documenta
 | **`DOC-021`** | `FD03-EPIS-Informe_SRS.md` | Sección 6.1.3 | Discrepancia en la nomenclatura de casos de uso (`CUS01..28` vs `CU-01..30`). | Narrativas usan `CUSXX`; normativa `DOCUMENTATION_RULES.md` y `TABLES.md` mandan `CU-XX`. | Adoptar `CU-XX` como identificador canónico principal en todas las especificaciones narrativas. | **Media** | Verificado (SRS v1.1) |
 | **`DOC-022`** | `FD03-EPIS-Informe_SRS.md` / `TABLES` | Sección 5.3 (`TB-06`) | Atribución de autoridad en `RN-03` asignada exclusivamente al Analista omitiendo al Administrador SCM. | `TB-06` línea de RN-03. El Check-In es función operativa del Administrador / Bibliotecario. | Declarar autoridad compartida de `RN-03` entre el Analista de Requerimientos y el Bibliotecario SCM. | **Baja** | Implementado (SRS v1.1) |
 | **`DOC-023`** | `FD03-EPIS-Informe_SRS.md` | Sección 5.1 y 6.1.3 | Falta de trazabilidad explícita del cierre formal exitoso en el requerimiento `RF-14`. | En las narrativas, `RF-14` solo se traza a cancelaciones (`CU-22`). Falta vínculo formal con `CU-20`. | Formalizar el vínculo explícito entre `CU-20` (Línea Base Maestra) y el cierre exitoso de `RF-14`. | **Media** | Verificado (SRS v1.1) |
-| **`DOC-024`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 1.3 y §3 | Ausencia de cláusula delimitadora entre la arquitectura física objetivo (Node/Postgres) y el prototipo React SPA. | `FD05` §3 describe backend y base de datos relacional de producción sin contrastar con `prototype/`. | Incorporar cláusula formal declarando al prototipo como Línea Base Demostrativa de Interfaz y Lógica. | **Alta** | Confirmado |
+| **`DOC-024`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 1.6 y §3 | Ausencia de cláusula delimitadora entre la arquitectura física objetivo (Node/Postgres) y el prototipo React SPA. | `FD05` §3 describe backend y base de datos relacional de producción sin contrastar con `prototype/`. | Incorporada cláusula formal de no falseamiento técnico y delimitación de líneas base demostrativas vs productivas. | **Alta** | Implementado (FD05 v0.5) |
 | **`DOC-025`** | `FD03-EPIS-Informe_SRS.md` | Sección 6.1.3 | Carencia de especificaciones canónicas completas para `CU-04.1`, `CU-29` y `CU-30`. | El cuerpo de `FD03` no incluye las fichas de flujo principal, alternativo y postcondición de estos 3 CUs. | Redactar e integrar las 3 fichas completas bajo la plantilla normativa de casos de uso. | **Alta** | Verificado (SRS v1.1) |
-| **`DOC-026`** | `FD04`, `FD05`, `RULES` | Enlaces internos | Enlaces internos entre documentos dentro de `docs/` utilizan prefijo redundante `docs/...`. | Rutas relativas como `docs/TABLES.md` desde un archivo ubicado dentro de `docs/`. | Estandarizar hipervínculos internos entre documentos hermanos a rutas directas (`TABLES.md`, `DIAGRAMS.md`).| **Baja** | Parcialmente Implementado (SAD v1.2 resuelto; pendiente FD05) |
-| **`DOC-027`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 7 (Seguridad) | Falta explicitar que las guardas RBAC del frontend controlan navegación pero no sustituyen validación backend. | `prototype/src/components/auth/RoleGuard.tsx` opera en cliente. | Documentar la naturaleza client-side de las guardas de interfaz y su contraparte requerida en la API REST. | **Media** | Confirmado |
+| **`DOC-026`** | `FD04`, `FD05`, `RULES` | Enlaces internos | Enlaces internos entre documentos dentro de `docs/` utilizan prefijo redundante `docs/...`. | Rutas relativas como `docs/TABLES.md` desde un archivo ubicado dentro de `docs/`. | Estandarizar hipervínculos internos entre documentos hermanos a rutas directas (`TABLES.md`, `DIAGRAMS.md`).| **Baja** | Implementado (FD04 v1.2 y FD05 v0.5 resueltos) |
+| **`DOC-027`** | `FD05-EPIS-Informe_SAD_Diseno.md` | Sección 10 (Seguridad) | Falta explicitar que las guardas RBAC del frontend controlan navegación pero no sustituyen validación backend. | `prototype/src/components/auth/RoleGuard.tsx` opera en cliente. | Documentada la naturaleza client-side de las guardas de interfaz y la primacía innegociable de la validación en backend NestJS (§10.2). | **Media** | Implementado (FD05 v0.5) |
 | **`DOC-028`** | `docs/gcsw/diagnosticos/` | `R-GCSW006` | Inventario de ECS desactualizado respecto de nuevos artefactos de refactor, auditoría y código. | `ACTA_AUDITORIA_01.md` hallazgo H-02 reporta 24 ECS al corte del commit `a12e44f`. | Actualizar inventario `R-GCSW006` asignando códigos `ECS-TF-25` en adelante a los nuevos componentes. | **Media** | Confirmado |
+| **`DOC-029`** | `docs/adr/ADR-006.md`, `FD05`, Reportes | Sección 2.1 y 10.2 / Reportes de Cierre | Discrepancia en reporte de cierre previo (Etapa 04) que atribuía adopción de Keycloak/JWT a ADR-006, contradiciendo la decisión oficial aprobada que seleccionó Cookie HttpOnly con sesión opaca en PostgreSQL y difirió Keycloak. | ADR-006 §3 y §4 vs Informe Cierre Etapa 04 §4.1. | Reafirmar ADR-006 en SAD de Diseño v0.5 (§2.1 y §10.2), registrar aclaración de seguridad y dejar constancia para rectificación formal de reportes históricos ante el CCB. | **Media** | Subsanado y Aclarado (FD05 v0.5 y Maestro v0.5.0; pendiente convalidación CCB) |
 
 ---
 
@@ -366,3 +367,4 @@ La secuencia de intervención se mantiene según lo establecido:
 | **12/11/2026** | **0.2.0** | C-SharkTeam (Medina, Antayhua, Loyola, Rivera) | Actualización integral de la Etapa 02: rectificación cuantitativa de pantallas (8 interactivas funcionales + 12 placeholders = 20 canónicas), rectificación matemática de diagramas (70 imágenes referenciadas ausentes + 2 modelos en FD04 = 72 pendientes), incorporación de hallazgos DOC-017 a DOC-028, y emisión del informe de auditoría detallado `INF-AUD-SRS-SAD-002`. | Instrucción de Agente — Etapa 02 (Rama `docs/alineacion-srs-sad-2026-11-12`) |
 | **12/11/2026** | **0.3.0** | C-SharkTeam (Medina, Antayhua, Loyola, Rivera) | Actualización de la Etapa 03: aplicación de correcciones y alineamiento integral en `docs/FD03-EPIS-Informe_SRS.md` (Revisión Candidata v1.1 borrador en revisión), resolución de 41 enlaces de figuras relativas (DOC-002/006), tratamiento de 34 diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-006/025), redacción técnica de Viabilidad Ambiental (DOC-020), depuración de contexto (DOC-022), formalización de 31 casos de uso (DOC-003/021/025), delimitación técnica sistema objetivo vs prototipo de 20 pantallas (§1.2, DOC-015/017) y emisión del informe de cierre `INF-CIERRE-SRS-ETAPA03`. | Instrucción de Agente — Etapa 03 (Rama `docs/alineacion-srs-sad-2026-11-12`) |
 | **12/11/2026** | **0.4.0** | C-SharkTeam (Medina, Antayhua, Loyola, Rivera) | Actualización de la Etapa 04: alineamiento y corrección integral de `docs/FD04-EPIS-Informe_SAD_Analisis.md` (Revisión Candidata v1.2), incorporación de Sección 1.6 (delimitación tripartita de arquitectura), Sección 4.5 (catálogo conceptual BCE de 31 casos de uso), notas de estado gráfico para `DG-SAD-A01` y `DG-SAD-A02` (DOC-007), matriz operacional de transiciones de 14 estados en Sección 7.2, resolución de 18 enlaces rotos a `TABLES.md` / `DIAGRAMS.md` / `DOCUMENTATION_RULES.md` (DOC-008, DOC-026), actualización de la declaración de baseline v1.2, publicación del commit inicial en GitHub (`origin/docs/alineacion-srs-sad-2026-11-12`) y emisión del informe de cierre `INF-CIERRE-SAD-ETAPA04`. | Instrucción de Agente — Etapa 04 (Rama `docs/alineacion-srs-sad-2026-11-12`) |
+| **12/11/2026** | **0.5.0** | C-SharkTeam (Medina, Antayhua, Loyola, Rivera) | Actualización integral de la Etapa 05: consolidación del SAD de Diseño en Revisión Candidata v0.5; corrección de metadatos históricos del archivo maestro (bump a v0.5.0); formalización de la delimitación tripartita de arquitectura en FD05 (§1.6: conceptual, objetivo e implementada); saneamiento y conciliación estricta de ADR-001 a ADR-010 con aclaración de ADR-006 (sesión opaca en PostgreSQL con HttpOnly vs Keycloak diferido); tratamiento editorial estandarizado de los 36 diagramas de diseño pendientes de render (DOC-009); formalización de la matriz canónica de 20 pantallas físicas (§20.5: 8 interactivas funcionales vía 9 vistas, 12 demostrativas placeholder y 2 de soporte); acotamiento de parámetros operativos RNF como metas de diseño sin pruebas empíricas en infraestructura física; incorporación de la matriz detallada de operaciones REST en §9.4; incorporación del hallazgo DOC-029; y emisión del informe de cierre `INF-CIERRE-SAD-DISENO-ETAPA05`. | Instrucción de Agente — Etapa 05 (Rama `docs/alineacion-srs-sad-2026-11-12`) |

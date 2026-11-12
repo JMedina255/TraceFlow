@@ -1,12 +1,12 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
-> **Documento de Arquitectura de Software (SAD) — Fase de Diseño**  
-> **Versión:** 0.4 (Borrador de Diseño Controlado — Wireframes de Baja Fidelidad)  
-> **Fecha:** Octubre 2026  
-> **Estado:** BORRADOR DE DISEÑO v0.4 (En proceso de revisión — No congelado como Baseline)  
-> **Repositorio Oficial:** `TraceFlow`  
-> **Organización Cliente:** ÉXODO S.A.C.  
-> **Equipo de Desarrollo:** C-SharkTeam  
+> **Documento de Arquitectura de Software (SAD) — Fase de Diseño**
+> **Versión:** 0.5 (Revisión Candidata — Alineamiento con SRS v1.1, SAD Análisis v1.2 y ADRs)
+> **Fecha:** 12 de Noviembre de 2026
+> **Estado:** BORRADOR EN REVISIÓN (Pendiente de Aprobación Formal por CCB)
+> **Repositorio Oficial:** `TraceFlow`
+> **Organización Cliente:** ÉXODO S.A.C.
+> **Equipo de Desarrollo:** C-SharkTeam
 
 ---
 
@@ -44,6 +44,7 @@
 | **0.2** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Auditoría y Saneamiento Técnico Integral**: Corrección de actores canónicos en secuencias técnicas (DG-DSEQ-10, 12, 17, 20, 21, 30); delimitación de Check-In (CU-12) vs Línea Base (CU-20); incorporación de autorización compartida para CU-30; precisión del flujo de rollback (CU-21 en Biblioteca de Trabajo); saneamiento de erratas de reglas de negocio (RN-08, RN-05, RN-04); aclaración de seguridad (Argon2id como KDF); desacoplamiento de transacciones DB+Storage con estados intermedios y compensación; y acotamiento de RNF-06. |
 | **0.3** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Incorporación de Modelos UWE de Navegación y Presentación**: Formalización de 28 nodos navegacionales (`NAV-01` a `NAV-28`), 8 diagramas de navegación (`DG-UWE-NAV-01` a `08`), 10 patrones de presentación (`PRES-01` a `PRES-10`), 13 diagramas de presentación (`DG-UWE-PRES-01` a `13`), catálogo de 19 pantallas (`SCREEN-01` a `19`), matrices de trazabilidad y accesibilidad/responsive. Saneamiento de semántica de NAV-20, clasificación de NAV-12 y orígenes de CU-20/21. |
 | **0.4** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | **Diseño y Formalización de Wireframes de Baja Fidelidad**: Formalización de 20 pantallas físicas (`SCREEN-01` a `SCREEN-20`) y catálogo de wireframes (`WF-01` a `WF-20`), variantes críticas (`WF-06A/B/C`, `WF-13A/B`), especificación de Shell Global, estados transversales de UI y matriz de trazabilidad cruzada. Saneamiento de erratas v0.3: secuencia UAT -> Check-In Maestra -> Línea Base, bloqueo RN-06 no desactivable, nomenclatura mayor.menor.parche (v1.0.0), delimitación de ejecutor exclusivo para Check-Out/In y división de SCREEN-19/20. |
+| **0.5** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 12/11/2026 | **Alineamiento Integral con Baselines de Análisis (SRS v1.1, SAD v1.2) y Decisiones ADR**: Formalización de delimitación tripartita (§1.6: Arquitectura Conceptual, Objetivo e Implementada); conciliación estricta con ADR-001 a ADR-010 (reafirmación de ADR-006: sesiones opacas en servidor con HttpOnly y PostgreSQL vs alternativas diferidas/rechazadas); tratamiento y avisos editoriales para los 36 diagramas de diseño pendientes de render; formalización de matriz canónica de 20 pantallas físicas (§20.5: 8 interactivas funcionales vía 9 vistas, 12 demostrativas placeholder y 2 de soporte del sistema); acotamiento de parámetros operativos RNF (§13, §14, §15) como compromisos y metas de diseño arquitectónico sin pruebas de laboratorio en infraestructura física; y saneamiento de enlaces y sintaxis matemática. |
 
 ---
 
@@ -55,6 +56,7 @@
    - 1.3 Relación con SRS/SAD de Análisis y Jerarquía de Autoridad
    - 1.4 Relación con las Decisiones Arquitectónicas (ADR-001 a ADR-010)
    - 1.5 Convenciones Documentales y de Notación
+   - 1.6 Delimitación Canónica entre Arquitectura Conceptual, Arquitectura Objetivo y Prototipo Implementado
 2. [Baseline Tecnológica de Diseño](#2-baseline-tecnológica-de-diseño)
    - 2.1 Decisiones Arquitectónicas Aprobadas (ADR-001 a ADR-010)
    - 2.2 Separación entre Decisiones Arquitectónicas y Versiones de Implementación
@@ -88,6 +90,7 @@
    - 9.1 Matriz de Correspondencia Casos de Uso (CU-01 a CU-30, CU-04.1) vs Operaciones API
    - 9.2 Catálogo Preliminar API-DRAFT-v0.2
    - 9.3 Formato Estándar de Errores (RFC 7807)
+   - 9.4 Matriz Detallada de Operaciones REST, Contratos y Cobertura
 10. [Diseño de Seguridad](#10-diseño-de-seguridad)
     - 10.1 Separación entre Autenticación, Autorización y Segregación de Funciones
     - 10.2 Flujo Técnico de Autenticación y Sesión Opaca en Servidor
@@ -113,7 +116,7 @@
 16. [Matriz de Trazabilidad de Diseño](#16-matriz-de-trazabilidad-de-diseño)
     - 16.1 Trazabilidad Componente -> ADR -> MOD -> RF -> RNF -> RN -> CU
 17. [Decisiones Pendientes para la Baseline de Implementación](#17-decisiones-pendientes-para-la-baseline-de-implementación)
-18. [Auditoría SAD de Diseño v0.2](#18-auditoría-sad-de-diseño-v02)
+18. [Auditoría y Control de Calidad del SAD de Diseño](#18-auditoría-y-control-de-calidad-del-sad-de-diseño)
 19. [Modelo UWE de Navegación](#19-modelo-uwe-de-navegación)
     - 19.1 Principios del Modelo de Navegación UWE
     - 19.2 Catálogo de Nodos Navegacionales y Tipología de Vistas
@@ -137,15 +140,16 @@
     - 21.4 Segundo Lote de Wireframes (WF-03 a WF-20)
     - 21.5 Estados Alternativos y Transversales de UI
     - 21.6 Matriz de Trazabilidad Cruzada (SCREEN ↔ WF ↔ NAV ↔ PRES ↔ CU)
+   - 21.7 Declaración de Revisión Candidata (v0.5)
 
 ---
 
 # 1. Introducción
 
 ## 1.1 Propósito
-El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.4)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces, despliegue, navegación, presentación visual y distribución de pantallas (wireframes) del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
+El presente **Documento de Arquitectura de Software — Fase de Diseño (SAD de Diseño, FD05 v0.5)** tiene por objeto formalizar la arquitectura técnica detallada, física, modular, de datos, interfaces, despliegue, navegación, presentación visual y distribución de pantallas (wireframes) del sistema **TraceFlow SCM**, transformando el modelo conceptual aprobado en la fase de análisis en especificaciones técnicas de ingeniería implementables, verificables y listas para la fase de construcción.
 
-Esta versión **v0.4** formaliza exhaustivamente los **Wireframes de Baja Fidelidad (Sección 21)**, cubriendo el catálogo completo de 20 pantallas físicas (`SCREEN-01` a `SCREEN-20`) y 20 wireframes canónicos (`WF-01` a `WF-20`) junto con sus variantes críticas (`WF-06A/B/C`, `WF-13A/B`), incorporando el saneamiento riguroso de v0.3 (secuencia UAT -> Check-In Maestra -> Línea Base, bloqueo RN-06 no desactivable, nomenclatura de versión mayor.menor.parche v1.0.0, ejecutor exclusivo del Bibliotecario para operaciones de custodia y separación de SCREEN-19/20).
+Esta versión **v0.5** consolida la alineación integral con el SRS candidato v1.1, el SAD de Análisis candidato v1.2 y los registros de decisiones arquitectónicas (ADR-001 a ADR-010), formalizando exhaustivamente los **Wireframes de Baja Fidelidad (Sección 21)**, cubriendo el catálogo completo de 20 pantallas físicas (`SCREEN-01` a `SCREEN-20`) y 20 wireframes canónicos (`WF-01` a `WF-20`) junto con sus variantes críticas (`WF-06A/B/C`, `WF-13A/B`), incorporando el saneamiento riguroso de v0.3 (secuencia UAT -> Check-In Maestra -> Línea Base, bloqueo RN-06 no desactivable, nomenclatura de versión mayor.menor.parche v1.0.0, ejecutor exclusivo del Bibliotecario para operaciones de custodia y separación de SCREEN-19/20).
 
 ## 1.2 Alcance
 El alcance de este documento abarca la especificación técnica completa de los 9 módulos de software de TraceFlow SCM:
@@ -165,17 +169,17 @@ El diseño comprende la interfaz de usuario en Single Page Application (SPA), lo
 La arquitectura de diseño se rige por una jerarquía estricta de fuentes de verdad:
 
 ```
-[Nivel 1] Baselines de Análisis Aprobadas (Inmutables)
-          ├── FD03-EPIS-Informe_SRS.md (v1.0 Baseline SRS)
-          │     ├── docs/TABLES.md (TB-01 a TB-14 - SSOT de Datos)
-          │     └── docs/DIAGRAMS.md (DG-01 a DG-12, DG-AO-01..30, DG-SEQ-01..30)
-          └── FD04-EPIS-Informe_SAD_Analisis.md (v1.1 Baseline SAD Análisis)
+[Nivel 1] Baselines de Análisis Aprobadas (En Revisión Candidata)
+          ├── FD03-EPIS-Informe_SRS.md (v1.1 Revisión Candidata SRS)
+          │     ├── TABLES.md (TB-01 a TB-14 - SSOT de Datos)
+          │     └── DIAGRAMS.md (DG-01 a DG-12, DG-AO-01..30, DG-SEQ-01..30)
+          └── FD04-EPIS-Informe_SAD_Analisis.md (v1.2 Revisión Candidata SAD Análisis)
                       ↓
 [Nivel 2] Decisiones Arquitectónicas Aprobadas
           └── docs/adr/ (ADR-001 a ADR-010 y README.md)
                       ↓
 [Nivel 3] Documento de Arquitectura de Software — Fase de Diseño
-          └── FD05-EPIS-Informe_SAD_Diseno.md (v0.2 Borrador Controlado)
+          └── FD05-EPIS-Informe_SAD_Diseno.md (v0.5 Revisión Candidata SAD Diseño)
 ```
 
 ### Regla Fundamental de No Divergencia Silenciosa:
@@ -207,6 +211,39 @@ Los registros de decisión técnica aprobados (`docs/adr/`) constituyen el funda
 
 ---
 
+## 1.6 Delimitación Canónica entre Arquitectura Conceptual, Arquitectura Objetivo y Prototipo Implementado
+
+En cumplimiento de los principios de rigor ingenieril, trazabilidad y transparencia técnica, este SAD de Diseño formaliza una distinción explícita e inviolable entre tres niveles arquitectónicos del sistema:
+
+### A. Arquitectura Conceptual (Modelo Lógico de Análisis — FD04)
+- **Definición**: Representa el modelo formal de negocio y colaboración conceptual sin atarse a detalles de implementación física o tecnologías específicas de despliegue.
+- **Componentes**: 9 subsistemas conceptuales (`MOD-01` a `MOD-09`), 31 casos de uso (`CU-01` a `CU-30`), 7 actores canónicos institucionales (`TB-09`), ciclo de vida de 14 estados de RFC con 20 transiciones operativas (`TB-07`), y modelo de dominio de clases y relaciones conceptuales (`DG-12`).
+- **Propósito**: Servir de especificación funcional pura y contrato de requerimientos para el desarrollo de software.
+
+### B. Arquitectura Objetivo (Sistema de Producción Empresarial — FD05 y ADRs)
+- **Definición**: Define la solución técnica completa de ingeniería planificada para el despliegue productivo corporativo en la organización cliente (ÉXODO S.A.C.), sustentada en los 10 registros de decisiones arquitectónicas aprobadas (`ADR-001` a `ADR-010`).
+- **Componentes Técnicos**:
+  - **Frontend**: Single Page Application (SPA) en React 19 + TypeScript + Vite, estructurada por capas y módulos (`ADR-002`).
+  - **Backend**: Monolito Modular en Node.js 24 LTS + NestJS + TypeScript (`ADR-001`, `ADR-003`), implementando Clean Architecture con separación estricta en 4 capas (Dominio, Aplicación, Adaptadores e Infraestructura).
+  - **Persistencia**: Base de datos relacional PostgreSQL 16 con aislamiento transaccional ACID, triggers de inmutabilidad, índice condicional único para bloqueo de sincronización (`RN-06`) y tablas append-only para auditoría (`ADR-004`, `ADR-007`, `ADR-008`).
+  - **Custodia de Artefactos**: Desacoplamiento mediante interfaz `StoragePort` con implementaciones de adaptadores locales, MinIO u Object Storage (`ADR-005`).
+  - **Seguridad**: Autenticación mediante Cookie `HttpOnly` (`SameSite=Strict`, `Secure`), sesiones opacas en tabla `user_session` de PostgreSQL con expiración por inactividad a los 15 minutos (decisión de seguridad de diseño), y Guards de autorización estricta en backend para RBAC (`RN-01`) y SoD (`RN-04`) (`ADR-006`).
+  - **Interoperabilidad**: API RESTful con contratos OpenAPI 3.0 y gestión de errores normalizada RFC 7807 (`ADR-009`).
+  - **Despliegue y Continuidad**: Contenedores Docker multi-stage, reverse proxy Nginx con balanceo para réplicas stateless y protocolo de respaldo de la Unidad Lógica (`DB + Storage + Manifest`) (`ADR-010`).
+
+### C. Arquitectura Implementada (Prototipo SPA React Demostrativo — `prototype/`)
+- **Definición**: Corresponde a la base de código real desarrollada en el directorio `prototype/`, la cual constituye una **Línea Base Demostrativa de Interfaz y Lógica de Negocio** desarrollada para validar la ergonomía, los flujos navegacionales UWE y las reglas de interacción.
+- **Componentes Reales y Limitaciones**:
+  - **Interfaz de Usuario**: SPA funcional desarrollada con React 19, TypeScript, Vite y Tailwind CSS, compuesta por 20 pantallas canónicas (`SCREEN-01` a `SCREEN-20`). De estas, 8 pantallas son interactivas funcionales (implementadas a través de 9 componentes de vista en `src/features/`), 12 son pantallas demostrativas parametrizadas mediante el componente unificado `ScreenPlaceholder.tsx`, y 2 corresponden a vistas de soporte del sistema (`NotFoundView.tsx` y `AccessDeniedView.tsx`).
+  - **Capa de Persistencia y Mock**: Los datos no se persisten en un servidor PostgreSQL remoto ni en servicios de almacenamiento en la nube; se simulan en memoria y en almacenamiento web local (`localStorage`) mediante el servicio `MockDataService.ts` y el store Zustand (`useDemoStore.ts`).
+  - **Seguridad en Cliente**: La protección de rutas se ejecuta en el navegador mediante los componentes `ProtectedRoute.tsx` y `RoleGuard.tsx`. Esta guarda de frontend proporciona ergonomía de interfaz y control de acceso visual, pero no sustituye ni debe confundirse con la autorización perimetral en backend exigida por ADR-006.
+  - **Infraestructura No Desplegada**: Los servicios Docker, clústeres de base de datos, balanceador Nginx y workers de reconciliación residen en las especificaciones de diseño objetivo de este documento y no constituyen servicios operativos en ejecución dentro del entorno del prototipo.
+
+> [!IMPORTANT]
+> **Regla de Rigor y No Falseamiento Técnico**:
+> Queda expresamente establecido que ninguna sección de este SAD de Diseño presentará los servicios, contenedores o bases de datos de la **Arquitectura Objetivo** como si estuviesen operativos o ejecutándose en el **Prototipo Demostrativo**. Toda afirmación de diseño se interpretará bajo esta nítida delimitación.
+
+
 # 2. Baseline Tecnológica de Diseño
 
 ## 2.1 Decisiones Arquitectónicas Aprobadas (ADR-001 a ADR-010)
@@ -224,6 +261,14 @@ En cumplimiento de la gobernanza técnica de TraceFlow SCM, la siguiente tabla c
 | **ADR-008** | **Auditoría Append-Only en PostgreSQL** | Registro inmutable de eventos con revocación de privilegios `UPDATE` y `DELETE` para el usuario de aplicación, triggers de inmutabilidad y encadenamiento criptográfico con SHA-256. | **APROBADO** |
 | **ADR-009** | **API RESTful + JSON + OpenAPI 3.0** | Comunicación estandarizada sobre HTTPS, verbos semánticos, errores RFC 7807 y especificación OpenAPI generada automáticamente a partir del código. | **APROBADO** |
 | **ADR-010** | **Docker Multi-Stage + Unidad de Respaldo** | Empaquetado reproducible en contenedores OCI, orquestación por Docker Compose con reverse proxy Nginx, réplicas stateless y respaldo coordinado y verificable de la Unidad Lógica (`DB + Storage + Manifest`). | **APROBADO** |
+
+> [!NOTE]
+> **Aclaración Arquitectónica sobre ADR-006 (Autenticación, Sesiones y Autorización)**:
+> En estricto cumplimiento del registro formal `docs/adr/ADR-006.md`, la decisión aprobada establece como único mecanismo oficial la **Cookie HttpOnly con Identificador de Sesión Opaco Almacenado en Servidor (PostgreSQL)**, con revocación instantánea en base de datos, expiración por inactividad de 15 minutos (decisión de seguridad de diseño) y validación de autorización mediante Guards de RBAC y SoD en NestJS.
+> Se deja constancia técnica y documental de que:
+> 1. **Alternativa C (Identity Provider Externo / Keycloak)** fue formalmente **DIFERIDA** como una alternativa de extensión futura para no sobrecargar de complejidad la infraestructura del proyecto en ÉXODO S.A.C.
+> 2. **Alternativas A y B (JWT en localStorage / JWT stateless)** fueron terminantemente **RECHAZADAS** por vulnerabilidad crítica a ataques XSS e imposibilidad de revocación inmediata.
+> 3. Cualquier mención en minutas o reportes históricos de cierre (p. ej. en etapas diagnósticas previas) que sugiriera la adopción de Keycloak o JWT para esta fase responde a una discrepancia documental previa que queda formalmente subsanada y desvirtuada por el presente SAD de Diseño y el Archivo Maestro v0.5.0.
 
 ## 2.2 Separación entre Decisiones Arquitectónicas y Versiones de Implementación
 Para garantizar una arquitectura duradera y evitar la obsolescencia técnica documental, se delimitan estrictamente los dos niveles de decisión:
@@ -282,7 +327,8 @@ La arquitectura física de TraceFlow SCM adopta una topología de tres capas fí
 
 ## 3.2 Diagrama DG-D01: Arquitectura Física de TraceFlow SCM
 
-![DG-D01](../assets/DG-D01.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D01.png` (destinado a `docs/assets/diagramas/render/DG-D01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -299,7 +345,7 @@ node "Dispositivo Cliente (Actor Canónico)" as ClientDevice {
 }
 
 node "Servidor Host / Plataforma de Ejecución (Docker Engine 24+)" as AppServer {
-    
+
     node "Contenedor: Reverse Proxy (Nginx 1.26+)" as NginxContainer {
         component [Nginx Proxy Inverso\\n& Servidor Estático] as NginxEngine
         folder "/usr/share/nginx/html\\n(Activos Estáticos SPA)" as StaticFolder
@@ -416,7 +462,8 @@ Para evitar la degradación arquitectónica hacia un monolito enredado (*Big Bal
 
 ## 4.4 Diagrama DG-D02: Componentes del Monolito Modular
 
-![DG-D02](../assets/DG-D02.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D02.png` (destinado a `docs/assets/diagramas/render/DG-D02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -676,7 +723,8 @@ No se crea ninguna tabla sin trazabilidad directa a una entidad conceptual o a u
 
 ## 7.2 Diagrama DG-D03: Modelo Relacional Lógico de TraceFlow SCM
 
-![DG-D03](../assets/DG-D03.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D03.png` (destinado a `docs/assets/diagramas/render/DG-D03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -969,8 +1017,8 @@ La exclusividad absoluta del bloqueo de sincronización para evitar condiciones 
 ```sql
 -- RESTRICCIÓN ÚNICA CONDICIONAL QUE BLINDA RN-06 A NIVEL DE MOTOR:
 -- Garantiza que jamás existirá más de UN bloqueo en estado ACTIVE para un mismo ECS.
-CREATE UNIQUE INDEX uq_active_sync_lock_per_ecs 
-ON sync_lock (ecs_id) 
+CREATE UNIQUE INDEX uq_active_sync_lock_per_ecs
+ON sync_lock (ecs_id)
 WHERE status = 'ACTIVE';
 ```
 
@@ -1052,7 +1100,8 @@ Una vez que un archivo se promueve a las bibliotecas `soporte` o `maestra`, el a
 
 ## 8.3 Diagrama DG-D04: Arquitectura de Storage y Bibliotecas
 
-![DG-D04](../assets/DG-D04.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D04.png` (destinado a `docs/assets/diagramas/render/DG-D04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1072,7 +1121,7 @@ package "Capa de Dominio & Aplicación" {
         + removeTemporary()
         + computeChecksum()
     }
-    
+
     class "VersionControlService" as VersionService
     VersionService -right-> StoragePort : consume
 }
@@ -1229,6 +1278,50 @@ Toda respuesta de error emitida por la API adopta la especificación RFC 7807 (*
 }
 ```
 
+
+## 9.4 Matriz Detallada de Operaciones REST, Contratos y Cobertura
+
+En cumplimiento de las directrices de auditoría arquitectónica, la siguiente matriz consolida el catálogo integral de operaciones de la API REST de TraceFlow SCM, relacionando formalmente cada endpoint con su verbo HTTP, caso de uso, requerimiento funcional, rol canónico autorizado, estructuras de datos de entrada y salida, y su estado efectivo de implementación (diferenciando los contratos formales de la arquitectura objetivo de aquellos simulados o interactivos en el prototipo React SPA):
+
+| Endpoint | Método | CU | RF | Rol Canónico Autorizado | Datos de Entrada (Params / Body) | Datos de Salida (DTO / Status) | Estado de Implementación |
+| :--- | :---: | :---: | :---: | :--- | :--- | :--- | :---: |
+| `/api/v1/auth/login` | `POST` | N/A | `RF-01` | Todos los Actores | `LoginDto`: `{username, password}` | `Set-Cookie: tf_session`, `UserDto` (`200 OK`) | **Objetivo** (Simulado en `LoginView.tsx` / `useDemoStore`) |
+| `/api/v1/auth/logout` | `POST` | N/A | `RF-01` | Todos los Actores | Cookie `tf_session` | Revocación en DB, `Clear-Cookie` (`200 OK`) | **Objetivo** (Simulado en `useDemoStore`) |
+| `/api/v1/users` | `GET` | `CU-01` | `RF-01` | Administrador de Seguridad | Query: `{role, page, limit}` | `UserListDto` (`200 OK`) | **Objetivo** (Simulado en memoria) |
+| `/api/v1/users` | `POST` | `CU-01` | `RF-01` | Administrador de Seguridad | `CreateUserDto`: `{username, email, role}` | `UserDto` (`201 Created`) | **Objetivo** (Simulado en memoria) |
+| `/api/v1/projects` | `GET` | `CU-02` | `RF-02` | Gestor, CCB, Bibliotecario | Query: `{status, search}` | `ProjectListDto` (`200 OK`) | **Objetivo** (Mock en `useDemoStore`) |
+| `/api/v1/projects` | `POST` | `CU-02` | `RF-02` | Gestor de Configuración | `CreateProjectDto`: `{code, name, desc}` | `ProjectDto` (`201 Created`) | **Objetivo** (Mock en `useDemoStore`) |
+| `/api/v1/projects/{id}` | `GET` | `CU-03` | `RF-02` | Gestor, CCB, Bibliotecario, Arq | Path: `id` | `ProjectDetailDto` (`200 OK`) | **Objetivo** (Mock en `useDemoStore`) |
+| `/api/v1/rfcs` | `GET` | `CU-04` | `RF-03` | Todos (Filtrado por Rol/SoD) | Query: `{status, priority, search}` | `RfcListDto` (`200 OK`) | **Implementado en Prototipo** (`RfcListView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs` | `POST` | `CU-04` | `RF-03` | Solicitante (PU-01) | `CreateRfcDto`: `{title, desc, priority, category, projectId}` | `RfcDto` (`201 Created`) | **Implementado en Prototipo** (`RfcCreateView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}` | `GET` | `CU-04..08`| `RF-03..08`| Todos los Actores | Path: `id` | `RfcExpediente360Dto` (`200 OK`) | **Implementado en Prototipo** (`RfcDetailView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/rectification` | `PATCH` | `CU-04.1`| `RF-04` | Solicitante (PU-01) | `RectifyRfcDto`: `{title, desc, clarificationText}` | `RfcDto` (`200 OK`) | **Implementado en Prototipo** (`RfcEditView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/classify` | `PATCH` | `CU-05` | `RF-05` | Analista de Requerimientos / Gestor | `ClassifyRfcDto`: `{category, priority, assignment}` | `RfcDto` (`200 OK`) | **Implementado en Prototipo** (`RfcDetailView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/impact-assessment` | `POST` | `CU-06` | `RF-06` | Arquitecto / Especialista Técnico | `ImpactAssessmentDto`: `{affectedEcs, effortHours, riskLevel, score}` | `ImpactResultDto` (`201 Created`) | **Implementado en Prototipo** (`RfcImpactAnalysisView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/ccb-resolution` | `POST` | `CU-07` | `RF-07` | Comité de Control de Cambios (CCB) | `CcbVoteDto`: `{decision: 'APROBADA'|'RECHAZADA', quorum, comments}` | `CcbResolutionDto` (`201 Created`) | **Implementado en Prototipo** (`RfcCcbDeliberationView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/minor-approval` | `POST` | `CU-30` | `RF-07` | Gestor Y Arquitecto (Doble Llave) | `MinorApprovalDto`: `{gestorSignature, architectSignature, rationale}` | `ApprovalResultDto` (`200 OK`) | **Implementado en Prototipo** (`RfcMinorApprovalView.tsx` vía `MockDataService`) |
+| `/api/v1/rfcs/{id}/change-order` | `POST` | `CU-08` | `RF-08` | Gestor de Configuración | `CreateEcnDto`: `{rfcId, developerId, targetBaseline, deadLine}` | `EcnDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/projects/{id}/ecs` | `GET` | `CU-09` | `RF-09` | Bibliotecario, Dev, Arq, QA | Path: `id`, Query: `{library}` | `EcsListDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/projects/{id}/ecs` | `POST` | `CU-09` | `RF-09` | Bibliotecario SCM | `CreateEcsDto`: `{code, name, type, library, initialVersion}` | `EcsDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/ecs/{id}/check-out` | `POST` | `CU-10, 11`| `RF-10, 11`| Bibliotecario SCM (Ejecutor) | `CheckOutDto`: `{ecnId, developerId, library: 'Soporte'}` | `SyncLockDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/ecs/{id}/check-in` | `POST` | `CU-12` | `RF-12` | Bibliotecario SCM (Ejecutor) | Multipart: `{file, sha256Checksum, ecnId, variant: 'A'|'B'}` | `EcsVersionDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/ecs/{id}/history` | `GET` | `CU-13` | `RF-13` | Todos los roles técnicos | Path: `id` | `EcsHistoryDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/qa/validations` | `POST` | `CU-16..19`| `RF-15` | Equipo de Calidad (SoD Calidad) | `QaValidationDto`: `{ecnId, testSuiteId, isCompliant, nonConformities}` | `QaCertificationDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/rfcs/{id}/uat-signoff` | `POST` | `CU-29` | `RF-16` | Solicitante (Usuario Final) | `UatSignoffDto`: `{criteriaAccepted: true, signatureHash, comments}` | `UatActaDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/baselines` | `POST` | `CU-20` | `RF-17` | Bibliotecario / Administrador | `CreateBaselineDto`: `{projectId, ecsVersionIds, tag: 'vX.Y.Z'}` | `BaselineDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/ecs/{id}/rollback` | `POST` | `CU-21` | `RF-17` | Bibliotecario / Administrador | `RollbackDto`: `{ecnId, reason}` | `RollbackResultDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/rfcs/{id}/cancel` | `POST` | `CU-22` | `RF-08` | Gestor de Configuración | `CancelRfcDto`: `{justification}` | `RfcDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/incidents` | `GET` | `CU-23` | `RF-18` | Solicitante, Gestor | Query: `{status, priority}` | `IncidentListDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/incidents` | `POST` | `CU-23` | `RF-18` | Solicitante, Gestor | `CreateIncidentDto`: `{title, desc, severity, projectId}` | `IncidentDto` (`201 Created`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/incidents/{id}/link-rfc` | `PATCH` | `CU-24` | `RF-18` | Gestor de Configuración | `LinkRfcDto`: `{rfcId}` | `IncidentDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/incidents/{id}/close` | `PATCH` | `CU-25` | `RF-18` | Gestor de Configuración | `CloseIncidentDto`: `{resolutionNotes}` | `IncidentDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/ecs/inventory` | `GET` | `CU-26` | `RF-14` | Bibliotecario, Dev, QA, Arq | Query: `{library, projectId}` | `EcsInventoryDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/audit/logs` | `GET` | `CU-27` | `RNF-03` | CCB, Bibliotecario, Gestor | Query: `{from, to, userId, action, entityId}` | `AuditLogListDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+| `/api/v1/audit/reports` | `GET` | `CU-28` | `RF-02` | CCB, Bibliotecario, Gestor | Query: `{reportType: 'TRACEABILITY'|'STATUS_ACCOUNTING', projectId}`| `ReportExportDto` (`200 OK`) | **Objetivo** (Simulado en `MockDataService`) |
+
+> **Nota de Cobertura y Trazabilidad Operacional**:
+> Las operaciones marcadas como **Implementado en Prototipo** corresponden a los 8 flujos interactivos canónicos provistos con pantallas activas en React SPA. Las operaciones marcadas como **Objetivo** corresponden a especificaciones completas de diseño para el backend NestJS y base de datos relacional de producción, simuladas a nivel de servicio demostrativo dentro de `MockDataService.ts` en el prototipo.
+
 ---
 
 # 10. Diseño de Seguridad
@@ -1242,6 +1335,12 @@ La seguridad técnica de TraceFlow SCM distingue formalmente tres dimensiones in
    - **SoD en CCB (`CU-07`)**: El usuario en rol `Solicitante` que originó una Solicitud de Cambio tiene prohibido votar o presidir la deliberación colegiada del `Comité de Control de Cambios (CCB)` sobre su propia solicitud.
 
 ## 10.2 Flujo Técnico de Autenticación y Sesión Opaca en Servidor
+
+> [!IMPORTANT]
+> **Delimitación de Seguridad: Guardas de Frontend vs Autorización en Backend**:
+> Conforme a ADR-006 y las buenas prácticas de seguridad de la información:
+> - Las guardas implementadas en el prototipo React SPA (`ProtectedRoute.tsx` y `RoleGuard.tsx`) actúan como **mecanismos de navegación ergonómica y control visual de interfaz** para ocultar o deshabilitar elementos no pertinentes al rol seleccionado.
+> - **El perímetro de seguridad real reside de manera innegociable en el backend NestJS**, donde los decoradores `@Roles()` y los guards (`RolesGuard`, `SodGuard`) validan en cada petición HTTP la sesión opaca persistida en `user_session` y ejecutan las restricciones de RBAC canónico (`RN-01`, `RN-04`) y SoD dinámico.
 Conforme a lo resuelto en **ADR-006**, el sistema implementa sesiones opacas gestionadas en servidor respaldadas por cookies seguras:
 1. El usuario envía sus credenciales (`username` / `password`) mediante `POST /api/v1/auth/login`.
 2. El servicio valida la contraseña comparando el hash calculado mediante la función de derivación de claves Argon2id (RFC 9106).
@@ -1254,7 +1353,8 @@ Conforme a lo resuelto en **ADR-006**, el sistema implementa sesiones opacas ges
 
 ## 10.3 Diagrama DG-D05: Flujo Técnico de Autenticación y Autorización
 
-![DG-D05](../assets/DG-D05.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D05.png` (destinado a `docs/assets/diagramas/render/DG-D05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1378,7 +1478,8 @@ En estricta sujeción a las baselines de análisis (`FD03` v1.0, `FD04` v1.1, `T
 
 ### DG-DSEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)
 
-![DG-DSEQ-04](../assets/DG-DSEQ-04.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-04.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1424,7 +1525,8 @@ UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 
 ### DG-DSEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)
 
-![DG-DSEQ-08](../assets/DG-DSEQ-08.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-08.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1472,7 +1574,8 @@ UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 
 ### DG-DSEQ-10: Efectuar Check-Out con Bloqueo de Sincronización (CU-10, CU-11, RN-06)
 
-![DG-DSEQ-10](../assets/DG-DSEQ-10.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-10** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-10.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-10.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1529,7 +1632,8 @@ end
 
 ### DG-DSEQ-12: Efectuar Check-In de Ítem de Configuración (CU-12, RNF-03, RF-17, RN-09)
 
-![DG-DSEQ-12](../assets/DG-DSEQ-12.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-12** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-12.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-12.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1570,7 +1674,7 @@ else Checksum Válido y Conforme
     Service -> VersionRepo : 8. Inicia Transacción BD 1
     VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, storage_status='PENDING_STORAGE', ...)
     VersionRepo -> DB : 10. COMMIT Transacción 1
-    
+
     alt Variante A: Check-In Técnico (Trabajo -> Soporte para Pruebas QA)
         Service -> Storage : 11a. promote(tempPath, 'soporte', verifiedSha)
         Storage --> Service : Archivo promovido a /storage/soporte/
@@ -1584,7 +1688,7 @@ else Checksum Válido y Conforme
         Service --> Ctrl : 19a. CheckInResponseDto (Puesto a disposición de QA)
         Ctrl --> UI : 20a. 201 Created (Entrega a Soporte conforme)
         UI --> Actor : 21a. Notifica entrega lista para pruebas de QA (CU-16)
-        
+
     else Variante B: Check-In Definitivo (Soporte -> Maestra con Doble Conformidad RN-09)
         Service -> DB : 11b. Valida Certificación QA (CU-17) y Acta UAT (CU-29) (RN-09)
         alt Falta Certificación QA o Acta UAT
@@ -1620,7 +1724,8 @@ end
 
 ### DG-DSEQ-17: Certificar Conformidad de Calidad (CU-17, SoD Dinámico)
 
-![DG-DSEQ-17](../assets/DG-DSEQ-17.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-17** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-17.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-17.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1676,7 +1781,8 @@ end
 
 ### DG-DSEQ-20: Crear y Congelar Línea Base (CU-20, RN-02, RN-09)
 
-![DG-DSEQ-20](../assets/DG-DSEQ-20.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-20** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-20.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-20.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1736,7 +1842,8 @@ end
 
 ### DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)
 
-![DG-DSEQ-21](../assets/DG-DSEQ-21.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-21** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-21.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-21.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1792,7 +1899,8 @@ UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberad
 
 ### DG-DSEQ-29: Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09)
 
-![DG-DSEQ-29](../assets/DG-DSEQ-29.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-29** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-29.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-29.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1845,7 +1953,8 @@ end
 
 ### DG-DSEQ-30: Autorizar Cambio Menor por Vía Delegada Compartida (CU-30, RN-01, RN-05)
 
-![DG-DSEQ-30](../assets/DG-DSEQ-30.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-DSEQ-30** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-DSEQ-30.png` (destinado a `docs/assets/diagramas/render/DG-DSEQ-30.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1950,7 +2059,8 @@ El despliegue de TraceFlow SCM adopta el estándar de contenedores OCI mediante 
 
 ## 13.2 Diagrama DG-D06: Deployment Diagram
 
-![DG-D06](../assets/DG-D06.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-D06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-D06.png` (destinado a `docs/assets/diagramas/render/DG-D06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -1965,9 +2075,9 @@ node "Dispositivo Cliente" as ClientNode <<Device>> {
 }
 
 node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostServer <<Node>> {
-    
+
     node "Red Interna Docker: tf_network (Bridge)" as DockerNet {
-        
+
         node "Contenedor: nginx_proxy" as NginxNode <<Container>> {
             component [Nginx Reverse Proxy\n& SSL Terminator] as NginxComp
             folder "/usr/share/nginx/html\n(Activos Estáticos SPA)" as StaticSPA
@@ -1993,11 +2103,11 @@ node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostS
 
     folder "Volumen Host: tf_pg_data" as PGVolume <<Disk Volume>>
     folder "Volumen Host: tf_ecs_storage" as StorageVolume <<Disk Volume>>
-    
+
     PGServer -down-> PGVolume : Persistencia de Datos
     BackendA -down-> StorageVolume : LocalStorageAdapter
     BackendB -down-> StorageVolume : LocalStorageAdapter
-    
+
     BackupWorker -up-> PGServer : pg_dump (TCP 5432)
     BackupWorker -up-> StorageVolume : Empaquetado tar.gz
 }
@@ -2019,6 +2129,10 @@ BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
 ---
 
 ## 13.3 Análisis de Disponibilidad: Proceso vs Falla Física de Host
+
+> [!NOTE]
+> **Nota de Verificación Operacional (Etapa 05 — Compromisos de Diseño RNF)**:
+> Se declara formalmente que los parámetros operativos de disponibilidad del 99.9% (`RNF-04`), Objetivo de Tiempo de Recuperación de $\le 2$ horas (`RNF-09`), transacciones atómicas (`RNF-03`) y tiempos de respuesta sub-segundo (`RNF-02`) constituyen **objetivos y compromisos de diseño arquitectónico** fundamentados en la topología de contenedores y base de datos relacional. Su validación empírica formal queda programada para las pruebas de carga, estrés y recuperación ante desastres en entorno pre-productivo; no constituyen resultados de laboratorio ejecutados en el prototipo actual en React SPA.
 Conforme a lo evaluado en **ADR-010**, se establece la distinción formal de disponibilidad para no confundir capacidades operativas:
 1. **Alta Disponibilidad ante Fallos de Proceso y Despliegues Sin Inactividad (*Zero-Downtime*)**:
    - Se ejecutan **dos réplicas stateless del backend** detrás de Nginx.
@@ -2136,7 +2250,7 @@ Con el fin de preservar el principio de arquitectura diferida y no tomar decisio
 
 ---
 
-# 18. Auditoría SAD de Diseño v0.2
+# 18. Auditoría y Control de Calidad del SAD de Diseño
 
 Se formaliza la auditoría de control de calidad sobre el presente documento técnico, certificando el saneamiento integral de las observaciones detectadas en la versión preliminar v0.1:
 
@@ -2155,9 +2269,9 @@ Se formaliza la auditoría de control de calidad sobre el presente documento té
 | **AUD-11** | Trazabilidad en ADRs | Existían citas cruzadas imprecisas a RN-08 y atributos no funcionales. | Se sanearon integralmente los archivos `ADR-001`, `ADR-003`, `ADR-005`, `ADR-006`, `ADR-008`, `ADR-009`, `ADR-010` y `README.md`. | **RESUELTO** |
 
 > [!IMPORTANT]
-> **DICTAMEN FORMAL DE ESTADO**:  
-> El presente documento se declara formalmente como **FD05 — SAD DE DISEÑO v0.2 (BORRADOR CONTROLADO)**.  
-> Se certifica la ausencia de observaciones críticas o mayores de coherencia con las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los ADRs aprobados (ADR-001 a ADR-010).  
+> **DICTAMEN FORMAL DE ESTADO**:
+> El presente documento se declara formalmente como **FD05 — SAD DE DISEÑO v0.2 (BORRADOR CONTROLADO)**.
+> Se certifica la ausencia de observaciones críticas o mayores de coherencia con las Baselines de Análisis (FD03 v1.0, FD04 v1.1) y los ADRs aprobados (ADR-001 a ADR-010).
 > **No se congela todavía como Baseline de Diseño v1.0**, manteniéndose como borrador controlado para sustentar el desarrollo del Modelo UWE de Navegación y Presentación.
 
 ---
@@ -2244,7 +2358,8 @@ Se formalizan **28 Nodos Navegacionales Canónicos (`NAV-01` a `NAV-28`)** deriv
 
 El siguiente diagrama modela el **mapa global de navegación** de TraceFlow SCM, estructurado en **8 subsistemas navegacionales**. Muestra cómo se conectan los accesos perimetrales, los menús de contexto y las transiciones intermodulares sin saturar la vista con detalles internos:
 
-![DG-UWE-NAV-01](../assets/DG-UWE-NAV-01.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-01.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2369,7 +2484,8 @@ A continuación se formalizan los **7 modelos de navegación específicos**, mod
 
 El Solicitante posee un espacio de interacción centrado en originar cambios, subsanar observaciones, verificar tickets de soporte y suscribir la aceptación final (UAT):
 
-![DG-UWE-NAV-02](../assets/DG-UWE-NAV-02.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-02.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2423,7 +2539,8 @@ NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
 
 El Analista de Requerimientos / Gestor administra proyectos, clasifica solicitudes, ejerce autorización compartida para Cambios Menores, emite Órdenes de Cambio y deriva incidencias:
 
-![DG-UWE-NAV-03](../assets/DG-UWE-NAV-03.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-03.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2485,7 +2602,8 @@ NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
 
 El Arquitecto / Especialista Técnico cataloga nuevos ECS, elabora el Informe Técnico de Impacto y ejerce la conformidad técnica en la autorización delegada de Cambios Menores:
 
-![DG-UWE-NAV-04](../assets/DG-UWE-NAV-04.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-04.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2540,7 +2658,8 @@ NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
 
 El CCB delibera y vota colegiadamente sobre Cambios Mayores, emite Órdenes de Cambio, audita pistas forenses e inspecciona reportes consolidados:
 
-![DG-UWE-NAV-05](../assets/DG-UWE-NAV-05.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-05.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2592,7 +2711,8 @@ NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
 
 El Administrador de Configuración / Bibliotecario es el custodio técnico de las 3 bibliotecas, controla los bloqueos de sincronización (`sync_lock`), ejecuta Check-Out y Check-In, congela Líneas Base, ejecuta rollbacks y gestiona identidades y roles:
 
-![DG-UWE-NAV-06](../assets/DG-UWE-NAV-06.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-06.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2658,7 +2778,8 @@ NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
 
 El Desarrollador accede a sus órdenes asignadas, obtiene su espacio en la Biblioteca de Trabajo, registra pruebas unitarias locales y corrige defectos reportados por QA:
 
-![DG-UWE-NAV-07](../assets/DG-UWE-NAV-07.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-07** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-07.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-07.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2705,7 +2826,8 @@ NAV20 ..> NAV15 : Subsanar defecto y preparar versión corregida
 
 El Equipo de Calidad / Testing valida las órdenes en fase de pruebas sobre la Biblioteca de Soporte, emite certificaciones de conformidad bajo Segregación de Funciones (SoD) y reporta no conformidades:
 
-![DG-UWE-NAV-08](../assets/DG-UWE-NAV-08.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-NAV-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-NAV-08.png` (destinado a `docs/assets/diagramas/render/DG-UWE-NAV-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2837,9 +2959,9 @@ El **Modelo UWE de Presentación (UML-based Web Engineering — Presentation Mod
 El diseño de presentación se rige por los siguientes principios metodológicos:
 
 ### 1. Distinción Conceptual Canónica
-$$\mathbf{Caso\ de\ Uso\ (CU)} 
-eq \mathbf{Espacio\ Navegacional\ (NAV)} 
-eq \mathbf{Estructura\ de\ Presentacicute{o}n\ (PRES)} 
+$$\mathbf{Caso\ de\ Uso\ (CU)}
+eq \mathbf{Espacio\ Navegacional\ (NAV)}
+eq \mathbf{Estructura\ de\ Presentacicute{o}n\ (PRES)}
 eq \mathbf{Pantalla\ Fcute{\imath}sica\ (SCREEN)}$$
 
 - **Caso de Uso (CU)**: Interacción funcional de negocio transaccional completa (SRS de Análisis).
@@ -2885,7 +3007,8 @@ Para garantizar consistencia visual y reutilización arquitectónica, se definen
 
 El **Shell Global** define el marco estructural envolvente de toda la SPA de TraceFlow SCM. Todas las pantallas autenticadas se alojan dentro de este contenedor compartido, garantizando coherencia de interacción y ergonomía de navegación:
 
-![DG-UWE-PRES-01](../assets/DG-UWE-PRES-01.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-01** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-01.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-01.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -2982,7 +3105,8 @@ A continuación se especifica la composición visual interna de los procesos cen
 ### 20.4.1 Acceso y Autenticación (DG-UWE-PRES-02)
 Derivado del nodo `NAV-01` bajo el patrón `PRES-01`. Representa la ventana de acceso inicial centrada:
 
-![DG-UWE-PRES-02](../assets/DG-UWE-PRES-02.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-02** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-02.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-02.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3048,7 +3172,8 @@ Card *-- Feedback
 ### 20.4.2 Dashboard Adaptativo por Rol (DG-UWE-PRES-03)
 Derivado del nodo `NAV-02` bajo el patrón `PRES-02`. Adapta sus regiones informativas y tarjetas de acción al rol canónico autenticado:
 
-![DG-UWE-PRES-03](../assets/DG-UWE-PRES-03.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-03** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-03.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-03.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3137,7 +3262,8 @@ ightarrow$ Ficha de Incidencia (`NAV-25`); Botón "+ Nueva Incidencia" (`CU-23`,
 ### 20.4.4 Detalle y Expediente 360° de Solicitud de Cambio (DG-UWE-PRES-04)
 Derivado del nodo `NAV-06` bajo el patrón `PRES-04`. Constituye el expediente unificado de seguimiento del ciclo de vida de la RFC:
 
-![DG-UWE-PRES-04](../assets/DG-UWE-PRES-04.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-04** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-04.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-04.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3206,7 +3332,8 @@ Container *-- Actions
 ### 20.4.5 Registro y Subsanación de Solicitudes de Cambio (DG-UWE-PRES-05)
 Derivado de los nodos `NAV-07` y `NAV-08` bajo los patrones `PRES-06` (Wizard Multipaso) y `PRES-05` (Formulario Correctivo):
 
-![DG-UWE-PRES-05](../assets/DG-UWE-PRES-05.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-05** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-05.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-05.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3298,7 +3425,8 @@ Se establecen patrones de presentación diferenciados para las dos vías decisio
 #### A. Sala de Deliberación CCB (DG-UWE-PRES-06)
 Derivado de `NAV-10` bajo el patrón `PRES-07`. Modela la consola de deliberación y votación colegiada para Cambios Mayores (`CU-07`):
 
-![DG-UWE-PRES-06](../assets/DG-UWE-PRES-06.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-06** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-06.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-06.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3366,7 +3494,8 @@ CCB *-- Resolution
 #### B. Autorización Delegada de Cambio Menor (DG-UWE-PRES-07)
 Derivado de `NAV-11` bajo el patrón `PRES-07`. Modela el mecanismo de **Doble Llave Operativa** (`CU-30`, `RN-01`, `RN-05`):
 
-![DG-UWE-PRES-07](../assets/DG-UWE-PRES-07.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-07** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-07.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-07.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3430,7 +3559,8 @@ Container *-- FinalState
 ### 20.4.7 Catálogo de ECS y Estructura de Bibliotecas (DG-UWE-PRES-08)
 Derivado de `NAV-14` y `NAV-15` bajo el patrón `PRES-08`. Estructura visualmente la custodia física entre las 3 bibliotecas:
 
-![DG-UWE-PRES-08](../assets/DG-UWE-PRES-08.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-08** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-08.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-08.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3497,7 +3627,8 @@ Explorer *-- ECSCard
 ### 20.4.8 Operaciones SCM: Check-Out y Check-In (DG-UWE-PRES-09)
 Derivado de `NAV-16` y `NAV-17` bajo el patrón `PRES-08`. Modela las transferencias entre bibliotecas y el control de bloqueos:
 
-![DG-UWE-PRES-09](../assets/DG-UWE-PRES-09.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-09** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-09.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-09.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3554,7 +3685,8 @@ ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
 ### 20.4.9 Consola de Validación QA y No Conformidades (DG-UWE-PRES-10)
 Derivado de `NAV-19` y `NAV-20` bajo el patrón `PRES-08` y `PRES-05`. Cubre los casos de uso `CU-16`, `CU-17`, `CU-18` y `CU-19`:
 
-![DG-UWE-PRES-10](../assets/DG-UWE-PRES-10.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-10** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-10.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-10.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3617,7 +3749,8 @@ QAContainer *-- DecisionBar
 ### 20.4.10 Suscripción de Acta de Aceptación UAT (DG-UWE-PRES-11)
 Derivado de `NAV-21` bajo el patrón `PRES-07`. Modela la suscripción del acta por el Solicitante (`CU-29`, `RN-09`):
 
-![DG-UWE-PRES-11](../assets/DG-UWE-PRES-11.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-11** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-11.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-11.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3678,7 +3811,8 @@ UAT *-- Signature
 ### 20.4.11 Gestión de Líneas Base y Reversión en Trabajo (DG-UWE-PRES-12)
 Derivado de `NAV-22` y `NAV-23` bajo el patrón `PRES-08`. Separa visual y operativamente el congelamiento de líneas base de la reversión de copias de trabajo:
 
-![DG-UWE-PRES-12](../assets/DG-UWE-PRES-12.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-12** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-12.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-12.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3752,7 +3886,8 @@ Los nodos `NAV-24` (Bandeja de Incidencias) y `NAV-25` (Detalle de Incidencia) i
 ### 20.4.13 Auditoría Inmutable y Generador de Reportes SCM (DG-UWE-PRES-13)
 Derivado de `NAV-26` y `NAV-27` bajo los patrones `PRES-03` y `PRES-10`. Garantiza cumplimiento de `RNF-01`, `RNF-03`, `RF-16`, `RF-17` y `RF-18`:
 
-![DG-UWE-PRES-13](../assets/DG-UWE-PRES-13.png)
+> [!NOTE]
+> **Aviso Editorial (Etapa 05 — Estado Gráfico)**: El identificador **DG-UWE-PRES-13** y su especificación PlantUML se conservan íntegros como definición formal de diseño. El renderizado físico del archivo de imagen `DG-UWE-PRES-13.png` (destinado a `docs/assets/diagramas/render/DG-UWE-PRES-13.png` / `.svg`) se encuentra catalogado en el inventario oficial de la Etapa 05 para su generación efectiva en la Etapa 06 (Formalización Gráfica).
 
 ```plantuml
 @startuml
@@ -3843,8 +3978,7 @@ La interfaz de usuario implementa un sistema transversal de estados de retroalim
 
 ## 20.5 Catálogo de Pantallas de la Aplicación (SCREEN-01 a SCREEN-20)
 
-Aplicando el principio fundamental de que **Pantalla $
-eq$ Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentación se sintetizan en **20 Pantallas Físicas Cohesivas (SCREEN-01 a SCREEN-20)**:
+Aplicando el principio fundamental de que **Pantalla \(\neq\) Caso de Uso**, los 28 nodos navegacionales y los 10 patrones de presentación se sintetizan en **20 Pantallas Físicas Cohesivas (SCREEN-01 a SCREEN-20)**:
 
 | SCREEN-ID | Nombre de Pantalla | Nodos NAV Consolidados | Patrón(es) PRES | Actor(es) Canónico(s) | Casos de Uso Gobernados |
 | :---: | :--- | :---: | :---: | :--- | :--- |
@@ -4835,3 +4969,13 @@ La siguiente matriz certifica la **cobertura exhaustiva del 100% de pantallas f�
 | **`WF-18`** | `SCREEN-18` | `NAV-24, 25` | `PRES-03, 04` | `CU-23..25` | Solicitante, Gestor | N/A (Mesa de Incidencias) |
 | **`WF-19`** | `SCREEN-19` | `NAV-26, 27` | `PRES-03, 10` | `CU-27, CU-28` | CCB, Bibliotecario, Gestor | Todos los estados (Auditoría) |
 | **`WF-20`** | `SCREEN-20` | `NAV-28` | `PRES-05` | `CU-01` | Administrador / Bibliotecario | N/A (Administración IAM) |
+
+---
+
+## 21.7 Declaración de Revisión Candidata (v0.5)
+
+> [!IMPORTANT]
+> **DICTAMEN FORMAL DE ESTADO — SAD DE DISEÑO v0.5 (REVISIÓN CANDIDATA)**:
+> El presente documento se declara formalmente como **FD05 — Documento de Arquitectura de Software (Fase de Diseño) v0.5 (Revisión Candidata — Borrador en Revisión)**.
+> Se certifica la conciliación integral con la Especificación de Requerimientos de Software (SRS v1.1 Candidata), el SAD de Análisis (FD04 v1.2 Candidata) y los 10 registros de decisiones arquitectónicas aprobadas (ADR-001 a ADR-010).
+> **Estado de Aprobación**: Esta revisión constituye un documento de trabajo sujeto a auditoría final y revisión colegiada. **No constituye aprobación formal ni congelamiento oficial como Baseline de Diseño v1.0**, lo cual requerirá la deliberación y resolución expresa del Comité de Control de Cambios (CCB) en la Etapa 07.

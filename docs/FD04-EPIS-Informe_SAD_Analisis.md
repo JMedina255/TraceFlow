@@ -1,9 +1,9 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 > **Documento de Arquitectura de Software (SAD) — Fase de Análisis**  
-> **Versión:** 1.1 (Baseline SAD de Análisis — Corregida y Aprobada)  
-> **Fecha:** Octubre 2026  
-> **Estado:** APROBADO  
+> **Versión:** 1.2 (Revisión Candidata — Alineamiento con SRS v1.1 y Prototipo)  
+> **Fecha:** 12 de Noviembre de 2026  
+> **Estado:** BORRADOR EN REVISIÓN (Pendiente de Aprobación Formal por CCB)  
 > **Repositorio Oficial:** `TraceFlow`  
 > **Organización Cliente:** ÉXODO S.A.C.  
 > **Equipo de Desarrollo:** C-SharkTeam  
@@ -42,6 +42,7 @@
 | :---: | :--- | :--- | :--- | :---: | :--- |
 | **1.0** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | Emisión formal y congelamiento de la Baseline del SAD de Análisis (Arquitectura Conceptual y Lógica inicial). |
 | **1.1** | C-SharkTeam (JCM / RAA / RFL / AJR) | Dr. Ricardo Valcarcel Alvarado | Dr. Ricardo Valcarcel Alvarado | 01/10/2026 | Corrección de coherencia y trazabilidad con Baseline SRS; normalización de 3 bibliotecas (Trabajo, Soporte, Maestra), 14 estados oficiales de RFC (TB-07), 9 RN (TB-06), 9 RNF (TB-05), retiro de métricas no normadas y preservación estricta del alcance funcional. |
+| **1.2** | C-SharkTeam (JCM / RAA / RFL / AJR) | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.2: alineamiento con SRS Candidato v1.1, formalización de CU-04.1, CU-29 y CU-30, integración de la matriz de transición de 14 estados, delimitación tripartita de arquitectura (análisis vs objetivo vs prototipo de 20 pantallas), resolución de enlaces a TABLES.md/DIAGRAMS.md (DOC-008), ratificación de modelos DG-SAD-A01/A02 y aviso de obsolescencia de DG-13 (DOC-007/025). |
 
 ---
 
@@ -53,6 +54,7 @@
   - [1.3 Relación con el SRS de Análisis (Baseline de Requerimientos)](#13-relación-con-el-srs-de-análisis-baseline-de-requerimientos)
   - [1.4 Definiciones, Acrónimos y Abreviaturas](#14-definiciones-acrónimos-y-abreviaturas)
   - [1.5 Referencias Documentales y Normativas](#15-referencias-documentales-y-normativas)
+  - [1.6 Delimitación Técnica Tripartita: Arquitectura de Análisis vs. Arquitectura Objetivo vs. Prototipo Demostrativo](#16-delimitación-técnica-tripartita-arquitectura-de-análisis-vs-arquitectura-objetivo-vs-prototipo-demostrativo)
 - [2. Drivers Arquitectónicos](#2-drivers-arquitectónicos)
   - [2.1 Drivers Funcionales (RF-01 a RF-18)](#21-drivers-funcionales-rf-01-a-rf-18)
   - [2.2 Drivers de Calidad (RNF-01 a RNF-09)](#22-drivers-de-calidad-rnf-01-a-rnf-09)
@@ -66,6 +68,7 @@
   - [4.2 Catálogo de los 9 Módulos Arquitectónicos Conceptuales](#42-catálogo-de-los-9-módulos-arquitectónicos-conceptuales)
   - [4.3 Diagrama DG-SAD-A02: Arquitectura Lógica Conceptual de TraceFlow SCM](#43-diagrama-dg-sad-a02-arquitectura-lógica-conceptual-de-traceflow-scm)
   - [4.4 Dependencias e Interacciones entre Módulos Conceptuales](#44-dependencias-e-interacciones-entre-módulos-conceptuales)
+  - [4.5 Modelo de Análisis de Objetos (Patrón BCE) para los 31 Casos de Uso](#45-modelo-de-análisis-de-objetos-patrón-bce-para-los-31-casos-de-uso)
 - [5. Responsabilidades Arquitectónicas](#5-responsabilidades-arquitectónicas)
   - [5.1 MOD-01: Gobernanza y Control de Acceso (Usuarios y Roles)](#51-mod-01-gobernanza-y-control-de-acceso-usuarios-y-roles)
   - [5.2 MOD-02: Gestión de Proyectos](#52-mod-02-gestión-de-proyectos)
@@ -110,10 +113,11 @@
 - [14. Auditoría de Coherencia SRS ↔ SAD y Aprobación de Baseline](#14-auditoría-de-coherencia-srs--sad-y-aprobación-de-baseline)
   - [14.1 Matriz de Coherencia Integral SRS ↔ SAD](#141-matriz-de-coherencia-integral-srs--sad)
   - [14.2 Matriz de Verificación contra Criterios de Calidad Arquitectónica](#142-matriz-de-verificación-contra-criterios-de-calidad-arquitectónica)
-  - [14.3 Declaración Formal de Aprobación (BASELINE SAD DE ANÁLISIS v1.1)](#143-declaración-formal-de-aprobación-baseline-sad-de-análisis-v11)
+  - [14.3 Estado Documental y Declaración de Revisión Candidata (SAD DE ANÁLISIS v1.2)](#143-estado-documental-y-declaración-de-revisión-candidata-sad-de-análisis-v12)
 
 ---
-
+
+
 # 1. Introducción
 
 ### 1.1 Propósito del Documento
@@ -140,13 +144,13 @@ El alcance del sistema en la fase de análisis comprende nueve capacidades conce
 
 ### 1.3 Relación con el SRS de Análisis (Baseline de Requerimientos)
 El SAD de Análisis se sustenta de manera directa y subordinada en el documento **`FD03-EPIS-Informe_SRS.md`**, el cual ha sido formalmente cerrado y congelado como **BASELINE DE ANÁLISIS**. Cada módulo, responsabilidad y escenario arquitectónico responde inequívocamente a los artefactos canónicos del SRS:
-- Los **18 Requerimientos Funcionales (`RF-01` a `RF-18`)** catalogados en `docs/TABLES.md` (`TB-04`).
-- Los **9 Requerimientos No Funcionales (`RNF-01` a `RNF-09`)** catalogados en `docs/TABLES.md` (`TB-05`).
-- Las **9 Reglas de Negocio (`RN-01` a `RN-09`)** catalogadas en `docs/TABLES.md` (`TB-06`).
-- Los **31 Casos de Uso (`CU-01` a `CU-30` y `CU-04.1`)** catalogados en `docs/TABLES.md` (`TB-10`).
+- Los **18 Requerimientos Funcionales (`RF-01` a `RF-18`)** catalogados en `TABLES.md` (`TB-04`).
+- Los **9 Requerimientos No Funcionales (`RNF-01` a `RNF-09`)** catalogados en `TABLES.md` (`TB-05`).
+- Las **9 Reglas de Negocio (`RN-01` a `RN-09`)** catalogadas en `TABLES.md` (`TB-06`).
+- Los **31 Casos de Uso (`CU-01` a `CU-30` y `CU-04.1`)** catalogados en `TABLES.md` (`TB-10`).
 - El **Modelo Conceptual del Dominio (`DG-12`)** y los **31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`)**.
 
-Cualquier discrepancia o ambigüedad detectada durante la elaboración del presente documento fue resuelta aplicando la jerarquía normativa fijada en `docs/DOCUMENTATION_RULES.md` Sección 3, manteniendo a `docs/TABLES.md` y `docs/DIAGRAMS.md` como las Fuentes Únicas de Verdad (SSOT).
+Cualquier discrepancia o ambigüedad detectada durante la elaboración del presente documento fue resuelta aplicando la jerarquía normativa fijada en `DOCUMENTATION_RULES.md` Sección 3, manteniendo a `TABLES.md` y `DIAGRAMS.md` como las Fuentes Únicas de Verdad (SSOT).
 
 ### 1.4 Definiciones, Acrónimos y Abreviaturas
 A continuación se definen los términos técnicos normativos empleados a lo largo del documento:
@@ -174,6 +178,44 @@ A continuación se definen los términos técnicos normativos empleados a lo lar
 | **UAT** | *User Acceptance Testing*: Pruebas de aceptación formal conducidas por el Solicitante/Usuario final para validar la conformidad de la entrega (`CU-29`). |
 | **WORM** | *Write Once, Read Many*: Principio conceptual de persistencia lógica donde los registros de auditoría se insertan cronológicamente y no admiten modificación ni eliminación. |
 
+### 1.6 Delimitación Técnica Tripartita: Arquitectura de Análisis vs. Arquitectura Objetivo vs. Prototipo Demostrativo
+Para garantizar la integridad metodológica del proyecto TraceFlow SCM, erradicar cualquier ambigüedad técnica y preservar la independencia de la fase de análisis conceptual frente a las fases de diseño físico y construcción, se formaliza la diferenciación estricta entre tres planos arquitectónicos complementarios:
+
+```
++---------------------------------------------------------------------------------------------------+
+| 1. ARQUITECTURA DE ANÁLISIS (SAD de Análisis — Modelo Conceptual)                                 |
+|    - 9 Módulos Conceptuales (MOD-01 a MOD-09) y Modelo del Dominio Canónico (DG-12).              |
+|    - 31 Casos de Uso (CU-01 a CU-30, incluyendo CU-04.1) modelados bajo patrón BCE (DG-AO-01..30). |
+|    - 7 Actores Canónicos (PU-01 a PU-07) con estricta segregación de funciones (SoD).             |
+|    - Ciclo de Vida de RFC gobernado por 14 Estados Oficiales (TB-07) y 17 transiciones normadas.   |
+|    - Independiente de lenguajes, frameworks, bases de datos o infraestructura física.             |
++---------------------------------------------------------------------------------------------------+
+                                                  |
+                                                  v
++---------------------------------------------------------------------------------------------------+
+| 2. ARQUITECTURA OBJETIVO (TraceFlow SCM Enterprise — Sistema de Producción)                       |
+|    - Arquitectura empresarial desacoplada en microservicios contenerizados (Docker / Kubernetes). |
+|    - Persistencia relacional en PostgreSQL transaccional con particionamiento de tablas de auditoría. |
+|    - Almacenamiento de artefactos y ECS en almacenamiento de objetos compatible con S3 (MinIO).   |
+|    - Autenticación federada, SSO y autorización RBAC gobernada por Keycloak / OAuth2 / JWT.       |
+|    - Pipelines automatizados de CI/CD, eventos en bus de mensajería y notificaciones SMTP/WebSocket. |
++---------------------------------------------------------------------------------------------------+
+                                                  |
+                                                  v
++---------------------------------------------------------------------------------------------------+
+| 3. PROTOTIPO DEMOSTRATIVO ACTUAL (TraceFlow SCM Prototype v1.0.0-beta — React SPA)                 |
+|    - Prueba de concepto navegable e interactiva desarrollada en React 19, TypeScript 5 y Vite 6.  |
+|    - Estilizada con TailwindCSS y persistencia reactiva en memoria del navegador (localStorage).  |
+|    - 20 Pantallas Canónicas (SCREEN-01 a SCREEN-20):                                              |
+|      * 8 Pantallas Funcionales Interactivas (9 componentes de vista en prototype/src/views/).     |
+|      * 12 Pantallas Demostrativas Guiadas gobernadas por ScreenPlaceholder.tsx.                   |
+|      * 2 Vistas de Soporte del Sistema (AccessDeniedView 403 y NotFoundView 404).                 |
+|    - Valida usabilidad, arquitectura de información y flujos decisionales TO-BE v2.               |
++---------------------------------------------------------------------------------------------------+
+```
+
+Esta delimitación garantiza que las decisiones conceptuales descritas en este documento rijan la lógica del negocio sin quedar constreñidas por las limitaciones temporales del prototipo demostrativo ni por los detalles tecnológicos de la arquitectura física objetivo.
+
 ### 1.5 Referencias Documentales y Normativas
 - **IEEE Std 830-1998:** *IEEE Recommended Practice for Software Requirements Specifications.*
 - **ISO/IEC/IEEE 42010:2011 / 2022:** *Systems and software engineering — Architecture description.*
@@ -182,15 +224,16 @@ A continuación se definen los términos técnicos normativos empleados a lo lar
 - **CMMI-DEV v2.0:** *Capability Maturity Model Integration — Configuration Management (CM) & Process and Product Quality Assurance (PPQA).*
 - **FD01-EPIS-Informe_Factibilidad_v2.md:** *Informe de Factibilidad Técnica, Operativa y Económica del Proyecto TraceFlow SCM.*
 - **FD03-EPIS-Informe_SRS.md:** *Documento Maestro de Especificación de Requerimientos de Software (Baseline de Análisis).*
-- **docs/DOCUMENTATION_RULES.md:** *Reglas de Gobernanza Documental y Marco Normativo de Trazabilidad.*
-- **docs/TABLES.md:** *Catálogo Centralizado de Tablas Maestras y Matrices de Trazabilidad (SSOT).*
-- **docs/DIAGRAMS.md:** *Catálogo Centralizado de Diagramas PlantUML (SSOT).*
+- **DOCUMENTATION_RULES.md:** *Reglas de Gobernanza Documental y Marco Normativo de Trazabilidad.*
+- **TABLES.md:** *Catálogo Centralizado de Tablas Maestras y Matrices de Trazabilidad (SSOT).*
+- **DIAGRAMS.md:** *Catálogo Centralizado de Diagramas PlantUML (SSOT).*
 
 ---
-
+
+
 # 2. Drivers Arquitectónicos
 
-Los drivers arquitectónicos son los requerimientos y fuerzas motrices que moldean decisivamente la estructura, la modularidad y el comportamiento lógico del sistema. Se clasifican en **Drivers Funcionales** y **Drivers de Calidad**, tomados literalmente de `docs/TABLES.md` (`TB-04` y `TB-05`).
+Los drivers arquitectónicos son los requerimientos y fuerzas motrices que moldean decisivamente la estructura, la modularidad y el comportamiento lógico del sistema. Se clasifican en **Drivers Funcionales** y **Drivers de Calidad**, tomados literalmente de `TABLES.md` (`TB-04` y `TB-05`).
 
 ### 2.1 Drivers Funcionales (RF-01 a RF-18)
 Los 18 Requerimientos Funcionales obligatorios aprobados en el SRS impactan directamente en las decisiones de diseño conceptual del sistema:
@@ -217,7 +260,7 @@ Los 18 Requerimientos Funcionales obligatorios aprobados en el SRS impactan dire
 | **RF-18** | Generación de Reportes | Generar reportes de estado del flujo de cambios, inventario de ECS y actas de cambios, con posibilidad de exportación. | Exige la consolidación analítica del estado de la configuración (Status Accounting) en tiempo real. |
 
 ### 2.2 Drivers de Calidad (RNF-01 a RNF-09)
-Los 9 Requerimientos No Funcionales normativos aprobados en `docs/TABLES.md` (`TB-05`) constituyen los drivers de calidad oficiales de la arquitectura:
+Los 9 Requerimientos No Funcionales normativos aprobados en `TABLES.md` (`TB-05`) constituyen los drivers de calidad oficiales de la arquitectura:
 
 | ID | Atributo de Calidad (`TB-05`) | Especificación Normativa de la Baseline | Prioridad |
 | :---: | :--- | :--- | :---: |
@@ -236,7 +279,8 @@ Los 9 Requerimientos No Funcionales normativos aprobados en `docs/TABLES.md` (`T
 > La arquitectura conceptual respeta estrictamente los umbrales numéricos definidos en `TB-05` (99.9% uptime en periodos críticos, < 3 horas de familiarización, > 50 proyectos simultáneos, <= 3 segundos en consultas de historial/comparación y copias automáticas diarias). Todo parámetro de rendimiento transaccional adicional, volumetría de transacciones o dimensionamiento de concurrencia no especificado en el SRS se declara formalmente como **`[PENDIENTE DE DEFINICIÓN EN DISEÑO]`**.
 
 ---
-
+
+
 # 3. Vista de Contexto Arquitectónico
 
 ### 3.1 Contexto del Sistema Frente a su Entorno Operativo
@@ -264,6 +308,10 @@ En concordancia con las normas de modelado UML y los lineamientos de auditoría 
 
 ### 3.4 Diagrama DG-SAD-A01: Contexto Arquitectónico de TraceFlow SCM
 A continuación se presenta el diagrama conceptual de contexto que modela la frontera del sistema y los flujos de interacción con los 7 actores canónicos:
+
+> [!NOTE]
+> **Especificación Gráfica y Estado del Diagrama (DOC-007):**  
+> El modelo conceptual `DG-SAD-A01` está plenamente especificado mediante la sintaxis PlantUML declarada abajo y en `DIAGRAMS.md`. Su renderizado gráfico en formato `.png` está programado para la Etapa 05 bajo la ruta canónica `docs/assets/diagramas/render/analisis/DG-SAD-A01.png`. Se ratifica su vigencia como modelo de análisis de primer orden.
 
 ```plantuml
 @startuml DG-SAD-A01
@@ -326,7 +374,8 @@ ACT_QA --> SUB_QA : "Reporta no conformidades y re-testea (CU-18, CU-19)"
 ```
 
 ---
-
+
+
 # 4. Arquitectura Lógica de Análisis
 
 ### 4.1 Criterios de Descomposición Modular Conceptual
@@ -353,6 +402,10 @@ La descomposición modular consolida **9 Módulos Arquitectónicos Conceptuales*
 
 ### 4.3 Diagrama DG-SAD-A02: Arquitectura Lógica Conceptual de TraceFlow SCM
 A continuación se reproduce el diagrama de paquetes arquitecturales `DG-SAD-A02` que ilustra los 9 módulos conceptuales y sus relaciones lógicas:
+
+> [!NOTE]
+> **Especificación Gráfica y Estado del Diagrama (DOC-007):**  
+> El modelo conceptual `DG-SAD-A02` está plenamente especificado mediante la sintaxis PlantUML declarada abajo y en `DIAGRAMS.md`. Su renderizado gráfico en formato `.png` está programado para la Etapa 05 bajo la ruta canónica `docs/assets/diagramas/render/analisis/DG-SAD-A02.png`. Se ratifica su vigencia como representación lógica canónica para la descomposición modular del sistema.
 
 ```plantuml
 @startuml DG-SAD-A02
@@ -442,8 +495,56 @@ Las interacciones observadas en `DG-SAD-A02` responden a principios rigurosos de
 6. **MOD-07 (Líneas Base y Reversión):** Inmoviliza conjuntos de versiones custodiadas en `MOD-05` (`RN-04`) o ejecuta el protocolo de Rollback ante fallos no subsanados (`RN-08`).
 7. **MOD-09 (Trazabilidad y Auditoría):** Receptor desacoplado que registra eventos de forma asincrónica desde todos los demás módulos (`RN-03`, `RF-17`), garantizando la observabilidad integral.
 
+### 4.5 Modelo de Análisis de Objetos (Patrón BCE) para los 31 Casos de Uso
+El modelado de análisis de **TraceFlow SCM** adopta el patrón canónico **Boundary-Control-Entity (BCE)** para descomponer conceptualmente la realización de los 31 casos de uso del sistema. Esta descomposición garantiza la estricta separación entre:
+- **Boundary (Frontera):** Clases que median la interacción con los actores humanos o sistemas externos (formularios, pantallas, vistas de expedientes, diálogos de captura).
+- **Control (Control):** Clases que encapsulan la lógica de coordinación, reglas de validación, transiciones de estado y orquestación del flujo operativo de SCM.
+- **Entity (Entidad):** Clases del dominio que representan los conceptos persistentes de información (solicitudes, ítems de configuración, versiones, actas, líneas base, registros de auditoría).
+
+A continuación se consolida la matriz conceptual BCE que gobierna los **31 Casos de Uso** del sistema TraceFlow SCM:
+
+| # | ID CU | Nombre del Caso de Uso | Clases Boundary (Frontera) | Clases Control | Clases Entity (Dominio) | Diagrama BCE PlantUML | Estado Gráfico |
+| :-: | :---: | :--- | :--- | :--- | :--- | :---: | :---: |
+| 1 | **CU-01** | Gestionar usuarios y roles | `Gestión de Usuarios y Roles` | `Control de Usuarios y Roles` | `Usuario`, `Rol`, `Permiso`, `Registro de Auditoría` | `DG-AO-01` | Especificado (Render Etapa 05) |
+| 2 | **CU-02** | Crear y administrar proyectos | `Administración de Proyectos` | `Control de Proyectos` | `Proyecto`, `Plan de Gestión SCM`, `Usuario`, `Registro de Auditoría` | `DG-AO-02` | Especificado (Render Etapa 05) |
+| 3 | **CU-03** | Consultar proyecto | `Consulta de Proyecto` | `Control de Consulta de Proyectos` | `Proyecto`, `Elemento de Configuración (ECS)`, `Línea Base` | `DG-AO-03` | Especificado (Render Etapa 05) |
+| 4 | **CU-04** | Registrar Solicitud de Cambio (RFC) | `Registro de Solicitud de Cambio` | `Control de Registro de RFC` | `Solicitud de Cambio (RFC)`, `Proyecto`, `Elemento de Configuración (ECS)` | `DG-AO-04` | Especificado (Render Etapa 05) |
+| 5 | **CU-04.1**| Subsanar Solicitud de Cambio (RFC) | `Subsanación de Solicitud de Cambio` | `Control de Subsanación de RFC` | `Solicitud de Cambio (RFC)`, `Observación de Solicitud`, `Historial de Estado RFC` | `DG-AO-04.1` | Especificado (Render Etapa 05) |
+| 6 | **CU-05** | Validar y clasificar la solicitud | `Validación y Clasificación de RFC` | `Control de Clasificación de RFC` | `Solicitud de Cambio (RFC)`, `Clasificación de Cambio`, `Observación de Solicitud`, `Notificación de Estado` | `DG-AO-05` | Especificado (Render Etapa 05) |
+| 7 | **CU-06** | Realizar análisis de impacto técnico | `Análisis de Impacto Técnico` | `Control de Análisis de Impacto` | `Informe Técnico de Impacto`, `Solicitud de Cambio (RFC)`, `Elemento de Configuración (ECS)`, `Estimación de Esfuerzo y Costo` | `DG-AO-06` | Especificado (Render Etapa 05) |
+| 8 | **CU-07** | Evaluar Cambio Mayor en CCB | `Evaluación Colegiada de Cambio Mayor` | `Control de Evaluación en CCB` | `Solicitud de Cambio (RFC)`, `Informe Técnico de Impacto`, `Acta del CCB`, `Dictamen del CCB` | `DG-AO-07` | Especificado (Render Etapa 05) |
+| 9 | **CU-08** | Emitir Orden de Cambio (ECN/ECO) | `Emisión de Orden de Cambio` | `Control de Emisión ECN/ECO` | `Orden de Cambio (ECN/ECO)`, `Solicitud de Cambio (RFC)`, `Elemento de Configuración (ECS)`, `Registro de Auditoría` | `DG-AO-08` | Especificado (Render Etapa 05) |
+| 10 | **CU-09** | Registrar ECS | `Registro de Elemento de Configuración` | `Control de Registro de ECS` | `Elemento de Configuración (ECS)`, `Proyecto`, `Tipo de ECS`, `Registro de Auditoría` | `DG-AO-09` | Especificado (Render Etapa 05) |
+| 11 | **CU-10** | Efectuar Check-Out | `Operación de Check-Out` | `Control de Check-Out` | `Orden de Cambio (ECN/ECO)`, `Elemento de Configuración (ECS)`, `Copia de Trabajo`, `Bloqueo de Sincronización` | `DG-AO-10` | Especificado (Render Etapa 05) |
+| 12 | **CU-11** | Aplicar bloqueo de sincronización | `Gestión de Bloqueos de Sincronización` | `Control de Bloqueo de Sincronización` | `Bloqueo de Sincronización`, `Elemento de Configuración (ECS)`, `Orden de Cambio (ECN/ECO)`, `Registro de Auditoría` | `DG-AO-11` | Especificado (Render Etapa 05) |
+| 13 | **CU-12** | Efectuar Check-In | `Operación de Check-In` | `Control de Check-In` | `Elemento de Configuración (ECS)`, `Nueva Versión de ECS`, `Certificación de Conformidad QA`, `Acta de Aceptación UAT`, `Bloqueo de Sincronización` | `DG-AO-12` | Especificado (Render Etapa 05) |
+| 14 | **CU-13** | Consultar historial de versiones | `Consulta de Historial de Versiones` | `Control de Historial y Trazabilidad` | `Elemento de Configuración (ECS)`, `Versión de ECS`, `Orden de Cambio (ECN/ECO)`, `Registro de Auditoría` | `DG-AO-13` | Especificado (Render Etapa 05) |
+| 15 | **CU-14** | Implementar cambio en el ECS | `Entorno de Implementación de Cambio` | `Control de Modificación de ECS` | `Orden de Cambio (ECN/ECO)`, `Copia de Trabajo`, `Bitácora de Modificación Técnica` | `DG-AO-14` | Especificado (Render Etapa 05) |
+| 16 | **CU-15** | Ejecutar pruebas unitarias locales | `Verificación de Pruebas Unitarias` | `Control de Pruebas Unitarias` | `Copia de Trabajo`, `Caso de Prueba Unitaria`, `Resultado de Prueba Unitaria` | `DG-AO-15` | Especificado (Render Etapa 05) |
+| 17 | **CU-16** | Ejecutar pruebas de integración | `Ejecución de Pruebas de Integración` | `Control de Pruebas de Integración` | `Elemento de Configuración (ECS)`, `Batería de Pruebas de Integración`, `Resultado de Pruebas QA` | `DG-AO-16` | Especificado (Render Etapa 05) |
+| 18 | **CU-17** | Certificar conformidad del cambio | `Certificación de Conformidad QA` | `Control de Certificación de Calidad` | `Certificación de Conformidad QA`, `Resultado de Pruebas QA`, `Orden de Cambio (ECN/ECO)`, `Elemento de Configuración (ECS)` | `DG-AO-17` | Especificado (Render Etapa 05) |
+| 19 | **CU-18** | Reportar no conformidad | `Reporte de No Conformidad QA` | `Control de Defectos y No Conformidades` | `Reporte de No Conformidad`, `Defecto / Hallazgo Técnico`, `Orden de Cambio (ECN/ECO)`, `Copia de Trabajo` | `DG-AO-18` | Especificado (Render Etapa 05) |
+| 20 | **CU-19** | Reevaluar y re-testear | `Reevaluación y Re-testeo QA` | `Control de Ciclo de Re-testeo` | `Plan de Re-testeo`, `Reporte de No Conformidad`, `Registro de Subsanación`, `Dictamen de Re-evaluación` | `DG-AO-19` | Especificado (Render Etapa 05) |
+| 21 | **CU-20** | Crear y congelar línea base | `Gestión de Líneas Base` | `Control de Línea Base` | `Línea Base`, `Proyecto`, `Versión de ECS`, `Acta de Congelamiento`, `Registro de Auditoría` | `DG-AO-20` | Especificado (Render Etapa 05) |
+| 22 | **CU-21** | Ejecutar rollback | `Operación de Rollback` | `Control de Reversión en Trabajo` | `Acta de Reversión (Rollback)`, `Copia de Trabajo`, `Versión Estable de ECS`, `Bloqueo de Sincronización` | `DG-AO-21` | Especificado (Render Etapa 05) |
+| 23 | **CU-22** | Cancelar Orden de Cambio | `Cancelación de Orden de Cambio` | `Control de Cancelación Definitiva` | `Orden de Cambio (ECN/ECO)`, `Acta de Cancelación`, `Acta de Reversión (Rollback)`, `Notificación de Cierre` | `DG-AO-22` | Especificado (Render Etapa 05) |
+| 24 | **CU-23** | Registrar incidencia | `Registro de Incidencia` | `Control de Incidencias` | `Incidencia (Ticket)`, `Proyecto`, `Elemento de Configuración (ECS)`, `Evidencia de Incidencia` | `DG-AO-23` | Especificado (Render Etapa 05) |
+| 25 | **CU-24** | Consultar estado de ticket | `Consulta de Estado de Ticket` | `Control de Consulta de Incidencias` | `Incidencia (Ticket)`, `Historial de Estado de Ticket`, `Solicitud de Cambio (RFC)` | `DG-AO-24` | Especificado (Render Etapa 05) |
+| 26 | **CU-25** | Derivar incidencia a RFC | `Derivación de Incidencia a RFC` | `Control de Transición Incidencia-RFC` | `Incidencia (Ticket)`, `Solicitud de Cambio (RFC)`, `Dictamen de Derivación` | `DG-AO-25` | Especificado (Render Etapa 05) |
+| 27 | **CU-26** | Validar integridad (checksum) | `Validación de Integridad Criptográfica` | `Control de Verificación de Integridad` | `Elemento de Configuración (ECS)`, `Constancia de Integridad Criptográfica`, `Registro de Auditoría` | `DG-AO-26` | Especificado (Render Etapa 05) |
+| 28 | **CU-27** | Auditar acciones del sistema | `Auditoría y Trazabilidad del Sistema` | `Control de Auditoría y Cumplimiento` | `Registro de Auditoría`, `Pista de Auditoría (Audit Trail)`, `Informe de Auditoría SCM` | `DG-AO-27` | Especificado (Render Etapa 05) |
+| 29 | **CU-28** | Generar reportes de estado | `Generación de Reportes SCM` | `Control de Reportes de Configuración` | `Reporte de Estado de Configuración`, `Proyecto`, `Línea Base`, `Solicitud de Cambio (RFC)`, `Orden de Cambio (ECN/ECO)` | `DG-AO-28` | Especificado (Render Etapa 05) |
+| 30 | **CU-29** | Validar aceptación del cambio (UAT) | `Validación de Aceptación del Cambio (UAT)` | `Control de Aceptación por el Usuario` | `Acta de Aceptación UAT`, `Solicitud de Cambio (RFC)`, `Elemento de Configuración (ECS)`, `Criterio de Aceptación Funcional` | `DG-AO-29` | Especificado (Render Etapa 05) |
+| 31 | **CU-30** | Autorizar Cambio Menor | `Autorización Delegada de Cambio Menor` | `Control de Autorización de Cambio Menor` | `Dictamen de Cambio Menor`, `Solicitud de Cambio (RFC)`, `Informe Técnico de Impacto`, `Elemento de Configuración (ECS)` | `DG-AO-30` | Especificado (Render Etapa 05) |
+
+> [!NOTE]
+> **Trazabilidad Gráfica de los Modelos BCE (DOC-004):**  
+> Las 31 especificaciones formales de análisis de objetos se encuentran declaradas exhaustivamente en sintaxis PlantUML dentro de `DIAGRAMS.md` (bloques `@startuml DG-AO-01` a `@startuml DG-AO-30` y `DG-AO-04.1`) y referenciadas en el SRS v1.1. La generación física de las imágenes `.png` correspondientes se realizará en la Etapa 05, alojándose en `docs/assets/diagramas/render/analisis/`.
+
+
 ---
-
+
+
 # 5. Responsabilidades Arquitectónicas
 
 En esta sección se detalla la especificación rigurosa de cada uno de los 9 módulos conceptuales que componen la arquitectura de TraceFlow SCM, alineados con las tablas maestras `TB-04`, `TB-05`, `TB-06` y `TB-10`.
@@ -603,11 +704,12 @@ En esta sección se detalla la especificación rigurosa de cada uno de los 9 mó
 - **Requerimientos y Reglas Asociadas:** `RF-16`, `RF-17`, `RF-18`, `RNF-01`, `RNF-03`, `RN-03`.
 
 ---
-
+
+
 # 6. Vista Conceptual del Dominio
 
 ### 6.1 Integración del Modelo Conceptual del Dominio (DG-12)
-El modelo conceptual del dominio de **TraceFlow SCM** representa los conceptos esenciales del negocio, sus atributos semánticos significativos y sus asociaciones estructurales. En estricto cumplimiento del nivel de análisis (`docs/DOCUMENTATION_RULES.md` Sección 8), este modelo prescinde deliberadamente de tipos de datos técnicos de bases de datos, métodos de controladores, llaves foráneas y dependencias de persistencia.
+El modelo conceptual del dominio de **TraceFlow SCM** representa los conceptos esenciales del negocio, sus atributos semánticos significativos y sus asociaciones estructurales. En estricto cumplimiento del nivel de análisis (`DOCUMENTATION_RULES.md` Sección 8), este modelo prescinde deliberadamente de tipos de datos técnicos de bases de datos, métodos de controladores, llaves foráneas y dependencias de persistencia.
 
 A continuación se reproduce el diagrama conceptual maestro **`DG-12`**, formalizado y aprobado en el cierre de la baseline del SRS:
 
@@ -831,7 +933,8 @@ El modelo conceptual impone las siguientes restricciones de integridad lógica d
 9. **Doble Validación Previa al Check-In a Biblioteca Maestra (`RN-09`):** Ningún ECS modificado puede ser transferido a la Biblioteca Maestra ni congelado en una nueva Línea Base sin contar concurrentemente con la Certificación de Conformidad técnica emitida por el Equipo de Calidad/Testing y el Acta de Aceptación formal suscrita por el Solicitante/Usuario Final en el entorno controlado de validación.
 
 ---
-
+
+
 # 7. Vista del Proceso de Gestión de Cambios (TO-BE v2)
 
 ### 7.1 Orquestación Arquitectónica del Flujo TO-BE v2 (DG-03)
@@ -871,6 +974,31 @@ El ciclo de vida de la Solicitud de Cambio se rige de forma literal y vinculante
 | **12** | **Rechazada** | CCB / Autoridad Operativa Delegada | Terminal | Cierre formal por dictamen colegiado negativo del CCB (`CU-07`) o rechazo de la Autoridad Delegada (`CU-30`), con notificación fundamentada al Solicitante. |
 | **13** | **Cancelada** | Administrador de Configuración / Bibliotecario | Terminal | Cierre formal por fallo técnico no subsanado en pruebas tras re-testeo o desistimiento justificado; se ejecuta rollback en Trabajo (`CU-21`) y se cancela la ECN (`CU-22`). |
 | **14** | **Implementada** | Administrador de Configuración / CCB | Terminal | Cierre formal exitoso: con la doble conformidad (QA + UAT, `RN-09`), se ejecutó Check-In a Biblioteca Maestra (`CU-12`), se congeló la Línea Base (`CU-20`) y se formalizó el cierre (`RF-14`). |
+
+A continuación se formaliza la **Matriz de Transición de Estados de la Solicitud de Cambio (RFC)**, detallando los eventos disparadores, condiciones de guarda, actores responsables y evidencias requeridas para cada transición entre los 14 estados canónicos:
+
+| # | Estado Origen | Evento Disparador | Condición de Guarda | Actor Responsable | Estado Destino | Evidencia Documental / Técnica |
+| :-: | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | **(Inicial)** | Registro de Solicitud de Cambio | Formulario completo con justificación y prioridad | Solicitante (`PU-01`) | **Registrada** (`1`) | RFC capturada en borrador / enviada (`CU-04`, `RF-04`) |
+| 2 | **Registrada** (`1`) | Admisión y filtro preliminar | Solicitud incompleta o con defectos subsanables | Analista de Requerimientos (`PU-02`) | **En Subsanación** (`2`) | Notificación de observaciones formal (`CU-05`) |
+| 3 | **En Subsanación** (`2`)| Corrección y reenvío | Subsanación en plazo con datos válidos | Solicitante (`PU-01`) | **Clasificada** (`3`) | Formulario de subsanación (`CU-04.1`, `RF-04`) |
+| 4 | **En Subsanación** (`2`)| Vencimiento o inviabilidad | Plazo expirado sin corrección o improcedencia | Analista de Requerimientos (`PU-02`) | **Desestimada** (`11` - Terminal 1) | Acta de desestimación formal (`CU-05`, `RN-07`) |
+| 5 | **Registrada** (`1`) | Admisión y filtro preliminar | Solicitud completa y consistente | Analista de Requerimientos (`PU-02`) | **Clasificada** (`3`) | Ficha de admisión y clasificación preliminar (`CU-05`) |
+| 6 | **Registrada** (`1`) | Admisión y filtro preliminar | Solicitud fuera de alcance, inviable o duplicada | Analista de Requerimientos (`PU-02`) | **Desestimada** (`11` - Terminal 1) | Resolución fundamentada de desestimación (`CU-05`, `RN-07`)|
+| 7 | **Clasificada** (`3`) | Asignación para análisis | RFC admitida formalmente para evaluación técnica | Analista (`PU-02`) / Arquitecto (`PU-03`) | **En Análisis Técnico** (`4`) | Asignación de evaluación en bandeja (`CU-05`, `CU-06`) |
+| 8 | **En Análisis Técnico** (`4`)| Finalización de informe técnico | Análisis completado con dictamen Mayor/Menor | Arquitecto / Especialista (`PU-03`) | **En Evaluación** (`5`) | Informe Técnico de Impacto formal (`CU-06`, `RN-05`) |
+| 9 | **En Evaluación** (`5`)| Deliberación colegiada CCB | Votación favorable de miembros del CCB | Comité de Control de Cambios (`PU-04`)| **Autorizada** (`6`) | Acta del CCB con dictamen aprobatorio (`CU-07`, `RN-01`) |
+| 10 | **En Evaluación** (`5`)| Evaluación por vía delegada | Doble visto bueno conjunto Analista + Arquitecto | Autoridad Delegada (`PU-02` + `PU-03`)| **Autorizada** (`6`) | Resolución de Autorización Delegada Menor (`CU-30`) |
+| 11 | **En Evaluación** (`5`)| Deliberación colegiada CCB | Votación desfavorable del CCB | Comité de Control de Cambios (`PU-04`)| **Rechazada** (`12` - Terminal 2) | Acta del CCB con dictamen denegatorio (`CU-07`, `RN-07`)|
+| 12 | **En Evaluación** (`5`)| Evaluación por vía delegada | Denegación fundada o rebasamiento de límites | Autoridad Delegada (`PU-02` + `PU-03`)| **Rechazada** (`12` - Terminal 2) | Dictamen denegatorio / reescalamiento (`CU-30`, `RN-07`)|
+| 13 | **Autorizada** (`6`) | Formalización de orden de cambio | RFC en estado Autorizada | CCB (`PU-04`) / Analista (`PU-02`) | **Orden Emitida** (`7`) | Orden de Cambio de Ingeniería ECN/ECO (`CU-08`, `RF-07`)|
+| 14 | **Orden Emitida** (`7`)| Check-Out y asignación | ECN/ECO emitida válidamente | Administrador SCM (`PU-05`) | **En Implementación** (`8`) | Copia de trabajo creada y bloqueo aplicado (`CU-10`, `CU-11`)|
+| 15 | **En Implementación** (`8`)| Entrega de versión candidata | Modificación realizada y pruebas unitarias OK | Desarrollador (`PU-06`) | **En Pruebas** (`9`) | Entrega a QA y registro de pruebas unitarias (`CU-14`, `CU-15`)|
+| 16 | **En Pruebas** (`9`) | Detección de no conformidad | Fallo funcional subsanable en integración | Equipo de Calidad (`PU-07`) | **En Implementación** (`8`) | Reporte de No Conformidad QA (`CU-18`, `CU-19`, `RF-11`)|
+| 17 | **En Pruebas** (`9`) | Certificación de calidad | Pruebas de integración aprobadas 100% | Equipo de Calidad (`PU-07`) | **En Aceptación** (`10`) | Certificación Técnica de Conformidad QA (`CU-17`, `RN-09`)|
+| 18 | **En Pruebas** (`9`) | Fallo no subsanado / desistimiento | Defecto crítico persistente o inviabilidad | Administrador SCM (`PU-05`) / CCB | **Cancelada** (`13` - Terminal 3) | Acta de Rollback y cancelación de orden (`CU-21`, `CU-22`, `RN-08`)|
+| 19 | **En Aceptación** (`10`)| Validación final UAT rechazada | Discrepancia funcional con requerimientos RFC | Solicitante / Usuario Final (`PU-01`)| **Cancelada** (`13` - Terminal 3) | Acta de rechazo UAT y reversión (`CU-29`, `CU-21`, `CU-22`)|
+| 20 | **En Aceptación** (`10`)| Aprobación formal UAT y Check-In | Doble validación acreditada (QA + UAT) | Solicitante (`PU-01`) + Admin (`PU-05`)| **Implementada** (`14` - Terminal 4) | Acta de Aceptación UAT (`CU-29`), Check-In a Maestra (`CU-12`), Congelamiento de Baseline (`CU-20`) y Cierre Formal (`RF-14`) |
 
 A continuación se esquematiza el flujo de transiciones lógicas entre los 14 estados canónicos:
 
@@ -920,7 +1048,8 @@ La siguiente matriz sintetiza la asignación de responsabilidades de cada fase d
 | **15. Trazabilidad y Verificación Continua** | `MOD-09` | Todos | `CU-26`, `CU-27`, `CU-28` | Administrador, CCB, Todos |
 
 ---
-
+
+
 # 8. Seguridad y Control de Acceso Conceptual
 
 ### 8.1 Modelo Conceptual RBAC y Privilegios
@@ -980,7 +1109,8 @@ En estricta observancia del alcance de la fase de análisis:
 - De igual modo, los algoritmos físicos de derivación de claves para almacenamiento de credenciales (como PBKDF2, bcrypt o Argon2) y los protocolos físicos de transferencia segura (HTTPS/SSH referidos en `RNF-01`) se reservan para la especificación del SAD de Diseño.
 
 ---
-
+
+
 # 9. Gestión Conceptual de Información y Configuración
 
 ### 9.1 Jerarquía Estructural del Sistema SCM
@@ -1044,11 +1174,12 @@ En cumplimiento del nivel de análisis:
 - El modelado físico de esquemas relacionales, particionamiento de tablas, índices B-Tree, optimización de consultas y capas ORM (Object-Relational Mapping) constituyen **Decisiones Diferidas a la Fase de Diseño**.
 
 ---
-
+
+
 # 10. Escenarios Arquitectónicos de Calidad
 
 ### 10.1 Especificación Formal de Escenarios de Calidad (RNF-01 a RNF-09)
-Para operacionalizar los 9 Requerimientos No Funcionales normativos aprobados en `docs/TABLES.md` (`TB-05`), se especifican a continuación los escenarios de calidad con correspondencia estricta 1:1, utilizando exclusivamente los umbrales aprobados en la baseline:
+Para operacionalizar los 9 Requerimientos No Funcionales normativos aprobados en `TABLES.md` (`TB-05`), se especifican a continuación los escenarios de calidad con correspondencia estricta 1:1, utilizando exclusivamente los umbrales aprobados en la baseline:
 
 | ID Escenario | Fuente RNF (`TB-05`) | Atributo de Calidad | Estímulo | Contexto Operativo | Respuesta Esperada del Sistema |
 | :---: | :---: | :--- | :--- | :--- | :--- |
@@ -1073,7 +1204,8 @@ El diseño de la arquitectura conceptual balancea compromisos inherentes a los s
 3. **Escalabilidad Multi-proyecto (`RNF-05`) vs. Aislamiento de Repositorios:** La contención jerárquica estricta asegura que la gestión concurrente de más de 50 proyectos no genere colisiones entre catálogos de ECS ni contaminación cruzada de configuraciones.
 
 ---
-
+
+
 # 11. Restricciones y Principios Arquitectónicos
 
 ### 11.1 Principios Rectores de la Arquitectura
@@ -1112,7 +1244,8 @@ Es imperativo distinguir las restricciones normativas del negocio de aquellas el
 | **Escalabilidad** | Soportar más de 50 proyectos simultáneos sin degradación funcional (`RNF-05`). | Estrategia multi-tenant en base de datos, particionamiento de esquemas. |
 
 ---
-
+
+
 # 12. Matriz de Trazabilidad Arquitectónica y Auditoría de Conceptos
 
 ### 12.1 Matriz Integral: Módulo | RF | RNF | RN | CU | Entidades DG-12
@@ -1147,11 +1280,12 @@ En cumplimiento del proceso de auditoría de coherencia, se analiza el catálogo
 | **Bloqueo Pesimista como Mecanismo Conceptual** | SAD v1.0 | **DECISIÓN ARQUITECTÓNICA DE ANÁLISIS** | Conservado como la abstracción lógica formal que operacionaliza el bloqueo de sincronización obligatorio (`RF-09`, `RN-06`) para impedir colisiones de edición. |
 
 ---
-
+
+
 # 13. Decisiones Diferidas a la Fase de Diseño
 
 ### 13.1 Catálogo de Decisiones Posteriores (Frontend, Backend, DB, APIs, Despliegue)
-En conformidad con `docs/DOCUMENTATION_RULES.md` Sección 7 y 8, se establece el catálogo explícito de definiciones arquitectónicas y técnicas cuya resolución se posterga formalmente para el **Documento de Arquitectura de Software de Diseño (SAD de Diseño)**:
+En conformidad con `DOCUMENTATION_RULES.md` Sección 7 y 8, se establece el catálogo explícito de definiciones arquitectónicas y técnicas cuya resolución se posterga formalmente para el **Documento de Arquitectura de Software de Diseño (SAD de Diseño)**:
 
 1. **Capa de Presentación e Interfaz de Usuario (Frontend):**
    - Selección del framework web SPA/SSR (React, Next.js, Vue, Angular).
@@ -1194,16 +1328,17 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md`, se ident
 
 **Evaluación Técnica y Dictamen de Auditoría:**
 1. El contenido de `DG-13` incorpora especificaciones concretas de componentes de implementación física (SPA React, Backend API REST Node.js/TypeScript, controladores técnicos, motor de base de datos PostgreSQL, caché Redis y almacenamiento S3/Supabase Storage).
-2. Según el marco metodológico normativo de `docs/DOCUMENTATION_RULES.md` Sección 7, 8 y 12, los diagramas que contienen detalles tecnológicos de software o hardware pertenecen de forma exclusiva al **DISEÑO DE ARQUITECTURA** y su inclusión en la fase de análisis vulnera el principio de independencia tecnológica.
+2. Según el marco metodológico normativo de `DOCUMENTATION_RULES.md` Sección 7, 8 y 12, los diagramas que contienen detalles tecnológicos de software o hardware pertenecen de forma exclusiva al **DISEÑO DE ARQUITECTURA** y su inclusión en la fase de análisis vulnera el principio de independencia tecnológica.
 3. **Dictamen Formal:** Se declara el diagrama histórico `DG-13` como **OBSOLETO PARA EL ANÁLISIS**.
 4. **Disposición Técnica:** Para la presente fase de Análisis, la arquitectura lógica queda formal y suficientemente representada por el **Diagrama de Contexto Arquitectónico (`DG-SAD-A01`)**, el **Diagrama de Paquetes Arquitecturales (`DG-04` / `DG-SAD-A02`)** y los **31 Diagramas de Análisis de Objetos BCE (`DG-AO`)**. La especificación contenida en `DG-13` queda archivada como entrada técnica de partida y candidata a revisión prioritaria durante la construcción del futuro **SAD de Diseño**.
 
 ---
-
+
+
 # 14. Auditoría de Coherencia SRS ↔ SAD y Aprobación de Baseline
 
 ### 14.1 Matriz de Coherencia Integral SRS ↔ SAD
-Para verificar la total consistencia entre la Baseline de Requerimientos de Software (`FD03` / `docs/TABLES.md` / `docs/DIAGRAMS.md`) y el presente Documento de Arquitectura de Software (`FD04`), se genera la siguiente matriz de coherencia:
+Para verificar la total consistencia entre la Baseline de Requerimientos de Software (`FD03` / `TABLES.md` / `DIAGRAMS.md`) y el presente Documento de Arquitectura de Software (`FD04`), se genera la siguiente matriz de coherencia:
 
 | Elemento / Dimensión | Especificación Oficial en SRS / SSOT | Representación en SAD de Análisis (`FD04`) | ¿Coincide? | Acción Aplicada |
 | :--- | :--- | :--- | :---: | :--- |
@@ -1235,42 +1370,41 @@ A continuación se audita el presente Documento de Arquitectura de Software cont
 | **9. Modelado Arquitectónico Riguroso** | Se incorporan y documentan los diagramas formales `DG-SAD-A01` (Contexto) y `DG-SAD-A02` (Arquitectura Lógica) en PlantUML. | **CUMPLE** |
 | **10. Delimitación con la Fase de Diseño** | Se catalogan detalladamente las decisiones diferidas a diseño y se dictamina formalmente la obsolescencia de `DG-13`. | **CUMPLE** |
 
-### 14.3 Declaración Formal de Aprobación (BASELINE SAD DE ANÁLISIS v1.1)
-Habiéndose completado la auditoría integral de coherencia SRS ↔ SAD, verificado el cumplimiento riguroso de la totalidad de los criterios de calidad, y constatado que **no existen inconsistencias críticas, altas ni moderadas pendientes**:
+### 14.3 Estado Documental y Declaración de Revisión Candidata (SAD DE ANÁLISIS v1.2)
+Habiéndose completado la auditoría integral de coherencia SRS ↔ SAD en el marco de la **Etapa 04**, verificado el alineamiento conceptual con la **Revisión Candidata v1.1 del SRS**, e integrado el modelo de análisis de objetos BCE y la matriz de transiciones de estado:
 
 ```
 ========================================================================================
-                          DECLARACIÓN FORMAL DE CIERRE
-                        BASELINE SAD DE ANÁLISIS v1.1
-                            CORREGIDA Y APROBADA
+                     DECLARACIÓN DE REVISIÓN CANDIDATA
+                      SAD DE ANÁLISIS — VERSIÓN 1.2
+                 (BORRADOR EN REVISIÓN — PENDIENTE CCB)
 ========================================================================================
 
-Por medio del presente documento, el equipo de desarrollo C-SharkTeam declara formalmente
-cerrado, aprobado y congelado el DOCUMENTO DE ARQUITECTURA DE SOFTWARE (SAD) — FASE DE ANÁLISIS
-de TraceFlow SCM en su Versión 1.1 (con preservación de la Versión 1.0 como baseline histórica).
+Por medio del presente documento, el equipo técnico C-SharkTeam emite la REVISIÓN CANDIDATA v1.2
+del DOCUMENTO DE ARQUITECTURA DE SOFTWARE (SAD) — FASE DE ANÁLISIS de TraceFlow SCM,
+conservando la Versión 1.1 (01/10/2026) como línea base histórica de referencia.
 
-Motivo del Versionamiento:
-"Corrección de coherencia y trazabilidad con Baseline SRS; normalización de 3 bibliotecas
-(Trabajo, Soporte, Maestra), 14 estados oficiales de RFC (TB-07), 9 RN (TB-06), 9 RNF (TB-05),
-retiro de métricas no normadas y preservación estricta del alcance funcional."
+Estado de Aprobación:
+"Revisión técnica interna completada en Etapa 04. Aprobación formal y pase a línea base
+definitiva pendientes de deliberación y dictamen por el Comité de Control de Cambios (CCB)
+en la Etapa 07 del plan de alineamiento documental."
 
-Este artefacto constituye la BASELINE ARQUITECTÓNICA CONCEPTUAL Y LÓGICA definitiva del
-proyecto TraceFlow SCM, habilitando formalmente el inicio de la FASE DE DISEÑO DE SOFTWARE.
+Alcance de la Revisión v1.2:
+- Alineamiento riguroso con el SRS Candidato v1.1 (RF-01 a RF-18, RNF-01 a RNF-09, RN-01 a RN-09).
+- Conciliación de los 31 casos de uso (CU-01 a CU-30, incluyendo CU-04.1) y catálogo BCE (DG-AO-01..30).
+- Delimitación técnica tripartita: Arquitectura de Análisis vs. Objetivo (Enterprise) vs. Prototipo (20 pantallas).
+- Integración de la matriz operacional de transiciones de los 14 estados oficiales de la RFC (TB-07).
+- Ratificación de los modelos DG-SAD-A01 y DG-SAD-A02 (renderizado programado para Etapa 05).
+- Reafirmación del dictamen de obsolescencia de DG-13 para el nivel de análisis conceptual.
+- Corrección de enlaces relativos a TABLES.md, DIAGRAMS.md y DOCUMENTATION_RULES.md (DOC-008, DOC-026).
 
-Tacna, 01 de Octubre de 2026.
+Tacna, 12 de Noviembre de 2026.
 
-Firmado Colegiadamente:
-
-  ANTAYHUA MAMANI, Renzo Antonio       (2022073504) - Analista y Desarrollador
-  MEDINA QUISPE, Joan Cristian         (2022074255) - Administrador de Configuración
-  LOYOLA VILCA CHOQUE, Renzo Fernando  (2021072615) - Arquitecto y Diseñador
-  RIVERA MUÑOZ, Augusto Joaquin        (2022073505) - Especialista de Calidad (QA)
-
-Revisado y Avalado Académicamente:
-
-  Dr. RICARDO EDUARDO VALCARCEL ALVARADO
-  Docente del Curso de Gestión de la Configuración de Software
-  Escuela Profesional de Ingeniería de Sistemas - UPT
+Equipo Responsable (C-SharkTeam):
+  - Joan Cristian Medina Quispe         (Administrador de Configuración / Arquitecto)
+  - Renzo Antonio Antayhua Mamani       (Analista de Requerimientos / Gestor SCM)
+  - Renzo Fernando Loyola Vilca Choque  (Ingeniero de Software / Frontend Lead)
+  - Augusto Joaquin Rivera Muñoz        (Aseguramiento de Calidad / Auditor SCM)
 ========================================================================================
 ```
 

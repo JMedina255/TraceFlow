@@ -3,7 +3,7 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 
-> Documento de Especificación de Requerimientos de Software (SRS) - Versión 1.0
+> Documento de Especificación de Requerimientos de Software (SRS) — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal por CCB)
 
 
 <!-- Página 1 del PDF original -->
@@ -31,8 +31,9 @@ ANTAYHUA MAMANI, Renzo Antonio (2022073504) MEDINA QUISPE, Joan Cristian (202207
 | --- | --- | --- | --- | --- | --- |
 | Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
 | 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
+| 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
 
-Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de Especificación de Requerimientos de Software Versión 1.0
+Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de Especificación de Requerimientos de Software — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal)
 
 
 <!-- Página 3 del PDF original -->
@@ -42,10 +43,15 @@ Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de E
 | --- | --- | --- | --- | --- | --- |
 | Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
 | 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
+| 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
 
 ## Índice general
 
 # 1. Introducción 5
+
+## 1.1. Propósito y Contexto Operativo 5
+
+## 1.2. Alcance del Sistema y Delimitación Técnica: Sistema Objetivo vs. Prototipo Demostrativo 5
 
 # 2. Generalidades de la Empresa 6
 
@@ -133,7 +139,45 @@ Conclusiones 115 Bibliografía 117
 
 # 1. Introducción
 
-El presente documento contiene la especificación de requerimientos de software (SRS) para el desarrollo del Sistema de Gestión de Configuración de Software - TraceFlow SCM, concebido para optimizar y formalizar los procesos operativos de la empresa consultora ÉXODO S.A.C. en el marco del semestre académico 2026-II en la EPIS-UPT. En el contexto productivo de ÉXODO S.A.C., la prestación de servicios de desarrollo y mantenimiento de software a medida se realiza actualmente sin un sistema formal ni centralizado de Gestión de la Configuración del Software (SCM). El código fuente, los esquemas de bases de datos y la documentación técnica de los proyectos se encuentran dispersos entre los equipos locales de los consultores y cuentas personales en diversas plataformas, careciendo de un estándar estricto de versionamiento e identificación de artefactos. Esta desarticulación operativa ocasiona la coexistencia de múltiples copias divergentes, pérdidas críticas de avances por sobreescritura durante el trabajo concurrente y la ausencia de líneas base (baselines) estables a las cuales retornar ante incidentes imprevistos en los entornos de producción de los clientes. Para resolver esta brecha y mitigar los riesgos de retrabajo y pérdida de información, el equipo de desarrollo C-Shark Team formula la presente especificación de requisitos con la finalidad de diseñar e implementar una solución integral . TraceFlow SCM provee una plataforma web centralizada que automatiza y estandariza el flujo integral de Solicitudes de Cambio (RFC) bajo la supervisión del Comité de Control de Cambios (CCB), gestiona la transferencia controlada de Elementos de Configuración (ECS) entre las bibliotecas de Trabajo, Soporte y Maestra mediante Check-Out/Check-In, impone bloqueos de sincronización para evitar conflictos de concurrencia y garantiza la trazabilidad e integridad criptográfica (SHA-256) de todos los activos de software liberados.
+## 1.1. Propósito y Contexto Operativo
+
+El presente documento contiene la especificación de requerimientos de software (SRS) para el desarrollo del Sistema de Gestión de Configuración de Software - TraceFlow SCM, concebido para optimizar y formalizar los procesos operativos de la empresa consultora ÉXODO S.A.C. en el marco del semestre académico 2026-II en la EPIS-UPT. En el contexto productivo de ÉXODO S.A.C., la prestación de servicios de desarrollo y mantenimiento de software a medida se realiza actualmente sin un sistema formal ni centralizado de Gestión de la Configuración del Software (SCM). El código fuente, los esquemas de bases de datos y la documentación técnica de los proyectos se encuentran dispersos entre los equipos locales de los consultores y cuentas personales en diversas plataformas, careciendo de un estándar estricto de versionamiento e identificación de artefactos. Esta desarticulación operativa ocasiona la coexistencia de múltiples copias divergentes, pérdidas críticas de avances por sobreescritura durante el trabajo concurrente y la ausencia de líneas base (baselines) estables a las cuales retornar ante incidentes imprevistos en los entornos de producción de los clientes. Para resolver esta brecha y mitigar los riesgos de retrabajo y pérdida de información, el equipo de desarrollo C-Shark Team formula la presente especificación de requisitos con la finalidad de diseñar e implementar una solución integral. TraceFlow SCM provee una plataforma web centralizada que automatiza y estandariza el flujo integral de Solicitudes de Cambio (RFC) bajo la supervisión del Comité de Control de Cambios (CCB), gestiona la transferencia controlada de Elementos de Configuración (ECS) entre las bibliotecas de Trabajo, Soporte y Maestra mediante Check-Out/Check-In, impone bloqueos de sincronización para evitar conflictos de concurrencia y garantiza la trazabilidad e integridad criptográfica (SHA-256) de todos los activos de software liberados.
+
+## 1.2. Alcance del Sistema y Delimitación Técnica: Sistema Objetivo vs. Prototipo Demostrativo
+
+Para asegurar la máxima transparencia en la auditoría de configuración y prevenir ambigüedades entre los requisitos de ingeniería y los entregables de software evaluables, se establece formalmente la delimitación técnica entre el **Sistema Objetivo en Producción (TraceFlow SCM Enterprise)** y el **Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)**:
+
+### 1.2.1. Sistema Objetivo en Producción (TraceFlow SCM Enterprise)
+Corresponde a la solución integral corporativa diseñada para gobernar la infraestructura SCM de ÉXODO S.A.C. en entornos de producción:
+- **Arquitectura:** Desacoplada en microservicios contenerizados (Docker/Kubernetes) con backend en Java (Spring Boot) o Node.js/TypeScript.
+- **Persistencia:** Base de datos relacional PostgreSQL con particionamiento de auditoría y soporte de transacciones ACID estrictas.
+- **Almacenamiento de Artefactos:** Servidor de almacenamiento de objetos compatible con S3 (MinIO) para el control de versiones binarias y fuentes de ECS con cálculo forzoso de hash SHA-256.
+- **Seguridad e Identidad:** Servidor IAM centralizado (Keycloak / OAuth2 / OIDC) con segregación estricta de funciones bajo control de acceso basado en roles (RBAC) para los 7 perfiles canónicos (`PU-01` a `PU-07`).
+- **Capacidades Operativas:** Automatización completa de pipelines CI/CD, agentes de sincronización para repositorios Git, escaneo automatizado de vulnerabilidades y notificaciones SMTP/WebSocket en tiempo real.
+
+### 1.2.2. Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)
+Corresponde al software interactivo desarrollado y desplegado en el repositorio (`prototype/`), concebido como prueba de concepto de alta fidelidad para validar la usabilidad, navegación, flujos de negocio y experiencia de usuario (UX):
+- **Tecnología:** Single Page Application (SPA) desarrollada en React 19, TypeScript 5, Vite 6 y estilizada con TailwindCSS.
+- **Gestión de Estado y Persistencia:** Servicio reactivo en memoria (`MockDataService`) con persistencia local en el navegador (`localStorage`), inicializado con un dataset preconfigurado de proyectos, ECS, usuarios y solicitudes RFC representativas.
+- **Catálogo de Vistas e Interfaz:** El prototipo implementa formalmente **20 pantallas canónicas** (`SCREEN-01` a `SCREEN-20`), estructuradas según el inventario de auditoría:
+  - **8 Pantallas Funcionales Interactivas (implementadas mediante 9 componentes de vista especializados):**
+    1. `SCREEN-01` — Inicio de Sesión / Login (`LoginView.tsx`): Autenticación simulada y selector contextual de rol activo (`PU-01` a `PU-07`).
+    2. `SCREEN-02` — Panel de Control Principal / Dashboard (`DashboardView.tsx`): Métricas de RFC por estado, volumen de cambios y accesos directos.
+    3. `SCREEN-05` — Bandeja de Solicitudes de Cambio (`RfcListView.tsx`): Listado paginado, búsqueda, filtrado multidimensional por estado y prioridad.
+    4. `SCREEN-06` — Expediente 360° de la RFC (`RfcDetailView.tsx`): Visualización exhaustiva del expediente, historial de transiciones, actas, hashes y trazabilidad completa.
+    5. `SCREEN-07` — Registro y Subsanación de RFC: Implementada mediante 2 vistas independientes para respetar el principio de responsabilidad única:
+       - `RfcCreateView.tsx`: Captura inicial de RFC en borrador / enviada (`CU-04`).
+       - `RfcEditView.tsx`: Edición y subsanación de RFC observadas (`CU-04.1`).
+    6. `SCREEN-08` — Análisis de Impacto Técnico (`ImpactAnalysisView.tsx`): Evaluación arquitectónica de esfuerzo, riesgos, dependencias y costos (`CU-06`).
+    7. `SCREEN-09` — Deliberación y Dictamen del CCB (`CcbDeliberationView.tsx`): Interfaz de votación, emisión de acta de comité y dictamen formal de cambios mayores (`CU-07`).
+    8. `SCREEN-10` — Autorización de Cambio Menor (`MinorApprovalView.tsx`): Procedimiento abreviado de aprobación para cambios de bajo riesgo por la autoridad delegada (`CU-30`).
+  - **12 Pantallas de Demostración Estructurada (Placeholders Guiados):**
+    - `SCREEN-03` (Registro de Proyectos), `SCREEN-04` (Catálogo de ECS), `SCREEN-11` (Bandeja ECN/ECO), `SCREEN-12` (Operación Check-Out), `SCREEN-13` (Operación Check-In), `SCREEN-14` (Gestión de Líneas Base), `SCREEN-15` (Rollback y Reversión), `SCREEN-16` (Gestión de Incidencias), `SCREEN-17` (Auditoría y Trazabilidad SCM), `SCREEN-18` (Generador de Reportes), `SCREEN-19` (Administración de Usuarios) y `SCREEN-20` (Configuración del Sistema). Todas gobernadas por el componente unificado `ScreenPlaceholder.tsx` que especifica los casos de uso (`CU`), requisitos funcionales (`RF`), reglas de negocio (`RN`) y roles autorizados asociados a cada módulo.
+  - **2 Vistas de Soporte del Sistema:**
+    - `AccessDeniedView.tsx`: Control de acceso contextual (error 403) ante intentos de navegación no autorizados según la matriz RBAC.
+    - `NotFoundView.tsx`: Control de rutas inválidas (error 404).
+
+Esta delimitación garantiza que las afirmaciones de verificación en el presente documento diferencien explícitamente entre la funcionalidad validada en el prototipo y los requisitos que serán instrumentados en la fase de construcción del sistema objetivo.
 
 
 <!-- Página 6 del PDF original -->
@@ -176,7 +220,7 @@ Dirección de Proyecto y Gobernanza SCM: Liderada por Joan Cristian Medina Quisp
 
 **Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente**
 
-![Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente](assets/DG-01.png)
+![Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente](../assets/DG-01.png)
 
 #### Código PlantUML del Diagrama
 
@@ -460,7 +504,7 @@ El análisis financiero se calculó para un horizonte de evaluación a 5 años (
 | Costo Operativo Anual (OPEX) | S/. 1,140.00 | Mantenimiento de infraestructura PaaS (Render/Supabase), renovación de dominio, soporte preventivo y materiales de difusión. |
 | Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida (COK 12.00%). |
 | Tasa Interna de Retorno (TIR) | 68.20% | Supera ampliamente el COK referencial (12.00%), otorgando un margen de seguridad amplio frente a variaciones de costos. |
-| Relación Beneficio / Costo (B/C) | 1.97 | Por cada sol invertido en el ciclo del proyecto, se generarán S/. 1.97 en beneficios y ahorros valorizados para la facultad y los estudiantes. |
+| Relación Beneficio / Costo (B/C) | 1.97 | Por cada sol invertido en el ciclo del proyecto, se generarán S/. 1.97 en beneficios y ahorros valorizados para la empresa consultora ÉXODO S.A.C. y sus clientes. |
 | Periodo de Recuperación (Payback) | 1 año y 9.7 meses | La inversión inicial se recuperará plenamente durante el transcurso del segundo año de operación. |
 3. Viabilidad Operativa
 
@@ -512,25 +556,15 @@ actas y reportes elimina la necesidad de documentación impresa.
 
 facilita el trabajo colaborativo a distancia entre los equipos de ÉXODO S.A.C. y sus clientes, reduciendo desplazamientos innecesarios.
 
-5. Viabilidad Ambiental
+6. Viabilidad Ambiental (Green IT y Eficiencia Energética)
 
-<!-- PENDIENTE DE VALIDACION: La Viabilidad Ambiental duplica literalmente los cuatro puntos de la Viabilidad Social. Pendiente de redacción técnica diferenciada enfocada en métricas energéticas y de centros de datos en la nube. -->
+1. Política de Cero Papel (Paperless Office): La digitalización integral del ciclo de vida de los cambios (solicitud RFC, evaluación técnica, deliberación de actas CCB, aprobación y órdenes de cambio) elimina el 100% del consumo de papel, tóner e insumos de impresión física asociados a la gestión documental de configuración.
 
-1. Optimización de Recursos de Hardware: la centralización del desarrollo en
+2. Eficiencia Energética en Infraestructura Cloud: El diseño arquitectónico sobre servicios cloud bajo demanda y arquitecturas de microservicios contenerizados maximiza el aprovechamiento por vCPU/RAM y permite el apagado automático o escalado a cero de instancias en horarios no laborales, reduciendo el consumo eléctrico de centros de datos frente a servidores locales sobredimensionados.
 
-repositorios institucionales evita la necesidad de adquirir nuevo hardware, extendiendo la vida útil de los equipos actuales.
+3. Reducción de Emisiones por Teletrabajo y Auditoría Remota: La plataforma web centralizada permite que los comités de control de cambios, aprobaciones de emergencia y auditorías de configuración se realicen de forma 100% remota y asíncrona, suprimiendo traslados vehiculares urbanos de consultores y clientes y mitigando las emisiones de CO2 asociadas.
 
-2. Reducción de la Huella de Carbono Digital: un flujo de trabajo ordenado
-
-reduce compilaciones fallidas y procesos redundantes, disminuyendo el consumo energético de los servidores.
-
-3. Digitalización y Cero Papel: la automatización de solicitudes de cambio, actas
-
-y reportes elimina la necesidad de documentación impresa.
-
-4. Promoción del Trabajo Remoto: un sistema de configuración robusto facilita
-
-el trabajo colaborativo a distancia entre los equipos de ÉXODO S.A.C. y sus clientes, reduciendo desplazamientos innecesarios.
+4. Extensión del Ciclo de Vida del Hardware Cliente: Al tratarse de una arquitectura cliente ligera (Single Page Application web optimizada), no se exigen estaciones de trabajo de alto rendimiento para la operación del sistema, permitiendo la reutilización de equipos de cómputo existentes en ÉXODO S.A.C. y postergando la generación de residuos de aparatos eléctricos y electrónicos (RAEE).
 
 
 <!-- Página 17 del PDF original -->
@@ -588,7 +622,7 @@ Nota: Elaboración Propia
 
 **Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)**
 
-![Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)](assets/DG-02.png)
+![Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)](../assets/DG-02.png)
 
 #### Código PlantUML del Diagrama
 
@@ -676,7 +710,7 @@ Con la ECN/ECO formalmente vigente, el Administrador de Configuración / Bibliot
 
 **Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)**
 
-![Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)](assets/DG-03.png)
+![Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)](../assets/DG-03.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1088,6 +1122,19 @@ El siguiente cuadro presenta los Requerimientos No Funcionales (RNF-01 a RNF-09)
 | RNF-09 | Respaldo | El sistema debe programar copias de seguridad automáticas diarias del repositorio central. | Alta |
 Nota: Elaboración Propia
 
+> [!NOTE]
+> **Criterios de Verificación y Aplicabilidad de RNF (Sistema Objetivo vs. Prototipo Demostrativo):**
+> Los requisitos no funcionales RNF-01 a RNF-09 establecen los atributos de calidad normativos exigidos para la arquitectura de producción del sistema objetivo (TraceFlow SCM Enterprise). Para la versión del prototipo demostrativo actual (v1.0.0-beta en React/TypeScript con almacenamiento en memoria del navegador), su evaluación se sujeta a las siguientes consideraciones:
+> - **RNF-01 (Seguridad - RBAC):** Implementado y verificable en el prototipo mediante el selector de sesión y control de acceso contextual por rol (PU-01 a PU-07); la capa de cifrado en tránsito (HTTPS/SSH) corresponde al despliegue en servidor.
+> - **RNF-02 (Disponibilidad 99.9%):** Atributo objetivo del entorno de producción; no aplica medición de SLA en entorno de demostración cliente local.
+> - **RNF-03 (Integridad SHA-256):** Implementado y verificable en el prototipo en el cálculo y validación de hash criptográfico en la vista de expediente y auditoría de ECS.
+> - **RNF-04 (Usabilidad < 3h):** Evaluado positivamente en pruebas heurísticas preliminares sobre el prototipo de 8 pantallas funcionales y flujos guiados.
+> - **RNF-05 (Escalabilidad > 50 proyectos):** Requisito del backend y base de datos relacional objetivo (PostgreSQL); el prototipo opera sobre un conjunto controlado de proyectos de demostración.
+> - **RNF-06 (Rendimiento < 3s):** Verificado plenamente en el prototipo cliente SPA con tiempos de respuesta sub-segundo en memoria.
+> - **RNF-07 (Compatibilidad IDEs):** Capacidad de integración del sistema objetivo mediante CLI/API REST; el prototipo actual valida la interfaz de usuario web.
+> - **RNF-08 (Mantenibilidad / Zero Downtime):** Diseñado a nivel de arquitectura objetivo mediante desacoplamiento en microservicios y despliegues canary; el prototipo demuestra modularidad por componentes React.
+> - **RNF-09 (Respaldo automatizado diario):** Operación de base de datos del sistema objetivo (pg_dump / snapshot de storage MinIO); en el prototipo se provee exportación y persistencia en localStorage.
+
 
 <!-- Página 25 del PDF original -->
 
@@ -1141,7 +1188,7 @@ En concordancia con el flujo de gestión de cambios adoptado por TraceFlow
 
 **Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC**
 
-![Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC](assets/DG-11.png)
+![Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC](../assets/DG-11.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1310,7 +1357,7 @@ El sistema se organiza en ocho paquetes principales: Gobernanza y Seguridad, Ges
 
 **Diagrama DG-04: Diagrama de Paquetes Arquitecturales**
 
-![Diagrama DG-04: Diagrama de Paquetes Arquitecturales](assets/DG-04.png)
+![Diagrama DG-04: Diagrama de Paquetes Arquitecturales](../assets/DG-04.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1402,7 +1449,7 @@ Nota: Elaboración Propia
 
 **Diagrama DG-05: Diagrama General de Casos de Uso**
 
-![Diagrama DG-05: Diagrama General de Casos de Uso](assets/DG-05.png)
+![Diagrama DG-05: Diagrama General de Casos de Uso](../assets/DG-05.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1526,7 +1573,7 @@ ACT_ADM --> UC28
 
 **Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos**
 
-![Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos](assets/DG-06.png)
+![Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos](../assets/DG-06.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1566,7 +1613,7 @@ UC02 ..> ACT_ADM : <<secundario>>
 
 **Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias**
 
-![Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias](assets/DG-07.png)
+![Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias](../assets/DG-07.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1624,7 +1671,7 @@ UC30 ..> UC08 : <<include>> (si autoriza)
 
 **Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)**
 
-![Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)](assets/DG-08.png)
+![Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)](../assets/DG-08.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1668,7 +1715,7 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 
 **Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad**
 
-![Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad](assets/DG-09.png)
+![Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad](../assets/DG-09.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1717,7 +1764,7 @@ UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
 
 **Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad**
 
-![Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad](assets/DG-10.png)
+![Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad](../assets/DG-10.png)
 
 #### Código PlantUML del Diagrama
 
@@ -1753,7 +1800,7 @@ UC28 ..> UC_EXP : <<extend>>
 
 ### 6.1.3. Escenarios de Caso de Uso (narrativa)
 
-El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo canónico de 30 casos de uso (`CU-01` a `CU-30`). Esta estructura conserva la numeración histórica de los 28 casos de uso originales (`CU-01` a `CU-28`), incorporando explícitamente las dos capacidades normativas del proceso TO-BE v2: `CU-29: Validar aceptación del cambio por el usuario (UAT)` a cargo del actor Solicitante, y `CU-30: Autorizar Cambio Menor` a cargo de la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto. A continuación se presenta el catálogo general consolidado (TB-10) y la especificación detallada de cada escenario:
+El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo canónico consolidado de 31 casos de uso (`CU-01` a `CU-30`, incluyendo la extensión correctiva `CU-04.1`). Esta estructura conserva la numeración histórica de los 28 casos de uso originales (`CU-01` a `CU-28`), incorporando explícitamente las dos capacidades normativas del proceso TO-BE v2: `CU-29: Validar aceptación del cambio por el usuario (UAT)` a cargo del actor Solicitante, y `CU-30: Autorizar Cambio Menor` a cargo de la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto. A continuación se presenta el catálogo general consolidado (TB-10) y la especificación detallada de cada escenario:
 
 **Tabla TB-10: Catálogo General de Casos de Uso del Sistema TraceFlow SCM**
 
@@ -4015,7 +4062,11 @@ ightarrow$ Autorizada (o Rechazada)
 
 **Diagrama DG-13: Modelo Lógico de la Arquitectura TraceFlow SCM**
 
-![Diagrama DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM](assets/DG-13.png)
+![Diagrama DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM](../assets/DG-13.png)
+
+> [!WARNING]
+> **Aviso de Obsolescencia Metodológica (DOC-025):**
+> Este diagrama ha sido formalmente declarado como **OBSOLETO PARA EL ANÁLISIS** en el SAD de Análisis (`docs/FD04-EPIS-Informe_SAD_Analisis.md`, §13.2) y en la auditoría técnica de la Etapa 02. El modelo introduce decisiones de diseño prematuro (tecnologías específicas de implementación como Node.js, PostgreSQL, Redis y MinIO) que desvirtúan el nivel de abstracción conceptual del SRS. Se conserva en esta revisión exclusivamente como antecedente histórico, quedando sustituido metodológicamente en el SAD por los modelos de análisis puro `DG-SAD-A01`, `DG-SAD-A02` y el Modelo Lógico Canónico `DG-12`.
 
 #### Código PlantUML del Diagrama
 
@@ -4110,7 +4161,7 @@ Cada diagrama modela la interacción directa entre el actor funcional canónico 
 
 **Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)**
 
-![Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)](assets/DG-SEQ-01.png)
+![Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)](../assets/DG-SEQ-01.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4152,7 +4203,7 @@ end
 
 **Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)**
 
-![Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)](assets/DG-SEQ-02.png)
+![Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)](../assets/DG-SEQ-02.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4190,7 +4241,7 @@ end
 
 **Diagrama DG-SEQ-03: Consultar proyecto (CU-03)**
 
-![Diagrama DG-SEQ-03: Consultar proyecto (CU-03)](assets/DG-SEQ-03.png)
+![Diagrama DG-SEQ-03: Consultar proyecto (CU-03)](../assets/DG-SEQ-03.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4225,7 +4276,7 @@ end
 
 **Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)**
 
-![Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)](assets/DG-SEQ-04.png)
+![Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)](../assets/DG-SEQ-04.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4262,7 +4313,10 @@ end
 
 **Diagrama DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
 
-![Diagrama DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)](assets/DG-SEQ-04.1.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-SEQ-04.1 — Subsanar Solicitud de Cambio (RFC) (CU-04.1)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-04.1`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-SEQ-04.1.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4294,7 +4348,7 @@ Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
 
 **Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)**
 
-![Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)](assets/DG-SEQ-05.png)
+![Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)](../assets/DG-SEQ-05.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4336,7 +4390,7 @@ end
 
 **Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)**
 
-![Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)](assets/DG-SEQ-06.png)
+![Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)](../assets/DG-SEQ-06.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4367,7 +4421,7 @@ Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CC
 
 **Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)**
 
-![Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)](assets/DG-SEQ-07.png)
+![Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)](../assets/DG-SEQ-07.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4406,7 +4460,7 @@ end
 
 **Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)**
 
-![Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/DG-SEQ-08.png)
+![Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)](../assets/DG-SEQ-08.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4439,7 +4493,7 @@ Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
 
 **Diagrama DG-SEQ-09: Registrar ECS (CU-09)**
 
-![Diagrama DG-SEQ-09: Registrar ECS (CU-09)](assets/DG-SEQ-09.png)
+![Diagrama DG-SEQ-09: Registrar ECS (CU-09)](../assets/DG-SEQ-09.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4471,7 +4525,7 @@ Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de ca
 
 **Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)**
 
-![Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)](assets/DG-SEQ-10.png)
+![Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)](../assets/DG-SEQ-10.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4503,7 +4557,7 @@ Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de activi
 
 **Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)**
 
-![Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)](assets/DG-SEQ-11.png)
+![Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)](../assets/DG-SEQ-11.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4533,7 +4587,7 @@ Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en
 
 **Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)**
 
-![Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)](assets/DG-SEQ-12.png)
+![Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)](../assets/DG-SEQ-12.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4565,7 +4619,7 @@ Sistema --> CCB: 6. Notificar integración exitosa habilitando la creación de l
 
 **Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)**
 
-![Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)](assets/DG-SEQ-13.png)
+![Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)](../assets/DG-SEQ-13.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4600,7 +4654,7 @@ end
 
 **Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)**
 
-![Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)](assets/DG-SEQ-14.png)
+![Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)](../assets/DG-SEQ-14.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4630,7 +4684,7 @@ Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pru
 
 **Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)**
 
-![Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)](assets/DG-SEQ-15.png)
+![Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)](../assets/DG-SEQ-15.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4660,7 +4714,7 @@ Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a prueb
 
 **Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)**
 
-![Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)](assets/DG-SEQ-16.png)
+![Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)](../assets/DG-SEQ-16.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4690,7 +4744,7 @@ Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certifi
 
 **Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)**
 
-![Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)](assets/DG-SEQ-17.png)
+![Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)](../assets/DG-SEQ-17.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4723,7 +4777,7 @@ Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
 
 **Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)**
 
-![Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)](assets/DG-SEQ-18.png)
+![Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)](../assets/DG-SEQ-18.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4754,7 +4808,7 @@ Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Bibliote
 
 **Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)**
 
-![Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)](assets/DG-SEQ-19.png)
+![Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)](../assets/DG-SEQ-19.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4792,7 +4846,7 @@ end
 
 **Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)**
 
-![Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)](assets/DG-SEQ-20.png)
+![Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)](../assets/DG-SEQ-20.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4826,7 +4880,7 @@ Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
 
 **Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)**
 
-![Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)](assets/DG-SEQ-21.png)
+![Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)](../assets/DG-SEQ-21.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4860,7 +4914,7 @@ Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de
 
 **Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)**
 
-![Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)](assets/DG-SEQ-22.png)
+![Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)](../assets/DG-SEQ-22.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4893,7 +4947,7 @@ Sistema --> CCB: 6. Notificar resolución formal de cancelación de la orden
 
 **Diagrama DG-SEQ-23: Registrar incidencia (CU-23)**
 
-![Diagrama DG-SEQ-23: Registrar incidencia (CU-23)](assets/DG-SEQ-23.png)
+![Diagrama DG-SEQ-23: Registrar incidencia (CU-23)](../assets/DG-SEQ-23.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4925,7 +4979,7 @@ Sistema --> Analista: 6. Notificar nuevo ticket de incidencia para evaluación y
 
 **Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)**
 
-![Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)](assets/DG-SEQ-24.png)
+![Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)](../assets/DG-SEQ-24.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4955,7 +5009,7 @@ Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones
 
 **Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)**
 
-![Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)](assets/DG-SEQ-25.png)
+![Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)](../assets/DG-SEQ-25.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -4987,7 +5041,7 @@ Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimi
 
 **Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)**
 
-![Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)](assets/DG-SEQ-26.png)
+![Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)](../assets/DG-SEQ-26.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -5023,7 +5077,7 @@ end
 
 **Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)**
 
-![Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)](assets/DG-SEQ-27.png)
+![Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)](../assets/DG-SEQ-27.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -5053,7 +5107,7 @@ CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de 
 
 **Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)**
 
-![Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)](assets/DG-SEQ-28.png)
+![Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)](../assets/DG-SEQ-28.png)
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -5085,7 +5139,10 @@ Sistema --> CCB: 6. Remitir reporte consolidado oficial a dirección de proyecto
 
 **Diagrama DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)**
 
-![Diagrama DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)](assets/DG-SEQ-29.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-SEQ-29 — Validar aceptación del cambio por el usuario (UAT) (CU-29)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-29`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-SEQ-29.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -5123,7 +5180,10 @@ end
 
 **Diagrama DG-SEQ-30: Autorizar Cambio Menor (CU-30)**
 
-![Diagrama DG-SEQ-30: Autorizar Cambio Menor (CU-30)](assets/DG-SEQ-30.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-SEQ-30 — Autorizar Cambio Menor (CU-30)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-30`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-SEQ-30.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Secuencia de Análisis)
 
@@ -5169,7 +5229,7 @@ Nota: Elaboración Propia
 
 **Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)**
 
-![Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM](assets/DG-12.png)
+![Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM](../assets/DG-12.png)
 
 #### Descripción Conceptual del Modelo de Dominio
 
@@ -5413,7 +5473,10 @@ Este modelado formaliza la interacción entre los actores canónicos, las fronte
 
 **Diagrama DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)**
 
-![Diagrama DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)](assets/DG-AO-01.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-01 — Análisis de Objetos — Gestionar usuarios y roles (CU-01)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-01`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-01.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5452,7 +5515,10 @@ E_USR --> E_AUD : "registrado en"
 
 **Diagrama DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)**
 
-![Diagrama DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)](assets/DG-AO-02.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-02 — Análisis de Objetos — Crear y administrar proyectos (CU-02)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-02`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-02.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5491,7 +5557,10 @@ E_PROY --> E_AUD : "registrado en"
 
 **Diagrama DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)**
 
-![Diagrama DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)](assets/DG-AO-03.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-03 — Análisis de Objetos — Consultar proyecto (CU-03)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-03`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-03.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5527,7 +5596,10 @@ E_PROY "1" o-- "0..*" E_LB : "define"
 
 **Diagrama DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)**
 
-![Diagrama DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)](assets/DG-AO-04.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-04 — Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-04`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-04.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5563,7 +5635,10 @@ E_RFC --> E_ECS : "afecta a"
 
 **Diagrama DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
 
-![Diagrama DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)](assets/DG-AO-04.1.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-04.1 — Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-04.1`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-04.1.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5599,7 +5674,10 @@ E_RFC "1" *-- "1..*" E_HIST : "registra evolución"
 
 **Diagrama DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)**
 
-![Diagrama DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)](assets/DG-AO-05.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-05 — Análisis de Objetos — Validar y clasificar la solicitud (CU-05)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-05`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-05.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5638,7 +5716,10 @@ E_RFC --> E_NOTIF : "dispara"
 
 **Diagrama DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)**
 
-![Diagrama DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)](assets/DG-AO-06.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-06 — Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-06`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-06.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5677,7 +5758,10 @@ E_INF "1" *-- "1" E_EST : "contiene"
 
 **Diagrama DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)**
 
-![Diagrama DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)](assets/DG-AO-07.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-07 — Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-07`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-07.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5715,7 +5799,10 @@ E_DICT --> E_INF : "fundamentado en"
 
 **Diagrama DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)**
 
-![Diagrama DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/DG-AO-08.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-08 — Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-08`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-08.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5754,7 +5841,10 @@ E_ECN --> E_AUD : "registrada en"
 
 **Diagrama DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)**
 
-![Diagrama DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)](assets/DG-AO-09.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-09 — Análisis de Objetos — Registrar ECS (CU-09)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-09`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-09.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5793,7 +5883,10 @@ E_ECS --> E_AUD : "registrado en"
 
 **Diagrama DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)**
 
-![Diagrama DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)](assets/DG-AO-10.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-10 — Análisis de Objetos — Efectuar Check-Out (CU-10)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-10`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-10.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5832,7 +5925,10 @@ E_ECS "1" *-- "1" E_LOCK : "protegido mediante"
 
 **Diagrama DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)**
 
-![Diagrama DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)](assets/DG-AO-11.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-11 — Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-11`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-11.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5871,7 +5967,10 @@ E_LOCK --> E_AUD : "registrado en"
 
 **Diagrama DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)**
 
-![Diagrama DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)](assets/DG-AO-12.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-12 — Análisis de Objetos — Efectuar Check-In (CU-12)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-12`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-12.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5912,7 +6011,10 @@ E_LOCK --> E_ECS : "liberado tras Check-In"
 
 **Diagrama DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)**
 
-![Diagrama DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)](assets/DG-AO-13.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-13 — Análisis de Objetos — Consultar historial de versiones (CU-13)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-13`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-13.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5951,7 +6053,10 @@ E_VER --> E_AUD : "trazable mediante"
 
 **Diagrama DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)**
 
-![Diagrama DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)](assets/DG-AO-14.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-14 — Análisis de Objetos — Implementar cambio en el ECS (CU-14)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-14`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-14.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -5987,7 +6092,10 @@ E_COPIA "1" *-- "1" E_BIT : "documentada mediante"
 
 **Diagrama DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)**
 
-![Diagrama DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)](assets/DG-AO-15.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-15 — Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-15`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-15.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6023,7 +6131,10 @@ E_TEST "1" *-- "1" E_RES : "produce"
 
 **Diagrama DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)**
 
-![Diagrama DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)](assets/DG-AO-16.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-16 — Análisis de Objetos — Ejecutar pruebas de integración (CU-16)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-16`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-16.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6059,7 +6170,10 @@ E_SUITE "1" *-- "1..*" E_RES : "genera"
 
 **Diagrama DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)**
 
-![Diagrama DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)](assets/DG-AO-17.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-17 — Análisis de Objetos — Certificar conformidad del cambio (CU-17)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-17`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-17.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6098,7 +6212,10 @@ E_CERT --> E_ECS : "autoriza promoción de"
 
 **Diagrama DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)**
 
-![Diagrama DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)](assets/DG-AO-18.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-18 — Análisis de Objetos — Reportar no conformidad (CU-18)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-18`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-18.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6137,7 +6254,10 @@ E_RNC --> E_COPIA : "restringe integración de"
 
 **Diagrama DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)**
 
-![Diagrama DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)](assets/DG-AO-19.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-19 — Análisis de Objetos — Reevaluar y re-testear (CU-19)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-19`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-19.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6176,7 +6296,10 @@ E_PLAN "1" *-- "1" E_DICT : "concluye en"
 
 **Diagrama DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)**
 
-![Diagrama DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)](assets/DG-AO-20.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-20 — Análisis de Objetos — Crear y congelar línea base (CU-20)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-20`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-20.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6218,7 +6341,10 @@ E_LB --> E_AUD : "registrada en"
 
 **Diagrama DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)**
 
-![Diagrama DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)](assets/DG-AO-21.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-21 — Análisis de Objetos — Ejecutar rollback (CU-21)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-21`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-21.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6257,7 +6383,10 @@ E_REV --> E_LOCK : "dispara liberación de"
 
 **Diagrama DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)**
 
-![Diagrama DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)](assets/DG-AO-22.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-22 — Análisis de Objetos — Cancelar Orden de Cambio (CU-22)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-22`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-22.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6296,7 +6425,10 @@ E_CANC --> E_NOTIF : "dispara"
 
 **Diagrama DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)**
 
-![Diagrama DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)](assets/DG-AO-23.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-23 — Análisis de Objetos — Registrar incidencia (CU-23)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-23`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-23.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6335,7 +6467,10 @@ E_INC "1" *-- "0..*" E_EVID : "respaldado con"
 
 **Diagrama DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)**
 
-![Diagrama DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)](assets/DG-AO-24.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-24 — Análisis de Objetos — Consultar estado de ticket (CU-24)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-24`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-24.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6371,7 +6506,10 @@ E_INC o-- "0..1" E_RFC : "puede derivar en"
 
 **Diagrama DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)**
 
-![Diagrama DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)](assets/DG-AO-25.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-25 — Análisis de Objetos — Derivar incidencia a RFC (CU-25)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-25`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-25.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6408,7 +6546,10 @@ E_INC --> E_RFC : "trazable hacia"
 
 **Diagrama DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)**
 
-![Diagrama DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)](assets/DG-AO-26.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-26 — Análisis de Objetos — Validar integridad (checksum) (CU-26)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-26`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-26.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6444,7 +6585,10 @@ E_HASH --> E_AUD : "asentada en"
 
 **Diagrama DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)**
 
-![Diagrama DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)](assets/DG-AO-27.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-27 — Análisis de Objetos — Auditar acciones del sistema (CU-27)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-27`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-27.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6480,7 +6624,10 @@ E_INF --> E_TRAIL : "consolida y analiza"
 
 **Diagrama DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)**
 
-![Diagrama DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)](assets/DG-AO-28.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-28 — Análisis de Objetos — Generar reportes de estado (CU-28)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-28`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-28.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6522,7 +6669,10 @@ E_REP o-- "0..*" E_ECN : "detalla ejecución de"
 
 **Diagrama DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)**
 
-![Diagrama DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)](assets/DG-AO-29.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-29 — Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-29`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-29.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6561,7 +6711,10 @@ E_UAT "1" *-- "1..*" E_CRIT : "respaldada en"
 
 **Diagrama DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)**
 
-![Diagrama DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)](assets/DG-AO-30.png)
+> [!NOTE]
+> **Figura Pendiente de Renderizado:** DG-AO-30 — Análisis de Objetos — Autorizar Cambio Menor (CU-30)  
+> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-30`).  
+> *Ubicación planificada:* `docs/assets/diagramas/render/analisis/DG-AO-30.png` (Plan de formalización gráfica Etapa 05 / Trazabilidad DOC-004 y DOC-005).
 
 #### Código PlantUML del Diagrama (Análisis BCE)
 
@@ -6709,8 +6862,20 @@ Las siguientes inconsistencias y discrepancias fueron identificadas durante la e
 ### 6. Duplicidad Literal entre Viabilidad Social y Viabilidad Ambiental
 - **Elemento:** Secciones de Viabilidad Social y Ambiental.
 - **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Págs. 16-17).
-- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental son una réplica idéntica de la Viabilidad Social.
-- **Estado de Resolución:** OBSOLETA PARA ANÁLISIS DE SOFTWARE / DIFERIDA A FASE DE FACTIBILIDAD. No compromete los requerimientos funcionales ni el modelo conceptual de SCM. Se mantiene documentada para revisión en el ciclo de actualización del informe de factibilidad (`FD01`).
+- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental eran una réplica idéntica de la Viabilidad Social.
+- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se formalizaron en la Sección 3.5 cuatro ejes técnicos diferenciados de Viabilidad Ambiental enfocados en la política de Cero Papel, eficiencia energética de infraestructura cloud bajo demanda, reducción de emisiones por teletrabajo/comités remotos y extensión de vida útil del hardware cliente mediante arquitectura SPA (DOC-023).
+
+### 8. Enlaces Relativos a Figuras y Gestión de Diagramas Pendientes
+- **Elemento:** Enlaces a diagramas e imágenes en Markdown (`assets/` vs `../assets/`).
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Secciones 4, 5 y 6.
+- **Descripción:** Se detectaron 41 rutas relativas rotas que apuntaban a `assets/` en vez de `../assets/`, impidiendo la visualización desde la subcarpeta `docs/`, así como 34 diagramas (31 de análisis de objetos BCE y 3 de secuencia) referenciados sin archivos gráficos existentes en el repositorio.
+- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se actualizaron las 41 rutas a archivos existentes hacia `../assets/` (DOC-006), se incorporó la advertencia formal de obsolescencia técnica sobre el modelo `DG-13` (DOC-025), y se reemplazaron los 34 enlaces rotos por avisos normativos estructurados de figura pendiente de renderizado vinculados a sus especificaciones PlantUML canónicas en `docs/DIAGRAMS.md` para su generación en la Etapa 05 (DOC-004 y DOC-005).
+
+### 9. Delimitación Técnica del Alcance: Sistema Objetivo vs. Prototipo Demostrativo
+- **Elemento:** Alcance del sistema y catálogo de pantallas.
+- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 1.2 y 5.2.
+- **Descripción:** Existía ambigüedad sobre qué componentes y requisitos correspondían a la arquitectura empresarial de producción y cuáles pertenecían al prototipo navegable desarrollado en React.
+- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se incorporó formalmente la Sección 1.2 delimitando el alcance objetivo vs el prototipo demostrativo (20 pantallas canónicas: 8 interactivas funcionales vía 9 vistas, 12 demostrativas guiadas en `ScreenPlaceholder.tsx` y 2 vistas de sistema), y se agregaron criterios explícitos de verificación de RNF en la Sección 5.2 (DOC-015 y DOC-020).
 
 ### 7. Cobertura del Cierre Exitoso en la Matriz RF-14
 - **Elemento:** Requerimiento RF-14 (Cierre Formal del Cambio y Notificaciones).
@@ -6727,7 +6892,7 @@ Estructuración Formal del Alcance y Gobernanza SCM: Se consolidó con precisió
 <!-- Página 117 del PDF original -->
 
 
-conforme al Decreto Legislativo N° 822 (Ley sobre el Derecho de Autor) y asegura la confidencialidad de la información gestionada en cumplimiento de la Ley N° 29733 . El modelado detallado de los casos de uso (CUS01 al CUS28) con sus respectivos flujos principales, alternativos y de excepción minimiza ambigüedades funcionales, sirviendo de base sólida para las etapas de arquitectura lógica, diseño de persistencia e implementación .
+conforme al Decreto Legislativo N° 822 (Ley sobre el Derecho de Autor) y asegura la confidencialidad de la información gestionada en cumplimiento de la Ley N° 29733 . El modelado detallado de los 31 casos de uso (CU-01 a CU-30, incluyendo CU-04.1) con sus respectivos flujos principales, alternativos y de excepción minimiza ambigüedades funcionales, sirviendo de base sólida para las etapas de arquitectura lógica, diseño de persistencia e implementación .
 
 
 <!-- Página 118 del PDF original -->

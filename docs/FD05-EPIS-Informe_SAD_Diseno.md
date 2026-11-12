@@ -2193,7 +2193,7 @@ BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
 
 > [!NOTE]
 > **Nota de Verificación Operacional (Etapa 05 — Compromisos de Diseño RNF)**:
-> Se declara formalmente que los parámetros operativos de disponibilidad del 99.9% (`RNF-04`), Objetivo de Tiempo de Recuperación de $\le 2$ horas (`RNF-09`), transacciones atómicas (`RNF-03`) y tiempos de respuesta sub-segundo (`RNF-02`) constituyen **objetivos y compromisos de diseño arquitectónico** fundamentados en la topología de contenedores y base de datos relacional. Su validación empírica formal queda programada para las pruebas de carga, estrés y recuperación ante desastres en entorno pre-productivo; no constituyen resultados de laboratorio ejecutados en el prototipo actual en React SPA.
+> Se declara formalmente que los parámetros operativos de disponibilidad del 99.9% (`RNF-02`), Objetivo de Tiempo de Recuperación de $\le 2$ horas (`RNF-09`), transacciones atómicas (`RNF-03`) y tiempos de respuesta sub-segundo (`RNF-06`) constituyen **objetivos y compromisos de diseño arquitectónico** fundamentados en la topología de contenedores y base de datos relacional. Su validación empírica formal queda programada para las pruebas de carga, estrés y recuperación ante desastres en entorno pre-productivo; no constituyen resultados de laboratorio ejecutados en el prototipo actual en React SPA.
 Conforme a lo evaluado en **ADR-010**, se establece la distinción formal de disponibilidad para no confundir capacidades operativas:
 1. **Alta Disponibilidad ante Fallos de Proceso y Despliegues Sin Inactividad (*Zero-Downtime*)**:
    - Se ejecutan **dos réplicas stateless del backend** detrás de Nginx.

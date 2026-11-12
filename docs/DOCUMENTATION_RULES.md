@@ -1,12 +1,12 @@
 # Reglas de Gobernanza Documental - TraceFlow SCM
 
-> **Sistema de Gestión de Configuración de Software - TraceFlow SCM**  
-> **Repositorio:** `TraceFlow`  
-> **Documento de Reglas de Gobernanza Documental**  
-> **Equipo de Desarrollo:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)  
-> **Versión:** 1.0  
-> **Fecha de Entrada en Vigencia:** 2026-09-30  
-> **Estado:** APROBADO  
+> **Sistema de Gestión de Configuración de Software - TraceFlow SCM**
+> **Repositorio:** `TraceFlow`
+> **Documento de Reglas de Gobernanza Documental**
+> **Equipo de Desarrollo:** C-SharkTeam (Medina, Antayhua, Loyola, Rivera)
+> **Versión:** 1.0
+> **Fecha de Entrada en Vigencia:** 2026-09-30
+> **Estado:** APROBADO
 
 ---
 
@@ -26,15 +26,19 @@ Para optimizar el mantenimiento y evitar redundancias operativas, la documentaci
 
 | Archivo | Responsabilidad Principal | Naturaleza |
 | :--- | :--- | :--- |
-| `FD03-EPIS-Informe_SRS.md` | **Documento Maestro Consolidado:** Contiene la memoria completa de Especificación de Requerimientos de Software (SRS) para evaluación formal, contractual y académica. Compila de forma estructurada los requerimientos, tablas, diagramas y narrativas. | Documento Consolidado |
+| `docs/FD03-EPIS-Informe_SRS.md` | **Documento Maestro Consolidado:** Contiene la memoria completa de Especificación de Requerimientos de Software (SRS) para evaluación formal, contractual y académica. Compila de forma estructurada los requerimientos, tablas, diagramas y narrativas. | Documento Consolidado (Revisión Candidata v1.1) |
+| `docs/FD04-EPIS-Informe_SAD_Analisis.md` | **Documento de Arquitectura de Software — Análisis:** Modela la descomposición lógica en 9 módulos conceptuales, modelo conceptual del dominio, análisis de objetos BCE y transiciones de estados RFC. | Documento Consolidado (Revisión Candidata v1.2) |
+| `docs/FD05-EPIS-Informe_SAD_Diseno.md` | **Documento de Arquitectura de Software — Diseño:** Formaliza la arquitectura física, modelo relacional, storage y 3 bibliotecas, flujo REST/SoD, secuencias técnicas, modelos UWE y catálogo de 20 pantallas físicas. | Documento Consolidado (Revisión Candidata v0.5) |
 | `docs/DOCUMENTATION_RULES.md` | **Normativa de Gobernanza Documental:** Define las reglas, estándares de nomenclatura, jerarquías, convenciones de identificadores, checklists y flujo de cambios documentales. | Referencia Normativa Vinculante |
-| `docs/DIAGRAMS.md` | **Fuente Oficial de Diagramas:** Repositorio centralizado y exclusivo de código fuente PlantUML, definiciones gráficas, especificaciones de modelos (casos de uso, secuencia, actividades, clases, paquetes). | Fuente Oficial de Diagramas (SSOT) |
-| `docs/TABLES.md` | **Fuente Oficial de Datos Estructurados:** Repositorio centralizado y exclusivo de matrices de trazabilidad, tablas de requerimientos (RF/RNF), reglas de negocio (RN), perfiles de usuario (PU), cuadros comparativos e inventarios de configuración. | Fuente Oficial de Datos Estructurados (SSOT) |
+| `docs/DIAGRAMS.md` | **Fuente Oficial de Diagramas:** Repositorio centralizado y canónico de código fuente PlantUML, definiciones gráficas, especificaciones de modelos (casos de uso, secuencia, actividades, clases, paquetes). | Fuente Oficial de Diagramas (SSOT) |
+| `docs/TABLES.md` | **Fuente Oficial de Datos Estructurados:** Repositorio centralizado y canónico de matrices de trazabilidad, tablas de requerimientos (RF/RNF), reglas de negocio (RN), perfiles de usuario (PU), cuadros comparativos e inventarios de configuración. | Fuente Oficial de Datos Estructurados (SSOT) |
+| `docs/assets/diagramas/` | **Catálogo Derivado y Modularizado:** Fuentes modulares `.puml` organizadas por dominio (`plantuml/`) y artefactos renderizados (`render/`) en formatos SVG y PNG con manifiesto técnico (`MANIFEST.md`). | Repositorio de Recursos Gráficos |
+| `docs/assets/capturas/` | **Catálogo de Evidencias de Interfaz:** Capturas reales en alta resolución (1440x900) del prototipo React SPA con índice técnico de pantallas y roles (`INDEX.md`). | Evidencias de Ejecución del Prototipo |
 
 ### Declaraciones Fundamentales de Autoridad:
-1. `docs/TABLES.md` es la **única fuente oficial** para cualquier dato tabular o matriz de trazabilidad. Ninguna tabla se crea de forma aislada en el SRS sin residir formalmente en este archivo.
-2. `docs/DIAGRAMS.md` es la **única fuente oficial** para los diagramas y su especificación PlantUML. Ningún diagrama se redefine de manera independiente sin estar versionado en este archivo.
-3. `FD03-EPIS-Informe_SRS.md` es el **documento consolidado**, que consume y refleja fielmente los contenidos definidos en `TABLES.md` y `DIAGRAMS.md`.
+1. `docs/TABLES.md` es la **única fuente oficial** para cualquier dato tabular o matriz de trazabilidad. Ninguna tabla se crea de forma aislada sin residir formalmente en este archivo.
+2. `docs/DIAGRAMS.md` es la **fuente oficial consolidada** para los diagramas y su especificación PlantUML. Ningún diagrama se redefine de manera independiente sin estar versionado en este archivo.
+3. Los documentos consolidados (`docs/FD03`, `docs/FD04`, `docs/FD05`) consumen y reflejan fielmente los contenidos definidos en `TABLES.md` y `DIAGRAMS.md`.
 
 ---
 
@@ -46,15 +50,19 @@ Se define la siguiente jerarquía de autoridad documental:
 [Nivel 1] docs/DOCUMENTATION_RULES.md (Gobernanza y Reglas Mandatorias)
    │
    ├── [Nivel 2] docs/TABLES.md (SSOT de Tablas y Matrices)
-   └── [Nivel 2] docs/DIAGRAMS.md (SSOT de Diagramas PlantUML)
-         │
-         └── [Nivel 3] FD03-EPIS-Informe_SRS.md (Documento Consolidado)
+   ├── [Nivel 2] docs/DIAGRAMS.md (SSOT Consolidado de Diagramas PlantUML)
+   │      └── docs/assets/diagramas/plantuml/ (Fuentes modulares sincronizadas)
+   │
+   └── [Nivel 3] Documentos Consolidados del Sistema:
+          ├── docs/FD03-EPIS-Informe_SRS.md (SRS Candidato v1.1)
+          ├── docs/FD04-EPIS-Informe_SAD_Analisis.md (SAD Análisis Candidato v1.2)
+          └── docs/FD05-EPIS-Informe_SAD_Diseno.md (SAD Diseño Candidato v0.5)
 ```
 
 ### Reglas de Precedencia y Consistencia:
-1. **Conflicto en datos estructurados o matrices:** Prevalece estrictamente lo definido en `docs/TABLES.md` sobre cualquier transcripción en el documento consolidado.
-2. **Conflicto en modelado o especificación visual:** Prevalece estrictamente la especificación PlantUML y la lógica descrita en `docs/DIAGRAMS.md`.
-3. **Sincronización Mandatoria:** Toda modificación efectuada en una fuente oficial (Nivel 2) exige la actualización sincronizada e inmediata del documento consolidado `FD03-EPIS-Informe_SRS.md` (Nivel 3) dentro del mismo ciclo de cambio.
+1. **Conflicto en datos estructurados o matrices:** Prevalece estrictamente lo definido en `docs/TABLES.md` sobre cualquier transcripción en los documentos consolidados.
+2. **Conflicto en modelado o especificación visual:** Prevalece estrictamente la especificación PlantUML y la lógica descrita en `docs/DIAGRAMS.md` y sus fuentes modulares sincronizadas en `docs/assets/diagramas/plantuml/`.
+3. **Sincronización Mandatoria:** Toda modificación efectuada en una fuente oficial (Nivel 2) exige la actualización sincronizada e inmediata de los documentos consolidados (`docs/FD03`, `docs/FD04`, `docs/FD05`) dentro del mismo ciclo de cambio.
 
 ---
 
@@ -64,13 +72,21 @@ Para asegurar la auditabilidad y trazabilidad inequívoca en todo el ciclo de vi
 
 | Elemento | Prefijo Oficial | Formato | Ejemplo | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
-| Requerimiento Funcional | `RF-` | `RF-XX` (2 dígitos mín.) | `RF-01`, `RF-14` | Capacidades y funciones del sistema TraceFlow SCM. |
-| Requerimiento No Funcional | `RNF-` | `RNF-XX` (2 dígitos mín.) | `RNF-01`, `RNF-08` | Criterios de calidad, seguridad, rendimiento y arquitectura. |
-| Regla de Negocio | `RN-` | `RN-XX` (2 dígitos mín.) | `RN-01`, `RN-06` | Políticas, restricciones y directrices operativas mandatorias. |
-| Perfil de Usuario / Actor | `PU-` | `PU-XX` (2 dígitos mín.) | `PU-01`, `PU-05` | Roles humanos o del sistema autorizados a interactuar con SCM. |
-| Caso de Uso | `CU-` | `CU-XX` (2 dígitos mín.) | `CU-01`, `CU-12` | Unidades de interacción funcional del sistema. |
-| Diagrama General / Proceso | `DG-` | `DG-XX` (2 dígitos mín.) | `DG-01`, `DG-04` | Diagramas de actividades, paquetes, clases o casos de uso. |
-| Diagrama de Secuencia | `DG-SEQ-` | `DG-SEQ-XX` (2 dígitos mín.) | `DG-SEQ-01` | Interacciones dinámicas y temporales entre objetos y capas. |
+| Requerimiento Funcional | `RF-` | `RF-XX` (2 dígitos mín.) | `RF-01`, `RF-14` | Capacidades y funciones del sistema TraceFlow SCM (18 RFs). |
+| Requerimiento No Funcional | `RNF-` | `RNF-XX` (2 dígitos mín.) | `RNF-01`, `RNF-08` | Criterios de calidad, seguridad, rendimiento y arquitectura (9 RNFs). |
+| Regla de Negocio | `RN-` | `RN-XX` (2 dígitos mín.) | `RN-01`, `RN-06` | Políticas, restricciones y directrices operativas mandatorias (9 RNs). |
+| Perfil de Usuario / Actor | `PU-` | `PU-XX` (2 dígitos mín.) | `PU-01`, `PU-05` | Roles humanos o del sistema autorizados a interactuar con SCM (7 PUs). |
+| Caso de Uso | `CU-` | `CU-XX` (2 dígitos mín.) | `CU-01`, `CU-30`, `CU-04.1` | Unidades de interacción funcional del sistema (31 CUs canónicos). |
+| Diagrama General / Proceso | `DG-` | `DG-XX` (2 dígitos mín.) | `DG-01`, `DG-04`, `DG-12` | Diagramas de actividades, paquetes, clases o casos de uso. |
+| Diagrama de Secuencia de Análisis | `DG-SEQ-` | `DG-SEQ-XX` (2 dígitos mín.) | `DG-SEQ-01`, `DG-SEQ-04.1` | Interacciones dinámicas y temporales en fase de análisis. |
+| Diagrama de Análisis de Objetos | `DG-AO-` | `DG-AO-XX` (2 dígitos mín.) | `DG-AO-01`, `DG-AO-04.1` | Diagramas BCE de análisis por caso de uso (31 modelos). |
+| Diagrama de Arquitectura de Análisis | `DG-SAD-A` | `DG-SAD-AXX` (2 dígitos) | `DG-SAD-A01`, `DG-SAD-A02` | Diagramas estructurales del SAD de Análisis. |
+| Diagrama de Diseño General | `DG-D` | `DG-DXX` (2 dígitos mín.) | `DG-D01`, `DG-D26` | Diagramas de componentes, paquetes, despliegue y datos en diseño. |
+| Diagrama de Secuencia de Diseño | `DG-DSEQ-` | `DG-DSEQ-XX` (2 dígitos mín.) | `DG-DSEQ-01`, `DG-DSEQ-10` | Secuencias técnicas detalladas de diseño de implementación. |
+| Diagrama de Navegación UWE | `DG-UWE-NAV-`| `DG-UWE-NAV-XX` (2 dígitos) | `DG-UWE-NAV-01`, `DG-UWE-NAV-20` | Modelos de navegación web por pantalla física (20 modelos). |
+| Diagrama de Presentación UWE | `DG-UWE-PRES-`| `DG-UWE-PRES-XX` (2 dígitos) | `DG-UWE-PRES-01`, `DG-UWE-PRES-15` | Modelos de presentación y componentes de UI (15 modelos). |
+| Pantalla Real del Prototipo | `SCREEN-` | `SCREEN-XX` (2 dígitos) | `SCREEN-01`, `SCREEN-09` | Capturas reales de la interfaz del prototipo React (17 capturas). |
+| Wireframe de Diseño | `WF-` | `WF-XX` (2 dígitos) | `WF-01`, `WF-20` | Especificaciones de maquetado e interfaz en diseño. |
 
 ### Regla Estricta de No Reutilización de Identificadores:
 - **Prohibición absoluta:** Un identificador asignado y posteriormente eliminado, fusionado o descartado **NUNCA DEBE REUTILIZARSE**.
@@ -646,4 +662,43 @@ Ante cualquier modificación funcional, actualizar en este orden:
 
 No actualizar directamente un diagrama derivado sin verificar primero la
 fuente funcional que lo origina.
-
+
+---
+
+## 15. Propuesta de Enmienda al CCB: Arquitectura de Gobernanza SSOT Híbrida y Sincronizada
+
+### 1. Contexto
+En la **Etapa 06** del plan de alineación documental, se llevó a cabo la formalización gráfica mediante la extracción y modularización del 100% de los modelos PlantUML, generando 114 archivos `.puml` individuales estructurados por dominio funcional (`docs/assets/diagramas/plantuml/`), así como 228 artefactos renderizados (`render/` en formatos SVG y PNG) y 17 capturas reales del prototipo React.
+
+### 2. Problema Detectado
+- **Monolito Documental Masivo:** Al formalizar los modelos de las fases de análisis y diseño, `docs/DIAGRAMS.md` superó las 7,100 líneas de código y compiló 114 bloques PlantUML heterogéneos.
+- **Riesgo Operativo en Control de Versiones:** La concurrencia de múltiples ingenieros sobre un único archivo centralizado incrementa exponencialmente el riesgo de conflictos de fusión (merge conflicts) en Git.
+- **Opacidad en Identificadores y Duplicidad:** El archivo monolítico albergó históricamente dos modelos semánticamente distintos bajo el mismo identificador `DG-12` (Diagrama de Clases del Dominio vs. Modelo Conceptual del Dominio de Análisis) sin detección temprana.
+- **Sobrecarga de Compilación:** La regeneración de un único diagrama requería parsear o evaluar el archivo completo, limitando la agilidad en integración continua (CI).
+
+### 3. Nueva Regla Propuesta
+Se propone formalizar una **Arquitectura de Gobernanza SSOT Híbrida y Sincronizada**:
+1. **Fuentes Modulares de Trabajo (Nivel 2.1 — Autoría y Edición):**
+   Los archivos individuales `.puml` ubicados en `docs/assets/diagramas/plantuml/` (`generales/`, `analisis/`, `diseno/`, `uwe/`) se reconocen formalmente como los artefactos canónicos de autoría y mantenimiento modular para cada modelo individual.
+2. **Compendio Centralizado Consolidado (Nivel 2.0 — Memoria Institucional):**
+   `docs/DIAGRAMS.md` se conserva y mantiene como el compendio integral consolidado para lectura lineal, auditoría global y revisión curricular del universo gráfico completo.
+3. **Mecanismo de Paridad y Validación Continua:**
+   La sincronización bidireccional se asegura mediante los scripts oficiales `extract_diagrams.py`, `validate_diagrams.py` y `audit_diagram_integrity.py`, controlados por el manifiesto maestro `docs/assets/diagramas/MANIFEST.md`.
+
+### 4. Justificación Técnica y Normativa
+- Cumple con las directrices de modularidad de IEEE 828-2012 e ISO/IEC/IEEE 12207:2017 para la gestión de elementos de configuración de software.
+- Permite la trazabilidad atómica en Git (un commit por modificación a un modelo específico).
+- Desacopla la compilación de imágenes (`render_diagrams.py`), permitiendo builds selectivos o globales por lotes.
+
+### 5. Impacto
+- **Funcional / Arquitectónico:** Nulo. La semántica de los modelos no se altera.
+- **Mantenibilidad y SCM:** Alto impacto positivo. Reduce tiempos de desarrollo, previene colisiones y habilita auditorías automáticas de integridad.
+
+### 6. Documentos Afectados
+- `docs/DOCUMENTATION_RULES.md` (Secciones 2 y 3).
+- `docs/DIAGRAMS.md` (Portada y declaraciones de autoridad).
+- `docs/assets/diagramas/MANIFEST.md` (Validación de fuentes).
+
+### 7. Aprobación Requerida
+La adopción de esta nueva regla queda supeditada a la **Resolución Formal de Aprobación del Comité de Control de Cambios (CCB)** en la sesión de revisión de la línea base documental. Hasta dicha resolución, `docs/DIAGRAMS.md` retiene su condición de SSOT formal consolidado.
+

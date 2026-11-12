@@ -1,0 +1,28 @@
+@startuml DG-AO-19
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Reevaluación y Re-testeo QA" as B
+control "Control de Ciclo de Re-testeo" as C
+
+entity "Plan de Re-testeo" as E_PLAN
+entity "Reporte de No Conformidad" as E_RNC
+entity "Registro de Subsanación" as E_SUBS
+entity "Dictamen de Re-evaluación" as E_DICT
+
+ACT --> B : "inicia ciclo de reverificación"
+B --> C : "coordina re-testeo de correcciones"
+C --> E_PLAN : "establece casos de prueba enfocados"
+C --> E_RNC : "contrasta hallazgos previos"
+C --> E_SUBS : "inspecciona parches aplicados"
+C --> E_DICT : "emite dictamen (Conforme / Fallo Persistente)"
+E_PLAN --> E_RNC : "valida corrección de"
+E_PLAN --> E_SUBS : "inspecciona evidencias de"
+E_PLAN "1" *-- "1" E_DICT : "concluye en"
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml DG-AO-07
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)</b>
+
+actor "Comité de Control\nde Cambios (CCB)" as ACT
+
+boundary "Evaluación Colegiada de Cambio Mayor" as B
+control "Control de Evaluación en CCB" as C
+
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Informe Técnico de Impacto" as E_INF
+entity "Acta del CCB" as E_ACTA
+entity "Dictamen del CCB" as E_DICT
+
+ACT --> B : "delibera viabilidad técnica y negocio"
+B --> C : "registra votación y resolución"
+C --> E_ACTA : "confecciona acta de sesión"
+C --> E_DICT : "emite resolución formal"
+C --> E_RFC : "actualiza estado ('Aprobada' / 'Rechazada')"
+E_ACTA "1" *-- "1..*" E_DICT : "registra acuerdos de"
+E_DICT --> E_RFC : "resuelve formalmente"
+E_DICT --> E_INF : "fundamentado en"
+
+@enduml

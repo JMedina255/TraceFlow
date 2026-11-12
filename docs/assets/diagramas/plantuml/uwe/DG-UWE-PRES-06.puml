@@ -1,0 +1,60 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-06: Panel de Deliberación CCB (NAV-10 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<panel>> #FAF5FF
+    BorderColor<<panel>> #6B46C1
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #9F7AEA
+    BackgroundColor<<vote>> #FFFFFF
+    BorderColor<<vote>> #D69E2E
+}
+
+class "CCBDeliberationContainer (NAV-10)" as CCB <<panel>> {
+    +sessionHeader: Text ("Comité de Control de Cambios — Sesión de Deliberación")
+    +rfcSummaryBanner: RFCReferenceCard (Código, Proyecto, Solicitante)
+}
+
+class "TechnicalImpactAssessmentView" as ImpactView <<section>> {
+    +architectureEvaluation: MarkdownViewer (Dictamen del Arquitecto - RN-05)
+    +affectedItemsList: List (ECS intervenidos y dependencias cruzadas)
+    +tripleConstraintGrid: Grid (Alcance: Alto | Tiempo estimado: 15d | Costo estimado)
+    +riskAssessment: RiskMatrix (Riesgo Técnico / Operacional)
+}
+
+class "MemberVotingPanel (Registro Individual de Votos)" as VotePanel <<vote>> {
+    +currentUserRoleBadge: Badge ("Miembro Votante: Dr. Valcarcel / CCB")
+    +radioVoteDecision: RadioGroup (APROBAR / RECHAZAR / ABSTENCIÓN)
+    +inputVoteJustification: TextArea (Fundamentación obligatoria del voto)
+    +btnSubmitVote: ActionButton ("Registrar Mi Voto")
+}
+
+class "VotingTallyRegion (Conteo y Registro de Votos Emitidos)" as Tally <<section>> {
+    +votesRecordedTable: Table (Miembro, Rol, Decisión, Fecha/Hora, Fundamento)
+    +statusResolutionBanner: Banner ("En espera de resolución formal")
+}
+
+class "FormalResolutionClosure" as Resolution <<section>> {
+    +inputResolutionObservations: TextArea ("Observaciones del Acta de Sesión")
+    +btnIssueApprovalResolution: PrimaryButton ("Emitir Resolución: APROBADA (CU-08)")
+    +btnIssueRejectionResolution: DangerButton ("Emitir Resolución: RECHAZADA")
+}
+
+note bottom of CCB
+  <b>Saneamiento Normativo:</b>
+  Se eliminan términos no regulados como "quórum" o "mayoría calificada".
+  El panel registra deliberación, votación individual fundamentada
+  y emisión de resolución colegiada formal (aprobación/rechazo).
+end note
+
+CCB *-- ImpactView
+CCB *-- VotePanel
+CCB *-- Tally
+CCB *-- Resolution
+
+@enduml

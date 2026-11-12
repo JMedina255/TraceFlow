@@ -1,0 +1,27 @@
+@startuml DG-SEQ-29
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
+
+actor "Solicitante\n(Usuario Final)" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+
+Solicitante -> Sistema: 1. Acceder a bandeja y seleccionar RFC en 'En Aceptación' certificada por QA
+Sistema --> Solicitante: 2. Presentar entorno de pruebas de aceptación y resumen de necesidad original
+Solicitante -> Sistema: 3. Ejecutar pruebas de aceptación verificando satisfacción de necesidades operativas
+Solicitante -> Sistema: 4. Confirmar que solución satisface requerimientos y suscribir Acta UAT
+Sistema -> Sistema: 5. Validar suscripción de acta, verificar certificación de QA y anexar al expediente (RN-09)
+Sistema --> Solicitante: 6. Emitir constancia formal de conformidad de usuario
+Sistema --> Admin: 6. Notificar cumplimiento de doble validación para Check-In a Maestra
+
+alt E1: Rechazo funcional de usuario por insatisfacción de necesidad original
+  Solicitante -> Sistema: Registrar Acta de No Aceptación UAT detallando discrepancias
+  Sistema -> Sistema: Bloquear Check-In a Biblioteca Maestra (RN-09)
+  Sistema --> Admin: Notificar activación obligatoria de Rollback (CU-21) y Cancelación (CU-22)
+end
+
+@enduml

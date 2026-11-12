@@ -1,0 +1,31 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Administración de Usuarios y Proyectos</b>
+
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+actor "Analista de Requerimientos / Gestor" as ACT_ANA
+actor "Usuarios del sistema" as ACT_USR
+
+rectangle "Módulo de Usuarios y Proyectos" {
+    usecase "CU-01: Gestionar usuarios y roles" as UC01
+    usecase "CU-02: Crear y administrar proyectos" as UC02
+    usecase "CU-03: Consultar proyecto" as UC03
+
+    usecase "Asignar permisos RBAC" as UC_RBAC
+    usecase "Aislar datos de cliente" as UC_ISOLATE
+}
+
+ACT_ADM --> UC01
+UC01 ..> UC_RBAC : <<include>>
+
+ACT_ANA --> UC02
+ACT_ANA --> UC03
+ACT_USR --> UC03
+
+UC02 ..> UC_ISOLATE : <<include>>
+UC02 ..> ACT_ADM : <<secundario>>
+@enduml

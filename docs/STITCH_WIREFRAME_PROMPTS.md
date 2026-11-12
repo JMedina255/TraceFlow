@@ -1049,6 +1049,23 @@ SCREEN → componente/página React → NAV → CU → API-DRAFT
 
 ---
 
+## 9.1 Evidencia de Implementación en Prototipo React (Etapa 06)
+
+Como parte de la consolidación de la Etapa 06, el prototipo navegable React implementó la suite completa de pantallas aquí especificadas, recopilando **17 capturas reales** en `docs/assets/capturas/`:
+
+- **Autenticación:** `SCREEN-01` (`assets/capturas/autenticacion/SCREEN-01_login_institucional.png`)
+- **Dashboards:** `SCREEN-02` en 3 variantes de rol (`assets/capturas/dashboard/`)
+- **Flujo de RFC:** `SCREEN-05` (Bandeja), `SCREEN-06` (Expediente 360°), `SCREEN-07` (Alta y Subsanación) en `assets/capturas/rfc/`
+- **Análisis de Impacto:** `SCREEN-08` (`assets/capturas/analisis-impacto/SCREEN-08_analisis_impacto_tecnico.png`)
+- **Deliberación CCB:** `SCREEN-09` (`assets/capturas/ccb/SCREEN-09_sala_deliberacion_ccb.png`)
+- **Autorización Cambio Menor:** `SCREEN-10` (`assets/capturas/autorizaciones/SCREEN-10_autorizacion_cambio_menor.png`)
+- **Soporte y Seguridad:** `SOPORTE-01` (404 Not Found) y `SOPORTE-02` (403 Forbidden SoD) en `assets/capturas/soporte/`
+- **Componentes Demostrativos:** `SCREEN-03`, `SCREEN-12`, `SCREEN-13`, `SCREEN-17` en `assets/capturas/placeholders/`
+
+El inventario exhaustivo con resoluciones y trazabilidad se encuentra en [`docs/assets/capturas/INDEX.md`](assets/capturas/INDEX.md).
+
+---
+
 # 10. Nota de gobernanza
 
 Este documento contiene PROMPTS DE GENERACIÓN y no modifica las baselines funcionales.

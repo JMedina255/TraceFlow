@@ -1,0 +1,19 @@
+@startuml DG-SEQ-27
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-27: Auditar acciones del sistema (CU-27)</b>
+
+actor "Comité de Control de Cambios (CCB)" as CCB
+participant "TraceFlow SCM" as Sistema
+
+CCB -> Sistema: 1. Acceder al panel de auditoría y trazabilidad del sistema
+Sistema --> CCB: 2. Presentar opciones de consulta y filtrado de bitácora histórica
+CCB -> Sistema: 3. Definir criterios de inspección por proyecto, rango de fechas, actor u operación
+Sistema -> Sistema: 4. Validar privilegios para visualización de registros confidenciales (RBAC)
+Sistema --> CCB: 5. Presentar secuencia cronológica de transacciones críticas y estados (RN-01)
+CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de trazabilidad
+
+@enduml

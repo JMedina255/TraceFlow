@@ -1,0 +1,78 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-05: Registro y Subsanación de RFC (NAV-07, NAV-08 / PRES-06, PRES-05)</b>
+
+skinparam class {
+    BackgroundColor<<wizard>> #F7FAFC
+    BorderColor<<wizard>> #3182CE
+    BackgroundColor<<step>> #FFFFFF
+    BorderColor<<step>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #63B3ED
+    BackgroundColor<<buttons>> #EDF2F7
+    BorderColor<<buttons>> #CBD5E0
+}
+
+class "RFCFormContainer" as Container <<wizard>> {
+    +formTitle: Text ("Registro de Solicitud de Cambio (RFC)")
+    +stepProgressBar: ProgressBar (Paso actual / Total)
+}
+
+package "Paso 1: Información General" as Step1 <<step>> {
+    class "GeneralInfoGroup" as G1 <<form>> {
+        +selectProject: ProjectSelector (Mandatorio)
+        +inputTitle: TextInput (Mandatorio, máx 120 caracteres)
+        +selectPriority: PriorityDropdown (Baja, Media, Alta, Urgente)
+        +selectCategory: ChangeCategoryDropdown (Correctivo, Adaptativo, Perfectivo)
+    }
+}
+
+package "Paso 2: Justificación y Descripción" as Step2 <<step>> {
+    class "DescriptionGroup" as G2 <<form>> {
+        +inputProblemDescription: TextArea (Mandatorio, descripción detallada)
+        +inputBusinessJustification: TextArea (Mandatorio, justificación y valor)
+        +inputProposedSolution: TextArea (Opcional, propuesta técnica sugerida)
+    }
+}
+
+package "Paso 3: ECS y Evidencias" as Step3 <<step>> {
+    class "ArtifactsGroup" as G3 <<form>> {
+        +multiSelectECS: ECSSelectorList (Sugeridos para intervención)
+        +fileUploader: AttachmentUploader (PDFs, capturas, logs de error)
+    }
+}
+
+package "Paso 4: Confirmación y Envío" as Step4 <<step>> {
+    class "ReviewSummaryGroup" as G4 <<form>> {
+        +summaryPreview: ReadOnlySummaryCard
+        +termsAcknowledgment: Checkbox ("Declaro que los datos son verídicos")
+    }
+}
+
+class "WizardNavigationControls" as Controls <<buttons>> {
+    +btnPrevious: ActionButton ("< Anterior")
+    +btnNext: ActionButton ("Siguiente >")
+    +btnSaveDraft: ActionButton ("Guardar Borrador")
+    +btnSubmit: PrimaryActionButton ("Enviar RFC (Pasa a REGISTRADA)")
+}
+
+note bottom of Container
+  <b>Reutilización para Subsanación (NAV-08):</b>
+  Cuando el Solicitante subsana observaciones (CU-04.1):
+  1. Carga los 4 pasos pre-poblados con los datos originales.
+  2. Resalta en rojo los campos con observaciones del Gestor.
+  3. Muestra panel superior con el Dictamen de Observación formal.
+  4. Botón final: "Re-enviar Solicitud Subsanada".
+end note
+
+Container *-- Step1
+Container *-- Step2
+Container *-- Step3
+Container *-- Step4
+Container *-- Controls
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml DG-SEQ-05
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-05: Validar y clasificar la solicitud (CU-05)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+participant "TraceFlow SCM" as Sistema
+actor "Arquitecto / Especialista Técnico" as Arquitecto
+actor "Solicitante" as Solicitante
+
+Analista -> Sistema: 1. Seleccionar RFC en estado 'Registrada' desde bandeja de evaluación
+Sistema --> Analista: 2. Presentar expediente de la solicitud, justificación, ECS y anexos
+Analista -> Sistema: 3. Revisar completitud de datos, coherencia de alcance y procedencia
+Analista -> Sistema: 4. Emitir dictamen de admisión formal y categorización preliminar
+Sistema -> Sistema: 5. Validar consistencia de admisibilidad y actualizar estado a 'Clasificada' (RN-01)
+Sistema --> Arquitecto: 6. Notificar RFC admitida habilitada para análisis de impacto técnico
+
+alt A1: Información incompleta o insuficiente (Observación)
+  Analista -> Sistema: Registrar pliego de observaciones formales
+  Sistema -> Sistema: Actualizar estado de RFC a 'En Subsanación'
+  Sistema --> Solicitante: Notificar observaciones y plazo de subsanación
+else A2: Solicitud improcedente, duplicada o fuera de alcance
+  Analista -> Sistema: Formular dictamen de desestimación fundamentado
+  Sistema -> Sistema: Transicionar estado a 'Desestimada' (RN-07)
+  Sistema --> Solicitante: Notificar cierre anticipado de solicitud
+end
+
+@enduml

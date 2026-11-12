@@ -1,0 +1,53 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-D05: Flujo Técnico de Autenticación, RBAC y Segregación de Funciones (SoD)</b>
+
+actor "Usuario (Actor Canónico)" as User
+participant "React SPA" as UI
+participant "Nginx Reverse Proxy" as Nginx
+participant "AuthGuard\n(Middleware)" as AuthGuard
+participant "RolesGuard\n(RBAC)" as RolesGuard
+participant "SodGuard\n(SoD Dinámico)" as SodGuard
+participant "Application Service" as AppService
+database "PostgreSQL\n(user_session)" as DB
+
+== Fase 1: Inicio de Sesión y Emisión de Cookie ==
+User -> UI : 1. Ingresar credenciales
+UI -> Nginx : 2. POST /api/v1/auth/login
+Nginx -> AppService : 3. Proxy a NestJS
+AppService -> DB : 4. Valida credenciales con Argon2id y genera token (256 bits)
+DB --> AppService : 5. Persiste hash de sesión
+AppService --> Nginx : 6. 200 OK + Set-Cookie: tf_session (HttpOnly, Secure, SameSite=Strict)
+Nginx --> UI : 7. Respuesta con Cookie segura
+
+== Fase 2: Petición Protegida y Verificación de Seguridad ==
+User -> UI : 8. Ejecutar acción de cambio (e.g. Certificar QA)
+UI -> Nginx : 9. POST /api/v1/change-orders/{id}/qa-certification\n(Cookie tf_session adjunta automáticamente)
+Nginx -> AuthGuard : 10. Enruta solicitud
+
+AuthGuard -> DB : 11. Consulta sesión por hash de token
+alt Sesión inexistente, revocada o inactividad > 15 min
+    DB --> AuthGuard : Sesión inválida / expirada
+    AuthGuard --> UI : 401 Unauthorized (Sesión Expirada)
+else Sesión Válida
+    DB --> AuthGuard : Sesión activa (Actualiza last_activity_at)
+    AuthGuard -> RolesGuard : 12. Pasa contexto de usuario autenticado
+end
+
+alt Rol no autorizado para el Caso de Uso (RN-01)
+    RolesGuard --> UI : 403 Forbidden: Rol no autorizado
+else Rol Autorizado (e.g. EQUIPO_CALIDAD)
+    RolesGuard -> SodGuard : 13. Pasa contexto para evaluación SoD
+end
+
+alt Conflicto de SoD (Desarrollador intenta certificar su propio cambio)
+    SodGuard --> UI : 403 Forbidden: Violación de Segregación de Funciones (SoD)
+else Conformidad SoD
+    SodGuard -> AppService : 14. Ejecuta lógica de Caso de Uso
+    AppService --> UI : 15. 201 Created (Operación Exitosa)
+end
+
+@enduml

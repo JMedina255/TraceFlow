@@ -1,0 +1,21 @@
+@startuml DG-SEQ-04.1
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+actor "Analista de Requerimientos\n/ Gestor" as Analista
+
+Solicitante -> Sistema: 1. Seleccionar RFC en estado 'En Subsanación'
+Sistema --> Solicitante: 2. Presentar formulario de subsanación y pliego formal de observaciones
+Solicitante -> Sistema: 3. Modificar campos requeridos, ampliar justificación y adjuntar anexos
+Sistema -> Sistema: 4. Validar atención de observaciones y completitud de campos (RN-01)
+Sistema -> Sistema: 5. Actualizar expediente de RFC y transicionar estado oficial a 'Registrada'
+Sistema --> Solicitante: 6. Emitir confirmación de subsanación formal
+Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
+
+@enduml

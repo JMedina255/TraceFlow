@@ -1,0 +1,27 @@
+@startuml DG-SEQ-19
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-19: Reevaluar y re-testear (CU-19)</b>
+
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+
+QA -> Sistema: 1. Seleccionar RFC con correcciones aplicadas en estado 'En Pruebas'
+Sistema --> QA: 2. Presentar pliego de defectos previos y memorias técnicas de corrección
+QA -> Sistema: 3. Reejecutar casos de prueba focalizados y suite de regresión en Soporte
+Sistema -> Sistema: 4. Validar resultados de re-testeo y constatar levantamiento de fallas (RN-08)
+Sistema -> Sistema: 5. Consolidar dictamen de re-testeo aprobatorio y actualizar expediente
+Sistema --> QA: 6. Derivar flujo hacia Certificación Técnica de Conformidad (CU-17)
+Sistema --> Dev: 6. Notificar resultado favorable del re-testeo de calidad
+
+alt E1: Fallo definitivo de re-testeo por agotamiento de instancias
+  Sistema -> Sistema: Declarar fallo técnico insubsanable por límite de ciclos
+  Sistema --> QA: Notificar agotamiento de instancias y bloqueo de re-test
+  Sistema --> Dev: Notificar activación obligatoria de Rollback (CU-21)
+end
+
+@enduml

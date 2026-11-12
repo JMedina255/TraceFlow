@@ -1,0 +1,19 @@
+@startuml DG-SEQ-24
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-24: Consultar estado de ticket (CU-24)</b>
+
+actor "Solicitante" as Solicitante
+participant "TraceFlow SCM" as Sistema
+
+Solicitante -> Sistema: 1. Acceder a bandeja de tickets de soporte del proyecto asignado
+Sistema --> Solicitante: 2. Presentar listado de tickets registrados con estados de atención
+Solicitante -> Sistema: 3. Seleccionar ticket de incidencia específico para inspeccionar
+Sistema -> Sistema: 4. Recuperar bitácora de seguimiento, comentarios y estado de atención
+Sistema --> Solicitante: 5. Presentar detalle completo y enlace directo hacia la RFC vinculada
+Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones complementarias
+
+@enduml

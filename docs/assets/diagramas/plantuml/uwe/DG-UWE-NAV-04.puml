@@ -1,0 +1,44 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-04: Modelo de Navegación — Arquitecto / Especialista Técnico (PU-03)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Arquitectura" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS\n(CU-09)" as NAV13 <<index>>
+class "NAV-14: Detalle de ECS\n(Arquitectura y Relaciones)" as NAV14 <<navClass>>
+
+class "NAV-05: RFCs para Análisis" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-09: Análisis de Impacto Técnico\n(CU-06, RN-05)" as NAV09 <<process>>
+class "NAV-11: Autorización Cambio Menor\n(Conformidad Técnica - CU-30)" as NAV11 <<process>>
+
+class "NAV-18: Historial y Comparador Diffs\n(CU-13)" as NAV18 <<index>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo de Configuración
+NAV02 -down-> NAV05 : Bandeja de Análisis Técnico
+
+NAV13 -right-> NAV14 : Seleccionar ECS
+NAV13 ..> NAV13 : [Acción Contextual: Registrar nuevo ECS]
+NAV14 -down-> NAV18 : Inspeccionar Versiones
+
+NAV05 -right-> NAV06 : Seleccionar RFC
+NAV06 -down-> NAV09 : [Condición: Estado = EN_ANALISIS_TECNICO]\nElaborar Informe de Impacto
+NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
+
+@enduml

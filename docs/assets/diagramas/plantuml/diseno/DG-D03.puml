@@ -1,0 +1,272 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam linetype ortho
+
+title <b>DG-D03: Modelo Relacional Lógico de Base de Datos - TraceFlow SCM</b>
+
+entity "app_user" as app_user {
+    * id : UUID [PK]
+    --
+    * username : VARCHAR(50) [UNIQUE]
+    * email : VARCHAR(100) [UNIQUE]
+    * password_hash : VARCHAR(255)
+    * full_name : VARCHAR(120)
+    * status : VARCHAR(20) <<ACTIVE, INACTIVE, SUSPENDED>>
+    * created_at : TIMESTAMP WITH TIME ZONE
+    * updated_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "app_role" as app_role {
+    * id : INT [PK]
+    --
+    * code : VARCHAR(30) [UNIQUE]
+    * name : VARCHAR(80)
+    * description : TEXT
+}
+
+entity "user_role_assignment" as user_role {
+    * user_id : UUID [PK, FK -> app_user.id]
+    * role_id : INT [PK, FK -> app_role.id]
+    --
+    * assigned_at : TIMESTAMP WITH TIME ZONE
+    * assigned_by : UUID [FK -> app_user.id]
+}
+
+entity "user_session" as user_session {
+    * id : UUID [PK]
+    --
+    * user_id : UUID [FK -> app_user.id]
+    * session_token_hash : VARCHAR(64) [UNIQUE, INDEX]
+    * ip_address : VARCHAR(45)
+    * user_agent : TEXT
+    * is_revoked : BOOLEAN
+    * created_at : TIMESTAMP WITH TIME ZONE
+    * last_activity_at : TIMESTAMP WITH TIME ZONE
+    * expires_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "project" as project {
+    * id : UUID [PK]
+    --
+    * code : VARCHAR(20) [UNIQUE]
+    * name : VARCHAR(120)
+    * description : TEXT
+    * client_name : VARCHAR(120)
+    * status : VARCHAR(20) <<ACTIVE, CLOSED, ARCHIVED>>
+    * created_by : UUID [FK -> app_user.id]
+    * created_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "config_item" as config_item {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK -> project.id]
+    * code : VARCHAR(30)
+    * name : VARCHAR(120)
+    * item_type : VARCHAR(30) <<SOURCE_CODE, DOCUMENT, DB_SCHEMA, BUILD_SCRIPT>>
+    * current_library : VARCHAR(20) <<TRABAJO, SOPORTE, MAESTRA>>
+    * current_version_id : UUID [NULLABLE]
+    * is_locked : BOOLEAN
+    * created_at : TIMESTAMP WITH TIME ZONE
+    --
+    CONSTRAINT uq_project_ecs_code UNIQUE(project_id, code)
+}
+
+entity "ecs_version" as ecs_version {
+    * id : UUID [PK]
+    --
+    * ecs_id : UUID [FK -> config_item.id]
+    * version_number : VARCHAR(20) <<mayor.menor.parche - RN-02>>
+    * sha256_checksum : VARCHAR(64) <<RNF-03, RF-17>>
+    * storage_path : VARCHAR(255)
+    * storage_status : VARCHAR(20) <<PENDING_STORAGE, COMMITTED, STORAGE_FAILED>>
+    * file_size_bytes : BIGINT
+    * check_in_by : UUID [FK -> app_user.id]
+    * change_order_id : UUID [NULLABLE]
+    * commit_message : TEXT <<RN-03>>
+    * created_at : TIMESTAMP WITH TIME ZONE
+    --
+    CONSTRAINT uq_ecs_version UNIQUE(ecs_id, version_number)
+}
+
+entity "change_request" as change_request {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK -> project.id]
+    * target_ecs_id : UUID [FK -> config_item.id]
+    * code : VARCHAR(30) [UNIQUE]
+    * title : VARCHAR(150)
+    * description : TEXT
+    * justification : TEXT
+    * priority : VARCHAR(20) <<BAJA, MEDIA, ALTA, CRITICA>>
+    * classification : VARCHAR(20) <<MENOR, MAYOR, PENDIENTE>>
+    * status : VARCHAR(30) <<14 ESTADOS OFICIALES TB-07>>
+    * requested_by : UUID [FK -> app_user.id]
+    * created_at : TIMESTAMP WITH TIME ZONE
+    * updated_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "impact_assessment" as impact_assessment {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [UNIQUE, FK -> change_request.id]
+    * architecture_impact : TEXT
+    * dependencies_impact : TEXT
+    * risk_level : VARCHAR(20) <<BAJO, MEDIO, ALTO>>
+    * effort_hours : INT
+    * estimated_cost : NUMERIC(10,2)
+    * estimated_days : INT
+    * recommended_classification : VARCHAR(20) <<MENOR, MAYOR>>
+    * assessed_by : UUID [FK -> app_user.id]
+    * assessed_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "ccb_resolution" as ccb_resolution {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [FK -> change_request.id]
+    * decision : VARCHAR(20) <<AUTORIZADA, RECHAZADA>>
+    * resolution_act_number : VARCHAR(50)
+    * votes_in_favor : INT
+    * votes_against : INT
+    * observations : TEXT
+    * resolved_by : UUID [FK -> app_user.id]
+    * resolved_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "change_authorization" as change_authorization {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [FK -> change_request.id]
+    * authorizer_role : VARCHAR(40) <<GESTOR, ARQUITECTO>>
+    * authorizer_user_id : UUID [FK -> app_user.id]
+    * decision : VARCHAR(20) <<APROBADO, OBSERVADO, RECHAZADO>>
+    * technical_notes : TEXT
+    * authorized_at : TIMESTAMP WITH TIME ZONE
+    --
+    CONSTRAINT uq_rfc_authorizer_role UNIQUE(rfc_id, authorizer_role)
+}
+
+entity "change_order" as change_order {
+    * id : UUID [PK]
+    --
+    * rfc_id : UUID [UNIQUE, FK -> change_request.id]
+    * ecs_id : UUID [FK -> config_item.id]
+    * code : VARCHAR(30) [UNIQUE] <<ECN/ECO-YYYY-NNN>>
+    * status : VARCHAR(20) <<EMITIDA, EN_EJECUCION, CERRADA, CANCELADA>>
+    * issued_by : UUID [FK -> app_user.id]
+    * assigned_developer_id : UUID [FK -> app_user.id]
+    * issued_at : TIMESTAMP WITH TIME ZONE
+    * closed_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "sync_lock" as sync_lock {
+    * id : UUID [PK]
+    --
+    * ecs_id : UUID [FK -> config_item.id]
+    * change_order_id : UUID [FK -> change_order.id]
+    * locked_by : UUID [FK -> app_user.id]
+    * status : VARCHAR(20) <<ACTIVE, RELEASED>>
+    * locked_at : TIMESTAMP WITH TIME ZONE
+    * released_at : TIMESTAMP WITH TIME ZONE
+    * release_reason : VARCHAR(30) <<CHECK_IN, ROLLBACK, CANCELED>>
+}
+
+entity "qa_certification" as qa_certification {
+    * id : UUID [PK]
+    --
+    * change_order_id : UUID [FK -> change_order.id]
+    * ecs_version_id : UUID [FK -> ecs_version.id]
+    * result : VARCHAR(20) <<CONFORME, NO_CONFORME>>
+    * test_suite_summary : TEXT
+    * certified_by : UUID [FK -> app_user.id]
+    * certified_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "uat_acceptance" as uat_acceptance {
+    * id : UUID [PK]
+    --
+    * change_order_id : UUID [FK -> change_order.id]
+    * ecs_version_id : UUID [FK -> ecs_version.id]
+    * result : VARCHAR(20) <<ACEPTADO, RECHAZADO>>
+    * observations : TEXT
+    * accepted_by : UUID [FK -> app_user.id]
+    * accepted_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "baseline" as baseline {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK -> project.id]
+    * code : VARCHAR(30) [UNIQUE]
+    * name : VARCHAR(120)
+    * version_label : VARCHAR(30)
+    * status : VARCHAR(20) <<CONGELADA, OBSOLETA>>
+    * frozen_by : UUID [FK -> app_user.id]
+    * frozen_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "baseline_item" as baseline_item {
+    * baseline_id : UUID [PK, FK -> baseline.id]
+    * ecs_version_id : UUID [PK, FK -> ecs_version.id]
+    --
+    * added_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "incident_ticket" as incident_ticket {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK -> project.id]
+    * code : VARCHAR(30) [UNIQUE]
+    * title : VARCHAR(150)
+    * description : TEXT
+    * reported_by : UUID [FK -> app_user.id]
+    * status : VARCHAR(20) <<REGISTRADO, DERIVADO, ATENDIDO, CERRADO>>
+    * derived_rfc_id : UUID [NULLABLE, FK -> change_request.id]
+    * created_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "audit_log" as audit_log {
+    * id : UUID [PK]
+    --
+    * timestamp : TIMESTAMP WITH TIME ZONE
+    * actor_user_id : UUID [FK -> app_user.id]
+    * actor_role : VARCHAR(50)
+    * operation : VARCHAR(60)
+    * entity_name : VARCHAR(50)
+    * entity_id : UUID
+    * related_ecn_id : UUID [NULLABLE]
+    * result_status : VARCHAR(20) <<SUCCESS, FAILURE, REJECTED>>
+    * payload_diff : JSONB
+    * ip_address : VARCHAR(45)
+    * user_agent : TEXT
+    * prev_log_hash : VARCHAR(64)
+    * curr_log_hash : VARCHAR(64)
+}
+
+' Relaciones
+app_user ||--o{ user_role : "posee"
+app_role ||--o{ user_role : "asignado a"
+app_user ||--o{ user_session : "inicia"
+app_user ||--o{ project : "crea"
+project ||--o{ config_item : "contiene"
+config_item ||--o{ ecs_version : "versionado en"
+config_item ||--o{ change_request : "afectado por"
+change_request ||--o| impact_assessment : "evaluado en"
+change_request ||--o{ ccb_resolution : "deliberado en (CU-07)"
+change_request ||--o{ change_authorization : "autorizado por (CU-30)"
+change_request ||--o| change_order : "formalizado en"
+change_order ||--o| sync_lock : "aplica"
+change_order ||--o{ qa_certification : "probado en"
+change_order ||--o{ uat_acceptance : "aprobado en"
+project ||--o{ baseline : "define"
+baseline ||--o{ baseline_item : "consolida"
+ecs_version ||--o{ baseline_item : "incluida en"
+project ||--o{ incident_ticket : "registra"
+incident_ticket ||--o| change_request : "deriva en"
+app_user ||--o{ audit_log : "origina"
+app_user ||--o{ change_authorization : "suscribe"
+
+@enduml

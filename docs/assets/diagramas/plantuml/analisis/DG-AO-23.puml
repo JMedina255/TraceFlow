@@ -1,0 +1,28 @@
+@startuml DG-AO-23
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Registro de Incidencia" as B
+control "Control de Incidencias" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Evidencia de Incidencia" as E_EVID
+
+ACT --> B : "reporta fallo u observación operativa"
+B --> C : "solicita alta de ticket"
+C --> E_INC : "crea ticket en estado 'Abierto'"
+C --> E_PROY : "asocia al proyecto afectado"
+C --> E_ECS : "vincula módulo con anomalía"
+C --> E_EVID : "adjunta registros y capturas"
+E_INC --> E_PROY : "afecta a"
+E_INC --> E_ECS : "reporta comportamiento de"
+E_INC "1" *-- "0..*" E_EVID : "respaldado con"
+
+@enduml

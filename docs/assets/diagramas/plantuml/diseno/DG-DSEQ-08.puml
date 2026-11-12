@@ -1,0 +1,39 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
+
+actor "Comité de Control de Cambios (CCB) /\nAnalista de Requerimientos / Gestor" as Actor
+participant "React SPA" as UI
+participant "ChangeRequestController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "ChangeRequestService" as Service
+participant "ChangeOrder (Domain)" as Domain
+participant "ChangeOrderRepoPort" as Repo
+database "PostgreSQL" as DB
+participant "NotificationService" as Notify
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Selecciona RFC autorizada y asigna desarrollador responsable
+UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/change-order (IssueEcnDto)
+Ctrl -> Guard : 3. Valida sesión y rol (LIDER_CCB / GESTOR)
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. issueChangeOrder(rfcId, developerId)
+Service -> DB : 6. Valida estado RFC = 'AUTORIZADA'
+Service -> Domain : 7. createChangeOrder(rfcId, ecsId, developerId)
+Domain --> Service : 8. Instancia Orden ECN (Estado: EMITIDA)
+Service -> Repo : 9. Inicia Transacción ACID
+Repo -> DB : 10. INSERT INTO change_order (...)
+Repo -> DB : 11. UPDATE change_request SET status = 'ORDEN_EMITIDA'
+Repo -> DB : 12. COMMIT
+Service -> Notify : 13. notifyEcnIssued(ecnId, 'BIBLIOTECARIO', developerId)
+Notify --> Service : Notificación despachada
+Service -> Audit : 14. logEvent('ECN_ISSUED', ecnId, userId)
+Audit -> DB : 15. INSERT INTO audit_log (...)
+Service --> Ctrl : 16. ChangeOrderResponseDto
+Ctrl --> UI : 17. 201 Created
+UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
+
+@enduml

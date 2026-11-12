@@ -1,0 +1,28 @@
+@startuml DG-AO-21
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Rollback" as B
+control "Control de Reversión en Trabajo" as C
+
+entity "Acta de Reversión (Rollback)" as E_REV
+entity "Copia de Trabajo" as E_COPIA
+entity "Versión Estable de ECS" as E_ESTAB
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "instruye reversión de cambios no conformes"
+B --> C : "ejecuta protocolo de rollback"
+C --> E_REV : "confecciona acta de descarte técnico"
+C --> E_COPIA : "descarta cambios fallidos en Trabajo"
+C --> E_ESTAB : "restituye estado desde Soporte"
+C --> E_LOCK : "libera bloqueo de sincronización"
+E_REV --> E_COPIA : "ordena purga de"
+E_REV --> E_ESTAB : "restaura versión de"
+E_REV --> E_LOCK : "dispara liberación de"
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml DG-AO-13
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Consulta de Historial de Versiones" as B
+control "Control de Historial y Trazabilidad" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Versión de ECS" as E_VER
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita trazabilidad de versiones"
+B --> C : "solicita línea temporal de cambios"
+C --> E_ECS : "recupera identificador del ECS"
+C --> E_VER : "obtiene árbol histórico y etiquetas"
+C --> E_ECN : "relaciona órdenes motivadoras"
+C --> E_AUD : "obtiene registro cronológico"
+E_ECS "1" *-- "1..*" E_VER : "evoluciona mediante"
+E_VER --> E_ECN : "originada por"
+E_VER --> E_AUD : "trazable mediante"
+
+@enduml

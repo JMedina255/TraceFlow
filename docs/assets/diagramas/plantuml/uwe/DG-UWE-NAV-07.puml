@@ -1,0 +1,36 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-07: Modelo de Navegación — Ingeniero de Software / Desarrollador (PU-06)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard del Desarrollador\n(Mis Órdenes en Ejecución)" as NAV02 <<navClass>>
+
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO - CU-08, CU-14)" as NAV12 <<navClass>>
+class "NAV-15: Mi Espacio de Trabajo\n(Biblioteca de Trabajo - CU-14)" as NAV15 <<navClass>>
+class "NAV-18: Historial de Versiones ECS\n(CU-13)" as NAV18 <<index>>
+class "NAV-20: Consola de No Conformidades\n(Vista Consulta de Defectos - CU-19)" as NAV20 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : [Widget Tareas Asignadas]\nSeleccionar ECN en Desarrollo
+NAV02 -down-> NAV20 : [Widget Alertas de Defectos]\nConsultar Defectos de la ECN
+
+NAV12 -right-> NAV15 : [Condición: Check-Out realizado]\nAcceder a Código Fuente
+NAV15 -down-> NAV18 : Comparar con versión estable
+NAV15 ..> NAV15 : [Acción Contextual: Registrar Pruebas Unitarias CU-15]
+NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
+
+@enduml

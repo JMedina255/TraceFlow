@@ -1,0 +1,56 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-12: Gestión de Línea Base y Rollback SCM (NAV-22, 23 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<base>> #EBF8FF
+    BorderColor<<base>> #2B6CB0
+    BackgroundColor<<baseline>> #FFFFFF
+    BorderColor<<baseline>> #3182CE
+    BackgroundColor<<rollback>> #FFF5F5
+    BorderColor<<rollback>> #E53E3E
+}
+
+class "SCMGovernanceContainer" as Gov <<base>> {
+    +actorIndicator: Text ("Operador: Administrador de Configuración / Bibliotecario (PU-05)")
+    +activeProjectHeader: Text ("Proyecto: TraceFlow SCM Core")
+}
+
+package "Zona A: Congelamiento de Línea Base (NAV-22 / CU-20)" as BaselineZone <<baseline>> {
+    class "BaselineCreationPanel" as B1 <<baseline>> {
+        +inputBaselineTag: TextInput ("Etiqueta: LB-PROY-01-v1.0.0 (Nomenclatura RN-02)")
+        +selectECSInMaster: MultiSelectList ("Seleccionar Versiones Certificadas en Maestra")
+        +baselineDescription: TextArea ("Alcance y Justificación de la Línea Base")
+        +preconditionIndicator: Badge ("Doble Conformidad (QA Conforme + Acta UAT) Verificada")
+        +btnFreezeBaseline: PrimaryButton ("Congelar Línea Base Inmutable")
+    }
+
+    class "FrozenBaselinesCatalog" as B2 <<baseline>> {
+        +baselinesTable: Table (Etiqueta, Fecha de Congelamiento, N° ECS, Checksum Manifiesto, Estado)
+        +btnDownloadManifest: LinkButton ("Descargar Manifiesto Criptográfico SHA-256")
+    }
+}
+
+package "Zona B: Consola de Rollback de Copia de Trabajo (NAV-23 / CU-21)" as RollbackZone <<rollback>> {
+    class "RollbackExecutionModal" as R1 <<rollback>> {
+        +warningBanner: AlertBanner ("ACCION CRITICA: Purga de Copia de Trabajo")
+        +selectActiveECN: Dropdown ("Seleccionar ECN en Conflicto / Cancelada")
+        +affectedWorkSpaceItem: ReadOnlyField ("ECS en /storage/trabajo/{devId}/{ecsId}")
+        +rollbackReasonInput: TextArea ("Motivo Técnico del Rollback (RN-08)")
+        +confirmSafetyCheckbox: Checkbox ("Entiendo que los cambios en Trabajo se descartarán")
+        +btnExecuteWorkRollback: DangerButton ("Ejecutar Rollback en Trabajo y Liberar Lock")
+        -- Restricción Arquitectónica Inviolable --
+        * El rollback purga EXCLUSIVAMENTE la Biblioteca de Trabajo
+        * NO altera, no elimina ni modifica versiones históricas en Biblioteca Maestra
+        * Libera el sync_lock asociado en PostgreSQL
+    }
+}
+
+Gov *-- BaselineZone
+Gov *-- RollbackZone
+
+@enduml

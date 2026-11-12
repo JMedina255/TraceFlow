@@ -1,0 +1,70 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>TraceFlow SCM - Diagrama de Paquetes Arquitecturales</b>
+
+package "Gobernanza y Seguridad" as PKG_GOB {
+    class "Autenticación y RBAC" as MOD_RBAC
+    class "Administración de Usuarios" as MOD_USER
+}
+
+package "Gestión de Proyectos" as PKG_PROJ {
+    class "Aislamiento de Proyectos" as MOD_PROJ
+    class "Asignación de Responsables" as MOD_RESP
+}
+
+package "Gestión de Configuración" as PKG_ECS {
+    class "Catálogo de ECS" as MOD_ECS
+    class "Identificación y Tipado" as MOD_TYPE
+}
+
+package "Gestión de Bibliotecas" as PKG_LIB {
+    class "Biblioteca de Trabajo" as LIB_WRK
+    class "Biblioteca de Soporte" as LIB_SUP
+    class "Biblioteca Maestra" as LIB_MST
+    class "Bloqueos de Sincronización" as MOD_LOCK
+}
+
+package "Control de Cambios" as PKG_CHG {
+    class "Gestión y Clasificación de RFC" as MOD_RFC
+    class "Análisis de Impacto Técnico" as MOD_IMP
+    class "Evaluación CCB (Cambios Mayores)" as MOD_CCB
+    class "Autorización Delegada (Cambios Menores)" as MOD_AUTH_MIN
+    class "Emisión de ECN/ECO" as MOD_ECN
+    class "Validación QA y Aceptación UAT" as MOD_QA_UAT
+    class "Orquestación Check-Out / Check-In" as MOD_ORQ
+}
+
+package "Soporte e Incidencias" as PKG_SUPP {
+    class "Tickets de Incidencias" as MOD_TCK
+    class "Derivación a RFC" as MOD_DERIV
+}
+
+package "Trazabilidad y Auditoría" as PKG_AUD {
+    class "Registro de Auditoría" as MOD_LOG
+    class "Verificación Criptográfica (SHA-256)" as MOD_SHA
+    class "Matriz de Trazabilidad RFC-ECN-ECS" as MOD_TRAC
+}
+
+package "Reportes" as PKG_REP {
+    class "Generador de Reportes e Inventarios" as MOD_RPT
+}
+
+' Relaciones de dependencia descritas en la sección 6.1.1 del SRS
+PKG_PROJ ..> PKG_GOB : <<use>> Seguridad
+PKG_ECS ..> PKG_GOB : <<use>> Seguridad
+PKG_CHG ..> PKG_GOB : <<use>> Seguridad
+
+PKG_LIB ..> PKG_ECS : administra ECS
+PKG_CHG ..> PKG_LIB : orquesta Check-Out / Check-In
+
+PKG_SUPP ..> PKG_CHG : deriva incidencia a RFC
+PKG_AUD <.. PKG_CHG : emite eventos de cambio
+PKG_AUD <.. PKG_ECS : emite eventos de configuración
+
+PKG_REP ..> PKG_AUD : consulta historial
+PKG_REP ..> PKG_LIB : consulta inventario
+@enduml

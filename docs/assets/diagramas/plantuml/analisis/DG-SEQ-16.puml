@@ -1,0 +1,19 @@
+@startuml DG-SEQ-16
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-16: Ejecutar pruebas de integración (CU-16)</b>
+
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+
+QA -> Sistema: 1. Seleccionar RFC en estado 'En Pruebas' desde panel de control
+Sistema --> QA: 2. Presentar expediente, ECN/ECO, ECS en Biblioteca de Soporte y plan de pruebas
+QA -> Sistema: 3. Ejecutar casos de prueba funcionales, de integración y regresión en Soporte
+Sistema -> Sistema: 4. Registrar resultados de cada caso de prueba (aprobado/fallido) y evidencias
+Sistema -> Sistema: 5. Consolidar informe de ejecución determinando cobertura y criterios de calidad
+Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certificar o reportar fallo
+
+@enduml

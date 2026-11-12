@@ -1,0 +1,25 @@
+@startuml DG-AO-26
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Validación de Integridad Criptográfica" as B
+control "Control de Verificación de Integridad" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Constancia de Integridad Criptográfica" as E_HASH
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "solicita verificación de hash SHA-256"
+B --> C : "ejecuta cálculo de suma de comprobación"
+C --> E_ECS : "obtiene archivo físico y hash registrado"
+C --> E_HASH : "genera constancia de coincidencia / alteración"
+C --> E_AUD : "registra resultado del control de seguridad"
+E_HASH --> E_ECS : "certifica integridad de"
+E_HASH --> E_AUD : "asentada en"
+
+@enduml

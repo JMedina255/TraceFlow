@@ -1,0 +1,28 @@
+@startuml DG-AO-17
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Certificación de Conformidad QA" as B
+control "Control de Certificación de Calidad" as C
+
+entity "Certificación de Conformidad QA" as E_CERT
+entity "Resultado de Pruebas QA" as E_RES
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Elemento de Configuración (ECS)" as E_ECS
+
+ACT --> B : "emite visto bueno formal"
+B --> C : "solicita emisión de certificado"
+C --> E_CERT : "confecciona constancia de pase a Maestra"
+C --> E_RES : "valida ausencia de defectos críticos"
+C --> E_ECN : "acredita cumplimiento del alcance"
+C --> E_ECS : "habilita Check-In oficial"
+E_CERT --> E_RES : "respaldada en"
+E_CERT --> E_ECN : "certifica cumplimiento de"
+E_CERT --> E_ECS : "autoriza promoción de"
+
+@enduml

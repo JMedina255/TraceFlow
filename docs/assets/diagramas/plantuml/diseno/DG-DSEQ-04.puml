@@ -1,0 +1,37 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+actor "Solicitante" as Actor
+participant "React SPA" as UI
+participant "ChangeRequestController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "ChangeRequestService" as Service
+participant "ChangeRequest (Domain)" as Domain
+participant "ChangeRequestRepoPort" as Repo
+database "PostgreSQL" as DB
+participant "NotificationService" as Notify
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Completa formulario de RFC (título, justificación, ECS afectado)
+UI -> Ctrl : 2. POST /api/v1/rfcs (CreateRfcDto)
+Ctrl -> Guard : 3. canActivate(context)
+Guard --> Ctrl : 4. Permitido (Rol Canónico: SOLICITANTE)
+Ctrl -> Service : 5. registerRfc(dto, userId)
+Service -> Domain : 6. create(dto, userId)
+Domain --> Service : 7. Instancia RFC (Estado Inicial: REGISTRADA)
+Service -> Repo : 8. save(changeRequest)
+Repo -> DB : 9. INSERT INTO change_request (...)
+DB --> Repo : 10. Confirmado
+Service -> Notify : 11. notifyRfcRegistered(rfcId, 'GESTOR')
+Notify --> Service : Evento encolado
+Service -> Audit : 12. logEvent('RFC_REGISTERED', rfcId, userId)
+Audit -> DB : 13. INSERT INTO audit_log (...)
+Service --> Ctrl : 14. RfcResponseDto
+Ctrl --> UI : 15. 201 Created
+UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
+
+@enduml

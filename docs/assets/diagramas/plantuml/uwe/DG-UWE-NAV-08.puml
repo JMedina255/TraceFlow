@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-08: Modelo de Navegación — Equipo de Calidad / Testing (PU-07)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de QA\n(Órdenes Pendientes de Certificación)" as NAV02 <<navClass>>
+
+class "NAV-12: Detalle de Orden de Cambio\n(ECN/ECO en Pruebas)" as NAV12 <<navClass>>
+class "NAV-19: Consola de Validación QA\n(Pruebas de Integración - CU-16)" as NAV19 <<navClass>>
+class "NAV-20: Consola de No Conformidades\n(Vista Registro de Defectos - CU-18)" as NAV20 <<process>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV12 : [Widget Testing Pendiente]\nSeleccionar ECN en Pruebas
+NAV12 -right-> NAV19 : Ejecutar Validación Técnica sobre Soporte
+
+NAV19 ..> NAV20 : [Prueba Fallida]\nReportar No Conformidad (CU-18)
+NAV19 ..> NAV19 : [Prueba Conforme]\nCertificar Conformidad con SoD (CU-17)\n(Habilita EN_ACEPTACION / UAT)
+NAV20 ..> NAV19 : Reevaluar y re-testear tras corrección (CU-19)
+
+@enduml

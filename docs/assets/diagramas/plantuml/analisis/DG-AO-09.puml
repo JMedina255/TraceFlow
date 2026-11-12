@@ -1,0 +1,28 @@
+@startuml DG-AO-09
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)</b>
+
+actor "Arquitecto\n/ Especialista Técnico" as ACT
+
+boundary "Registro de Elemento de Configuración" as B
+control "Control de Registro de ECS" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Proyecto" as E_PROY
+entity "Tipo de ECS" as E_TIPO
+entity "Registro de Auditoría" as E_AUD
+
+ACT --> B : "ingresa metadatos del ECS"
+B --> C : "solicita alta de ítem"
+C --> E_ECS : "registra con nomenclatura unívoca"
+C --> E_PROY : "asocia al proyecto correspondiente"
+C --> E_TIPO : "asigna categoría (Código, Doc, Test)"
+C --> E_AUD : "asienta registro formal"
+E_ECS --> E_PROY : "pertenece a"
+E_ECS --> E_TIPO : "catalogado como"
+E_ECS --> E_AUD : "registrado en"
+
+@enduml

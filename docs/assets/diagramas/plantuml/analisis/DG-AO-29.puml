@@ -1,0 +1,28 @@
+@startuml DG-AO-29
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
+
+actor "Solicitante\n(Usuario Final)" as ACT
+
+boundary "Validación de Aceptación del Cambio (UAT)" as B
+control "Control de Aceptación por el Usuario" as C
+
+entity "Acta de Aceptación UAT" as E_UAT
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Criterio de Aceptación Funcional" as E_CRIT
+
+ACT --> B : "ejecuta pruebas de usuario y registra conformidad"
+B --> C : "solicita formalización de aceptación UAT"
+C --> E_UAT : "emite acta ('Aceptada' / 'Rechazada con Observaciones')"
+C --> E_RFC : "asocia dictamen de negocio a la solicitud"
+C --> E_ECS : "avala entrega funcional del ítem"
+C --> E_CRIT : "verifica cumplimiento de expectativas operativas"
+E_UAT --> E_RFC : "certifica aceptación de"
+E_UAT --> E_ECS : "aprueba versión entregada de"
+E_UAT "1" *-- "1..*" E_CRIT : "respaldada en"
+
+@enduml

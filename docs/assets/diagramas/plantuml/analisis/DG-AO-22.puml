@@ -1,0 +1,28 @@
+@startuml DG-AO-22
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Cancelación de Orden de Cambio" as B
+control "Control de Cancelación Definitiva" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Acta de Cancelación" as E_CANC
+entity "Acta de Reversión (Rollback)" as E_REV
+entity "Notificación de Cierre" as E_NOTIF
+
+ACT --> B : "registra justificación de cierre fallido"
+B --> C : "instruye cancelación formal de orden"
+C --> E_ECN : "revoca orden y transiciona a 'Cancelada'"
+C --> E_CANC : "asienta acta administrativa definitiva"
+C --> E_REV : "verifica ejecución previa de rollback"
+C --> E_NOTIF : "emite aviso de terminación a Solicitante y CCB"
+E_CANC --> E_ECN : "cancela formalmente"
+E_CANC --> E_REV : "fundamentada en"
+E_CANC --> E_NOTIF : "dispara"
+
+@enduml

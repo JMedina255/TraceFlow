@@ -1,0 +1,64 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-13: Auditoría Inmutable y Reportes SCM (NAV-26, 27 / PRES-03, 10)</b>
+
+skinparam class {
+    BackgroundColor<<audit>> #F7FAFC
+    BorderColor<<audit>> #4A5568
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #718096
+    BackgroundColor<<report>> #FFFFFF
+    BorderColor<<report>> #3182CE
+}
+
+class "GovernanceInspectionContainer" as Gov <<audit>> {
+    +projectHeader: Text ("Inspección y Gobernanza SCM")
+}
+
+package "Consola de Auditoría Forense (NAV-26 / CU-27, RNF-03)" as AuditZone <<section>> {
+    class "AuditFilterBar" as AF <<section>> {
+        +actorFilter: Dropdown (Todos los usuarios)
+        +operationFilter: Dropdown (CHECK_OUT, CHECK_IN, LB_FREEZE, etc.)
+        +dateRangePicker: DateRange
+        +btnVerifyChainIntegrity: ActionButton ("Verificar Cadena SHA-256")
+    }
+
+    class "AppendOnlyLogTable" as AT <<section>> {
+        +logTable: Table
+        -- Columnas de Auditoría --
+        * Timestamp (ISO 8601) | Actor | Rol | Operación | Entidad | ECN | SHA-256 Previo | SHA-256 Hash | Estado
+    }
+
+    class "CryptographicVerificationModal" as AVM <<section>> {
+        +integrityResultBanner: SuccessBanner ("Cadena Criptográfica Verificada: 1,420 registros íntegros")
+        +mismatchAlert: DangerBanner ("ALERTA: Corrupción o alteración detectada en registro #ID")
+    }
+}
+
+package "Generador Paramétrico de Reportes (NAV-27 / CU-28, RF-18)" as ReportZone <<report>> {
+    class "ReportParametersForm" as RF <<report>> {
+        +selectReportType: Dropdown
+        -- Reportes Normativos Soportados por RF-18 --
+        * 1. Reporte de Estado de Configuración (CSAR)
+        * 2. Matriz de Trazabilidad Requerimientos vs ECS
+        * 3. Registro Histórico de Cambios por Proyecto
+        +scopeFilter: ProjectDropdown
+        +periodFilter: DateRange
+        +formatSelector: RadioGroup (PDF Ejecutivo / CSV de Datos)
+        +btnGenerateReport: PrimaryButton ("Generar Reporte Oficial")
+    }
+
+    class "ReportPreviewAndDownloadArea" as RD <<report>> {
+        +previewContainer: DocumentViewer (Vista previa preliminar de datos)
+        +btnDownloadFile: DownloadButton ("Descargar Archivo Generado")
+    }
+}
+
+Gov *-- AuditZone
+Gov *-- ReportZone
+
+@enduml

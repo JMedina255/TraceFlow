@@ -1,0 +1,180 @@
+@startuml DG-12
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title <b>DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)</b>
+
+package "Gobernanza y Seguridad" {
+    class Usuario {
+        codigo
+        nombreCompleto
+        correoElectronico
+        estado
+    }
+    class Rol {
+        nombreRol
+        descripcion
+    }
+    class Permiso {
+        codigoPermiso
+        accionPermitida
+    }
+}
+
+package "Gestión de Proyectos" {
+    class Proyecto {
+        codigoProyecto
+        nombre
+        descripcion
+        estado
+    }
+    class "Plan de Gestión SCM" as PlanGestionSCM {
+        politicaVersionamiento
+        estrategiaRamas
+        criteriosCongelamiento
+    }
+}
+
+package "Gestión de Configuración y Bibliotecas" {
+    class "Elemento de Configuración (ECS)" as ElementoConfiguracion {
+        codigoECS
+        nombre
+        tipoECS
+        estado
+        bibliotecaActual
+    }
+    class "Versión de ECS" as VersionECS {
+        numeroVersion
+        etiqueta
+        checksumSHA256
+        fechaSello
+    }
+    class "Bloqueo de Sincronización" as BloqueoSincronizacion {
+        tipoBloqueo
+        fechaImposicion
+        estado
+    }
+    class "Línea Base" as LineaBase {
+        codigoLineaBase
+        nombreHito
+        tipoLineaBase
+        fechaCongelamiento
+        estado
+    }
+}
+
+package "Control de Cambios (RFC / ECN)" {
+    class "Solicitud de Cambio (RFC)" as SolicitudCambio {
+        codigoRFC
+        titulo
+        descripcionMotivo
+        clasificacion
+        prioridad
+        estado
+    }
+    class "Informe Técnico de Impacto" as InformeImpacto {
+        codigoInforme
+        analisisArquitectura
+        evaluacionDependencias
+        estimacionEsfuerzo
+        estimacionCosto
+        dictamenClasificacion
+    }
+    class "Dictamen de Cambio" as DictamenCambio {
+        tipoAutoridad
+        sentidoResolucion
+        justificacionFundamento
+        fechaResolucion
+    }
+    class "Orden de Cambio (ECN/ECO)" as OrdenCambio {
+        codigoOrden
+        alcanceAutorizado
+        responsableAsignado
+        fechaEmision
+        estado
+    }
+}
+
+package "Aseguramiento de Calidad y Aceptación" {
+    class "Certificación de Conformidad QA" as CertificacionQA {
+        codigoCertificado
+        resultadoPruebas
+        conclusionTecnica
+        fechaEmision
+    }
+    class "Acta de Aceptación UAT" as ActaAceptacionUAT {
+        codigoActa
+        resultadoValidacion
+        observacionesUsuario
+        fechaAceptacion
+    }
+    class "Reporte de No Conformidad" as ReporteNoConformidad {
+        codigoReporte
+        descripcionDefecto
+        severidad
+        estadoSubsanacion
+    }
+}
+
+package "Soporte e Incidencias" {
+    class "Incidencia (Ticket)" as TicketIncidencia {
+        codigoTicket
+        resumen
+        severidad
+        estado
+    }
+}
+
+package "Trazabilidad y Auditoría" {
+    class "Registro de Auditoría" as RegistroAuditoria {
+        codigoEvento
+        tipoOperacion
+        marcaTemporal
+        direccionOrigen
+        estadoIntegridad
+    }
+}
+
+' Relaciones de Gobernanza
+Usuario "1" *-- "1..*" Rol : asignado a >
+Rol "1" *-- "1..*" Permiso : otorga >
+
+' Relaciones de Proyecto
+Proyecto "1" *-- "1" PlanGestionSCM : normado por >
+Proyecto "1" o-- "1..*" Usuario : asigna participantes >
+Proyecto "1" *-- "0..*" ElementoConfiguracion : contiene >
+Proyecto "1" *-- "0..*" SolicitudCambio : ámbito de >
+Proyecto "1" *-- "0..*" LineaBase : define >
+
+' Relaciones de ECS y Bibliotecas
+ElementoConfiguracion "1" *-- "1..*" VersionECS : genera >
+ElementoConfiguracion "1" o-- "0..1" BloqueoSincronizacion : restringido por >
+LineaBase "1" o-- "1..*" VersionECS : consolida >
+
+' Relaciones de Cambio
+SolicitudCambio "1" -- "1..*" ElementoConfiguracion : afecta a >
+SolicitudCambio "1" *-- "0..1" InformeImpacto : fundamentada por >
+SolicitudCambio "1" *-- "0..1" DictamenCambio : resuelta mediante >
+DictamenCambio "1" --> "0..1" OrdenCambio : habilita emisión de >
+OrdenCambio "1" --> "1" SolicitudCambio : amparada en >
+OrdenCambio "1" --> "1..*" ElementoConfiguracion : autoriza modificación de >
+
+' Relaciones de Promoción y Versiones
+VersionECS "1" --> "0..1" OrdenCambio : implementada bajo >
+VersionECS "0..1" --> "0..1" CertificacionQA : avalada técnicamente por >
+VersionECS "0..1" --> "0..1" ActaAceptacionUAT : aceptada por usuario mediante >
+CertificacionQA "0..1" o-- "0..*" ReporteNoConformidad : documenta hallazgos en >
+
+' Relaciones de Incidencias
+TicketIncidencia "1" --> "0..1" SolicitudCambio : escala a >
+TicketIncidencia "1" --> "0..1" ElementoConfiguracion : reporta fallo en >
+
+' Relaciones de Auditoría
+RegistroAuditoria "*" --> "1" Usuario : ejecutado por >
+RegistroAuditoria "*" --> "0..1" Proyecto : contextualizado en >
+RegistroAuditoria "*" --> "0..1" SolicitudCambio : traza ciclo de >
+RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
+
+@enduml

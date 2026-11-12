@@ -1,0 +1,28 @@
+@startuml DG-AO-06
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)</b>
+
+actor "Arquitecto\n/ Especialista Técnico" as ACT
+
+boundary "Análisis de Impacto Técnico" as B
+control "Control de Análisis de Impacto" as C
+
+entity "Informe Técnico de Impacto" as E_INF
+entity "Solicitud de Cambio (RFC)" as E_RFC
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Estimación de Esfuerzo y Costo" as E_EST
+
+ACT --> B : "ingresa evaluación técnica"
+B --> C : "solicita formalización de impacto"
+C --> E_INF : "emite y firma informe"
+C --> E_RFC : "asocia a RFC y transiciona a 'En Evaluación'"
+C --> E_ECS : "identifica dependencias afectadas"
+C --> E_EST : "calcula esfuerzo, costo y cronograma"
+E_INF --> E_RFC : "fundamenta decisión de"
+E_INF --> E_ECS : "dimensiona impacto sobre"
+E_INF "1" *-- "1" E_EST : "contiene"
+
+@enduml

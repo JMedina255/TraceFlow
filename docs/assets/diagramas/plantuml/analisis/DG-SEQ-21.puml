@@ -1,0 +1,23 @@
+@startuml DG-SEQ-21
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-21: Ejecutar rollback (CU-21)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+actor "Comité de Control de Cambios (CCB)" as CCB
+
+Admin -> Sistema: 1. Seleccionar orden no conforme sujeta a reversión en Biblioteca de Trabajo
+Sistema --> Admin: 2. Presentar historial de versiones del ECS y versión de origen estable en Soporte
+Admin -> Sistema: 3. Confirmar ejecución de reversión (rollback) sobre la copia de trabajo
+Sistema -> Sistema: 4. Validar que ECS no ingresó a Maestra y restringir reversión a Trabajo (RN-08)
+Sistema -> Sistema: 5. Descartar cambios no conformes, restituir copia previa y liberar bloqueo (RN-06)
+Sistema --> Admin: 6. Asentar acta de reversión en auditoría habilitando cancelación (CU-22)
+Sistema --> Dev: 6. Notificar descarte de copia de trabajo y liberación de bloqueo
+Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de Trabajo
+
+@enduml

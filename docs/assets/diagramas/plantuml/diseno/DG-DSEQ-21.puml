@@ -1,0 +1,47 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-21: Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08)</b>
+
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+participant "React SPA" as UI
+participant "BaselineController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "BaselineService" as Service
+participant "SyncLockRepoPort" as LockRepo
+participant "StoragePort" as Storage
+database "PostgreSQL" as DB
+participant "AuditService" as Audit
+
+note over Service
+  <b>Salvaguarda de la Biblioteca Maestra</b>:
+  El rollback purga exclusivamente los artefactos defectuosos en la
+  Biblioteca de Trabajo. La Biblioteca Maestra y la Biblioteca de Soporte
+  preservan sus versiones estables inalteradas.
+end note
+
+Actor -> UI : 1. Solicita rollback de ECS ante fallo no subsanado en re-test o UAT (RN-08)
+UI -> Ctrl : 2. POST /api/v1/change-orders/{id}/rollback (RollbackDto)
+Ctrl -> Guard : 3. Valida rol canónico BIBLIOTECARIO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. executeRollback(ecnId, reason, userId)
+
+Service -> DB : 6. Inicia Transacción ACID
+Service -> LockRepo : 7. UPDATE sync_lock SET status='RELEASED', release_reason='ROLLBACK'
+LockRepo -> DB : 8. Libera bloqueo de sincronización (RN-06)
+Service -> DB : 9. UPDATE config_item SET is_locked=false, current_library='SOPORTE'
+Service -> DB : 10. UPDATE change_order SET status='CANCELADA'
+Service -> DB : 11. UPDATE change_request SET status='CANCELADA'
+Service -> DB : 12. COMMIT Transacción
+
+Service -> Storage : 13. Purga y restaura espacio de trabajo en /storage/trabajo/{projectId}/{ecsId}/
+Storage --> Service : Espacio de trabajo purgado y restaurado
+Service -> Audit : 14. logEvent('ROLLBACK_EXECUTED', ecsId, userId)
+Audit -> DB : 15. INSERT INTO audit_log (...)
+Service --> Ctrl : 16. RollbackSuccessDto
+Ctrl --> UI : 17. 200 OK
+UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberado y orden cancelada
+
+@enduml

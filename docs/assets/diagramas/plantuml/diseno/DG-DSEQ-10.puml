@@ -1,0 +1,48 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-10: Efectuar Check-Out y Bloqueo de Sincronización (CU-10, CU-11, RN-06)</b>
+
+actor "Administrador de Configuración /\nBibliotecario" as Actor
+actor "Ingeniero de Software /\nDesarrollador" as Dev
+participant "React SPA" as UI
+participant "VersionControlController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "VersionControlService" as Service
+participant "SyncLockRepoPort" as LockRepo
+participant "StoragePort" as Storage
+database "PostgreSQL" as DB
+participant "AuditService" as Audit
+
+Actor -> UI : 1. Selecciona ECN autorizada y ejecuta Check-Out de ECS
+UI -> Ctrl : 2. POST /api/v1/ecs/{id}/check-out (CheckOutDto)
+Ctrl -> Guard : 3. Valida rol canónico (BIBLIOTECARIO)
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. executeCheckOut(ecsId, ecnId, developerId)
+Service -> LockRepo : 6. Inicia Transacción: acquireLock(ecsId, ecnId, developerId)
+LockRepo -> DB : 7. INSERT INTO sync_lock (ecs_id, change_order_id, status='ACTIVE', locked_by=developerId)
+
+alt Conflicto: ECS ya bloqueado por otra orden (Violación RN-06)
+    DB --> LockRepo : Error por Restricción Única Condicional (uq_active_sync_lock_per_ecs)
+    LockRepo --> Service : Excepción SyncLockActiveException
+    Service --> Ctrl : Mapea a 409 Conflict (RFC 7807)
+    Ctrl --> UI : 409 Conflict
+    UI --> Actor : Alerta: "ECS bloqueado por otra orden activa"
+else Bloqueo Adquirido Exitosamente
+    DB --> LockRepo : Inserción Exitosa (Lock ACTIVE)
+    Service -> DB : 8. UPDATE config_item SET is_locked = true, current_library = 'TRABAJO'
+    Service -> DB : 9. UPDATE change_request SET status = 'EN_IMPLEMENTACION'
+    Service -> Storage : 10. copy(soportePath, trabajoPath)
+    Storage --> Service : Archivo copiado en /storage/trabajo/
+    Service -> DB : 11. COMMIT Transacción
+    Service -> Audit : 12. logEvent('CHECK_OUT_APPLIED', ecsId, developerId)
+    Audit -> DB : 13. INSERT INTO audit_log (...)
+    Service --> Ctrl : 14. CheckOutSuccessDto
+    Ctrl --> UI : 15. 200 OK + URL de entrega de artefacto
+    UI --> Actor : 16. Notifica Check-Out exitoso y entrega workspace al Desarrollador
+    UI --> Dev : 17. Habilita espacio de trabajo y descarga de código autorizado
+end
+
+@enduml

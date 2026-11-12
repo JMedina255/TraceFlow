@@ -1,0 +1,55 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-06: Modelo de Navegación — Administrador de Configuración / Bibliotecario (PU-05)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard de Configuración (SCM)" as NAV02 <<navClass>>
+
+class "NAV-13: Catálogo de ECS" as NAV13 <<index>>
+class "NAV-14: Detalle ECS y Verificación SHA-256\n(CU-26)" as NAV14 <<navClass>>
+class "NAV-15: Explorador de Bibliotecas\n(Trabajo, Soporte, Maestra)" as NAV15 <<navClass>>
+
+class "NAV-16: Consola Check-Out\n(CU-10, CU-11, RN-06)" as NAV16 <<process>>
+class "NAV-17: Consola Check-In\n(CU-12, RNF-03, RN-09)" as NAV17 <<process>>
+class "NAV-18: Historial de Versiones\n(CU-13)" as NAV18 <<index>>
+
+class "NAV-22: Consola Líneas Base\n(CU-20, RN-02, RN-09)" as NAV22 <<process>>
+class "NAV-23: Consola de Rollback\n(CU-21, RN-08, RN-06)" as NAV23 <<process>>
+
+class "NAV-28: Gestión Usuarios y Roles\n(CU-01)" as NAV28 <<navClass>>
+class "NAV-26: Auditoría Inmutable (CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado (CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV13 : Catálogo y Bibliotecas
+NAV02 -down-> NAV16 : Operaciones Check-Out
+NAV02 -down-> NAV17 : Operaciones Check-In
+NAV02 -down-> NAV22 : Líneas Base
+NAV02 -down-> NAV28 : IAM y Roles
+NAV02 -down-> NAV26 : Pistas Forenses
+NAV02 -down-> NAV27 : Generar Reportes
+
+NAV13 -right-> NAV14 : Inspeccionar ECS
+NAV14 -down-> NAV18 : Ver Historial
+NAV14 ..> NAV14 : [Acción: Validar Checksum SHA-256]
+
+NAV16 -down-> NAV15 : Bloquea y Transfiere a Trabajo
+NAV17 -down-> NAV15 : Custodia Permanente y Desbloqueo
+NAV22 -down-> NAV15 : Congela en Maestra (mayor.menor.parche)
+NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
+
+@enduml

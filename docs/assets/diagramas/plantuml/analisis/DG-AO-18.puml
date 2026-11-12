@@ -1,0 +1,28 @@
+@startuml DG-AO-18
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)</b>
+
+actor "Equipo de Calidad\n/ Testing" as ACT
+
+boundary "Reporte de No Conformidad QA" as B
+control "Control de Defectos y No Conformidades" as C
+
+entity "Reporte de No Conformidad" as E_RNC
+entity "Defecto / Hallazgo Técnico" as E_DEF
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Copia de Trabajo" as E_COPIA
+
+ACT --> B : "registra observaciones y fallos"
+B --> C : "solicita emisión de no conformidad"
+C --> E_RNC : "crea informe formal de fallas"
+C --> E_DEF : "cataloga severidad de defectos"
+C --> E_ECN : "asocia a orden en curso"
+C --> E_COPIA : "mantiene copia retenida en Trabajo"
+E_RNC "1" *-- "1..*" E_DEF : "detalla"
+E_RNC --> E_ECN : "bloquea promoción de"
+E_RNC --> E_COPIA : "restringe integración de"
+
+@enduml

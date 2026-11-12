@@ -1,0 +1,65 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ActivityMaxWidth 220
+skinparam conditionStyle inside
+
+title <b>ÉXODO S.A.C. - Proceso Actual Empírico de Modificación (AS-IS)</b>
+
+|Consultor / Desarrollador|
+start
+:Identificar necesidad o requerimiento
+arbitrario de cambio;
+
+:Modificar código directamente
+en equipo personal local;
+
+:Nombrar archivos o carpetas
+de forma arbitraria
+(ej. "Proyecto_Final_v2");
+
+:Enviar archivos alterados
+por medios informales
+(correo electrónico, chat, USB);
+
+|Entorno de Integración / Servidor|
+:Recibir archivos divergentes
+sin control de versiones centralizado;
+
+if (¿Trabajo concurrente de varios consultores?) then (Sí)
+    :Sobreescribir archivos
+    y generar pérdida de avances;
+    note right
+        Conflicto de concurrencia:
+        no existen bloqueos de sincronización.
+    end note
+else (No)
+    :Integrar copia directamente;
+endif
+
+:Desplegar a producción del cliente
+sin validación previa de QA
+ni pruebas formales;
+
+|Entorno de Producción del Cliente|
+if (¿Se presenta fallo en producción?) then (Sí)
+    :Detectar incidente crítico;
+    
+    :Intentar identificar versión
+    previa o autor del cambio;
+    
+    note right
+        Fallo crítico:
+        No existen líneas base
+        ni registro de auditoría.
+        No es posible ejecutar Rollback inmediato.
+    end note
+    
+    :Retrabajo forzado y demora en servicio;
+    stop
+else (No)
+    :Operación inestable sin baseline;
+    stop
+endif
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-11: Centro de Suscripción de Acta UAT (NAV-21 / PRES-07)</b>
+
+skinparam class {
+    BackgroundColor<<uat>> #F0FFF4
+    BorderColor<<uat>> #22543D
+    BackgroundColor<<section>> #FFFFFF
+    BorderColor<<section>> #38A169
+    BackgroundColor<<auth>> #FFFFFF
+    BorderColor<<auth>> #276749
+}
+
+class "UATAcceptanceContainer (NAV-21)" as UAT <<uat>> {
+    +rfcReferenceHeader: Text ("Acta de Aceptación de Usuario — RFC-2026-0042")
+    +ecnReferenceTag: Text ("Orden de Cambio Implementada: ECN-2026-0018")
+}
+
+class "PreconditionValidationBadge" as Precond <<section>> {
+    +qaConformityStatus: StatusCard
+    -- Regla de Validación Inviolable (RN-09) --
+    * Muestra: "Certificación QA Conforme Verificada [VÁLIDA]"
+    * Si QA NO ha certificado: Formulario bloqueado con alerta
+      "No es posible suscribir UAT sin certificación conforme previa de QA."
+}
+
+class "FunctionalVerificationChecklist" as Checklist <<section>> {
+    +functionalCriteriaTable: Table
+    -- Criterios de Aceptación Evaluados --
+    * Requerimiento original cumplido según especificación
+    * Casos de uso de usuario final verificados satisfactoriamente
+    * No se introdujeron regresiones en la interfaz funcional
+}
+
+class "UserDecisionAndSignaturePanel" as Signature <<auth>> {
+    +observationsInput: TextArea ("Observaciones del Solicitante / Usuario Final")
+    +radioAcceptanceDecision: RadioGroup (ACEPTADA CONFORME / RECHAZADA)
+    +signatureConfirmationCheck: Checkbox ("Suscribo formalmente en calidad de Solicitante autorizador")
+    +btnSubmitUATConforme: PrimaryButton ("Suscribir Acta Conforme (Habilita Check-In Maestra CU-12 Variante B -> CU-20)")
+    +btnSubmitUATRechazo: DangerButton ("Rechazar Aceptación (Deriva a Corrección/Rollback)")
+}
+
+UAT *-- Precond
+UAT *-- Checklist
+UAT *-- Signature
+
+@enduml

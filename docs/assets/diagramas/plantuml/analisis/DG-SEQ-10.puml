@@ -1,0 +1,21 @@
+@startuml DG-SEQ-10
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-10: Efectuar Check-Out (CU-10)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as Admin
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+
+Admin -> Sistema: 1. Seleccionar Orden de Cambio en estado 'Orden Emitida'
+Sistema --> Admin: 2. Presentar datos de ECN/ECO, ECS en Biblioteca de Soporte y Desarrollador asignado
+Admin -> Sistema: 3. Confirmar operación de Check-Out hacia la Biblioteca de Trabajo
+Sistema -> Sistema: 4. Validar ausencia de bloqueo previo y verificar integridad del ECS (RN-06)
+Sistema -> Sistema: 5. Transferir copia a Biblioteca de Trabajo, aplicar bloqueo y actualizar a 'En Implementación'
+Sistema --> Admin: 6. Registrar asiento histórico de Check-Out en bitácora de auditoría
+Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de actividades técnicas
+
+@enduml

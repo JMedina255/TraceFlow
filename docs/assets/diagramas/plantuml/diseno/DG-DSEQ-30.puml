@@ -1,0 +1,63 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-DSEQ-30: Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05)</b>
+
+actor "Analista de Requerimientos /\nGestor" as Gestor
+actor "Arquitecto /\nEspecialista Técnico" as Arq
+participant "React SPA" as UI
+participant "ChangeRequestController" as Ctrl
+participant "Auth/RolesGuard" as Guard
+participant "ChangeRequestService" as Service
+participant "ChangeAuthRepoPort" as AuthRepo
+database "PostgreSQL" as DB
+participant "NotificationService" as Notify
+participant "AuditService" as Audit
+
+note over Service
+  <b>Modelo de Doble Llave Operativa (RN-01, RN-05)</b>:
+  La autorización de un Cambio Menor no es unipersonal. Exige
+  concurrentemente dos registros de conformidad en la tabla
+  change_authorization: el visto bueno de Gestión y el visto bueno de Arquitectura.
+end note
+
+== Visto Bueno 1: Evaluación por Arquitecto / Especialista Técnico ==
+Arq -> UI : 1. Emite conformidad técnica basada en Informe de Impacto (RN-05)
+UI -> Ctrl : 2. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: ARQUITECTO)
+Ctrl -> Guard : 3. Valida rol ARQUITECTO
+Guard --> Ctrl : 4. Permitido
+Ctrl -> Service : 5. submitAuthorization(rfcId, 'ARQUITECTO', dto, arqUserId)
+Service -> AuthRepo : 6. INSERT INTO change_authorization (rfc_id, authorizer_role='ARQUITECTO', decision='APROBADO')
+AuthRepo -> DB : 7. Persiste conformidad técnica
+Service -> Audit : 8. logEvent('MINOR_CHANGE_ARCH_APPROVED', rfcId, arqUserId)
+Audit -> DB : 9. INSERT INTO audit_log (...)
+Service --> Ctrl : 10. 201 Created (Conformidad técnica registrada)
+Ctrl --> UI : 11. 201 Created
+UI --> Arq : 12. Muestra conformidad técnica registrada (esperando visto bueno de Gestión)
+
+== Visto Bueno 2: Evaluación por Analista de Requerimientos / Gestor y Cierre ==
+Gestor -> UI : 13. Emite visto bueno de alcance, planificación y prioridad
+UI -> Ctrl : 14. POST /api/v1/rfcs/{id}/authorizations (AuthorizeMinorDto: GESTOR)
+Ctrl -> Guard : 15. Valida rol GESTOR
+Guard --> Ctrl : 16. Permitido
+Ctrl -> Service : 17. submitAuthorization(rfcId, 'GESTOR', dto, gestorUserId)
+Service -> AuthRepo : 18. INSERT INTO change_authorization (rfc_id, authorizer_role='GESTOR', decision='APROBADO')
+AuthRepo -> DB : 19. Persiste conformidad de gestión
+
+Service -> DB : 20. Valida existencia concurrente de AMBAS conformidades (GESTOR + ARQUITECTO)
+alt Ambas Conformidades Aprobadas Existen
+    Service -> DB : 21. Inicia Transacción ACID
+    Service -> DB : 22. UPDATE change_request SET status = 'AUTORIZADA'
+    Service -> DB : 23. COMMIT
+    Service -> Notify : 24. notifyMinorChangeAuthorized(rfcId)
+    Notify --> Service : Notificación a Solicitante y CCB
+    Service -> Audit : 25. logEvent('MINOR_CHANGE_FULLY_AUTHORIZED', rfcId, gestorUserId)
+    Audit -> DB : 26. INSERT INTO audit_log (...)
+    Service --> Ctrl : 27. ChangeAuthResponseDto (Estado: AUTORIZADA)
+    Ctrl --> UI : 28. 200 OK (Autorización Compartida Completa)
+    UI --> Gestor : 29. Muestra RFC como AUTORIZADA y habilita emisión de ECN (CU-08)
+end
+
+@enduml

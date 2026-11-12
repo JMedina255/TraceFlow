@@ -1,0 +1,25 @@
+@startuml DG-AO-15
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+
+boundary "Verificación de Pruebas Unitarias" as B
+control "Control de Pruebas Unitarias" as C
+
+entity "Copia de Trabajo" as E_COPIA
+entity "Caso de Prueba Unitaria" as E_TEST
+entity "Resultado de Prueba Unitaria" as E_RES
+
+ACT --> B : "ejecuta batería local"
+B --> C : "coordina verificación unitaria"
+C --> E_COPIA : "inspecciona copia modificada"
+C --> E_TEST : "ejecuta casos de prueba"
+C --> E_RES : "registra métricas y aserciones"
+E_COPIA "1" o-- "1..*" E_TEST : "validada con"
+E_TEST "1" *-- "1" E_RES : "produce"
+
+@enduml

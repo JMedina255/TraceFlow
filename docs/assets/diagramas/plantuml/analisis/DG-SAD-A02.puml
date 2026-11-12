@@ -1,0 +1,75 @@
+@startuml DG-SAD-A02
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-SAD-A02: Arquitectura Lógica Conceptual de TraceFlow SCM</b>
+
+package "MOD-01: Gobernanza y Control de Acceso" as M_GOB #F8F9FA {
+    class "Control de Identidad y Roles" as C_GOB <<boundary>>
+}
+
+package "MOD-02: Gestión de Proyectos" as M_PROJ #F8F9FA {
+    class "Administración de Proyectos" as C_PROJ <<control>>
+}
+
+package "MOD-03: Gestión de Configuración (Identificación de ECS)" as M_ECS #F8F9FA {
+    class "Catálogo e Inventario de ECS" as C_ECS <<entity>>
+}
+
+package "MOD-04: Control de Cambios (RFC / ECN)" as M_CHG #F8F9FA {
+    class "Gestión de RFC y Órdenes ECN" as C_CHG <<control>>
+}
+
+package "MOD-05: Gestión de Bibliotecas y Versionamiento" as M_LIB #F8F9FA {
+    class "Custodia y Versionado en 3 Bibliotecas" as C_LIB <<control>>
+}
+
+package "MOD-06: Implementación y Validación de Calidad" as M_QA #F8F9FA {
+    class "Verificación, Pruebas y UAT" as C_QA <<control>>
+}
+
+package "MOD-07: Líneas Base y Reversión" as M_BASE #F8F9FA {
+    class "Congelamiento y Rollback" as C_BASE <<control>>
+}
+
+package "MOD-08: Soporte y Gestión de Incidencias" as M_INC #F8F9FA {
+    class "Mesa de Incidencias y Escalamiento" as C_INC <<control>>
+}
+
+package "MOD-09: Trazabilidad, Auditoría y Reportes" as M_AUD #F8F9FA {
+    class "Status Accounting y Auditoría Inmutable" as C_AUD <<control>>
+}
+
+' Relaciones de dependencia y colaboración conceptual
+M_GOB ..> M_PROJ : "restringe acceso por rol"
+M_GOB ..> M_CHG : "valida privilegios de autorización"
+M_GOB ..> M_LIB : "autoriza operaciones de biblioteca"
+
+M_PROJ --> M_ECS : "delimita catálogo de"
+M_PROJ --> M_BASE : "define hitos de línea base en"
+
+M_INC --> M_CHG : "deriva incidentes a RFC"
+M_INC ..> M_ECS : "identifica ítem con falla"
+
+M_CHG --> M_ECS : "evalúa impacto sobre"
+M_CHG --> M_LIB : "emite ECN habilitando Check-Out"
+M_CHG --> M_QA : "notifica orden autorizada para implementación"
+
+M_LIB --> M_ECS : "custodia versiones de"
+M_LIB --> M_QA : "provee copia en Trabajo / recibe copia certificada"
+M_LIB --> M_BASE : "suministra versiones aprobadas para congelar"
+
+M_QA --> M_LIB : "exige certificación previa a Check-In"
+M_QA --> M_BASE : "dispara protocolo de rollback ante fallo no subsanado"
+
+M_BASE --> M_LIB : "inmoviliza versiones en Biblioteca Maestra"
+
+M_AUD <-- M_GOB : "audita autenticación y RBAC"
+M_AUD <-- M_CHG : "traza ciclo de vida de RFC y ECN"
+M_AUD <-- M_LIB : "registra Check-Out/In y bloqueos"
+M_AUD <-- M_QA : "asienta certificaciones y dictámenes UAT"
+M_AUD <-- M_BASE : "registra congelamientos y reversiones"
+
+@enduml

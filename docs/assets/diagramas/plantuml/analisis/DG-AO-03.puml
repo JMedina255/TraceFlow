@@ -1,0 +1,25 @@
+@startuml DG-AO-03
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)</b>
+
+actor "Analista de Requerimientos\n/ Gestor" as ACT
+
+boundary "Consulta de Proyecto" as B
+control "Control de Consulta de Proyectos" as C
+
+entity "Proyecto" as E_PROY
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Línea Base" as E_LB
+
+ACT --> B : "consulta estado"
+B --> C : "solicita datos del proyecto"
+C --> E_PROY : "recupera información"
+C --> E_ECS : "obtiene catálogo de ECS"
+C --> E_LB : "obtiene líneas base activas"
+E_PROY "1" o-- "0..*" E_ECS : "contiene"
+E_PROY "1" o-- "0..*" E_LB : "define"
+
+@enduml

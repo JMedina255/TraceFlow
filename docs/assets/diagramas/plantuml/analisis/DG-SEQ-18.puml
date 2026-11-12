@@ -1,0 +1,20 @@
+@startuml DG-SEQ-18
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+title <b>DG-SEQ-18: Reportar no conformidad (CU-18)</b>
+
+actor "Equipo de Calidad\n/ Testing" as QA
+participant "TraceFlow SCM" as Sistema
+actor "Ingeniero de Software\n/ Desarrollador" as Dev
+
+QA -> Sistema: 1. Seleccionar opción de reportar no conformidad sobre RFC en 'En Pruebas'
+Sistema --> QA: 2. Presentar formulario de registro de defectos precargando pruebas fallidas
+QA -> Sistema: 3. Detallar descripción del error, severidad, pasos de reproducción y evidencias
+Sistema -> Sistema: 4. Validar reporte, asentar defecto e incrementar contador de ciclos (RN-08)
+Sistema -> Sistema: 5. Registrar Informe de No Conformidad y suspender trámite de certificación
+Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Biblioteca de Trabajo
+
+@enduml

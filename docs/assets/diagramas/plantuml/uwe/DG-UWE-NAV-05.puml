@@ -1,0 +1,41 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-05: Modelo de Navegación — Comité de Control de Cambios (CCB) (PU-04)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Consola CCB\n(Sesiones y Votaciones Activas)" as NAV02 <<navClass>>
+
+class "NAV-05: Bandeja Cambios Mayores" as NAV05 <<index>>
+class "NAV-06: Detalle Expediente RFC" as NAV06 <<navClass>>
+class "NAV-09: Visor Informe de Impacto" as NAV09 <<navClass>>
+class "NAV-10: Consola Votación CCB\n(CU-07, RN-01, RN-07)" as NAV10 <<process>>
+class "NAV-12: Formalización Orden ECN\n(CU-08)" as NAV12 <<process>>
+
+class "NAV-26: Visor Auditoría Append-Only\n(CU-27)" as NAV26 <<index>>
+class "NAV-27: Reportes de Estado SCM\n(CU-28)" as NAV27 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Deliberación de Cambios
+NAV02 -down-> NAV26 : Auditoría de Acciones
+NAV02 -down-> NAV27 : Reportes Ejecutivos
+
+NAV05 -right-> NAV06 : Seleccionar Cambio Mayor
+NAV06 -down-> NAV09 : Inspeccionar Evaluación Técnica
+NAV06 -right-> NAV10 : [Condición: Estado = EN_EVALUACION]\nVotación y Dictamen
+NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad</b>
+
+actor "Ingeniero de Software / Desarrollador" as ACT_DEV
+actor "Equipo de Calidad / Testing" as ACT_QA
+actor "Solicitante" as ACT_SOL
+
+rectangle "Módulo de Implementación y QA" {
+    usecase "CU-14: Implementar cambio en el ECS" as UC14
+    usecase "CU-15: Ejecutar pruebas unitarias locales" as UC15
+    usecase "CU-16: Ejecutar pruebas de integración" as UC16
+    usecase "CU-17: Certificar conformidad del cambio" as UC17
+    usecase "CU-18: Reportar no conformidad" as UC18
+    usecase "CU-19: Reevaluar y re-testear" as UC19
+    usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
+}
+
+ACT_DEV --> UC14
+ACT_DEV --> UC15
+UC14 ..> UC15 : <<include>>
+
+ACT_QA --> UC16
+ACT_QA --> UC17
+ACT_QA --> UC18
+ACT_QA --> UC19
+
+UC16 ..> UC17 : <<extend>> (si conforme)
+UC16 ..> UC18 : <<extend>> (si defectos)
+UC18 ..> UC19 : <<triggers>> (tras corrección)
+ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
+
+' Validación UAT del Solicitante / Usuario Final
+ACT_SOL --> UC29
+UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
+@enduml

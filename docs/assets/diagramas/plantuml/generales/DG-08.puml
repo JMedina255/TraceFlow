@@ -1,0 +1,35 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+left to right direction
+
+title <b>TraceFlow SCM - Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)</b>
+
+actor "Arquitecto / Especialista Técnico" as ACT_ARQ
+actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
+
+rectangle "Núcleo de Configuración (SCM Core)" {
+    usecase "CU-09: Registrar ECS" as UC09
+    usecase "CU-10: Efectuar Check-Out (Soporte → Trabajo)" as UC10
+    usecase "CU-11: Aplicar bloqueo de sincronización" as UC11
+    usecase "CU-12: Efectuar Check-In (Trabajo → Maestra/Soporte)" as UC12
+    usecase "CU-13: Consultar historial de versiones" as UC13
+    usecase "CU-20: Crear y congelar línea base" as UC20
+    usecase "CU-21: Ejecutar rollback en Biblioteca de Trabajo" as UC21
+    usecase "CU-22: Cancelar Orden de Cambio" as UC22
+}
+
+ACT_ARQ --> UC09
+ACT_ADM --> UC10
+ACT_ADM --> UC11
+ACT_ADM --> UC12
+ACT_ADM --> UC13
+ACT_ADM --> UC20
+ACT_ADM --> UC21
+ACT_ADM --> UC22
+
+UC10 ..> UC11 : <<include>> (impone bloqueo)
+UC12 ..> UC20 : <<triggers>> (tras certificación)
+UC21 ..> UC22 : <<include>> (si re-test falla)
+@enduml

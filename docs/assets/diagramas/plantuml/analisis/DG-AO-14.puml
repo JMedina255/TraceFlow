@@ -1,0 +1,25 @@
+@startuml DG-AO-14
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)</b>
+
+actor "Ingeniero de Software\n/ Desarrollador" as ACT
+
+boundary "Entorno de Implementación de Cambio" as B
+control "Control de Modificación de ECS" as C
+
+entity "Orden de Cambio (ECN/ECO)" as E_ECN
+entity "Copia de Trabajo" as E_COPIA
+entity "Bitácora de Modificación Técnica" as E_BIT
+
+ACT --> B : "aplica modificaciones al código / doc"
+B --> C : "gestiona trabajo en espacio aislado"
+C --> E_ECN : "verifica alcance autorizado"
+C --> E_COPIA : "modifica ítem en Biblioteca de Trabajo"
+C --> E_BIT : "asienta detalles de intervención técnica"
+E_COPIA --> E_ECN : "amparada en"
+E_COPIA "1" *-- "1" E_BIT : "documentada mediante"
+
+@enduml

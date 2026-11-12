@@ -1,0 +1,47 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-09: Operaciones SCM — Check-Out y Check-In (NAV-16, 17 / PRES-08)</b>
+
+skinparam class {
+    BackgroundColor<<dialog>> #FFFFFF
+    BorderColor<<dialog>> #2B6CB0
+    BackgroundColor<<field>> #F7FAFC
+    BorderColor<<field>> #CBD5E0
+    BackgroundColor<<action>> #3182CE
+    FontColor<<action>> #FFFFFF
+}
+
+class "CheckOutModal (NAV-16 / CU-10, CU-11)" as CheckOutDialog <<dialog>> {
+    +modalTitle: Text ("Extracción de Copia de Trabajo (Check-Out)")
+    +ecsTargetInfo: ECSReferenceCard (ID, Nombre, Versión origen en Soporte)
+    +assignedDeveloper: UserSelector (Ingeniero de Software PU-06)
+    +authorizedECN: ECNSelector (Orden de Cambio aprobada)
+    +lockMandatoryNotice: StatusText ("🔒 Bloqueo Exclusivo RN-06: Se aplicará automáticamente al confirmar Check-Out (El usuario no puede desactivarlo)")
+    +btnExecuteCheckOut: ActionButton ("Confirmar Check-Out y Bloquear")
+    -- Efecto Transaccional --
+    * Copia física a /storage/trabajo/{devId}/{ecsId}
+    * Inserción de sync_lock (ACTIVE) en PostgreSQL
+}
+
+class "CheckInModal (NAV-17 / CU-12)" as CheckInDialog <<dialog>> {
+    +modalTitle: Text ("Depósito y Promoción de Artefacto (Check-In)")
+    +targetOperationSelector: RadioGroup
+    -- Opciones de Promoción --
+    * **Check-In A (Técnico)**: Trabajo $
+ightarrow$ Soporte (Tras pruebas unitarias CU-15)
+    * **Check-In B (Definitivo)**: Soporte $
+ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
+    +fileUploadInput: FileInput (Selección del archivo modificado)
+    +clientComputedHash: CodeTag ("SHA-256 Calculado en Navegador")
+    +serverVerifiedHash: CodeTag ("SHA-256 Verificado por Backend")
+    +versionIncrementType: RadioGroup (Parche / Menor / Mayor - RN-02)
+    +changeLogNotes: TextArea ("Notas de la versión implementada")
+    +releaseLockCheckbox: Checkbox ("Liberar sync_lock tras Check-In exitoso [Marcado]")
+    +btnExecuteCheckIn: ActionButton ("Completar Check-In y Verificar SHA-256")
+}
+
+@enduml

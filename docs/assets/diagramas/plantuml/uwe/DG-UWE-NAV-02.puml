@@ -1,0 +1,43 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-NAV-02: Modelo de Navegación — Solicitante (PU-01)</b>
+
+skinparam class {
+    BackgroundColor<<navClass>> #EBF8FF
+    BorderColor<<navClass>> #3182CE
+    BackgroundColor<<index>> #E6FFFA
+    BorderColor<<index>> #319795
+    BackgroundColor<<process>> #FFF5F5
+    BorderColor<<process>> #E53E3E
+}
+
+class "NAV-01: Inicio de Sesión" as NAV01 <<navClass>>
+class "NAV-02: Dashboard Solicitante\n(Mis Tareas y Alertas)" as NAV02 <<navClass>>
+class "NAV-05: Mis Solicitudes (RFC)" as NAV05 <<index>>
+class "NAV-06: Detalle de RFC" as NAV06 <<navClass>>
+class "NAV-07: Formulario Registro RFC\n(CU-04)" as NAV07 <<process>>
+class "NAV-08: Subsanar RFC\n(CU-04.1)" as NAV08 <<process>>
+class "NAV-21: Acta de Aceptación UAT\n(CU-29, RN-09)" as NAV21 <<process>>
+class "NAV-24: Mis Incidencias\n(CU-23)" as NAV24 <<index>>
+class "NAV-25: Detalle de Incidencia\n(CU-24)" as NAV25 <<navClass>>
+
+NAV01 -down-> NAV02 : Login exitoso
+
+NAV02 -down-> NAV05 : Ver mis solicitudes
+NAV02 -down-> NAV24 : Ver mis incidencias
+NAV02 -right-> NAV07 : [Botón Rápido] Nueva RFC
+
+NAV05 -right-> NAV06 : Inspeccionar solicitud
+NAV05 ..> NAV07 : Registrar RFC
+
+NAV06 ..> NAV08 : [Condición: Estado = EN_SUBSANACION]
+NAV06 ..> NAV21 : [Condición: Estado = EN_ACEPTACION]
+
+NAV24 -right-> NAV25 : Ver estado del ticket
+NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
+
+@enduml

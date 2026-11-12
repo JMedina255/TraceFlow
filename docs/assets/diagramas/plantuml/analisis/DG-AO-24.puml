@@ -1,0 +1,25 @@
+@startuml DG-AO-24
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)</b>
+
+actor "Solicitante" as ACT
+
+boundary "Consulta de Estado de Ticket" as B
+control "Control de Consulta de Incidencias" as C
+
+entity "Incidencia (Ticket)" as E_INC
+entity "Historial de Estado de Ticket" as E_HIST
+entity "Solicitud de Cambio (RFC)" as E_RFC
+
+ACT --> B : "ingresa código de seguimiento"
+B --> C : "solicita estado del ticket"
+C --> E_INC : "recupera información del incidente"
+C --> E_HIST : "obtiene avances y transiciones"
+C --> E_RFC : "identifica RFC derivada si aplica"
+E_INC "1" *-- "1..*" E_HIST : "contiene evolución de"
+E_INC o-- "0..1" E_RFC : "puede derivar en"
+
+@enduml

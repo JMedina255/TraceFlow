@@ -1,0 +1,30 @@
+@startuml DG-AO-12
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)</b>
+
+actor "Administrador de Configuración\n/ Bibliotecario" as ACT
+
+boundary "Operación de Check-In" as B
+control "Control de Check-In" as C
+
+entity "Elemento de Configuración (ECS)" as E_ECS
+entity "Nueva Versión de ECS" as E_VER
+entity "Certificación de Conformidad QA" as E_CERT
+entity "Acta de Aceptación UAT" as E_UAT
+entity "Bloqueo de Sincronización" as E_LOCK
+
+ACT --> B : "solicita promoción formal"
+B --> C : "instruye Check-In Trabajo → Maestra"
+C --> E_CERT : "valida certificación técnica previa"
+C --> E_UAT : "valida aceptación de usuario"
+C --> E_VER : "promueve y sella nueva versión oficial"
+C --> E_LOCK : "libera bloqueo exclusivo"
+E_ECS "1" *-- "1..*" E_VER : "incorpora"
+E_VER --> E_CERT : "avalada por"
+E_VER --> E_UAT : "aprobada mediante"
+E_LOCK --> E_ECS : "liberado tras Check-In"
+
+@enduml

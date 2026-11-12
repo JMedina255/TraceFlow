@@ -1,0 +1,56 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-UWE-PRES-02: Presentación de Acceso y Autenticación (NAV-01 / PRES-01)</b>
+
+skinparam class {
+    BackgroundColor<<container>> #F7FAFC
+    BorderColor<<container>> #4A5568
+    BackgroundColor<<form>> #FFFFFF
+    BorderColor<<form>> #3182CE
+    BackgroundColor<<input>> #FFFFFF
+    BorderColor<<input>> #CBD5E0
+    BackgroundColor<<button>> #3182CE
+    FontColor<<button>> #FFFFFF
+    BackgroundColor<<alert>> #FFF5F5
+    BorderColor<<alert>> #E53E3E
+}
+
+class "LoginViewport (Pantalla Completa)" as Viewport <<container>> {
+    +background: Neutral/Corporate
+}
+
+class "LoginCardContainer" as Card <<form>> {
+    +appLogo: Image (TraceFlow SCM)
+    +systemTitle: Text ("Sistema de Gestión de Configuración de Software")
+    +institutionLabel: Text ("ÉXODO S.A.C. — Entorno Institucional")
+}
+
+class "CredentialsForm (Formulario de Acceso)" as Form <<form>> {
+    +inputUsername: TextInput ("Usuario / Correo Institucional")
+    +inputPassword: PasswordInput ("Contraseña")
+    +btnSubmit: ActionButton ("Iniciar Sesión")
+}
+
+class "FeedbackRegion (Mensajes y Estado)" as Feedback <<alert>> {
+    +validationErrorMessage: InlineText (HTTP 400)
+    +unauthorizedAlert: BannerText ("Credenciales inválidas / Sesión expirada - HTTP 401")
+    +loadingSpinner: ProgressIndicator
+}
+
+note bottom of Form
+  <b>Decisión de Presentación sobre Selección de Rol:</b>
+  La baseline no contempla selección manual de rol en el login.
+  El sistema autentica al usuario y carga su rol canónico principal.
+  Si el usuario posee múltiples roles asignados en BD, el Header
+  mostrará un selector de contexto de rol como decisión de presentación.
+end note
+
+Viewport *-- Card
+Card *-- Form
+Card *-- Feedback
+
+@enduml

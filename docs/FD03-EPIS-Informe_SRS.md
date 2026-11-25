@@ -3,7 +3,7 @@
 # Sistema de Gestión de Configuración de Software - TraceFlow SCM
 
 
-> Documento de Especificación de Requerimientos de Software (SRS) — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal por CCB)
+> Documento de Especificación de Requerimientos de Software (SRS) — Revisión Candidata v1.2 Final DOC-02 (Borrador en Revisión — Pendiente de Aprobación Formal por CCB)
 
 
 <!-- Página 1 del PDF original -->
@@ -32,8 +32,9 @@ ANTAYHUA MAMANI, Renzo Antonio (2022073504) MEDINA QUISPE, Joan Cristian (202207
 | Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
 | 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
 | 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
+| 1.2 | Equipo Arquitectura y GCSW | En revisión técnica | Pendiente CCB | 25/11/2026 | Revisión Candidata Final (DOC-02.5): alineamiento con arquitectura aprobada ADR-001..ADR-010 (NestJS 11, React 19, PostgreSQL 17 Supabase), integración del Glosario Oficial (`GLOSARIO.md`), delimitación explícita de estado real de implementación (§1.2.3 y §6.4) y trazabilidad integral (`MATRIZ_TRAZABILIDAD.md`). |
 
-Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de Especificación de Requerimientos de Software — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal)
+Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de Especificación de Requerimientos de Software — Revisión Candidata v1.2 Final DOC-02 (Borrador en Revisión — Pendiente de Aprobación Formal)
 
 
 <!-- Página 3 del PDF original -->
@@ -44,6 +45,7 @@ Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de E
 | Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
 | 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
 | 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
+| 1.2 | Equipo Arquitectura y GCSW | En revisión técnica | Pendiente CCB | 25/11/2026 | Revisión Candidata Final (DOC-02.5): alineamiento con arquitectura aprobada ADR-001..ADR-010 (NestJS 11, React 19, PostgreSQL 17 Supabase), integración del Glosario Oficial (`GLOSARIO.md`), delimitación explícita de estado real de implementación (§1.2.3 y §6.4) y trazabilidad integral (`MATRIZ_TRAZABILIDAD.md`). |
 
 ## Índice general
 
@@ -148,36 +150,28 @@ El presente documento contiene la especificación de requerimientos de software 
 Para asegurar la máxima transparencia en la auditoría de configuración y prevenir ambigüedades entre los requisitos de ingeniería y los entregables de software evaluables, se establece formalmente la delimitación técnica entre el **Sistema Objetivo en Producción (TraceFlow SCM Enterprise)** y el **Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)**:
 
 ### 1.2.1. Sistema Objetivo en Producción (TraceFlow SCM Enterprise)
-Corresponde a la solución integral corporativa diseñada para gobernar la infraestructura SCM de ÉXODO S.A.C. en entornos de producción:
-- **Arquitectura:** Desacoplada en microservicios contenerizados (Docker/Kubernetes) con backend en Java (Spring Boot) o Node.js/TypeScript.
-- **Persistencia:** Base de datos relacional PostgreSQL con particionamiento de auditoría y soporte de transacciones ACID estrictas.
-- **Almacenamiento de Artefactos:** Servidor de almacenamiento de objetos compatible con S3 (MinIO) para el control de versiones binarias y fuentes de ECS con cálculo forzoso de hash SHA-256.
-- **Seguridad e Identidad:** Servidor IAM centralizado (Keycloak / OAuth2 / OIDC) con segregación estricta de funciones bajo control de acceso basado en roles (RBAC) para los 7 perfiles canónicos (`PU-01` a `PU-07`).
-- **Capacidades Operativas:** Automatización completa de pipelines CI/CD, agentes de sincronización para repositorios Git, escaneo automatizado de vulnerabilidades y notificaciones SMTP/WebSocket en tiempo real.
+Corresponde a la solución integral corporativa diseñada para gobernar la infraestructura SCM de ÉXODO S.A.C. conforme a las decisiones arquitectónicas aprobadas (`ADR-001` a `ADR-010`, consolidadas en `SAD_FINAL.md`):
+- **Arquitectura:** Monolito Modular (`ADR-001`) estructurado en 9 módulos de dominio (`MOD-01` a `MOD-09`) con backend en **Node.js 24 LTS, TypeScript y NestJS 11** (`ADR-003`) y cliente SPA en **React 19 + Vite + Zustand** (`ADR-002`).
+- **Persistencia:** Base de datos relacional **PostgreSQL 17** (`ADR-004`, instancia `TraceFlow-UPT` en Supabase, esquema `traceflow` con 21 tablas), transacciones ACID estrictas, triggers de inmutabilidad/SoD y bitácora append-only encadenada con SHA-256 (`ADR-008`).
+- **Almacenamiento de Artefactos:** Custodia híbrida desacoplada mediante el puerto `StoragePort` (`ADR-005`) para el tránsito controlado de ECS entre las 3 bibliotecas (`TRABAJO`, `SOPORTE`, `MAESTRA`) con suma de verificación SHA-256.
+- **Seguridad e Identidad:** Sesiones opacas gestionadas en servidor con cookies `HttpOnly`, hashes de contraseña **Argon2id** y Guards RBAC/SoD en NestJS (`ADR-006`; Keycloak diferido para fase corporativa posterior) sobre los 7 perfiles canónicos (`PU-01` a `PU-07`).
 
-### 1.2.2. Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)
-Corresponde al software interactivo desarrollado y desplegado en el repositorio (`prototype/`), concebido como prueba de concepto de alta fidelidad para validar la usabilidad, navegación, flujos de negocio y experiencia de usuario (UX):
-- **Tecnología:** Single Page Application (SPA) desarrollada en React 19, TypeScript 5, Vite 6 y estilizada con TailwindCSS.
-- **Gestión de Estado y Persistencia:** Servicio reactivo en memoria (`MockDataService`) con persistencia local en el navegador (`localStorage`), inicializado con un dataset preconfigurado de proyectos, ECS, usuarios y solicitudes RFC representativas.
-- **Catálogo de Vistas e Interfaz:** El prototipo implementa formalmente **20 pantallas canónicas** (`SCREEN-01` a `SCREEN-20`), estructuradas según el inventario de auditoría:
-  - **8 Pantallas Funcionales Interactivas (implementadas mediante 9 componentes de vista especializados):**
-    1. `SCREEN-01` — Inicio de Sesión / Login (`LoginView.tsx`): Autenticación simulada y selector contextual de rol activo (`PU-01` a `PU-07`).
-    2. `SCREEN-02` — Panel de Control Principal / Dashboard (`DashboardView.tsx`): Métricas de RFC por estado, volumen de cambios y accesos directos.
-    3. `SCREEN-05` — Bandeja de Solicitudes de Cambio (`RfcListView.tsx`): Listado paginado, búsqueda, filtrado multidimensional por estado y prioridad.
-    4. `SCREEN-06` — Expediente 360° de la RFC (`RfcDetailView.tsx`): Visualización exhaustiva del expediente, historial de transiciones, actas, hashes y trazabilidad completa.
-    5. `SCREEN-07` — Registro y Subsanación de RFC: Implementada mediante 2 vistas independientes para respetar el principio de responsabilidad única:
-       - `RfcCreateView.tsx`: Captura inicial de RFC en borrador / enviada (`CU-04`).
-       - `RfcEditView.tsx`: Edición y subsanación de RFC observadas (`CU-04.1`).
-    6. `SCREEN-08` — Análisis de Impacto Técnico (`ImpactAnalysisView.tsx`): Evaluación arquitectónica de esfuerzo, riesgos, dependencias y costos (`CU-06`).
-    7. `SCREEN-09` — Deliberación y Dictamen del CCB (`CcbDeliberationView.tsx`): Interfaz de votación, emisión de acta de comité y dictamen formal de cambios mayores (`CU-07`).
-    8. `SCREEN-10` — Autorización de Cambio Menor (`MinorApprovalView.tsx`): Procedimiento abreviado de aprobación para cambios de bajo riesgo por la autoridad delegada (`CU-30`).
-  - **12 Pantallas de Demostración Estructurada (Placeholders Guiados):**
-    - `SCREEN-03` (Registro de Proyectos), `SCREEN-04` (Catálogo de ECS), `SCREEN-11` (Bandeja ECN/ECO), `SCREEN-12` (Operación Check-Out), `SCREEN-13` (Operación Check-In), `SCREEN-14` (Gestión de Líneas Base), `SCREEN-15` (Rollback y Reversión), `SCREEN-16` (Gestión de Incidencias), `SCREEN-17` (Auditoría y Trazabilidad SCM), `SCREEN-18` (Generador de Reportes), `SCREEN-19` (Administración de Usuarios) y `SCREEN-20` (Configuración del Sistema). Todas gobernadas por el componente unificado `ScreenPlaceholder.tsx` que especifica los casos de uso (`CU`), requisitos funcionales (`RF`), reglas de negocio (`RN`) y roles autorizados asociados a cada módulo.
-  - **2 Vistas de Soporte del Sistema:**
-    - `AccessDeniedView.tsx`: Control de acceso contextual (error 403) ante intentos de navegación no autorizados según la matriz RBAC.
-    - `NotFoundView.tsx`: Control de rutas inválidas (error 404).
+### 1.2.2. Prototipo e Implementación Vigente en el Repositorio (`master @ 84c832f`)
+Corresponde al software desplegable actualmente existente en el repositorio (`backend/`, `prototype/`, `supabase/`):
+- **Frontend (`prototype/`):** Single Page Application (SPA) en React 19, TypeScript y Vite 8 con Zustand y Tailwind CSS v4. Opera en modo dual (`VITE_SERVICE_MODE=api` conectado al backend NestJS o `mock` local). Implementa **20 pantallas canónicas** (`SCREEN-01` a `SCREEN-20`):
+  - **8 Pantallas Funcionales Interactivas (implementadas mediante 9 vistas):** `LoginView.tsx` (`SCREEN-01`), `DashboardView.tsx` (`SCREEN-02`), `RfcListView.tsx` (`SCREEN-05`), `RfcDetailView.tsx` (`SCREEN-06`), `RfcCreateView.tsx` y `RfcEditView.tsx` (`SCREEN-07`), `RfcImpactAnalysisView.tsx` (`SCREEN-08`), `RfcCcbDeliberationView.tsx` (`SCREEN-09`) y `RfcMinorApprovalView.tsx` (`SCREEN-10`).
+  - **12 Pantallas en Placeholder Guiado (`ScreenPlaceholder.tsx`):** `SCREEN-03`, `SCREEN-04` y `SCREEN-11` a `SCREEN-20`.
+  - **2 Vistas de Soporte:** `AccessDeniedView.tsx` (403) y `NotFoundView.tsx` (404).
+- **Backend (`backend/`) y Base de Datos (`supabase/`):** API REST `/api/v1` en NestJS 11 conectada a PostgreSQL 17.12 en Supabase mediante TLS estricto y rol de mínimo privilegio `traceflow_app`, con autenticación real (`login`/`me`/`logout`), consulta multitenant de proyectos (`CU-03`), registro y consulta de RFC (`CU-04`) y auditoría SHA-256 (`CU-27` base).
 
-Esta delimitación garantiza que las afirmaciones de verificación en el presente documento diferencien explícitamente entre la funcionalidad validada en el prototipo y los requisitos que serán instrumentados en la fase de construcción del sistema objetivo.
+### 1.2.3. Clasificación del Estado de Implementación por Capacidad (Corte DOC-02)
+Para evitar ambigüedades contractuales o de auditoría, el cumplimiento actual de los requerimientos y casos de uso aprobados se clasifica en cuatro niveles verificables:
+1. **Funcionalidad implementada (End-to-End real React + NestJS + PostgreSQL):** Autenticación con Argon2id y sesión opaca (`CU-01` parcial), consulta de proyectos (`CU-03`), registro formal y consulta de RFC (`CU-04`, `RF-04`), aislamiento multitenant y auditoría SHA-256 (`CU-27` base).
+2. **Funcionalidad parcialmente implementada:** Administración de usuarios/roles (`CU-01`: esquema/aprovisionamiento CLI listo, falta UI y endpoints CRUD), administración de proyectos (`CU-02`: tabla/lectura API lista, falta creación/edición UI/API).
+3. **Funcionalidad simulada en prototipo React (`localStorage`, pendiente de traslado a backend):** Admisión/observación/desestimación (`CU-05`), subsanación (`CU-04.1`), análisis de impacto técnico (`CU-06`), doble llave de cambio menor (`CU-30`) y deliberación CCB (`CU-07`).
+4. **Funcionalidad aprobada pendiente de implementación funcional:** Emisión de ECN (`CU-08`), gestión completa de ECS/check-out/bloqueo/check-in/versiones (`CU-09`..`CU-14`), pruebas y certificación QA (`CU-15`..`CU-19`), líneas base/rollback/cancelación (`CU-20`..`CU-22`), incidencias (`CU-23`..`CU-25`), integridad checksum CLI/API (`CU-26`), reportes (`CU-28`) y aceptación UAT (`CU-29`), aunque sus tablas físicas ya existen en `traceflow`.
+
+*(La correspondencia exacta con tablas, módulos y pruebas figura en [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md) y el vocabulario rector en [`GLOSARIO.md`](GLOSARIO.md)).*
 
 
 <!-- Página 6 del PDF original -->
@@ -7043,63 +7037,20 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 | Transparencia y reportería de gestión | RF-18 (Generación de Reportes) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para reportes en SRS) | CU-28 | Administrador de Configuración / Bibliotecario |
 
 ---
-## Inconsistencias Detectadas
+## 6.4. Estado de Implementación y Criterios de Verificación de los 31 Casos de Uso (Corte DOC-02)
 
-Las siguientes inconsistencias y discrepancias fueron identificadas durante la extracción minuciosa del documento consolidado `FD03-EPIS-Informe_SRS.md`. A continuación se presenta el estado formal de resolución tras el cierre del SRS de ANÁLISIS:
+Ningún requerimiento o caso de uso aprobado ha sido suprimido por encontrarse pendiente de programación. Su estado verificable al corte `master @ 84c832f` es:
 
-### 1. Inconsistencia de Contexto en Perfiles de Usuario
-- **Elemento:** Párrafo explicativo posterior a la tabla de perfiles de usuario.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Págs. 30-31).
-- **Descripción:** El texto heredado hacía referencia a conceptos de tutorías universitarias ("mentoreado", "mentor", "servicio tutorial").
-- **Estado de Resolución:** RESUELTA. Subsanado e integrado formalmente mediante la definición de la estricta segregación de funciones entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
+| Rango / Caso de Uso | Estado de Implementación | Detalle y Evidencia Verificable |
+|---|---|---|
+| **CU-04** (Registrar RFC) | **Implementado (E2E Real)** | `POST /api/v1/rfcs` + `RfcCreateView.tsx` + `traceflow.change_request` + `INT-T09` / `rfcs.spec.ts`. |
+| **CU-03** (Consultar proyecto) | **Implementado (API + BD)** | `GET /api/v1/projects/:id` + `traceflow.project` + `projects.spec.ts`; vista UI en placeholder guiado. |
+| **CU-01** (Usuarios/roles) y **CU-27** (Auditoría) | **Implementado Parcialmente** | Autenticación real `login/me/logout` (Argon2id + `user_session`) y `append_audit_log()` SHA-256 activos; faltan CRUD UI de usuarios y visor de auditoría. |
+| **CU-02** (Administrar proyectos) | **Implementado Parcialmente** | Tabla `traceflow.project` + semillas y lectura API activas; creación/edición UI y API pendientes. |
+| **CU-04.1, CU-05, CU-06, CU-07, CU-30** | **Simulado en Prototipo (`localStorage`)** | Flujos completos en `RfcEditView`, `RfcDetailView`, `RfcImpactAnalysisView`, `RfcCcbDeliberationView`, `RfcMinorApprovalView` y 9 suites `.spec.mjs`; pendiente migración al backend NestJS (`SCM-01`+). |
+| **CU-08 a CU-26, CU-28, CU-29** | **Aprobado Pendiente de Implementación** | Esquema físico desplegado en `traceflow` (`change_order`, `sync_lock`, `qa_certification`, `uat_acceptance`, `baseline`, `incident_ticket`) con pruebas físicas `DB-T03`..`DB-T09`; endpoints y pantallas operativas pendientes. |
 
-### 2. Discrepancia en la Convención de Nomenclatura de Casos de Uso
-- **Elemento:** Identificadores de casos de uso.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Págs. 35-94) y 6.2.1 (Págs. 95-114).
-- **Descripción:** Discrepancia entre la codificación original `CUS01` a `CUS28` y la convención normativa `CU-XX`.
-- **Estado de Resolución:** RESUELTA / COMPATIBILIDAD. Se adoptó `CU-XX` como estándar oficial único (SSOT) en todas las tablas (`TABLES.md`), diagramas (`DIAGRAMS.md`) y narrativas canónicas. La nomenclatura `CUSXX` se mantiene exclusivamente en una columna histórica para trazabilidad con el PDF preliminar.
-
-### 3. Omisión del Diagrama de Secuencia para CUS03 (Consultar proyecto)
-- **Elemento:** Diagramas de secuencia del modelo lógico.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
-- **Descripción:** El documento original saltaba de CUS02 a CUS04, omitiendo el diagrama de interacción de CUS03.
-- **Estado de Resolución:** RESUELTA. Reconstruido formalmente e integrado como `DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)` (1:1 con la narrativa) y `DG-AO-03`.
-
-### 4. Malformación de Sintaxis Markdown en Encabezados de CUS19 y CUS20
-- **Elemento:** Tablas narrativas de CUS19 y CUS20.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3.
-- **Descripción:** Metadatos iniciales renderizados como texto corrido antes de los saltos de página.
-- **Estado de Resolución:** RESUELTA. Corregido integralmente durante la reescritura de las 31 narrativas bajo la plantilla normativa única.
-
-### 5. Autoridad de la Regla de Negocio RN-03 (Trazabilidad de Cambios)
-- **Elemento:** Campo *Autoridad* en la tabla de Reglas de Negocio.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Pág. 25) y `docs/TABLES.md` (`TB-06`).
-- **Descripción:** Atribuía autoridad exclusiva a `Analista de Requerimientos / Gestor`, omitiendo al `Administrador de Configuración / Bibliotecario` quien ejecuta materialmente el Check-In con asociación a ECN/ECO.
-- **Estado de Resolución:** RESUELTA. Establecida formalmente como **Autoridad Compartida: Administrador de Configuración / Bibliotecario y Analista de Requerimientos / Gestor**, amparada en los casos CU-08, CU-12, CU-14, CU-27 y las responsabilidades delimitadas de PU-02 y PU-05.
-
-### 6. Duplicidad Literal entre Viabilidad Social y Viabilidad Ambiental
-- **Elemento:** Secciones de Viabilidad Social y Ambiental.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Págs. 16-17).
-- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental eran una réplica idéntica de la Viabilidad Social.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se formalizaron en la Sección 3.5 cuatro ejes técnicos diferenciados de Viabilidad Ambiental enfocados en la política de Cero Papel, eficiencia energética de infraestructura cloud bajo demanda, reducción de emisiones por teletrabajo/comités remotos y extensión de vida útil del hardware cliente mediante arquitectura SPA (DOC-023).
-
-### 8. Enlaces Relativos a Figuras y Gestión de Diagramas Pendientes
-- **Elemento:** Enlaces a diagramas e imágenes en Markdown (`assets/` vs `../assets/`).
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Secciones 4, 5 y 6.
-- **Descripción:** Se detectaron 41 rutas relativas rotas que apuntaban a `assets/` en vez de `../assets/`, impidiendo la visualización desde la subcarpeta `docs/`, así como 34 diagramas (31 de análisis de objetos BCE y 3 de secuencia) referenciados sin archivos gráficos existentes en el repositorio.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se actualizaron las 41 rutas a archivos existentes hacia `../assets/` (DOC-006), se incorporó la advertencia formal de obsolescencia técnica sobre el modelo `DG-13` (DOC-025), y se reemplazaron los 34 enlaces rotos por avisos normativos estructurados de figura pendiente de renderizado vinculados a sus especificaciones PlantUML canónicas en `docs/DIAGRAMS.md` para su generación en la Etapa 05 (DOC-004 y DOC-005).
-
-### 9. Delimitación Técnica del Alcance: Sistema Objetivo vs. Prototipo Demostrativo
-- **Elemento:** Alcance del sistema y catálogo de pantallas.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 1.2 y 5.2.
-- **Descripción:** Existía ambigüedad sobre qué componentes y requisitos correspondían a la arquitectura empresarial de producción y cuáles pertenecían al prototipo navegable desarrollado en React.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se incorporó formalmente la Sección 1.2 delimitando el alcance objetivo vs el prototipo demostrativo (20 pantallas canónicas: 8 interactivas funcionales vía 9 vistas, 12 demostrativas guiadas en `ScreenPlaceholder.tsx` y 2 vistas de sistema), y se agregaron criterios explícitos de verificación de RNF en la Sección 5.2 (DOC-015 y DOC-020).
-
-### 7. Cobertura del Cierre Exitoso en la Matriz RF-14
-- **Elemento:** Requerimiento RF-14 (Cierre Formal del Cambio y Notificaciones).
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.1 y 6.1.3.
-- **Descripción:** RF-14 se referenciaba predominantemente en cancelaciones y rechazos, existiendo asimetría con el cierre exitoso.
-- **Estado de Resolución:** RESUELTA. Resuelto formalmente mediante la definición de la máquina de 14 estados del TO-BE v2 y la asignación explícita de RF-14 a los 4 estados terminales en `TB-07`, `TB-12` y los casos de uso CU-05 (Desestimada), CU-07/CU-30 (Rechazada), CU-22 (Cancelada) y CU-20 (Implementada tras aceptación UAT en CU-29).
+*(El historial de resoluciones editoriales de etapas 01–07R se consolidó en [`ESTADO_DEL_PROYECTO.md`](ESTADO_DEL_PROYECTO.md), y la trazabilidad completa por caso de uso figura en [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md)).*
 
 
 # Conclusiones

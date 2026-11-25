@@ -355,12 +355,16 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_operation ON traceflow.audit_log(operat
 
 -- 23. TRIGGER DEFENSIVO DE INMUTABILIDAD CONTRA UPDATE O DELETE EN AUDIT_LOG (ADR-008, SAD 11.1)
 CREATE OR REPLACE FUNCTION traceflow.prevent_audit_log_tampering()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = traceflow, pg_catalog, pg_temp
+AS $$
 BEGIN
     RAISE EXCEPTION 'VIOLACIÓN DE INMUTABILIDAD (ADR-008 / RN-02): Los registros de audit_log son estrictamente append-only y no pueden modificarse ni eliminarse.';
     RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 DROP TRIGGER IF EXISTS trg_audit_log_immutable ON traceflow.audit_log;
 CREATE TRIGGER trg_audit_log_immutable
@@ -382,7 +386,11 @@ CREATE OR REPLACE FUNCTION traceflow.append_audit_log(
     p_ip_address VARCHAR(45),
     p_user_agent TEXT
 )
-RETURNS UUID AS $$
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = traceflow, extensions, pg_catalog, pg_temp
+AS $$
 DECLARE
     v_last_hash VARCHAR(64);
     v_new_hash VARCHAR(64);

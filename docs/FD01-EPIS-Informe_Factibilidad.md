@@ -6,7 +6,7 @@
 > **Versión:** 1.0  
 > **Fecha:** 2026-10-01  
 > **Estado:** REVISION  
-> **Norma de Gobernanza:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md)  
+> **Norma de Gobernanza:** [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md)  
 > **Documento Consolidado de Referencia:** [FD03-EPIS-Informe_SRS.md](FD03-EPIS-Informe_SRS.md)  
 
 ---
@@ -42,7 +42,7 @@ En la ingeniería de software profesional, la evaluación de factibilidad consti
 
 El desarrollo de TraceFlow SCM responde a una problemática recurrente en la industria de desarrollo de software: el crecimiento de la cartera de proyectos bajo prácticas empíricas de administración de código propicia la coexistencia de versiones divergentes, incidentes graves de sobreescritura por trabajo concurrente y la imposibilidad de certificar qué artefactos fueron formalmente aprobados y desplegados al cliente final.
 
-Este documento se rige estrictamente por las disposiciones de la [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md), preservando el principio de Fuente Única de Verdad (SSOT) y aislando las afirmaciones demostrables en la documentación actual frente a aquellos datos que quedan formalmente catalogados como **PENDIENTE DE VALIDACIÓN**.
+Este documento se rige estrictamente por las disposiciones de la [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md), preservando el principio de Fuente Única de Verdad (SSOT) y aislando las afirmaciones demostrables en la documentación actual frente a aquellos datos que quedan formalmente catalogados como **PENDIENTE DE VALIDACIÓN**.
 
 ---
 
@@ -79,7 +79,7 @@ De acuerdo con el levantamiento de información documentado en el SRS (`FD03-EPI
 
 ### 3.3. Cuadro de Necesidades Identificadas
 
-La siguiente tabla sintetiza las brechas críticas identificadas durante el levantamiento inicial y su requerimiento correspondiente en el sistema ([docs/TABLES.md](docs/TABLES.md), TB-03):
+La siguiente tabla sintetiza las brechas críticas identificadas durante el levantamiento inicial y su requerimiento correspondiente en el sistema ([TABLES.md](TABLES.md), TB-03):
 
 | Área | Problema Detectado (Situación AS-IS) | Requerimiento del Sistema TraceFlow SCM |
 | :--- | :--- | :--- |
@@ -181,7 +181,7 @@ Como respuesta a la problemática diagnosticada, se propone el diseño e implant
 
 ### 4.2. Modelo de Roles Canónicos (RBAC)
 
-De conformidad estricta con la [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) (Sección 5), la solución descarta cualquier rol informal y opera exclusivamente bajo 7 perfiles homologados:
+De conformidad estricta con la [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md) (Sección 5), la solución descarta cualquier rol informal y opera exclusivamente bajo 7 perfiles homologados:
 
 | ID Perfil | Rol Canónico Homologado | Atribución Principal en TraceFlow SCM |
 | :---: | :--- | :--- |
@@ -197,7 +197,7 @@ De conformidad estricta con la [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_
 
 El flujo TO-BE documentado en el sistema formaliza la interacción entre los 7 roles y las bibliotecas (`DG-03`):
 
-![Proceso Propuesto de Gestión de Cambios](assets/proceso_gestion_cambios.png)
+![Proceso Propuesto de Gestión de Cambios](../assets/proceso_gestion_cambios.png)
 
 ---
 
@@ -481,7 +481,7 @@ La viabilidad financiera definitiva dependerá críticamente de los siguientes f
 La viabilidad operativa evalúa si los procesos, la segregación de funciones, la carga de trabajo y los flujos de interacción de TraceFlow SCM pueden integrarse armoniosamente en las rutinas productivas de **ÉXODO S.A.C.**, asegurando que los usuarios adopten, operen y sostengan la plataforma en el tiempo.
 
 #### 6.3.1. Coherencia y Segregación con los Actores Oficiales
-De estricto acuerdo con la norma de gobernanza [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) (Sección 5) y la matriz de perfiles `TB-09` de [docs/TABLES.md](docs/TABLES.md), el sistema opera bajo un modelo de Control de Acceso Basado en Roles (RBAC) estructurado en 7 perfiles canónicos que eliminan la ambigüedad y la discrecionalidad:
+De estricto acuerdo con la norma de gobernanza [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md) (Sección 5) y la matriz de perfiles `TB-09` de [TABLES.md](TABLES.md), el sistema opera bajo un modelo de Control de Acceso Basado en Roles (RBAC) estructurado en 7 perfiles canónicos que eliminan la ambigüedad y la discrecionalidad:
 
 1. **`Solicitante / Usuario Final` (`PU-01`):** Cliente externo de ÉXODO S.A.C. o usuario interno que identifica una necesidad de cambio; formaliza el registro de la Solicitud de Cambio (RFC), subsana datos observados, realiza la aceptación funcional y recibe las notificaciones de dictamen o cierre.
 2. **`Analista de Requerimientos / Gestor` (`PU-02`):** Responsable de la recepción de solicitudes; valida la completitud de la información de la RFC, categoriza su tipo y criticidad, administra proyectos aislados (`RF-02`) y deriva incidencias operativas hacia nuevas RFCs (`RF-15`).
@@ -708,7 +708,7 @@ Para mitigar la huella digital del sistema, se proponen las siguientes práctica
 
 1. **Restricción Temporal:** El ciclo completo de especificación (Fase 3) y diseño inicial debe concluirse en el marco del semestre académico 2026-II de la UPT.
 2. **Restricción Presupuestaria:** El costo de desarrollo directo inicial debe mantenerse acotado al límite financiero del CAPEX estimado de S/. 5,475.00, con un costo de mantenimiento mensual proyectado no mayor a S/. 95.00 (S/. 1,140.00 anuales).
-3. **Restricción de Gobernanza Documental:** Cumplimiento obligatorio y vinculante de las reglas establecidas en [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md), en particular la prohibición de reciclar identificadores dados de baja y el respeto irrestricto de las fuentes oficiales SSOT.
+3. **Restricción de Gobernanza Documental:** Cumplimiento obligatorio y vinculante de las reglas establecidas en [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md), en particular la prohibición de reciclar identificadores dados de baja y el respeto irrestricto de las fuentes oficiales SSOT.
 4. **Restricción de Políticas de Configuración (Reglas de Negocio):** El sistema debe implementar de manera inexcusable las 9 reglas de negocio formalizadas:
    - Aprobación obligatoria por el CCB previa a integración (`RN-01`).
    - Identificación semántica unívoca de líneas base (`RN-02`).
@@ -762,7 +762,7 @@ La continuidad se justifica plenamente debido a que cinco de las seis dimensione
 
 Las dimensiones que cuentan con respaldo documental, técnico y metodológico suficiente en el repositorio son:
 
-- **Dimensión Operativa (VIABLE):** Se encuentra plenamente fundamentada en la arquitectura de gobernanza de 7 perfiles canónicos (`PU-01` a `PU-07`) formalizados en [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md). El flujo formal de 10 etapas con compuertas de decisión mutuamente excluyentes (análisis técnico por el Arquitecto, clasificación menor/mayor, arbitraje por el CCB, certificación obligatoria por QA y aceptación por el Usuario Final) garantiza la segregación de funciones (`RN-01`, `RN-02`) con una curva de aprendizaje inferior a 3 horas.
+- **Dimensión Operativa (VIABLE):** Se encuentra plenamente fundamentada en la arquitectura de gobernanza de 7 perfiles canónicos (`PU-01` a `PU-07`) formalizados en [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md). El flujo formal de 10 etapas con compuertas de decisión mutuamente excluyentes (análisis técnico por el Arquitecto, clasificación menor/mayor, arbitraje por el CCB, certificación obligatoria por QA y aceptación por el Usuario Final) garantiza la segregación de funciones (`RN-01`, `RN-02`) con una curva de aprendizaje inferior a 3 horas.
 - **Dimensión Social (VIABLE):** El sustento cualitativo demuestra la mitigación directa del estrés laboral de los consultores, la erradicación del sobretiempo no remunerado ocasionado por la pérdida involuntaria de avances, la eliminación de imputaciones arbitrarias de fallos mediante bitácoras inmutables de autoría y la habilitación de un entorno de trabajo remoto coordinado y transparente.
 - **Dimensión Ambiental (VIABLE):** Demuestra viabilidad técnica cualitativa bajo preceptos de Green IT: erradicación absoluta del soporte en papel para actas y solicitudes, reutilización eficiente de la infraestructura física instalada en ÉXODO S.A.C. y diseño de políticas de compresión de artefactos para mitigar el consumo de almacenamiento y cómputo.
 - **Dimensión Técnica (Arquitectura e Integridad):** El desacoplamiento modular en 4 capas, el aislamiento en tres bibliotecas (Trabajo, Soporte, Maestra), los mecanismos de bloqueo transaccional para exclusión mutua y la verificación criptográfica SHA-256 (`RNF-04`) cuentan con solvencia conceptual verificable y son directamente ejecutables por las capacidades técnicas del equipo C-SharkTeam.
@@ -822,6 +822,6 @@ En cumplimiento estricto de los lineamientos de evaluación, a continuación se 
 | **AUD-02** | Sección 3.5 (Pág. 14, TB-02) | **Incompletitud en el costeo de mano de obra (CAPEX):** Solo se presupuestan 500 horas para dos miembros (Joan Medina y Renzo Antayhua), omitiendo a Renzo Loyola y Augusto Rivera. | Subvaluación del costo real del proyecto en más de un 50% de las horas requeridas para Frontend y QA. | Reformular la planilla de esfuerzo del CAPEX integrando las horas estimadas de los 4 integrantes del C-SharkTeam. |
 | **AUD-03** | Sección 3.5 (Pág. 14, TB-02) | **Inverificabilidad de flujos financieros (VAN, TIR, Payback):** Se reportan valores de VAN (+S/. 10,801.64) y TIR (68.20%) sin incluir el cuadro de flujos netos anuales ni fórmula de cálculo. | Falta de auditabilidad financiera; riesgo de observaciones en evaluaciones formales del proyecto. | Marcar como **PENDIENTE DE VALIDACIÓN** e incorporar en el repositorio el anexo financiero con el flujo de caja descontado año por año. |
 | **AUD-04** | Sección 3.5 (Págs. 16-17) | **Duplicidad textual literal entre Viabilidad Social y Ambiental:** Los cuatro numerales de la Viabilidad Ambiental son una copia idéntica palabra por palabra de la Viabilidad Social. | Reducción del rigor técnico del documento; carencia de una evaluación ambiental auténtica de la plataforma. | Reestructurar la Viabilidad Ambiental enfocándose en eco-eficiencia digital, ahorro energético de servidores y política cero papel (subsanado en FD01). |
-| **AUD-05** | Sección 3.4.2 y 3.5 (Págs. 12, 14) | **Uso de nomenclatura de roles obsoleta y desalineada:** Se mencionan roles como "Jefe de Proyecto", "Auditor", "QA" de forma informal, en conflicto con los 7 roles canónicos. | Inconsistencia con la norma mandatoria [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) (Sección 5). | Homologar todas las referencias hacia los 7 perfiles canónicos (`PU-01` a `PU-07`) tanto en el informe FD01 como en el SRS consolidado. |
+| **AUD-05** | Sección 3.4.2 y 3.5 (Págs. 12, 14) | **Uso de nomenclatura de roles obsoleta y desalineada:** Se mencionan roles como "Jefe de Proyecto", "Auditor", "QA" de forma informal, en conflicto con los 7 roles canónicos. | Inconsistencia con la norma mandatoria [DOCUMENTATION_RULES.md](DOCUMENTATION_RULES.md) (Sección 5). | Homologar todas las referencias hacia los 7 perfiles canónicos (`PU-01` a `PU-07`) tanto en el informe FD01 como en el SRS consolidado. |
 | **AUD-06** | Sección 3.5 (Pág. 13) | **Afirmación no respaldada de infraestructura del cliente:** Se asevera que ÉXODO S.A.C. cuenta con servidores propios y nube sin especificar características técnicas. | Riesgo de dimensionamiento erróneo al momento de planificar el despliegue de base de datos y archivos. | Catalogar la infraestructura disponible como **PENDIENTE DE VALIDACIÓN** hasta ejecutar un inventario técnico in situ. |
 | **AUD-07** | Sección 6.1 (Líneas 1070-1076, Págs. 30-31) | **Párrafo residual de sistema de tutorías:** Texto sobre "mentoreados", "mentores" y "servicio tutorial" ubicado tras la matriz de perfiles de usuario del SRS. | Contradicción conceptual absoluta en el SRS consolidado. | Programar la depuración y sustitución del párrafo por la fundamentación técnica de la segregación de funciones SCM en el SRS. |

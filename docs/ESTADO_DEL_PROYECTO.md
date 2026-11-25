@@ -67,12 +67,26 @@ Este documento consolida el estado real de implementación del sistema **TraceFl
 
 ---
 
-## 4. Hallazgos Abiertos y Puntos de Decisión
+## 4. Hallazgos Abiertos, Propuestas al CCB y Recuperación de Trazabilidad Histórica
 
-1. **Colisión canónica `DG-12` (`DOC-030`):** Coexisten `generales/DG-12.puml` (Diagrama de Clases) y `analisis/DG-12.puml` (Modelo Conceptual). Pendiente de resolución por CCB para reasignar código único sin reutilizar identificadores.
-2. **Ambigüedades de nomenclatura (`AMB-01`..`AMB-07`):** Pendientes de aprobación en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md) antes de iniciar `REF-01`.
-3. **Verificación pendiente vía Supabase MCP:** Lectura del historial `supabase_migrations.schema_migrations` y políticas externas de la instancia `xmyfqxlvveiawnxgydtz`.
-4. **Conectividad IPv4 en equipos sin IPv6:** En redes sin enrutamiento IPv6, usar el Session Pooler IPv4 `aws-1-us-west-2.pooler.supabase.com:5432` con `traceflow_app.xmyfqxlvveiawnxgydtz` y TLS estricto.
+### 4.1 Decisiones y Propuestas Abiertas
+1. **Colisión canónica `DG-12` (`DOC-030`):** Coexisten `generales/DG-12.puml` (Diagrama de Clases) y `analisis/DG-12.puml` (Modelo Conceptual). Pendiente de dictamen del CCB para ratificar `analisis/DG-12.puml` como `DG-12` canónico y reasignar/archivar el histórico como `DG-12-HIST` o `DG-CLASS-01` (verificado sin dictamen firmado en `4f4107d^:docs/PAQUETE_REVISION_CCB_ETAPA07.md` §16).
+2. **Enmienda SSOT Híbrida (`DOC-033`) y Metas RTO/RPO (`DOC-034`):** Sometidas a aprobación formal del CCB junto con el paquete documental (`DOCUMENTATION_RULES.md` §15 para fuentes modulares `.puml`; parámetros de diseño `RTO <= 2h` / `RPO <= 24h` en `ADR-010` frente a `RNF-09`).
+3. **Ambigüedades de nomenclatura (`AMB-01`..`AMB-07`):** Pendientes de aprobación en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md) antes de iniciar `REF-01`.
+4. **Verificación pendiente vía Supabase MCP:** Lectura del historial `supabase_migrations.schema_migrations` y roles/políticas externas de la instancia `xmyfqxlvveiawnxgydtz`.
+5. **Conectividad IPv4 en equipos sin IPv6:** En redes sin enrutamiento IPv6, usar el Session Pooler IPv4 `aws-1-us-west-2.pooler.supabase.com:5432` con `traceflow_app.xmyfqxlvveiawnxgydtz` y TLS estricto.
+
+### 4.2 Referencias Técnicas Preservadas de Documentos Consolidados (Recuperables vía Git `4f4107d^`)
+- **Mecanismo Demo Web Crypto (`AUTH_IMPLEMENTATION_REPORT.md`):** En modo `mock` local (`prototype/src/services/auth.service.ts`), las credenciales de demostración usan SHA-256 con salt `traceflow:exodo:scm:auth:v1`, provisión local vía `authService.setLocalPassword()` y sesión local de 8 horas (en modo `api`/producción rige Argon2id en PostgreSQL y sesión opaca de 15 minutos según `ADR-006`).
+- **Certificación BD y E2E (`IMPLEMENTACION_BD_SUPABASE.md`):** Se preservan las matrices históricas `DB-T01`..`DB-T14` (`14/14`) e `INT-T01`..`INT-T18` (`18/18` en `docs/evidence/int-01/`). *(Nota correctiva DOC-03: aquel informe citaba 5 tablas de borrador y "11 secuencias"; la introspección real en [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) certifica exactamente **21 tablas**, **2 secuencias** y **120 restricciones**).*
+- **Registro `DOC-001`..`DOC-039` y Acta CCB (`MAESTRO_CAMBIOS_SRS_SAD.md` / `PAQUETE_REVISION_CCB_ETAPA07.md`):** Íntegramente preservados en el historial de Git (`4f4107d^`) sin firmas prematuras de aprobación.
+
+### 4.3 Métricas Netas de Consolidación Documental (DOC-02 / DOC-03)
+- **Documentos Markdown iniciales:** `53` (`49` en `docs/` + `4` READMEs).
+- **Documentos redundantes eliminados (`git rm`):** `17`.
+- **Documentos previos preservados:** `36`.
+- **Nuevos documentos creados en DOC-02:** `8`.
+- **Total final vigente:** `44` archivos Markdown — **reducción neta de 9 documentos (`~17.0%`)** respecto del universo inicial.
 
 ---
 

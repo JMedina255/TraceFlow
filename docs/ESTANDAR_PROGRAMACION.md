@@ -247,7 +247,8 @@ WHERE s.codigo = $1;
   "datos": {
     "id": "d0000001-0000-0000-0000-000000000001",
     "codigo": "RFC-2026-0001",
-    "idProyecto": "PRJ-001",
+    "idProyecto": "b0000001-0000-0000-0000-000000000001",
+    "codigoProyecto": "PRJ-001",
     "idEcsObjetivo": "c0000001-0000-0000-0000-000000000001",
     "estado": "IMPLEMENTADA"
   }

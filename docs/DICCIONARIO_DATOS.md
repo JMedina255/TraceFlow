@@ -3,35 +3,41 @@
 > **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
 > **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
 > **Instancia Supabase:** `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`, AWS `us-west-2`)  
-> **Motor Verificado:** `PostgreSQL 17.12` (inspección de solo lectura vía `traceflow_app` con TLS estricto)  
+> **Motor Verificado:** `PostgreSQL 17.12` (introspección de solo lectura vía `traceflow_app` sobre `information_schema` y `pg_catalog`)  
 > **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)  
-> **Estado:** Candidato a Aprobación (DOC-02.2) — *El esquema físico en Supabase NO ha sido renombrado*  
+> **Estado:** Candidato a Aprobación (DOC-02.2 / Revisado en DOC-03) — *El esquema físico en Supabase NO ha sido renombrado*  
 > **Fecha:** 25 de noviembre de 2026  
 
 > [!IMPORTANT]
-> **Nota de verificación MCP (Adenda DOC-02 §4):** Este diccionario fue verificado mediante introspección directa de solo lectura con `traceflow_app` (`information_schema` y `pg_catalog`) contrastada contra las 3 migraciones SQL en `supabase/migrations/`. Los metadatos fuera de privilegios de `traceflow_app` (`supabase_migrations.schema_migrations`, roles administrativos de Supabase y configuración externa de plataforma) quedan marcados explícitamente como **`[PENDIENTE DE VERIFICACIÓN VÍA MCP]`**.
+> **Cobertura de verificación y límites de privilegio (`traceflow_app`):**
+> - **Verificado directamente en PostgreSQL 17.12 (`pg_catalog` + `information_schema`):** 21 tablas, 198 columnas, 21 PKs, 51 FKs, 22 UNIQUE, 26 CHECK explícitos (120 restricciones totales), 55 índices, 2 secuencias, 11 funciones `SECURITY DEFINER`, 10 triggers normativos (`pg_trigger`), 46 privilegios de `traceflow_app` y estado RLS (`false` en las 21 tablas).
+> - **`[PENDIENTE DE VERIFICACIÓN VÍA MCP]`:** Historial aplicado en `supabase_migrations.schema_migrations` (`permission denied` para `traceflow_app`), roles administrativos externos de Supabase (`postgres`, `anon`, `authenticated`, `service_role`), exposición PostgREST y configuración externa de plataforma.
 
 ---
 
 ## 1. Introducción y Propósito
-Este documento constituye la especificación formal del modelo de datos de **TraceFlow SCM**, cubriendo íntegramente las **21 tablas** y **198 columnas** desplegadas en el esquema privado `traceflow`, así como su correspondencia con el **modelo objetivo normalizado al español** definido para la futura etapa `REF-01.5`.
+Este documento formaliza el modelo de datos de **TraceFlow SCM**, cubriendo las **21 tablas** y **198 columnas** actualmente desplegadas en `traceflow`, junto con su equivalente objetivo en español para la futura etapa `REF-01.5`.
 
 ## 2. Alcance del Modelo de Datos
-- **Esquema cubierto:** `traceflow` (21 tablas relacionales, 2 secuencias, 11 funciones PL/pgSQL, 10 triggers normativos, 55 índices).
-- **Fuera de alcance de renombrado:** Esquemas gestionados por Supabase (`public`, `auth`, `storage`, `supabase_migrations`) y sus extensiones nativas.
+- **Esquema cubierto:** `traceflow` (21 tablas relacionales, 2 secuencias, 11 funciones PL/pgSQL, 10 triggers normativos, 55 índices, 120 restricciones declaradas en `pg_constraint`).
+- **Fuera de alcance de renombrado:** Esquemas gestionados por Supabase (`public`, `auth`, `storage`, `supabase_migrations`) y extensiones nativas.
 
 ## 3. Convenciones de Nomenclatura
 - **Idioma objetivo:** Español sin tildes ni caracteres especiales en `snake_case` singular para tablas (`usuario`, `solicitud_cambio`, `orden_cambio`).
 - **Siglas normativas preservadas:** `ecs`, `rfc`, `ccb`, `qa`, `uat`, `sod`, `sha256`.
 - **Prefijos de restricciones e índices:** `pk_*`, `fk_*`, `uq_*`, `chk_*`, `idx_*`, `trg_*`.
 
-## 4. Esquema Físico Actual (PostgreSQL 17.12)
+## 4. Esquema Físico Actual y Conciliación con Inventarios Históricos
 - **Esquemas visibles para `traceflow_app`:** `public`, `traceflow`.
 - **Migraciones versionadas en repositorio (`supabase/migrations/`):**
   1. `202611250001_initial_traceflow.sql` — 21 tablas, 2 secuencias, FKs, CHECKs e índices iniciales.
   2. `202611250002_structural_seeds.sql` — Catálogo inicial de los 7 roles `PU-01`..`PU-07`.
   3. `202611250003_secure_app_role_least_privilege.sql` — 10 triggers de inmutabilidad/SoD y privilegios mínimos para `traceflow_app`.
-- **Estado aplicado en `supabase_migrations.schema_migrations`:** `[PENDIENTE DE VERIFICACIÓN VÍA MCP]` (`traceflow_app` recibe `permission denied for schema supabase_migrations`).
+- **Conciliación frente a documentos históricos:**
+  - `ADR-007` y `FD05` mencionaban conceptualmente `scm_locks` y `DG-D03` omitía `app_user.code`, `change_authorization` y `uat_acceptance`; el esquema físico real consolidado utiliza `sync_lock` e incluye las 21 tablas descritas aquí.
+  - El informe histórico `IMPLEMENTACION_BD_SUPABASE.md` (consolidado en `ESTADO_DEL_PROYECTO.md`) citaba 5 tablas de borrador (`implementation_task`, `qa_test_run`, `defect_report`, `uat_session`, `rollback_event`) y "11 secuencias"; la inspección real certifica exactamente **21 tablas** y **2 secuencias**.
+  - En `information_schema.table_constraints`, `traceflow_app` solo visualizaba 15 PKs porque posee únicamente `SELECT` en 6 tablas (`app_role`, `project`, `user_role_assignment`, `user_project_assignment`, `baseline`, `baseline_item`); consultando `pg_catalog.pg_constraint` se verifican íntegramente las **21 PKs** y **120 restricciones**.
+  - **Estado aplicado en `supabase_migrations.schema_migrations`:** `[PENDIENTE DE VERIFICACIÓN VÍA MCP]`.
 
 ## 5. Modelo Relacional Objetivo en Español
 Propone la traducción uniforme de las 21 tablas, 198 columnas, 11 funciones, 10 triggers y restricciones propias hacia `snake_case` singular en español, ejecutable mediante migraciones incrementales `ALTER TABLE ... RENAME TO` y `RENAME COLUMN` en `REF-01.5` sin `DROP/CREATE` destructivo ni pérdida de historial.
@@ -48,7 +54,7 @@ Fuente: [`DG-ER-OBJETIVO.puml`](assets/diagramas/plantuml/diseno/DG-ER-OBJETIVO.
 ![Diagrama ER Objetivo en Español](assets/diagramas/render/diseno/DG-ER-OBJETIVO.svg)
 
 ### 6.3 Diagrama Lógico de Diseño Preexistente (`DG-D03`)
-Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D03.puml`](assets/diagramas/plantuml/diseno/DG-D03.puml) ([SVG](assets/diagramas/render/diseno/DG-D03.svg)), cuyas diferencias frente al modelo físico real (p. ej. `app_user.code`, `change_authorization`, `uat_acceptance`) quedan conciliadas en este diccionario.
+Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D03.puml`](assets/diagramas/plantuml/diseno/DG-D03.puml) ([SVG](assets/diagramas/render/diseno/DG-D03.svg)), cuyas diferencias frente al modelo físico real quedan conciliadas en la Sección 4.
 
 ## 7. Catálogo de Tablas (21 Tablas)
 
@@ -81,14 +87,14 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 ### 8.1 `app_role` → `rol_aplicacion`
 - **Descripción funcional:** Catálogo inmutable de los 7 perfiles funcionales canónicos (PU-01 a PU-07).
 - **Módulo responsable:** MOD-01 Autenticación y RBAC | **Casos de uso:** CU-01
-- **Clave primaria:** `()`
+- **Clave primaria:** `(id)`
 - **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
 - **Restricciones relevantes:** PK/FK/UNIQUE estándar
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `INTEGER` | NO | — | `nextval('traceflow.app_role_id_seq'::regclass)` | NOT NULL | Columna de `rol_aplicacion` (`id`) |
-| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `rol_aplicacion` (`code`) |
+| `id` | `id` | `INTEGER` | NO | PK | `nextval('traceflow.app_role_id_seq'::regclass)` | NOT NULL | Columna de `rol_aplicacion` (`id`) |
+| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `rol_aplicacion` (`code`) |
 | `name` | `nombre` | `VARCHAR(80)` | NO | — | — | NOT NULL | Columna de `rol_aplicacion` (`name`) |
 | `description` | `descripcion` | `TEXT` | NO | — | — | NOT NULL | Columna de `rol_aplicacion` (`description`) |
 
@@ -97,7 +103,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Módulo responsable:** MOD-01 Autenticación y RBAC | **Casos de uso:** CU-01, CU-27
 - **Clave primaria:** `(id)`
 - **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Restricciones relevantes:** `app_user_status_check`: `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
@@ -109,7 +115,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | `full_name` | `nombre_completo` | `VARCHAR(120)` | NO | — | — | NOT NULL | Columna de `usuario` (`full_name`) |
 | `organization` | `organizacion` | `VARCHAR(120)` | NO | — | `'ÉXODO S.A.C.'::character varying` | NOT NULL | Columna de `usuario` (`organization`) |
 | `position` | `cargo` | `VARCHAR(120)` | SÍ | — | — | — | Columna de `usuario` (`position`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | NOT NULL | Columna de `usuario` (`status`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))` | Columna de `usuario` (`status`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `usuario` (`created_at`) |
 | `updated_at` | `fecha_actualizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `usuario` (`updated_at`) |
 
@@ -117,8 +123,8 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Bitácora append-only encadenada criptográficamente con SHA-256.
 - **Módulo responsable:** MOD-07 Auditoría e Integridad | **Casos de uso:** CU-27, ADR-008
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `actor_user_id` → `None.None (ON DELETE SET NULL)`, `project_id` → `None.None (ON DELETE SET NULL)`, `related_ecn_id` → `None.None (ON DELETE SET NULL)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `actor_user_id` → `traceflow.app_user(id) ON DELETE SET NULL`, `project_id` → `traceflow.project(id) ON DELETE SET NULL`, `related_ecn_id` → `traceflow.change_order(id) ON DELETE SET NULL`
+- **Restricciones relevantes:** `audit_log_result_status_check`: `CHECK (((result_status)::text = ANY ((ARRAY['SUCCESS'::character varying, 'FAILURE'::character varying, 'REJECTED'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
@@ -126,14 +132,14 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | `sequence_number` | `numero_secuencia` | `BIGINT` | NO | — | `nextval('traceflow.audit_log_sequence_number_seq'::regclass)` | UNIQUE | Columna de `registro_auditoria` (`sequence_number`) |
 | `event_code` | `codigo_evento` | `VARCHAR(30)` | SÍ | — | — | — | Columna de `registro_auditoria` (`event_code`) |
 | `timestamp` | `timestamp` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `registro_auditoria` (`timestamp`) |
-| `actor_user_id` | `id_usuario_actor` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `registro_auditoria` (`actor_user_id`) |
+| `actor_user_id` | `id_usuario_actor` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE SET NULL | Columna de `registro_auditoria` (`actor_user_id`) |
 | `actor_role` | `rol_actor` | `VARCHAR(50)` | NO | — | — | NOT NULL | Columna de `registro_auditoria` (`actor_role`) |
 | `operation` | `operacion` | `VARCHAR(60)` | NO | — | — | NOT NULL | Columna de `registro_auditoria` (`operation`) |
 | `entity_name` | `nombre_entidad` | `VARCHAR(50)` | NO | — | — | NOT NULL | Columna de `registro_auditoria` (`entity_name`) |
 | `entity_id` | `id_entidad` | `VARCHAR(50)` | NO | — | — | NOT NULL | Columna de `registro_auditoria` (`entity_id`) |
-| `project_id` | `id_proyecto` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `registro_auditoria` (`project_id`) |
-| `related_ecn_id` | `related_ecn_id` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `registro_auditoria` (`related_ecn_id`) |
-| `result_status` | `estado_resultado` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `registro_auditoria` (`result_status`) |
+| `project_id` | `id_proyecto` | `UUID` | SÍ | FK | — | FK traceflow.project(id) ON DELETE SET NULL | Columna de `registro_auditoria` (`project_id`) |
+| `related_ecn_id` | `related_ecn_id` | `UUID` | SÍ | FK | — | FK traceflow.change_order(id) ON DELETE SET NULL | Columna de `registro_auditoria` (`related_ecn_id`) |
+| `result_status` | `estado_resultado` | `VARCHAR(20)` | NO | — | — | `CHECK (((result_status)::text = ANY ((ARRAY['SUCCESS'::character varying, 'FAILURE'::character varying, 'REJECTED'::character varying])::text[])))` | Columna de `registro_auditoria` (`result_status`) |
 | `payload_diff` | `diferencia_carga` | `JSONB` | NO | — | `'{}'::jsonb` | NOT NULL | Columna de `registro_auditoria` (`payload_diff`) |
 | `ip_address` | `direccion_ip` | `VARCHAR(45)` | SÍ | — | — | — | Columna de `registro_auditoria` (`ip_address`) |
 | `user_agent` | `agente_usuario` | `TEXT` | SÍ | — | — | — | Columna de `registro_auditoria` (`user_agent`) |
@@ -143,68 +149,68 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 ### 8.4 `baseline` → `linea_base`
 - **Descripción funcional:** Instantánea congelada en Biblioteca Maestra identificada por versión semántica.
 - **Módulo responsable:** MOD-05 Administración SCM | **Casos de uso:** CU-20, RN-02
-- **Clave primaria:** `()`
-- **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Clave primaria:** `(id)`
+- **Relaciones salientes (FK):** `frozen_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `project_id` → `traceflow.project(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `baseline_status_check`: `CHECK (((status)::text = ANY ((ARRAY['CONGELADA'::character varying, 'OBSOLETA'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `UUID` | NO | — | `gen_random_uuid()` | NOT NULL | Columna de `linea_base` (`id`) |
-| `project_id` | `id_proyecto` | `UUID` | NO | — | — | NOT NULL | Columna de `linea_base` (`project_id`) |
-| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `linea_base` (`code`) |
+| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `linea_base` (`id`) |
+| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | FK traceflow.project(id) ON DELETE RESTRICT | Columna de `linea_base` (`project_id`) |
+| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `linea_base` (`code`) |
 | `name` | `nombre` | `VARCHAR(120)` | NO | — | — | NOT NULL | Columna de `linea_base` (`name`) |
 | `version_label` | `etiqueta_version` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `linea_base` (`version_label`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'CONGELADA'::character varying` | NOT NULL | Columna de `linea_base` (`status`) |
-| `frozen_by` | `congelado_por` | `UUID` | NO | — | — | NOT NULL | Columna de `linea_base` (`frozen_by`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'CONGELADA'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['CONGELADA'::character varying, 'OBSOLETA'::character varying])::text[])))` | Columna de `linea_base` (`status`) |
+| `frozen_by` | `congelado_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `linea_base` (`frozen_by`) |
 | `frozen_at` | `fecha_congelamiento` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `linea_base` (`frozen_at`) |
 
 ### 8.5 `baseline_item` → `elemento_linea_base`
 - **Descripción funcional:** Detalle inmutable de las versiones exactas de ECS incluidas en una línea base.
 - **Módulo responsable:** MOD-05 Administración SCM | **Casos de uso:** CU-20
-- **Clave primaria:** `()`
-- **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
+- **Clave primaria:** `(baseline_id, ecs_version_id)`
+- **Relaciones salientes (FK):** `baseline_id` → `traceflow.baseline(id) ON DELETE CASCADE`, `ecs_version_id` → `traceflow.ecs_version(id) ON DELETE RESTRICT`
 - **Restricciones relevantes:** PK/FK/UNIQUE estándar
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `baseline_id` | `id_linea_base` | `UUID` | NO | — | — | NOT NULL | Columna de `elemento_linea_base` (`baseline_id`) |
-| `ecs_version_id` | `id_version_ecs` | `UUID` | NO | — | — | NOT NULL | Columna de `elemento_linea_base` (`ecs_version_id`) |
+| `baseline_id` | `id_linea_base` | `UUID` | NO | PK, FK | — | FK traceflow.baseline(id) ON DELETE CASCADE | Columna de `elemento_linea_base` (`baseline_id`) |
+| `ecs_version_id` | `id_version_ecs` | `UUID` | NO | PK, FK | — | FK traceflow.ecs_version(id) ON DELETE RESTRICT | Columna de `elemento_linea_base` (`ecs_version_id`) |
 | `added_at` | `added_at` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `elemento_linea_base` (`added_at`) |
 
 ### 8.6 `ccb_resolution` → `resolucion_ccb`
 - **Descripción funcional:** Acta y escrutinio colegiado de deliberación del Comité de Control de Cambios (CCB).
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-07
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `resolved_by` → `None.None (ON DELETE SET NULL)`, `rfc_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `resolved_by` → `traceflow.app_user(id) ON DELETE SET NULL`, `rfc_id` → `traceflow.change_request(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `ccb_resolution_decision_check`: `CHECK (((decision)::text = ANY ((ARRAY['AUTORIZADA'::character varying, 'RECHAZADA'::character varying, 'EN_DELIBERACION'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `resolucion_ccb` (`id`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `resolucion_ccb` (`rfc_id`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK traceflow.change_request(id) ON DELETE RESTRICT | Columna de `resolucion_ccb` (`rfc_id`) |
 | `resolution_code` | `codigo_resolucion` | `VARCHAR(50)` | NO | — | — | UNIQUE | Columna de `resolucion_ccb` (`resolution_code`) |
-| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `resolucion_ccb` (`decision`) |
+| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | `CHECK (((decision)::text = ANY ((ARRAY['AUTORIZADA'::character varying, 'RECHAZADA'::character varying, 'EN_DELIBERACION'::character varying])::text[])))` | Columna de `resolucion_ccb` (`decision`) |
 | `votes_in_favor` | `votos_a_favor` | `INTEGER` | NO | — | `0` | NOT NULL | Columna de `resolucion_ccb` (`votes_in_favor`) |
 | `votes_against` | `votos_en_contra` | `INTEGER` | NO | — | `0` | NOT NULL | Columna de `resolucion_ccb` (`votes_against`) |
 | `votes_abstention` | `votos_abstencion` | `INTEGER` | NO | — | `0` | NOT NULL | Columna de `resolucion_ccb` (`votes_abstention`) |
 | `observations` | `observaciones` | `TEXT` | SÍ | — | — | — | Columna de `resolucion_ccb` (`observations`) |
-| `resolved_by` | `resuelto_por` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `resolucion_ccb` (`resolved_by`) |
+| `resolved_by` | `resuelto_por` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE SET NULL | Columna de `resolucion_ccb` (`resolved_by`) |
 | `resolved_at` | `fecha_resolucion` | `TIMESTAMPTZ` | SÍ | — | — | — | Columna de `resolucion_ccb` (`resolved_at`) |
 
 ### 8.7 `ccb_vote` → `voto_ccb`
 - **Descripción funcional:** Voto individual, único e irrevocable de cada miembro del CCB por solicitud.
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-07, SoD-05
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `resolution_id` → `None.None (ON DELETE CASCADE)`, `rfc_id` → `None.None (ON DELETE CASCADE)`, `voter_user_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `resolution_id` → `traceflow.ccb_resolution(id) ON DELETE CASCADE`, `rfc_id` → `traceflow.change_request(id) ON DELETE CASCADE`, `voter_user_id` → `traceflow.app_user(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `ccb_vote_decision_check`: `CHECK (((decision)::text = ANY ((ARRAY['APROBAR'::character varying, 'RECHAZAR'::character varying, 'ABSTENERSE'::character varying])::text[])))`; `uq_ccb_vote_per_member`: `UNIQUE (rfc_id, voter_user_id)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `voto_ccb` (`id`) |
-| `resolution_id` | `id_resolucion` | `UUID` | NO | FK | — | FK None.None (ON DELETE CASCADE) | Columna de `voto_ccb` (`resolution_id`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE CASCADE) | Columna de `voto_ccb` (`rfc_id`) |
-| `voter_user_id` | `id_usuario_votante` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE RESTRICT) | Columna de `voto_ccb` (`voter_user_id`) |
-| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `voto_ccb` (`decision`) |
+| `resolution_id` | `id_resolucion` | `UUID` | NO | FK | — | FK traceflow.ccb_resolution(id) ON DELETE CASCADE | Columna de `voto_ccb` (`resolution_id`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK traceflow.change_request(id) ON DELETE CASCADE | Columna de `voto_ccb` (`rfc_id`) |
+| `voter_user_id` | `id_usuario_votante` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `voto_ccb` (`voter_user_id`) |
+| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | `CHECK (((decision)::text = ANY ((ARRAY['APROBAR'::character varying, 'RECHAZAR'::character varying, 'ABSTENERSE'::character varying])::text[])))` | Columna de `voto_ccb` (`decision`) |
 | `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `voto_ccb` (`justification`) |
 | `voted_at` | `fecha_votacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `voto_ccb` (`voted_at`) |
 
@@ -212,17 +218,17 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Registro de Doble Llave Operativa para Cambios Menores (PU-02 + PU-03 de distinta identidad).
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-30
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `authorizer_user_id` → `None.None (ON DELETE RESTRICT)`, `rfc_id` → `None.None (ON DELETE CASCADE)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `authorizer_user_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `rfc_id` → `traceflow.change_request(id) ON DELETE CASCADE`
+- **Restricciones relevantes:** `change_authorization_authorizer_role_check`: `CHECK (((authorizer_role)::text = ANY ((ARRAY['GESTOR'::character varying, 'ARQUITECTO'::character varying])::text[])))`; `change_authorization_authorizer_role_id_check`: `CHECK (((authorizer_role_id)::text = ANY ((ARRAY['PU-02'::character varying, 'PU-03'::character varying])::text[])))`; `change_authorization_decision_check`: `CHECK (((decision)::text = ANY ((ARRAY['APROBADO'::character varying, 'RECHAZADO'::character varying, 'REESCALADO_CCB'::character varying])::text[])))`; `uq_rfc_authorizer_role`: `UNIQUE (rfc_id, authorizer_role)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `autorizacion_delegada` (`id`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE CASCADE) | Columna de `autorizacion_delegada` (`rfc_id`) |
-| `authorizer_role` | `rol_autorizador` | `VARCHAR(40)` | NO | — | — | UNIQUE | Columna de `autorizacion_delegada` (`authorizer_role`) |
-| `authorizer_role_id` | `id_rol_autorizador` | `VARCHAR(10)` | NO | — | — | NOT NULL | Columna de `autorizacion_delegada` (`authorizer_role_id`) |
-| `authorizer_user_id` | `id_usuario_autorizador` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `autorizacion_delegada` (`authorizer_user_id`) |
-| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `autorizacion_delegada` (`decision`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK traceflow.change_request(id) ON DELETE CASCADE | Columna de `autorizacion_delegada` (`rfc_id`) |
+| `authorizer_role` | `rol_autorizador` | `VARCHAR(40)` | NO | — | — | `CHECK (((authorizer_role)::text = ANY ((ARRAY['GESTOR'::character varying, 'ARQUITECTO'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`authorizer_role`) |
+| `authorizer_role_id` | `id_rol_autorizador` | `VARCHAR(10)` | NO | — | — | `CHECK (((authorizer_role_id)::text = ANY ((ARRAY['PU-02'::character varying, 'PU-03'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`authorizer_role_id`) |
+| `authorizer_user_id` | `id_usuario_autorizador` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `autorizacion_delegada` (`authorizer_user_id`) |
+| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | `CHECK (((decision)::text = ANY ((ARRAY['APROBADO'::character varying, 'RECHAZADO'::character varying, 'REESCALADO_CCB'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`decision`) |
 | `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `autorizacion_delegada` (`justification`) |
 | `authorized_at` | `fecha_autorizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `autorizacion_delegada` (`authorized_at`) |
 
@@ -230,18 +236,18 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Orden de Cambio formal (ECN/ECO) que asigna implementación al Desarrollador (PU-06).
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-08, CU-10, CU-22
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `assigned_developer_id` → `None.None (ON DELETE RESTRICT)`, `ecs_id` → `None.None (ON DELETE RESTRICT)`, `issued_by` → `None.None (ON DELETE RESTRICT)`, `rfc_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `assigned_developer_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `ecs_id` → `traceflow.config_item(id) ON DELETE RESTRICT`, `issued_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `rfc_id` → `traceflow.change_request(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `change_order_status_check`: `CHECK (((status)::text = ANY ((ARRAY['EMITIDA'::character varying, 'EN_EJECUCION'::character varying, 'CERRADA'::character varying, 'CANCELADA'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `orden_cambio` (`id`) |
 | `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `orden_cambio` (`code`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE RESTRICT) | Columna de `orden_cambio` (`rfc_id`) |
-| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `orden_cambio` (`ecs_id`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'EMITIDA'::character varying` | NOT NULL | Columna de `orden_cambio` (`status`) |
-| `issued_by` | `emitido_por` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `orden_cambio` (`issued_by`) |
-| `assigned_developer_id` | `id_desarrollador_asignado` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `orden_cambio` (`assigned_developer_id`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK traceflow.change_request(id) ON DELETE RESTRICT | Columna de `orden_cambio` (`rfc_id`) |
+| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | FK traceflow.config_item(id) ON DELETE RESTRICT | Columna de `orden_cambio` (`ecs_id`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'EMITIDA'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['EMITIDA'::character varying, 'EN_EJECUCION'::character varying, 'CERRADA'::character varying, 'CANCELADA'::character varying])::text[])))` | Columna de `orden_cambio` (`status`) |
+| `issued_by` | `emitido_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `orden_cambio` (`issued_by`) |
+| `assigned_developer_id` | `id_desarrollador_asignado` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `orden_cambio` (`assigned_developer_id`) |
 | `issued_at` | `fecha_emision` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `orden_cambio` (`issued_at`) |
 | `closed_at` | `fecha_cierre` | `TIMESTAMPTZ` | SÍ | — | — | — | Columna de `orden_cambio` (`closed_at`) |
 
@@ -249,22 +255,22 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Expediente central de Solicitud de Cambio (RFC) en 14 estados oficiales TB-07.
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-04, CU-04.1, CU-05..CU-08
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `project_id` → `None.None (ON DELETE RESTRICT)`, `requested_by` → `None.None (ON DELETE RESTRICT)`, `target_ecs_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `project_id` → `traceflow.config_item(id, project_id) ON DELETE RESTRICT`, `project_id` → `traceflow.project(id) ON DELETE RESTRICT`, `requested_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `target_ecs_id` → `traceflow.config_item(id, project_id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `change_request_classification_check`: `CHECK (((classification)::text = ANY ((ARRAY['CAMBIO_MENOR'::character varying, 'CAMBIO_MAYOR'::character varying, 'PENDIENTE'::character varying])::text[])))`; `change_request_priority_check`: `CHECK (((priority)::text = ANY ((ARRAY['BAJA'::character varying, 'MEDIA'::character varying, 'ALTA'::character varying, 'CRITICA'::character varying])::text[])))`; `change_request_status_check`: `CHECK (((status)::text = ANY ((ARRAY['REGISTRADA'::character varying, 'EN_SUBSANACION'::character varying, 'CLASIFICADA'::character varying, 'EN_ANALISIS_TECNICO'::character varying, 'EN_EVALUACION'::character varying, 'AUTORIZADA'::character varying, 'ORDEN_EMITIDA'::character varying, 'EN_IMPLEMENTACION'::character varying, 'EN_PRUEBAS'::character varying, 'EN_ACEPTACION'::character varying, 'DESESTIMADA'::character varying, 'RECHAZADA'::character varying, 'CANCELADA'::character varying, 'IMPLEMENTADA'::character varying])::text[])))`; `uq_rfc_id_project`: `UNIQUE (id, project_id)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | UNIQUE | Columna de `solicitud_cambio` (`id`) |
+| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `solicitud_cambio` (`id`) |
 | `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `solicitud_cambio` (`code`) |
-| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE RESTRICT); None.None (ON DELETE RESTRICT) | Columna de `solicitud_cambio` (`project_id`) |
-| `target_ecs_id` | `id_ecs_objetivo` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `solicitud_cambio` (`target_ecs_id`) |
+| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | FK traceflow.project(id) ON DELETE RESTRICT; traceflow.config_item(id, project_id) ON DELETE RESTRICT | Columna de `solicitud_cambio` (`project_id`) |
+| `target_ecs_id` | `id_ecs_objetivo` | `UUID` | NO | FK | — | FK traceflow.config_item(id, project_id) ON DELETE RESTRICT | Columna de `solicitud_cambio` (`target_ecs_id`) |
 | `title` | `titulo` | `VARCHAR(200)` | NO | — | — | NOT NULL | Columna de `solicitud_cambio` (`title`) |
 | `description` | `descripcion` | `TEXT` | NO | — | — | NOT NULL | Columna de `solicitud_cambio` (`description`) |
 | `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `solicitud_cambio` (`justification`) |
-| `priority` | `prioridad` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `solicitud_cambio` (`priority`) |
-| `classification` | `clasificacion` | `VARCHAR(20)` | SÍ | — | `'PENDIENTE'::character varying` | — | Columna de `solicitud_cambio` (`classification`) |
-| `status` | `estado` | `VARCHAR(30)` | NO | — | `'REGISTRADA'::character varying` | NOT NULL | Columna de `solicitud_cambio` (`status`) |
-| `requested_by` | `id_solicitante` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `solicitud_cambio` (`requested_by`) |
+| `priority` | `prioridad` | `VARCHAR(20)` | NO | — | — | `CHECK (((priority)::text = ANY ((ARRAY['BAJA'::character varying, 'MEDIA'::character varying, 'ALTA'::character varying, 'CRITICA'::character varying])::text[])))` | Columna de `solicitud_cambio` (`priority`) |
+| `classification` | `clasificacion` | `VARCHAR(20)` | SÍ | — | `'PENDIENTE'::character varying` | `CHECK (((classification)::text = ANY ((ARRAY['CAMBIO_MENOR'::character varying, 'CAMBIO_MAYOR'::character varying, 'PENDIENTE'::character varying])::text[])))` | Columna de `solicitud_cambio` (`classification`) |
+| `status` | `estado` | `VARCHAR(30)` | NO | — | `'REGISTRADA'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['REGISTRADA'::character varying, 'EN_SUBSANACION'::character varying, 'CLASIFICADA'::character varying, 'EN_ANALISIS_TECNICO'::character varying, 'EN_EVALUACION'::character varying, 'AUTORIZADA'::character varying, 'ORDEN_EMITIDA'::character varying, 'EN_IMPLEMENTACION'::character varying, 'EN_PRUEBAS'::character varying, 'EN_ACEPTACION'::character varying, 'DESESTIMADA'::character varying, 'RECHAZADA'::character varying, 'CANCELADA'::character varying, 'IMPLEMENTADA'::character varying])::text[])))` | Columna de `solicitud_cambio` (`status`) |
+| `requested_by` | `id_solicitante` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `solicitud_cambio` (`requested_by`) |
 | `observations` | `observaciones` | `TEXT` | SÍ | — | — | — | Columna de `solicitud_cambio` (`observations`) |
 | `rejection_reason` | `motivo_rechazo` | `TEXT` | SÍ | — | — | — | Columna de `solicitud_cambio` (`rejection_reason`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `solicitud_cambio` (`created_at`) |
@@ -275,23 +281,23 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Inventario de Elementos de Configuración de Software (ECS) y su biblioteca actual.
 - **Módulo responsable:** MOD-05 Administración SCM | **Casos de uso:** CU-09..CU-14, CU-20, CU-26
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `author_id` → `None.None (ON DELETE SET NULL)`, `project_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `author_id` → `traceflow.app_user(id) ON DELETE SET NULL`, `project_id` → `traceflow.project(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `config_item_current_library_check`: `CHECK (((current_library)::text = ANY ((ARRAY['TRABAJO'::character varying, 'SOPORTE'::character varying, 'MAESTRA'::character varying])::text[])))`; `config_item_item_type_check`: `CHECK (((item_type)::text = ANY ((ARRAY['CODIGO_FUENTE'::character varying, 'DOCUMENTO_TECNICO'::character varying, 'ESQUEMA_BD'::character varying, 'SCRIPT_DESPLIEGUE'::character varying, 'SOURCE_CODE'::character varying, 'DOCUMENT'::character varying, 'DB_SCHEMA'::character varying, 'BUILD_SCRIPT'::character varying])::text[])))`; `uq_ecs_id_project`: `UNIQUE (id, project_id)`; `uq_project_ecs_code`: `UNIQUE (project_id, code)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | UNIQUE | Columna de `elemento_configuracion` (`id`) |
-| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE RESTRICT) | Columna de `elemento_configuracion` (`project_id`) |
-| `code` | `codigo` | `VARCHAR(50)` | NO | — | — | UNIQUE | Columna de `elemento_configuracion` (`code`) |
+| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `elemento_configuracion` (`id`) |
+| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | FK traceflow.project(id) ON DELETE RESTRICT | Columna de `elemento_configuracion` (`project_id`) |
+| `code` | `codigo` | `VARCHAR(50)` | NO | — | — | NOT NULL | Columna de `elemento_configuracion` (`code`) |
 | `name` | `nombre` | `VARCHAR(120)` | NO | — | — | NOT NULL | Columna de `elemento_configuracion` (`name`) |
 | `description` | `descripcion` | `TEXT` | SÍ | — | — | — | Columna de `elemento_configuracion` (`description`) |
-| `item_type` | `tipo_elemento` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `elemento_configuracion` (`item_type`) |
-| `current_library` | `biblioteca_actual` | `VARCHAR(20)` | NO | — | `'TRABAJO'::character varying` | NOT NULL | Columna de `elemento_configuracion` (`current_library`) |
+| `item_type` | `tipo_elemento` | `VARCHAR(30)` | NO | — | — | `CHECK (((item_type)::text = ANY ((ARRAY['CODIGO_FUENTE'::character varying, 'DOCUMENTO_TECNICO'::character varying, 'ESQUEMA_BD'::character varying, 'SCRIPT_DESPLIEGUE'::character varying, 'SOURCE_CODE'::character varying, 'DOCUMENT'::character varying, 'DB_SCHEMA'::character varying, 'BUILD_SCRIPT'::character varying])::text[])))` | Columna de `elemento_configuracion` (`item_type`) |
+| `current_library` | `biblioteca_actual` | `VARCHAR(20)` | NO | — | `'TRABAJO'::character varying` | `CHECK (((current_library)::text = ANY ((ARRAY['TRABAJO'::character varying, 'SOPORTE'::character varying, 'MAESTRA'::character varying])::text[])))` | Columna de `elemento_configuracion` (`current_library`) |
 | `current_version` | `version_actual` | `VARCHAR(20)` | NO | — | `'1.0.0'::character varying` | NOT NULL | Columna de `elemento_configuracion` (`current_version`) |
 | `file_path` | `ruta_archivo` | `VARCHAR(255)` | NO | — | — | NOT NULL | Columna de `elemento_configuracion` (`file_path`) |
 | `sha256_checksum` | `suma_sha256` | `VARCHAR(64)` | NO | — | — | NOT NULL | Columna de `elemento_configuracion` (`sha256_checksum`) |
 | `is_locked` | `esta_bloqueado` | `BOOLEAN` | NO | — | `false` | NOT NULL | Columna de `elemento_configuracion` (`is_locked`) |
-| `author_id` | `author_id` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `elemento_configuracion` (`author_id`) |
+| `author_id` | `author_id` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE SET NULL | Columna de `elemento_configuracion` (`author_id`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `elemento_configuracion` (`created_at`) |
 | `updated_at` | `fecha_actualizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `elemento_configuracion` (`updated_at`) |
 
@@ -299,19 +305,19 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Historial inmutable de versiones de cada ECS con suma SHA-256 (RNF-03, RN-02).
 - **Módulo responsable:** MOD-05 Administración SCM | **Casos de uso:** CU-12, CU-13, CU-20, CU-26
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `check_in_by` → `None.None (ON DELETE RESTRICT)`, `ecs_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `check_in_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `ecs_id` → `traceflow.config_item(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `ecs_version_storage_status_check`: `CHECK (((storage_status)::text = ANY ((ARRAY['PENDING_STORAGE'::character varying, 'COMMITTED'::character varying, 'STORAGE_FAILED'::character varying])::text[])))`; `uq_ecs_version`: `UNIQUE (ecs_id, version_number)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `version_ecs` (`id`) |
-| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE RESTRICT) | Columna de `version_ecs` (`ecs_id`) |
-| `version_number` | `numero_version` | `VARCHAR(20)` | NO | — | — | UNIQUE | Columna de `version_ecs` (`version_number`) |
+| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | FK traceflow.config_item(id) ON DELETE RESTRICT | Columna de `version_ecs` (`ecs_id`) |
+| `version_number` | `numero_version` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `version_ecs` (`version_number`) |
 | `sha256_checksum` | `suma_sha256` | `VARCHAR(64)` | NO | — | — | NOT NULL | Columna de `version_ecs` (`sha256_checksum`) |
 | `storage_path` | `storage_path` | `VARCHAR(255)` | NO | — | — | NOT NULL | Columna de `version_ecs` (`storage_path`) |
-| `storage_status` | `storage_status` | `VARCHAR(20)` | NO | — | `'COMMITTED'::character varying` | NOT NULL | Columna de `version_ecs` (`storage_status`) |
+| `storage_status` | `storage_status` | `VARCHAR(20)` | NO | — | `'COMMITTED'::character varying` | `CHECK (((storage_status)::text = ANY ((ARRAY['PENDING_STORAGE'::character varying, 'COMMITTED'::character varying, 'STORAGE_FAILED'::character varying])::text[])))` | Columna de `version_ecs` (`storage_status`) |
 | `file_size_bytes` | `tamano_bytes` | `BIGINT` | NO | — | `0` | NOT NULL | Columna de `version_ecs` (`file_size_bytes`) |
-| `check_in_by` | `check_in_by` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `version_ecs` (`check_in_by`) |
+| `check_in_by` | `check_in_by` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `version_ecs` (`check_in_by`) |
 | `change_order_id` | `id_orden_cambio` | `UUID` | SÍ | — | — | — | Columna de `version_ecs` (`change_order_id`) |
 | `commit_message` | `commit_message` | `TEXT` | NO | — | — | NOT NULL | Columna de `version_ecs` (`commit_message`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `version_ecs` (`created_at`) |
@@ -320,22 +326,22 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Dictamen técnico de impacto sobre la Triple Restricción elaborado por el Arquitecto (PU-03).
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-06, RN-05
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `architect_id` → `None.None (ON DELETE RESTRICT)`, `rfc_id` → `None.None (ON DELETE CASCADE)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `architect_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `rfc_id` → `traceflow.change_request(id) ON DELETE CASCADE`
+- **Restricciones relevantes:** `impact_assessment_classification_check`: `CHECK (((classification)::text = ANY ((ARRAY['CAMBIO_MENOR'::character varying, 'CAMBIO_MAYOR'::character varying])::text[])))`; `impact_assessment_effort_hours_check`: `CHECK ((effort_hours >= 0))`; `impact_assessment_estimated_cost_check`: `CHECK ((estimated_cost >= (0)::numeric))`; `impact_assessment_estimated_days_check`: `CHECK ((estimated_days >= 0))`; `impact_assessment_technical_risk_check`: `CHECK (((technical_risk)::text = ANY ((ARRAY['BAJO'::character varying, 'MEDIO'::character varying, 'ALTO'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `informe_impacto` (`id`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK None.None (ON DELETE CASCADE) | Columna de `informe_impacto` (`rfc_id`) |
-| `architect_id` | `id_arquitecto` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `informe_impacto` (`architect_id`) |
-| `classification` | `clasificacion` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`classification`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | UNIQUE; FK traceflow.change_request(id) ON DELETE CASCADE | Columna de `informe_impacto` (`rfc_id`) |
+| `architect_id` | `id_arquitecto` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `informe_impacto` (`architect_id`) |
+| `classification` | `clasificacion` | `VARCHAR(20)` | NO | — | — | `CHECK (((classification)::text = ANY ((ARRAY['CAMBIO_MENOR'::character varying, 'CAMBIO_MAYOR'::character varying])::text[])))` | Columna de `informe_impacto` (`classification`) |
 | `architecture_impact` | `impacto_arquitectura` | `TEXT` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`architecture_impact`) |
 | `dependencies_impact` | `impacto_dependencias` | `TEXT` | SÍ | — | — | — | Columna de `informe_impacto` (`dependencies_impact`) |
 | `affected_ecs_ids` | `ids_ecs_afectados` | `JSONB` | NO | — | `'[]'::jsonb` | NOT NULL | Columna de `informe_impacto` (`affected_ecs_ids`) |
-| `effort_hours` | `horas_esfuerzo` | `INTEGER` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`effort_hours`) |
-| `estimated_cost` | `costo_estimado` | `NUMERIC(10,2)` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`estimated_cost`) |
-| `estimated_days` | `dias_estimados` | `INTEGER` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`estimated_days`) |
-| `technical_risk` | `riesgo_tecnico` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `informe_impacto` (`technical_risk`) |
+| `effort_hours` | `horas_esfuerzo` | `INTEGER` | NO | — | — | `CHECK ((effort_hours >= 0))` | Columna de `informe_impacto` (`effort_hours`) |
+| `estimated_cost` | `costo_estimado` | `NUMERIC(10,2)` | NO | — | — | `CHECK ((estimated_cost >= (0)::numeric))` | Columna de `informe_impacto` (`estimated_cost`) |
+| `estimated_days` | `dias_estimados` | `INTEGER` | NO | — | — | `CHECK ((estimated_days >= 0))` | Columna de `informe_impacto` (`estimated_days`) |
+| `technical_risk` | `riesgo_tecnico` | `VARCHAR(20)` | NO | — | — | `CHECK (((technical_risk)::text = ANY ((ARRAY['BAJO'::character varying, 'MEDIO'::character varying, 'ALTO'::character varying])::text[])))` | Columna de `informe_impacto` (`technical_risk`) |
 | `scope_affected` | `alcance_afectado` | `BOOLEAN` | NO | — | `false` | NOT NULL | Columna de `informe_impacto` (`scope_affected`) |
 | `schedule_affected` | `cronograma_afectado` | `BOOLEAN` | NO | — | `false` | NOT NULL | Columna de `informe_impacto` (`schedule_affected`) |
 | `cost_affected` | `costo_afectado` | `BOOLEAN` | NO | — | `false` | NOT NULL | Columna de `informe_impacto` (`cost_affected`) |
@@ -345,42 +351,42 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Tickets operativos de incidencias derivables a Solicitudes de Cambio (RFC).
 - **Módulo responsable:** MOD-08 Incidencias | **Casos de uso:** CU-23, CU-24, CU-25
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `derived_rfc_id` → `None.None (ON DELETE SET NULL)`, `project_id` → `None.None (ON DELETE RESTRICT)`, `reported_by` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `derived_rfc_id` → `traceflow.change_request(id) ON DELETE SET NULL`, `project_id` → `traceflow.project(id) ON DELETE RESTRICT`, `reported_by` → `traceflow.app_user(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `incident_ticket_status_check`: `CHECK (((status)::text = ANY ((ARRAY['REGISTRADO'::character varying, 'DERIVADO'::character varying, 'ATENDIDO'::character varying, 'CERRADO'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `incidencia` (`id`) |
-| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `incidencia` (`project_id`) |
+| `project_id` | `id_proyecto` | `UUID` | NO | FK | — | FK traceflow.project(id) ON DELETE RESTRICT | Columna de `incidencia` (`project_id`) |
 | `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `incidencia` (`code`) |
 | `title` | `titulo` | `VARCHAR(150)` | NO | — | — | NOT NULL | Columna de `incidencia` (`title`) |
 | `description` | `descripcion` | `TEXT` | NO | — | — | NOT NULL | Columna de `incidencia` (`description`) |
-| `reported_by` | `reportado_por` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `incidencia` (`reported_by`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'REGISTRADO'::character varying` | NOT NULL | Columna de `incidencia` (`status`) |
-| `derived_rfc_id` | `id_rfc_derivada` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE SET NULL) | Columna de `incidencia` (`derived_rfc_id`) |
+| `reported_by` | `reportado_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `incidencia` (`reported_by`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'REGISTRADO'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['REGISTRADO'::character varying, 'DERIVADO'::character varying, 'ATENDIDO'::character varying, 'CERRADO'::character varying])::text[])))` | Columna de `incidencia` (`status`) |
+| `derived_rfc_id` | `id_rfc_derivada` | `UUID` | SÍ | FK | — | FK traceflow.change_request(id) ON DELETE SET NULL | Columna de `incidencia` (`derived_rfc_id`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `incidencia` (`created_at`) |
 
 ### 8.15 `project` → `proyecto`
 - **Descripción funcional:** Catálogo de proyectos clientes con clave de proyecto, estado y versión de línea base activa.
 - **Módulo responsable:** MOD-02 Gestión de Proyectos | **Casos de uso:** CU-02, CU-03
-- **Clave primaria:** `()`
-- **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Clave primaria:** `(id)`
+- **Relaciones salientes (FK):** `architect_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `created_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `librarian_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `manager_id` → `traceflow.app_user(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `project_status_check`: `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'CLOSED'::character varying, 'ARCHIVED'::character varying])::text[])))`; `uq_project_id_code`: `UNIQUE (id, code)`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `UUID` | NO | — | `gen_random_uuid()` | NOT NULL | Columna de `proyecto` (`id`) |
-| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `proyecto` (`code`) |
-| `project_key` | `clave_proyecto` | `VARCHAR(30)` | NO | — | — | NOT NULL | Columna de `proyecto` (`project_key`) |
+| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `proyecto` (`id`) |
+| `code` | `codigo` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `proyecto` (`code`) |
+| `project_key` | `clave_proyecto` | `VARCHAR(30)` | NO | — | — | UNIQUE | Columna de `proyecto` (`project_key`) |
 | `name` | `nombre` | `VARCHAR(120)` | NO | — | — | NOT NULL | Columna de `proyecto` (`name`) |
 | `description` | `descripcion` | `TEXT` | SÍ | — | — | — | Columna de `proyecto` (`description`) |
 | `client_name` | `nombre_cliente` | `VARCHAR(120)` | NO | — | — | NOT NULL | Columna de `proyecto` (`client_name`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | NOT NULL | Columna de `proyecto` (`status`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'CLOSED'::character varying, 'ARCHIVED'::character varying])::text[])))` | Columna de `proyecto` (`status`) |
 | `active_baseline_version` | `version_linea_base_activa` | `VARCHAR(30)` | SÍ | — | — | — | Columna de `proyecto` (`active_baseline_version`) |
-| `manager_id` | `manager_id` | `UUID` | SÍ | — | — | — | Columna de `proyecto` (`manager_id`) |
-| `architect_id` | `id_arquitecto` | `UUID` | SÍ | — | — | — | Columna de `proyecto` (`architect_id`) |
-| `librarian_id` | `id_bibliotecario` | `UUID` | SÍ | — | — | — | Columna de `proyecto` (`librarian_id`) |
-| `created_by` | `creado_por` | `UUID` | SÍ | — | — | — | Columna de `proyecto` (`created_by`) |
+| `manager_id` | `id_gestor` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `proyecto` (`manager_id`) |
+| `architect_id` | `id_arquitecto` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `proyecto` (`architect_id`) |
+| `librarian_id` | `id_bibliotecario` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `proyecto` (`librarian_id`) |
+| `created_by` | `creado_por` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `proyecto` (`created_by`) |
 | `created_at` | `fecha_creacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `proyecto` (`created_at`) |
 | `updated_at` | `fecha_actualizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `proyecto` (`updated_at`) |
 
@@ -388,96 +394,96 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Descripción funcional:** Certificación técnica de calidad emitida por PU-07 (segregada de PU-06).
 - **Módulo responsable:** MOD-06 Calidad y Pruebas | **Casos de uso:** CU-16..CU-19
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `certified_by` → `None.None (ON DELETE RESTRICT)`, `change_order_id` → `None.None (ON DELETE RESTRICT)`, `ecs_version_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `certified_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `change_order_id` → `traceflow.change_order(id) ON DELETE RESTRICT`, `ecs_version_id` → `traceflow.ecs_version(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `qa_certification_result_check`: `CHECK (((result)::text = ANY ((ARRAY['CONFORME'::character varying, 'NO_CONFORME'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `certificacion_qa` (`id`) |
-| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `certificacion_qa` (`change_order_id`) |
-| `ecs_version_id` | `id_version_ecs` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `certificacion_qa` (`ecs_version_id`) |
-| `result` | `resultado` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `certificacion_qa` (`result`) |
+| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK traceflow.change_order(id) ON DELETE RESTRICT | Columna de `certificacion_qa` (`change_order_id`) |
+| `ecs_version_id` | `id_version_ecs` | `UUID` | SÍ | FK | — | FK traceflow.ecs_version(id) ON DELETE RESTRICT | Columna de `certificacion_qa` (`ecs_version_id`) |
+| `result` | `resultado` | `VARCHAR(20)` | NO | — | — | `CHECK (((result)::text = ANY ((ARRAY['CONFORME'::character varying, 'NO_CONFORME'::character varying])::text[])))` | Columna de `certificacion_qa` (`result`) |
 | `test_suite_summary` | `test_suite_summary` | `TEXT` | NO | — | — | NOT NULL | Columna de `certificacion_qa` (`test_suite_summary`) |
-| `certified_by` | `certificado_por` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `certificacion_qa` (`certified_by`) |
+| `certified_by` | `certificado_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `certificacion_qa` (`certified_by`) |
 | `certified_at` | `fecha_certificacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `certificacion_qa` (`certified_at`) |
 
 ### 8.17 `sync_lock` → `bloqueo_sincronizacion`
 - **Descripción funcional:** Bloqueo exclusivo de Check-Out por ECS protegido por índice único condicional (RN-06).
 - **Módulo responsable:** MOD-05 Administración SCM | **Casos de uso:** CU-10, CU-11, CU-12, CU-21, CU-22
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `change_order_id` → `None.None (ON DELETE RESTRICT)`, `ecs_id` → `None.None (ON DELETE RESTRICT)`, `locked_by` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `change_order_id` → `traceflow.change_order(id) ON DELETE RESTRICT`, `ecs_id` → `traceflow.config_item(id) ON DELETE RESTRICT`, `locked_by` → `traceflow.app_user(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `sync_lock_release_reason_check`: `CHECK (((release_reason)::text = ANY ((ARRAY['CHECK_IN'::character varying, 'ROLLBACK'::character varying, 'CANCELED'::character varying])::text[])))`; `sync_lock_status_check`: `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'RELEASED'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `bloqueo_sincronizacion` (`id`) |
-| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `bloqueo_sincronizacion` (`ecs_id`) |
-| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `bloqueo_sincronizacion` (`change_order_id`) |
-| `locked_by` | `bloqueado_por` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `bloqueo_sincronizacion` (`locked_by`) |
-| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | NOT NULL | Columna de `bloqueo_sincronizacion` (`status`) |
+| `ecs_id` | `id_ecs` | `UUID` | NO | FK | — | FK traceflow.config_item(id) ON DELETE RESTRICT | Columna de `bloqueo_sincronizacion` (`ecs_id`) |
+| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK traceflow.change_order(id) ON DELETE RESTRICT | Columna de `bloqueo_sincronizacion` (`change_order_id`) |
+| `locked_by` | `bloqueado_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `bloqueo_sincronizacion` (`locked_by`) |
+| `status` | `estado` | `VARCHAR(20)` | NO | — | `'ACTIVE'::character varying` | `CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'RELEASED'::character varying])::text[])))` | Columna de `bloqueo_sincronizacion` (`status`) |
 | `work_library_path` | `ruta_biblioteca_trabajo` | `VARCHAR(255)` | NO | — | — | NOT NULL | Columna de `bloqueo_sincronizacion` (`work_library_path`) |
 | `locked_at` | `fecha_bloqueo` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `bloqueo_sincronizacion` (`locked_at`) |
 | `released_at` | `fecha_liberacion` | `TIMESTAMPTZ` | SÍ | — | — | — | Columna de `bloqueo_sincronizacion` (`released_at`) |
-| `release_reason` | `motivo_liberacion` | `VARCHAR(30)` | SÍ | — | — | — | Columna de `bloqueo_sincronizacion` (`release_reason`) |
+| `release_reason` | `motivo_liberacion` | `VARCHAR(30)` | SÍ | — | — | `CHECK (((release_reason)::text = ANY ((ARRAY['CHECK_IN'::character varying, 'ROLLBACK'::character varying, 'CANCELED'::character varying])::text[])))` | Columna de `bloqueo_sincronizacion` (`release_reason`) |
 
 ### 8.18 `uat_acceptance` → `aceptacion_uat`
 - **Descripción funcional:** Conformidad de Aceptación de Usuario emitida por el Solicitante previa al Check-In a Maestra.
 - **Módulo responsable:** MOD-06 Calidad y Pruebas | **Casos de uso:** CU-29, RN-09
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `accepted_by` → `None.None (ON DELETE RESTRICT)`, `change_order_id` → `None.None (ON DELETE RESTRICT)`, `ecs_version_id` → `None.None (ON DELETE RESTRICT)`
-- **Restricciones relevantes:** PK/FK/UNIQUE estándar
+- **Relaciones salientes (FK):** `accepted_by` → `traceflow.app_user(id) ON DELETE RESTRICT`, `change_order_id` → `traceflow.change_order(id) ON DELETE RESTRICT`, `ecs_version_id` → `traceflow.ecs_version(id) ON DELETE RESTRICT`
+- **Restricciones relevantes:** `uat_acceptance_result_check`: `CHECK (((result)::text = ANY ((ARRAY['ACEPTADO'::character varying, 'RECHAZADO'::character varying])::text[])))`
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `aceptacion_uat` (`id`) |
-| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `aceptacion_uat` (`change_order_id`) |
-| `ecs_version_id` | `id_version_ecs` | `UUID` | SÍ | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `aceptacion_uat` (`ecs_version_id`) |
-| `result` | `resultado` | `VARCHAR(20)` | NO | — | — | NOT NULL | Columna de `aceptacion_uat` (`result`) |
+| `change_order_id` | `id_orden_cambio` | `UUID` | NO | FK | — | FK traceflow.change_order(id) ON DELETE RESTRICT | Columna de `aceptacion_uat` (`change_order_id`) |
+| `ecs_version_id` | `id_version_ecs` | `UUID` | SÍ | FK | — | FK traceflow.ecs_version(id) ON DELETE RESTRICT | Columna de `aceptacion_uat` (`ecs_version_id`) |
+| `result` | `resultado` | `VARCHAR(20)` | NO | — | — | `CHECK (((result)::text = ANY ((ARRAY['ACEPTADO'::character varying, 'RECHAZADO'::character varying])::text[])))` | Columna de `aceptacion_uat` (`result`) |
 | `observations` | `observaciones` | `TEXT` | NO | — | — | NOT NULL | Columna de `aceptacion_uat` (`observations`) |
-| `accepted_by` | `aceptado_por` | `UUID` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `aceptacion_uat` (`accepted_by`) |
+| `accepted_by` | `aceptado_por` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `aceptacion_uat` (`accepted_by`) |
 | `accepted_at` | `fecha_aceptacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `aceptacion_uat` (`accepted_at`) |
 
 ### 8.19 `user_project_assignment` → `asignacion_proyecto_usuario`
 - **Descripción funcional:** Matriz N:M de aislamiento multitenant que restringe el acceso por proyecto.
 - **Módulo responsable:** MOD-02 Gestión de Proyectos | **Casos de uso:** CU-01, CU-02, CU-03
-- **Clave primaria:** `()`
-- **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
+- **Clave primaria:** `(user_id, project_id)`
+- **Relaciones salientes (FK):** `assigned_by` → `traceflow.app_user(id) ON DELETE SET NULL`, `project_id` → `traceflow.project(id) ON DELETE RESTRICT`, `user_id` → `traceflow.app_user(id) ON DELETE RESTRICT`
 - **Restricciones relevantes:** PK/FK/UNIQUE estándar
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `user_id` | `id_usuario` | `UUID` | NO | — | — | NOT NULL | Columna de `asignacion_proyecto_usuario` (`user_id`) |
-| `project_id` | `id_proyecto` | `UUID` | NO | — | — | NOT NULL | Columna de `asignacion_proyecto_usuario` (`project_id`) |
+| `user_id` | `id_usuario` | `UUID` | NO | PK, FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `asignacion_proyecto_usuario` (`user_id`) |
+| `project_id` | `id_proyecto` | `UUID` | NO | PK, FK | — | FK traceflow.project(id) ON DELETE RESTRICT | Columna de `asignacion_proyecto_usuario` (`project_id`) |
 | `assigned_at` | `fecha_asignacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `asignacion_proyecto_usuario` (`assigned_at`) |
-| `assigned_by` | `assigned_by` | `UUID` | SÍ | — | — | — | Columna de `asignacion_proyecto_usuario` (`assigned_by`) |
+| `assigned_by` | `asignado_por` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE SET NULL | Columna de `asignacion_proyecto_usuario` (`assigned_by`) |
 
 ### 8.20 `user_role_assignment` → `asignacion_rol_usuario`
 - **Descripción funcional:** Relación N:M entre usuarios y roles autorizados con indicador de rol principal.
 - **Módulo responsable:** MOD-01 Autenticación y RBAC | **Casos de uso:** CU-01
-- **Clave primaria:** `()`
-- **Relaciones salientes (FK):** Ninguna (tabla raíz/catálogo)
+- **Clave primaria:** `(user_id, role_id)`
+- **Relaciones salientes (FK):** `assigned_by` → `traceflow.app_user(id) ON DELETE SET NULL`, `role_id` → `traceflow.app_role(id) ON DELETE RESTRICT`, `user_id` → `traceflow.app_user(id) ON DELETE RESTRICT`
 - **Restricciones relevantes:** PK/FK/UNIQUE estándar
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `user_id` | `id_usuario` | `UUID` | NO | — | — | NOT NULL | Columna de `asignacion_rol_usuario` (`user_id`) |
-| `role_id` | `id_rol` | `INTEGER` | NO | — | — | NOT NULL | Columna de `asignacion_rol_usuario` (`role_id`) |
+| `user_id` | `id_usuario` | `UUID` | NO | PK, FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `asignacion_rol_usuario` (`user_id`) |
+| `role_id` | `id_rol` | `INTEGER` | NO | PK, FK | — | FK traceflow.app_role(id) ON DELETE RESTRICT | Columna de `asignacion_rol_usuario` (`role_id`) |
 | `is_primary` | `es_principal` | `BOOLEAN` | NO | — | `false` | NOT NULL | Columna de `asignacion_rol_usuario` (`is_primary`) |
 | `assigned_at` | `fecha_asignacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `asignacion_rol_usuario` (`assigned_at`) |
-| `assigned_by` | `assigned_by` | `UUID` | SÍ | — | — | — | Columna de `asignacion_rol_usuario` (`assigned_by`) |
+| `assigned_by` | `asignado_por` | `UUID` | SÍ | FK | — | FK traceflow.app_user(id) ON DELETE SET NULL | Columna de `asignacion_rol_usuario` (`assigned_by`) |
 
 ### 8.21 `user_session` → `sesion_usuario`
 - **Descripción funcional:** Sesiones opacas en servidor asociadas a token SHA-256 y rol efectivo único (ADR-006).
 - **Módulo responsable:** MOD-01 Autenticación y RBAC | **Casos de uso:** CU-01, RNF-01
 - **Clave primaria:** `(id)`
-- **Relaciones salientes (FK):** `active_role_id` → `None.None (ON DELETE RESTRICT)`, `user_id` → `None.None (ON DELETE CASCADE)`
+- **Relaciones salientes (FK):** `active_role_id` → `traceflow.app_role(id) ON DELETE RESTRICT`, `user_id` → `traceflow.app_user(id) ON DELETE CASCADE`
 - **Restricciones relevantes:** PK/FK/UNIQUE estándar
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
 | `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `sesion_usuario` (`id`) |
-| `user_id` | `id_usuario` | `UUID` | NO | FK | — | FK None.None (ON DELETE CASCADE) | Columna de `sesion_usuario` (`user_id`) |
-| `active_role_id` | `id_rol_activo` | `INTEGER` | NO | FK | — | FK None.None (ON DELETE RESTRICT) | Columna de `sesion_usuario` (`active_role_id`) |
+| `user_id` | `id_usuario` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE CASCADE | Columna de `sesion_usuario` (`user_id`) |
+| `active_role_id` | `id_rol_activo` | `INTEGER` | NO | FK | — | FK traceflow.app_role(id) ON DELETE RESTRICT | Columna de `sesion_usuario` (`active_role_id`) |
 | `session_token_hash` | `hash_token_sesion` | `VARCHAR(64)` | NO | — | — | UNIQUE | Columna de `sesion_usuario` (`session_token_hash`) |
 | `ip_address` | `direccion_ip` | `VARCHAR(45)` | SÍ | — | — | — | Columna de `sesion_usuario` (`ip_address`) |
 | `user_agent` | `agente_usuario` | `TEXT` | SÍ | — | — | — | Columna de `sesion_usuario` (`user_agent`) |
@@ -498,7 +504,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - `change_request` (1) ──< (N) `ccb_resolution` (1) ──< (N) `ccb_vote` (`UNIQUE (rfc_id, voter_user_id)`)
 - `change_request` (1) ── (0..1) `change_order` (`rfc_id UNIQUE`) ──< (N) `sync_lock` / `qa_certification` / `uat_acceptance`
 - `project` (1) ──< (N) `incident_ticket` (N) >── (0..1) `change_request` (`derived_rfc_id`)
-- `app_user` (1) ──< (N) `audit_log` (`SET NULL` lógico en tabla append-only)
+- `app_user` (1) ──< (N) `audit_log` (`SET NULL` en tabla append-only)
 
 ## 10. Catálogos y Enumeraciones Oficiales
 - **Roles (`app_role`):** `PU-01` a `PU-07` (7 registros activos).
@@ -509,12 +515,12 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 - **Tipos ECS:** `CODIGO_FUENTE`, `ESQUEMA_BD`, `DOCUMENTO_TECNICO`, `SCRIPT_DESPLIEGUE`, `CONFIGURACION`.
 - **Causas de liberación de bloqueo (`sync_lock.release_reason`):** `CHECK_IN`, `ROLLBACK`, `CANCELED`.
 
-## 11. Restricciones de Integridad Verificadas
-Conteo real en `information_schema.table_constraints` (excluyendo restricciones internas `NOT NULL` autogeneradas por PG 17):
-- **PRIMARY KEY:** 15 declaraciones (más PKs compuestas en tablas puente)
-- **FOREIGN KEY:** 37 claves foráneas (incluyendo FK compuesta `fk_rfc_target_ecs_same_project`)
-- **UNIQUE:** 17 restricciones de unicidad
-- **CHECK:** 158 cláusulas `CHECK` explícitas e implícitas verificadas
+## 11. Restricciones de Integridad Verificadas (`pg_catalog.pg_constraint`)
+Conteo físico exacto de las **120 restricciones** en el esquema `traceflow`:
+- **PRIMARY KEY (`p`):** `21` (1 por cada tabla, incluyendo PKs compuestas en `user_role_assignment`, `user_project_assignment` y `baseline_item`).
+- **FOREIGN KEY (`f`):** `51` (incluyendo FK compuesta `fk_rfc_target_ecs_same_project`).
+- **UNIQUE (`u`):** `22` (incluyendo restricciones compuestas `uq_project_id_code`, `uq_rfc_id_project`, `uq_rfc_authorizer_role`, `uq_ccb_vote_per_member`).
+- **CHECK (`c`):** `26` restricciones explícitas de dominio y estados.
 
 ## 12. Índices y Secuencias (55 Índices / 2 Secuencias)
 ### 12.1 Secuencias
@@ -637,7 +643,7 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 ## 18. Dependencias y Riesgos de Migración (`REF-01.5`)
 1. **Triggers y funciones `SECURITY DEFINER`:** Al renombrar tablas y columnas (`ALTER TABLE ... RENAME`), las funciones PL/pgSQL (`append_audit_log`, `enforce_*`, `prevent_*`) deben actualizarse dentro de la **misma transacción migratoria** porque referencian nombres de tablas/columnas como texto compilado en tiempo de ejecución.
 2. **Cadena criptográfica histórica (`audit_log`):** No reescribir ni re-hashear `entity_name`, `operation` o `payload_diff` de registros existentes, para no invalidar `curr_log_hash`.
-3. **Repositorios NestJS y pruebas `DB-T01`..`DB-T14`:** Deben desplegarse coordinadamente con la migración SQL o mediante vistas/sinónimos transitorios definidos en `PLAN_REFACTORIZACION.md`.
+3. **Repositorios NestJS y pruebas `DB-T01`..`DB-T14`:** Deben desplegarse coordinadamente con la migración SQL conforme a [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md).
 
 ## 19. Trazabilidad con SRS y SAD
 - **SRS (`FD03`):** Cubre `RF-01`..`RF-18`, `RNF-01`..`RNF-09`, `RN-01`..`RN-09` y `CU-01`..`CU-30` + `CU-04.1`.
@@ -645,4 +651,4 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 - **Verificación pendiente vía MCP (`xmyfqxlvveiawnxgydtz`):** historial `supabase_migrations.schema_migrations`, roles externos y configuración PostgREST/Storage de Supabase.
 
 ---
-*Diccionario de Datos de TraceFlow SCM — Etapa DOC-02.2 — C-SharkTeam / ÉXODO S.A.C.*
+*Diccionario de Datos de TraceFlow SCM — Etapa DOC-02.2 / Auditado DOC-03 — C-SharkTeam / ÉXODO S.A.C.*

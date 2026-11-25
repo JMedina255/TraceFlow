@@ -66,9 +66,10 @@ export const RfcCreateView: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, activeRoleId } = useAuthStore();
   const { activeProject, projects, setActiveProject } = useProjectStore();
-  const { createRfc } = useRfcStore();
+  const { createRfcAsync } = useRfcStore();
 
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>(() => ({
     ...INITIAL_FORM,
     projectId: activeProject.id,
@@ -216,7 +217,7 @@ export const RfcCreateView: React.FC = () => {
   };
 
   // Envío formal de la RFC
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
 
@@ -229,7 +230,8 @@ export const RfcCreateView: React.FC = () => {
     }
 
     try {
-      const created = createRfc(
+      setIsSubmitting(true);
+      const created = await createRfcAsync(
         {
           projectId: formData.projectId,
           title: formData.title,
@@ -251,6 +253,8 @@ export const RfcCreateView: React.FC = () => {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al procesar el registro de la RFC.';
       setSubmitError(msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -944,15 +948,15 @@ export const RfcCreateView: React.FC = () => {
             ) : (
               <button
                 type="submit"
-                disabled={!isAuthorized || !formData.termsAccepted}
+                disabled={!isAuthorized || !formData.termsAccepted || isSubmitting}
                 className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md ${
-                  isAuthorized && formData.termsAccepted
+                  isAuthorized && formData.termsAccepted && !isSubmitting
                     ? 'bg-upt-success hover:bg-emerald-700 text-white cursor-pointer'
                     : 'bg-upt-bg text-upt-muted/60 cursor-not-allowed border border-upt-border'
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>Enviar Solicitud de Cambio</span>
+                <span>{isSubmitting ? 'Enviando Solicitud...' : 'Enviar Solicitud de Cambio'}</span>
               </button>
             )}
           </div>

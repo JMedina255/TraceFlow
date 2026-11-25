@@ -31,6 +31,17 @@ const getInitialSession = (): {
   roleId: CanonicalRoleId | null;
   isAuthenticated: boolean;
 } => {
+  const apiUser = storageService.get<any>('tf_api_user', null);
+  const apiRoleId = storageService.get<any>('tf_api_role_id', null);
+  if (apiUser) {
+    return {
+      user: apiUser,
+      role: apiUser.role || (apiRoleId ? CANONICAL_ROLES[apiRoleId as CanonicalRoleId] : null),
+      roleId: (apiRoleId || apiUser.activeRoleId || apiUser.roleId) as CanonicalRoleId,
+      isAuthenticated: true,
+    };
+  }
+
   const persisted = authService.validatePersistedSession();
   if (persisted) {
     return {
@@ -66,10 +77,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId) => {
     if (traceFlowAdapter.isApiMode()) {
       const user = await traceFlowAdapter.auth.login(email, password, requestedRoleId);
+      const effectiveRole = (requestedRoleId || user.activeRoleId || user.roleId || 'PU-01') as CanonicalRoleId;
+      const roleDef = user.role || CANONICAL_ROLES[effectiveRole];
+      const hydratedUser = { ...user, role: roleDef, roleId: effectiveRole };
+      storageService.set('tf_api_user', hydratedUser);
+      storageService.set('tf_api_role_id', effectiveRole);
       set({
-        currentUser: user,
-        activeRoleId: requestedRoleId || user.roleId,
-        activeRole: user.role,
+        currentUser: hydratedUser,
+        activeRoleId: effectiveRole,
+        activeRole: roleDef,
         isAuthenticated: true,
       });
       return;
@@ -88,6 +104,8 @@ export const useAuthStore = create<AuthState>((set) => ({
    * Cierre formal de sesión activa y revocación de tokens vía traceFlowAdapter.
    */
   logout: () => {
+    storageService.remove('tf_api_user');
+    storageService.remove('tf_api_role_id');
     if (traceFlowAdapter.isApiMode()) {
       traceFlowAdapter.auth.logout().catch(console.error);
     } else {

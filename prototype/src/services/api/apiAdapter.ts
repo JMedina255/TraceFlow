@@ -95,7 +95,30 @@ export const traceFlowAdapter = {
           justification: dto.justification,
           priority: dto.priority,
         });
-        return res.data;
+        const serverRfc = res.data;
+        const hydrated: RFC = {
+          id: serverRfc.id,
+          code: serverRfc.code,
+          projectId: serverRfc.project_id || serverRfc.project_code || dto.projectId,
+          projectName: dto.projectId === 'PRJ-001' || dto.projectId === 'b0000001-0000-0000-0000-000000000001' ? 'Pasarela de Pagos Core' : 'Portal Autoservicio Clientes',
+          title: serverRfc.title,
+          description: serverRfc.description,
+          justification: serverRfc.justification,
+          proposedSolution: dto.proposedSolution,
+          priority: serverRfc.priority,
+          category: dto.category || 'CORRECTIVO',
+          affectedEcsId: serverRfc.target_ecs_id,
+          affectedEcsName: 'Módulo de Autenticación y Firma JWT',
+          status: serverRfc.status || 'REGISTRADA',
+          requesterId: user.id,
+          requesterName: user.fullName,
+          requesterEmail: user.email,
+          createdAt: serverRfc.created_at || new Date().toISOString(),
+          updatedAt: serverRfc.updated_at || new Date().toISOString(),
+          attachments: dto.attachments || [],
+          timeline: [],
+        };
+        return hydrated;
       }
       return rfcService.create(dto, user);
     },

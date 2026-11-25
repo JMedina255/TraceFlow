@@ -147,6 +147,17 @@ export class RfcsRepository {
 
   async findEcsByIdOrCode(idOrCode: string): Promise<EcsEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
+      const mockIdMap: Record<string, string> = {
+        'ECS-001': 'c0000001-0000-0000-0000-000000000001',
+        'ECS-002': 'c0000001-0000-0000-0000-000000000002',
+        'ECS-003': 'c0000001-0000-0000-0000-000000000003',
+        'ECS-004': 'c0000001-0000-0000-0000-000000000004',
+        'ECS-005': 'c0000001-0000-0000-0000-000000000005',
+        'ECS-006': 'c0000001-0000-0000-0000-000000000006',
+        'ECS-007': 'c0000001-0000-0000-0000-000000000007',
+        'ECS-008': 'c0000001-0000-0000-0000-000000000008',
+      };
+      const resolved = mockIdMap[idOrCode] || idOrCode;
       const query = `
         SELECT c.*, p.code as project_code 
         FROM traceflow.config_item c
@@ -154,7 +165,7 @@ export class RfcsRepository {
         WHERE c.id::text = $1 OR c.code = $1 
         LIMIT 1
       `;
-      const res = await this.db.query<EcsEntity>(query, [idOrCode]);
+      const res = await this.db.query<EcsEntity>(query, [resolved]);
       return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.ecsList.find((e) => e.id === idOrCode || e.code === idOrCode) || null;

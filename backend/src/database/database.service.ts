@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit, Logger, Optional, Inject } from '@nestjs/common';
 import pg from 'pg';
 const { Pool } = pg;
 import { loadConfig } from '../config/configuration.js';
@@ -10,7 +10,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
   private databaseMode: 'postgres' | 'mock' = 'postgres';
 
-  constructor(mode?: 'postgres' | 'mock') {
+  constructor(@Optional() @Inject('DATABASE_MODE') mode?: 'postgres' | 'mock') {
     if (mode) {
       this.databaseMode = mode;
     } else {

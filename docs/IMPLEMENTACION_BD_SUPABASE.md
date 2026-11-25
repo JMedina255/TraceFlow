@@ -1,6 +1,6 @@
 # TraceFlow SCM — Especificación de Implementación de Base de Datos PostgreSQL y Supabase
 
-> **Hito:** DB-01 / DB-01.1 / DB-02 — Despliegue y Certificación Física Real en Supabase  
+> **Hito:** DB-01 / DB-01.1 / DB-02 / DB-02.1 / INT-01 — Despliegue, Endurecimiento y Certificación E2E en Supabase  
 > **Fecha:** 25 de Noviembre de 2026  
 > **Esquema:** `traceflow` (Privado / Least Privilege / Sin exposición a PostgREST)  
 > **Instancia Autorizada:** Supabase `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`) — AWS `us-west-2`  
@@ -9,17 +9,21 @@
 
 ---
 
-## 1. Estado de Ejecución del Hito DB-02 (COMPLETADO)
+## 1. Estado de Ejecución de Hitos de Base de Datos e Integración (COMPLETADO)
 
-El Hito **DB-02: Despliegue y Certificación Real de PostgreSQL en Supabase** ha sido completado y certificado físicamente en su totalidad sobre el proyecto oficial **TraceFlow-UPT**:
+Los Hitos **DB-01**, **DB-01.1**, **DB-02**, **DB-02.1** e **INT-01** han sido completados y certificados en su totalidad sobre el proyecto oficial **TraceFlow-UPT**:
 
-- **Conexión Cifrada TLS:** Verificada con `rejectUnauthorized: true` empleando el certificado CA raíz oficial `backend/cert/prod-ca-2021.crt` (X.509 Supabase Root CA 2021, válido hasta 2031). Prohibido estrictamente `rejectUnauthorized: false`.
-- **Rol Operativo de Mínimo Privilegio:** Usuario `traceflow_app` aprovisionado sin privilegios DDL ni acceso a esquemas administrativos de Supabase (`auth`, `storage`, `vault`), con revocación explícita sobre tablas inmutables.
-- **Migraciones Versionadas:** Esquema `traceflow` desplegado (21 tablas relacionales, 1 trigger de inmutabilidad, 1 función transaccional de auditoría con lock consultivo y 1 índice único parcial condicional).
-- **Aprovisionamiento de Datos:** Roles `PU-01` a `PU-07`, 3 proyectos de desarrollo, 6 activos ECS canónicos y 4 usuarios institucionales de ÉXODO S.A.C. aprovisionados con hashes independientes Argon2id.
-- **Certificación Física (DB-T01 a DB-T14):** 14/14 pruebas superadas en vivo contra el motor remoto PostgreSQL 17.12.
-- **Verificación de Flujo Vertical NestJS:** 10/10 pasos E2E HTTP superados en vivo vía `supertest`.
-- **Regresión Completa:** 44/44 pruebas pasadas en Backend (7 suites), 71/71 pruebas pasadas en Frontend Prototipo (9 suites), builds limpios al 100%.
+- **Conexión Cifrada TLS:** Verificada con `rejectUnauthorized: true` empleando el certificado CA raíz oficial `backend/cert/prod-ca-2021.crt` (X.509 Amazon Root CA 1 / Supabase Root CA 2021, válido hasta 2031).
+- **Rol Operativo de Mínimo Privilegio (`traceflow_app`):** Concesión granular por categoría de tabla (solo lectura en catálogos y proyectos; lectura/escritura en sesiones, ECS y solicitudes; append-only en pistas de auditoría y votos CCB; sin borrado físico `DELETE`).
+- **Invariantes Físicas en PostgreSQL:** 10 triggers normativos a nivel de motor (inmutabilidad estricta de `audit_log`, `ecs_version`, `ccb_vote`, `change_authorization`, líneas base congeladas, exclusividad de `sync_lock`, doble llave obligatoria y anti-autoevaluación en informes de impacto y votos CCB).
+- **Migraciones Versionadas:** 3 migraciones consolidadas en `supabase/migrations/`:
+  - `202611250001_initial_traceflow.sql` (21 tablas, secuencias, claves foráneas e índices)
+  - `202611250002_structural_seeds.sql` (Catálogo de roles PU-01 a PU-07)
+  - `202611250003_secure_app_role_least_privilege.sql` (Privilegios mínimos, triggers de gobernanza y SoD física)
+- **Aprovisionamiento Criptográfico:** Roles `PU-01` a `PU-07`, 3 proyectos de desarrollo (`PRJ-001` a `PRJ-003`), 6 ECS canónicos y 4 usuarios institucionales aprovisionados con hashes independientes Argon2id generados con `@node-rs/argon2`.
+- **Certificación Física (DB-T01 a DB-T14):** 14/14 pruebas aprobadas (100% de éxito) ejecutadas contra PostgreSQL 17.12 en vivo.
+- **Certificación E2E en Vivo (INT-T01 a INT-T18):** 18/18 pruebas aprobadas (100% de éxito) mediante Playwright en navegador Chromium headless contra React y NestJS reales sin mocks.
+- **Regresión Completa:** 44/44 pruebas backend pasadas, 71/71 pruebas frontend pasadas, compila y empaqueta limpiamente.
 
 ---
 
@@ -98,20 +102,65 @@ Suite E2E HTTP ejecutada contra NestJS en modo producción con PostgreSQL (`test
 ## 5. Arquitectura de Seguridad y Mínimo Privilegio (Least Privilege)
 
 ```sql
--- Rol operativo de aplicación exclusivo
-CREATE ROLE traceflow_app WITH LOGIN PASSWORD '...';
+-- Rol operativo traceflow_app (Least Privilege per Module)
+REVOKE ALL PRIVILEGES ON SCHEMA traceflow FROM traceflow_app;
+REVOKE ALL ON ALL TABLES IN SCHEMA traceflow FROM traceflow_app;
 
--- Privilegios exclusivos sobre esquema traceflow
-GRANT USAGE ON SCHEMA traceflow TO traceflow_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA traceflow TO traceflow_app;
+-- 1. Catálogos y Asignaciones (Solo Lectura)
+GRANT SELECT ON TABLE 
+  traceflow.app_role,
+  traceflow.project,
+  traceflow.user_role_assignment,
+  traceflow.user_project_assignment
+TO traceflow_app;
+
+-- 2. Identidad y Operación (Lectura/Escritura sin DELETE)
+GRANT SELECT, INSERT, UPDATE ON TABLE 
+  traceflow.app_user,
+  traceflow.user_session,
+  traceflow.config_item,
+  traceflow.sync_lock,
+  traceflow.change_request,
+  traceflow.impact_assessment,
+  traceflow.change_order,
+  traceflow.implementation_task,
+  traceflow.qa_test_run,
+  traceflow.defect_report,
+  traceflow.qa_certification,
+  traceflow.uat_session,
+  traceflow.incident_ticket
+TO traceflow_app;
+
+-- 3. Entidades Inmutables y de Auditoría (Append-Only)
+GRANT SELECT, INSERT ON TABLE 
+  traceflow.audit_log,
+  traceflow.ecs_version,
+  traceflow.ccb_resolution,
+  traceflow.ccb_vote,
+  traceflow.change_authorization,
+  traceflow.baseline,
+  traceflow.baseline_item,
+  traceflow.rollback_event
+TO traceflow_app;
+
+-- 4. Secuencias y Funciones
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA traceflow TO traceflow_app;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA traceflow TO traceflow_app;
 
--- Defensa en profundidad: Revocaciones estrictas
-REVOKE UPDATE, DELETE, TRUNCATE ON TABLE traceflow.audit_log FROM traceflow_app;
-REVOKE DELETE, TRUNCATE ON TABLE traceflow.ecs_version FROM traceflow_app;
-REVOKE TRUNCATE ON TABLE traceflow.sync_lock FROM traceflow_app;
-
--- Aislamiento de PostgREST
+-- 5. Aislamiento total de PostgREST
 REVOKE ALL ON SCHEMA traceflow FROM anon, authenticated;
 ```
+
+---
+
+## 6. Certificación E2E Playwright en Vivo (INT-T01 a INT-T18)
+
+Las 18 pruebas verticales entre React (puerto 5173 en modo API), NestJS (puerto 3001) y Supabase PostgreSQL 17.12 fueron certificadas con un 100% de aprobación:
+
+- `INT-T01` a `INT-T05`: Autenticación con Argon2id, cookie `tf_session`, control SoD en conmutación de roles y navegación contextual.
+- `INT-T06` a `INT-T08`: Aislamiento multitenant de proyectos y catálogo contextual de ECS por proyecto.
+- `INT-T09` a `INT-T12`: Creación de RFC desde React (`RFC-2026-0020`), inserción en PostgreSQL, emisión de evento en `audit_log` con hash SHA-256 y control de propiedad.
+- `INT-T13` a `INT-T14`: Resiliencia a recargas (F5) en navegador y reinicios de proceso backend NestJS sin pérdida de datos.
+- `INT-T15` a `INT-T18`: Cierre e invalidación de sesión, redirección segura de rutas y ausencia total de fallback a mock (`VITE_SERVICE_MODE=api`).
+
+Evidencias archivadas en `docs/evidence/int-01/`.

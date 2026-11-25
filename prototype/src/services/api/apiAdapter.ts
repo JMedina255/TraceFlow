@@ -112,11 +112,9 @@ export const traceFlowAdapter = {
           status: serverRfc.status || 'REGISTRADA',
           requesterId: user.id,
           requesterName: user.fullName,
-          requesterEmail: user.email,
           createdAt: serverRfc.created_at || new Date().toISOString(),
           updatedAt: serverRfc.updated_at || new Date().toISOString(),
           attachments: dto.attachments || [],
-          timeline: [],
         };
         return hydrated;
       }

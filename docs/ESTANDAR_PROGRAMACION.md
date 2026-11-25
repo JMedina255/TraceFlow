@@ -20,6 +20,7 @@
 7. **Sin fallback silencioso a datos simulados:** En `DATABASE_MODE=postgres`, cualquier indisponibilidad de PostgreSQL debe abortar o fallar explícitamente sin degradar silenciosamente a `mock`.
 8. **Cero secretos en el código fuente:** Prohibido incluir contraseñas, tokens, claves privadas o cadenas `DATABASE_URL` reales en archivos versionados.
 9. **Reutilización controlada:** Extraer utilidades comunes antes de duplicar lógica de validación, hash o mapeo.
+10. **Codificación UTF-8 explícita sin BOM:** Todo código fuente, script de automatización, documentación Markdown y artefacto PlantUML debe leerse y escribirse explícitamente en `UTF-8` sin BOM (`Path.read_text(encoding='utf-8')` / `Path.write_text(..., encoding='utf-8')`), sin depender de la página de códigos predeterminada de Windows o PowerShell 5.1. Al invocar herramientas Java/PlantUML, exigir `-Dfile.encoding=UTF-8` y `-charset UTF-8`.
 
 ---
 

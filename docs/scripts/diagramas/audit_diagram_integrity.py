@@ -73,9 +73,12 @@ def run_audit():
     else:
         print("    - Sin duplicaciones de identificador detectadas.")
 
-    # 3. Auditar artefactos renderizados (SVG + PNG)
-    print(f"\n[3] Auditoría de Renders Vectoriales (SVG) y Rasterizados (PNG):")
+    # 3. Auditar artefactos renderizados (SVG + PNG) y codificación UTF-8/XML
+    print(f"\n[3] Auditoría de Renders Vectoriales (SVG), PNG y Regresión UTF-8:")
+    import xml.etree.ElementTree as ET
+    mojibake_re = re.compile(r'(?:Ã[\x80-\xbf¡-¿]?|Â[¿¡°ºª\x80-\xbf]?|â\x80|\ufffd)')
     missing_renders = []
+    encoding_issues = []
     total_svg = 0
     total_png = 0
 
@@ -86,23 +89,41 @@ def run_audit():
 
             if os.path.exists(svg_path) and os.path.getsize(svg_path) > 0:
                 total_svg += 1
+                try:
+                    with open(svg_path, 'rb') as sf:
+                        sraw = sf.read()
+                    stxt = sraw.decode('utf-8')
+                    root = ET.fromstring(stxt)
+                    all_t = ' '.join(el.text.strip() for el in root.iter() if el.text and el.text.strip())
+                    hits = mojibake_re.findall(all_t)
+                    if hits or '\ufffd' in all_t or sraw.startswith(b'\xef\xbb\xbf'):
+                        encoding_issues.append((cat, f"{diag_id}.svg", hits[:4]))
+                except Exception as exc:
+                    encoding_issues.append((cat, f"{diag_id}.svg", [str(exc)]))
             else:
                 missing_renders.append((cat, f"{diag_id}.svg"))
 
             if os.path.exists(png_path) and os.path.getsize(png_path) > 0:
-                total_png += 1
+                with open(png_path, 'rb') as pf:
+                    sig = pf.read(8)
+                if sig == b'\x89PNG\r\n\x1a\n':
+                    total_png += 1
+                else:
+                    missing_renders.append((cat, f"{diag_id}.png (firma inválida)"))
             else:
                 missing_renders.append((cat, f"{diag_id}.png"))
 
     print(f"    - Total archivos SVG conformes (>0 bytes): {total_svg} / {puml_total}")
-    print(f"    - Total archivos PNG conformes (>0 bytes): {total_png} / {puml_total}")
+    print(f"    - Total archivos PNG conformes (firma PNG válida): {total_png} / {puml_total}")
     print(f"    - Total artefactos gráficos verificados: {total_svg + total_png} / {puml_total * 2}")
 
     if missing_renders:
-        print(f"    [FAIL] Renders faltantes o vacíos ({len(missing_renders)}): {missing_renders}")
+        print(f"    [FAIL] Renders faltantes o corruptos ({len(missing_renders)}): {missing_renders}")
         return False
-    else:
-        print("    [PASS] Cobertura de renderizado: 100.0% (Cero renders faltantes)")
+    if encoding_issues:
+        print(f"    [FAIL] Regresión de codificación/mojibake detectada en {len(encoding_issues)} SVG(s): {encoding_issues[:10]}")
+        return False
+    print("    [PASS] Cobertura de renderizado y control UTF-8 XML: 100.0% (Cero mojibake, cero renders faltantes)")
 
     # 4. Auditar preservación de nombres decimales
     print(f"\n[4] Auditoría de Preservación de Nombres con Puntos Decimales:")

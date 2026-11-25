@@ -150,6 +150,7 @@ Cada sección, requerimiento, matriz o diagrama del proyecto debe poseer un esta
 - **Estandarización visual:** Los diagramas PlantUML deben utilizar la paleta corporativa y configuración skinparam definida para el proyecto (fuente Arial, bordes redondeados, colores de swimlane canónicos).
 - **Consistencia de actores:** Los nombres de carriles (swimlanes), lifelines o actores en diagramas de secuencia y casos de uso deben coincidir exactamente con los 7 roles oficiales.
 - **Exportación gráfica:** Cada diagrama debe contar con su correspondiente archivo compilado `.png` y/o `.svg` alojado en el directorio `assets/`.
+- **Codificación UTF-8 obligatoria:** Todas las fuentes Markdown (`.md`), especificaciones PlantUML (`.puml`), renders XML (`.svg`) y scripts Python/Java de generación deben operar explícitamente en **UTF-8 sin BOM**, invocando PlantUML con `-Dfile.encoding=UTF-8 -charset UTF-8` y verificando la ausencia de mojibake (`Ã³`, `Ã¡`, `Â`, `\ufffd`) mediante `validate_diagrams.py` y `audit_diagram_integrity.py` antes de cada commit.
 
 ### 8.2. Reglas para Creación y Modificación de Tablas
 - **Ubicación oficial:** Toda tabla analítica, requerimiento o matriz debe residir en `docs/TABLES.md`.

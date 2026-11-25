@@ -12,9 +12,9 @@
 ## 1. Objetivo y Prerrequisitos de Inicio
 
 Ejecutar de forma progresiva, segura y libre de regresiones la normalización al español de los identificadores propios del dominio en código fuente, contratos API y esquema PostgreSQL `traceflow`, **únicamente después de que el responsable del proyecto apruebe formalmente**:
-1. Las decisiones sobre elementos ambiguos (`AMB-01` a `AMB-07`) en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md).
-2. [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) (incluyendo la verificación pendiente vía Supabase MCP).
-3. [`ESTANDAR_PROGRAMACION.md`](ESTANDAR_PROGRAMACION.md).
+1. Las decisiones sobre elementos ambiguos (`AMB-01` a `AMB-07`, ya resueltas documentalmente en DOC-03.1 dentro de [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md)), incluyendo la diferenciación de `notas_admision`, `observaciones_subsanacion`, `respuesta_subsanacion`, `motivo_desestimacion` y el diseño propuesto de `historial_subsanacion_rfc` para múltiples ciclos de subsanación.
+2. [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) (complementando la verificación pendiente vía Supabase MCP).
+3. [`ESTANDAR_PROGRAMACION.md`](ESTANDAR_PROGRAMACION.md) (con `PascalCase.tsx` en componentes React y `kebab-case` en lógica/servicios).
 4. Este plan `REF-01` y los candidatos finales `FD03` / `SAD_FINAL.md`.
 
 ---
@@ -55,7 +55,7 @@ Ejecutar de forma progresiva, segura y libre de regresiones la normalización al
   2. **Dependencias FK y compuestas:** Verificar que `fk_rfc_target_ecs_same_project` y FKs compuestas sigan íntegras tras renombrar columnas.
   3. **Funciones SQL y Triggers:** Recrear/reemplazar dentro de la **misma transacción (`BEGIN...COMMIT`)** las 11 funciones (`registrar_auditoria`, `validar_*`, `prevenir_*`) y actualizar referencias internas a los nuevos nombres de tablas/columnas en español.
   4. **Índices y Secuencias:** Renombrar `uq_active_sync_lock_per_ecs` → `uq_bloqueo_activo_por_ecs` y secuencias asociadas.
-  5. **Privilegios `traceflow_app`:** Verificar mediante `GRANT` explícito post-renombrado que `traceflow_app` conserve exactamente el mismo mapa de permisos mínimos (`SELECT`, `INSERT`, `UPDATE`, sin `DELETE`) definido en `SEC-02`.
+  5. **Privilegios `traceflow_app` y endurecimiento `SECURITY DEFINER`:** Verificar mediante `GRANT` explícito post-renombrado que `traceflow_app` conserve exactamente el mapa de permisos mínimos (`SELECT`, `INSERT`, `UPDATE`, sin `DELETE`) definido en `SEC-02`, y ejecutar `REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA traceflow FROM PUBLIC;` manteniendo `GRANT EXECUTE` exclusivo para `traceflow_app` (hallazgo de auditoría DOC-03.1 sobre `pg_proc`).
   6. **Sincronización con código:** Actualizar `backend/src/modules/*/*.repository.ts`, `provision-users.ts`, semillas y pruebas `real-postgres-*.spec.ts` en el mismo despliegue coordinado.
 - **Estrategia de Rollback:** Script de reversión simétrico `RENAME` + restauración desde el snapshot `pg_dump` previo si ocurre anomalía crítica en verificación post-migración.
 

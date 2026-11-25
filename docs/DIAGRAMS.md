@@ -1291,16 +1291,16 @@ Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 
 ---
 
-# DG-12 — Diagrama de Clases del Dominio TraceFlow SCM
+# DG-12-HIST — Diagrama de Clases del Dominio TraceFlow SCM (Histórico)
 
 > [!NOTE]
-> **Nota de Auditoría SCM (Etapa 07 — Hallazgo DOC-030):**
-> Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Comparte el identificador canónico `DG-12` con el *Modelo Conceptual del Dominio* (Fase de Análisis). Las especificaciones de diseño y análisis consumen preferentemente el modelo conceptual (`analisis/DG-12.svg`). Se mantiene bajo revisión técnica y propuesta de reclasificación ante el CCB como `DG-12-HIST` o `DG-CLASS-01`.
+> **Resolución DOC-030 (DOC-03.1):**
+> Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Queda formalmente reclasificado como **`DG-12-HIST`** para eliminar colisiones de identificación con el *Modelo Conceptual del Dominio de Análisis* (`analisis/DG-12.svg`), que permanece como el único **`DG-12`** canónico.
 
-**ID:** DG-12 | **Tipo:** Clases | **Estado:** APROBADO | **Versión:** 1.0  
+**ID:** DG-12-HIST | **Tipo:** Clases (Histórico) | **Estado:** ARCHIVADO HISTÓRICO | **Versión:** 1.0  
 **RF:** RF-01 a RF-18 | **RN:** RN-01 a RN-09 | **CU:** CU-01 a CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2
 
-![DG-12](assets/diagramas/render/generales/DG-12.svg)
+![DG-12-HIST](assets/diagramas/render/generales/DG-12-HIST.svg)
 
 ```plantuml
 @startuml
@@ -1309,7 +1309,7 @@ skinparam roundcorner 8
 skinparam defaultFontName Arial
 skinparam classAttributeIconSize 0
 
-title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+title <b>DG-12-HIST: Diagrama de Clases del Dominio TraceFlow SCM (Histórico)</b>
 
 class Usuario {
     - id: Long
@@ -4066,8 +4066,8 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 ### DG-12 — Modelo Conceptual del Dominio TraceFlow SCM
 
 > [!NOTE]
-> **Nota de Auditoría SCM (Etapa 07 — Consumo Canónico):**
-> Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1). Propuesto formalmente al CCB como único titular canónico del identificador `DG-12`.
+> **Nota de Auditoría SCM (Resolución DOC-030 en DOC-03.1):**
+> Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1), ratificada como único titular canónico del identificador `DG-12` (el diagrama histórico de clases se conserva como `DG-12-HIST`).
 
 - **ID:** DG-12  
 - **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM  
@@ -7450,7 +7450,7 @@ package "Control de Cambios y Gobernanza" {
     * clasificacion : VARCHAR(20)
     * riesgo_tecnico : VARCHAR(20)
   }
-  entity "autorizacion_delegada" as autorizacion_delegada {
+  entity "autorizacion_cambio" as autorizacion_cambio {
     * id : UUID <<PK>>
     --
     * id_rfc : UUID <<FK>>
@@ -7545,7 +7545,7 @@ proyecto ||--o{ solicitud_cambio
 elemento_configuracion ||--o{ solicitud_cambio
 usuario ||--o{ solicitud_cambio
 solicitud_cambio ||--o| informe_impacto
-solicitud_cambio ||--o{ autorizacion_delegada
+solicitud_cambio ||--o{ autorizacion_cambio
 solicitud_cambio ||--o{ resolucion_ccb
 resolucion_ccb ||--o{ voto_ccb
 solicitud_cambio ||--o| orden_cambio

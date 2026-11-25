@@ -75,9 +75,9 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
 
 ## 11. Modelo de Dominio (`DG-12`)
-*(Nota de configuración `DOC-030`: se conserva referencia a la coexistencia de `generales/DG-12.puml` y `analisis/DG-12.puml`, pendiente de dictamen CCB para desambiguar identificador).*
+*(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
 
-![Diagrama de Clases del Dominio](assets/diagramas/render/generales/DG-12.svg)
+![Modelo Conceptual del Dominio (DG-12 Canónico)](assets/diagramas/render/analisis/DG-12.svg)
 
 ## 12. Modelo de Datos (`DICCIONARIO_DATOS.md`)
 Consta de **21 tablas** en el esquema privado `traceflow`, verificadas en PostgreSQL 17.12.

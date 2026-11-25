@@ -69,12 +69,14 @@ Este documento consolida el estado real de implementación del sistema **TraceFl
 
 ## 4. Hallazgos Abiertos, Propuestas al CCB y Recuperación de Trazabilidad Histórica
 
-### 4.1 Decisiones y Propuestas Abiertas
-1. **Colisión canónica `DG-12` (`DOC-030`):** Coexisten `generales/DG-12.puml` (Diagrama de Clases) y `analisis/DG-12.puml` (Modelo Conceptual). Pendiente de dictamen del CCB para ratificar `analisis/DG-12.puml` como `DG-12` canónico y reasignar/archivar el histórico como `DG-12-HIST` o `DG-CLASS-01` (verificado sin dictamen firmado en `4f4107d^:docs/PAQUETE_REVISION_CCB_ETAPA07.md` §16).
-2. **Enmienda SSOT Híbrida (`DOC-033`) y Metas RTO/RPO (`DOC-034`):** Sometidas a aprobación formal del CCB junto con el paquete documental (`DOCUMENTATION_RULES.md` §15 para fuentes modulares `.puml`; parámetros de diseño `RTO <= 2h` / `RPO <= 24h` en `ADR-010` frente a `RNF-09`).
-3. **Ambigüedades de nomenclatura (`AMB-01`..`AMB-07`):** Pendientes de aprobación en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md) antes de iniciar `REF-01`.
-4. **Verificación pendiente vía Supabase MCP:** Lectura del historial `supabase_migrations.schema_migrations` y roles/políticas externas de la instancia `xmyfqxlvveiawnxgydtz`.
-5. **Conectividad IPv4 en equipos sin IPv6:** En redes sin enrutamiento IPv6, usar el Session Pooler IPv4 `aws-1-us-west-2.pooler.supabase.com:5432` con `traceflow_app.xmyfqxlvveiawnxgydtz` y TLS estricto.
+### 4.1 Decisiones Resueltas (DOC-03.1) y Pendientes de Aprobación
+1. **Colisión `DG-12` (`DOC-030` — Resuelta en DOC-03.1):** Ratificado `analisis/DG-12.puml` como único `DG-12` canónico y reclasificado `generales/DG-12.puml` como **`DG-12-HIST`** (preservando contenido histórico y actualizando renders, `DIAGRAMS.md` y `MANIFEST.md`).
+2. **Ambigüedades `AMB-01`..`AMB-07` (Resueltas en DOC-03.1):** Formalizadas en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md) (singular en tablas, `elemento_configuracion`, `orden_cambio`, `autorizacion_cambio`, separación de campos + diseño futuro `historial_subsanacion_rfc`, conservación de variables `.env` y rol `traceflow_app`, y `PascalCase.tsx` vs `kebab-case`).
+3. **Auditoría `SECURITY DEFINER` (`pg_proc` — Hallazgo DOC-03.1):** Las 11 funciones de `traceflow` tienen propietario `postgres` y `search_path` protegido, pero mantienen `EXECUTE` heredado para `PUBLIC`; queda programado `REVOKE EXECUTE ... FROM PUBLIC` en [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md) sin alterar BD todavía.
+4. **Pendientes de Dictamen Formal del CCB (`DOC-033` y `DOC-034`):** Permanecen explícitamente **pendientes** hasta aprobación formal del CCB la enmienda híbrida SSOT (`DOCUMENTATION_RULES.md` §15, `DOC-033`) y la formalización de metas de diseño `RTO <= 2h` / `RPO <= 24h` frente a `RNF-09` (`DOC-034`).
+5. **Verificación pendiente vía Supabase MCP (`xmyfqxlvveiawnxgydtz`):** Lectura de `supabase_migrations.schema_migrations` y roles/políticas externas de plataforma cuando se reinicie Antigravity con OAuth activo.
+6. **Limpieza de ramas históricas (preparada en DOC-03.1):** Commit `e709979` de `docs/presentacion-traceflow-5min` incorporado limpiamente (`af2c729`) en esta rama; las `11` ramas integradas en `master` quedan listas para eliminación tras autorización expresa.
+7. **Conectividad IPv4 en equipos sin IPv6:** En redes sin enrutamiento IPv6, usar el Session Pooler IPv4 `aws-1-us-west-2.pooler.supabase.com:5432` con `traceflow_app.xmyfqxlvveiawnxgydtz` y TLS estricto.
 
 ### 4.2 Referencias Técnicas Preservadas de Documentos Consolidados (Recuperables vía Git `4f4107d^`)
 - **Mecanismo Demo Web Crypto (`AUTH_IMPLEMENTATION_REPORT.md`):** En modo `mock` local (`prototype/src/services/auth.service.ts`), las credenciales de demostración usan SHA-256 con salt `traceflow:exodo:scm:auth:v1`, provisión local vía `authService.setLocalPassword()` y sesión local de 8 horas (en modo `api`/producción rige Argon2id en PostgreSQL y sesión opaca de 15 minutos según `ADR-006`).

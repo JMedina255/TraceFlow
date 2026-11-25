@@ -46,7 +46,7 @@ def extract_diagrams():
             diag_id = f"DG-{idx+1:02d}"
             category = 'generales'
         elif idx == 11:
-            diag_id = "DG-12"
+            diag_id = "DG-12-HIST"
             category = 'generales'
         elif idx == 12:
             diag_id = "DG-13"

@@ -35,7 +35,7 @@
 | `DG-09` | Modelo General / Análisis | TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad | [`DG-09.puml`](plantuml/generales/DG-09.puml) | [SVG](render/generales/DG-09.svg) | [PNG](render/generales/DG-09.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-10` | Modelo General / Análisis | TraceFlow SCM - Casos de Uso: Trazabilidad, Auditoría e Integridad | [`DG-10.puml`](plantuml/generales/DG-10.puml) | [SVG](render/generales/DG-10.svg) | [PNG](render/generales/DG-10.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-11` | Modelo General / Análisis | TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales) | [`DG-11.puml`](plantuml/generales/DG-11.puml) | [SVG](render/generales/DG-11.svg) | [PNG](render/generales/DG-11.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
-| `DG-12` | Modelo General / Análisis | Diagrama de Clases del Dominio TraceFlow SCM | [`DG-12.puml`](plantuml/generales/DG-12.puml) | [SVG](render/generales/DG-12.svg) | [PNG](render/generales/DG-12.png) | `FD03 / FD04` | ✅ Renderizado (SVG + PNG) |
+| `DG-12-HIST` | Diagrama de Clases (Histórico) | Diagrama de Clases del Dominio TraceFlow SCM (Histórico) | [`DG-12-HIST.puml`](plantuml/generales/DG-12-HIST.puml) | [SVG](render/generales/DG-12-HIST.svg) | [PNG](render/generales/DG-12-HIST.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-13` | Modelo General / Análisis | Modelo Lógico de la Arquitectura de Software TraceFlow SCM | [`DG-13.puml`](plantuml/generales/DG-13.puml) | [SVG](render/generales/DG-13.svg) | [PNG](render/generales/DG-13.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 
 ## 3. Catálogo Detallado: Modelos de Análisis y Casos de Uso (65 Diagramas)

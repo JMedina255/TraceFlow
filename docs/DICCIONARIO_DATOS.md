@@ -67,7 +67,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | 05 | `baseline_item` | `elemento_linea_base` | 3 | MOD-05 Administración SCM | CU-20 | `SELECT` |
 | 06 | `ccb_resolution` | `resolucion_ccb` | 10 | MOD-04 Control de Cambios | CU-07 | `INSERT, SELECT` |
 | 07 | `ccb_vote` | `voto_ccb` | 7 | MOD-04 Control de Cambios | CU-07, SoD-05 | `INSERT, SELECT` |
-| 08 | `change_authorization` | `autorizacion_delegada` | 8 | MOD-04 Control de Cambios | CU-30 | `INSERT, SELECT` |
+| 08 | `change_authorization` | `autorizacion_cambio` | 8 | MOD-04 Control de Cambios | CU-30 | `INSERT, SELECT` |
 | 09 | `change_order` | `orden_cambio` | 9 | MOD-04 Control de Cambios | CU-08, CU-10, CU-22 | `INSERT, SELECT, UPDATE` |
 | 10 | `change_request` | `solicitud_cambio` | 16 | MOD-04 Control de Cambios | CU-04, CU-04.1, CU-05..CU-08 | `INSERT, SELECT, UPDATE` |
 | 11 | `config_item` | `elemento_configuracion` | 14 | MOD-05 Administración SCM | CU-09..CU-14, CU-20, CU-26 | `INSERT, SELECT, UPDATE` |
@@ -214,8 +214,8 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `voto_ccb` (`justification`) |
 | `voted_at` | `fecha_votacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `voto_ccb` (`voted_at`) |
 
-### 8.8 `change_authorization` → `autorizacion_delegada`
-- **Descripción funcional:** Registro de Doble Llave Operativa para Cambios Menores (PU-02 + PU-03 de distinta identidad).
+### 8.8 `change_authorization` → `autorizacion_cambio`
+- **Descripción funcional:** Registro de autorizaciones de cambio (actualmente Doble Llave Operativa PU-02 + PU-03 para Cambios Menores).
 - **Módulo responsable:** MOD-04 Control de Cambios | **Casos de uso:** CU-30
 - **Clave primaria:** `(id)`
 - **Relaciones salientes (FK):** `authorizer_user_id` → `traceflow.app_user(id) ON DELETE RESTRICT`, `rfc_id` → `traceflow.change_request(id) ON DELETE CASCADE`
@@ -223,14 +223,14 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 
 | Campo actual | Campo objetivo | Tipo PostgreSQL | Nulo | PK/FK | Predeterminado | Restricción | Descripción |
 |---|---|---|:---:|:---:|---|---|---|
-| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `autorizacion_delegada` (`id`) |
-| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK traceflow.change_request(id) ON DELETE CASCADE | Columna de `autorizacion_delegada` (`rfc_id`) |
-| `authorizer_role` | `rol_autorizador` | `VARCHAR(40)` | NO | — | — | `CHECK (((authorizer_role)::text = ANY ((ARRAY['GESTOR'::character varying, 'ARQUITECTO'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`authorizer_role`) |
-| `authorizer_role_id` | `id_rol_autorizador` | `VARCHAR(10)` | NO | — | — | `CHECK (((authorizer_role_id)::text = ANY ((ARRAY['PU-02'::character varying, 'PU-03'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`authorizer_role_id`) |
-| `authorizer_user_id` | `id_usuario_autorizador` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `autorizacion_delegada` (`authorizer_user_id`) |
-| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | `CHECK (((decision)::text = ANY ((ARRAY['APROBADO'::character varying, 'RECHAZADO'::character varying, 'REESCALADO_CCB'::character varying])::text[])))` | Columna de `autorizacion_delegada` (`decision`) |
-| `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `autorizacion_delegada` (`justification`) |
-| `authorized_at` | `fecha_autorizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `autorizacion_delegada` (`authorized_at`) |
+| `id` | `id` | `UUID` | NO | PK | `gen_random_uuid()` | NOT NULL | Columna de `autorizacion_cambio` (`id`) |
+| `rfc_id` | `id_rfc` | `UUID` | NO | FK | — | FK traceflow.change_request(id) ON DELETE CASCADE | Columna de `autorizacion_cambio` (`rfc_id`) |
+| `authorizer_role` | `rol_autorizador` | `VARCHAR(40)` | NO | — | — | `CHECK (((authorizer_role)::text = ANY ((ARRAY['GESTOR'::character varying, 'ARQUITECTO'::character varying])::text[])))` | Columna de `autorizacion_cambio` (`authorizer_role`) |
+| `authorizer_role_id` | `id_rol_autorizador` | `VARCHAR(10)` | NO | — | — | `CHECK (((authorizer_role_id)::text = ANY ((ARRAY['PU-02'::character varying, 'PU-03'::character varying])::text[])))` | Columna de `autorizacion_cambio` (`authorizer_role_id`) |
+| `authorizer_user_id` | `id_usuario_autorizador` | `UUID` | NO | FK | — | FK traceflow.app_user(id) ON DELETE RESTRICT | Columna de `autorizacion_cambio` (`authorizer_user_id`) |
+| `decision` | `decision` | `VARCHAR(20)` | NO | — | — | `CHECK (((decision)::text = ANY ((ARRAY['APROBADO'::character varying, 'RECHAZADO'::character varying, 'REESCALADO_CCB'::character varying])::text[])))` | Columna de `autorizacion_cambio` (`decision`) |
+| `justification` | `justificacion` | `TEXT` | NO | — | — | NOT NULL | Columna de `autorizacion_cambio` (`justification`) |
+| `authorized_at` | `fecha_autorizacion` | `TIMESTAMPTZ` | NO | — | `now()` | NOT NULL | Columna de `autorizacion_cambio` (`authorized_at`) |
 
 ### 8.9 `change_order` → `orden_cambio`
 - **Descripción funcional:** Orden de Cambio formal (ECN/ECO) que asigna implementación al Desarrollador (PU-06).
@@ -614,6 +614,13 @@ Conteo físico exacto de las **120 restricciones** en el esquema `traceflow`:
 | `impact_assessment` | `trg_enforce_impact_assessment_sod` | `CREATE TRIGGER trg_enforce_impact_assessment_sod BEFORE INSERT ON traceflow.impact_assessment FOR EACH ROW EXECUTE FUNCTION traceflow.enforce_impact_assessment_sod()` |
 | `sync_lock` | `trg_sync_lock_no_delete` | `CREATE TRIGGER trg_sync_lock_no_delete BEFORE DELETE ON traceflow.sync_lock FOR EACH ROW EXECUTE FUNCTION traceflow.prevent_sync_lock_delete()` |
 
+### 13.3 Auditoría de Seguridad sobre Funciones `SECURITY DEFINER` (`pg_proc`)
+La inspección directa sobre `pg_catalog.pg_proc` (`traceflow_app` en modo lectura) verificó para las **11 funciones**:
+- **Propietario (`proowner`):** `postgres` en todas las funciones.
+- **`search_path` (`proconfig`):** Fijado explícitamente en todas ellas (`traceflow, extensions, pg_catalog, pg_temp` en `append_audit_log`; `traceflow, pg_catalog, pg_temp` en las 10 funciones de trigger), mitigando *search_path hijacking*.
+- **Permisos `EXECUTE` (`proacl`):** Actualmente presentan concesión heredada `=X/postgres` (`has_function_privilege('public', oid, 'EXECUTE') = true`) además de `traceflow_app=X/postgres`.
+- **Recomendación de endurecimiento (sin mutación aplicada todavía):** Aunque las funciones trigger no son invocables directamente fuera de triggers, `append_audit_log` es una función `SECURITY DEFINER` invocable; en `REF-01.5` o migración de seguridad futura se deberá ejecutar `REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA traceflow FROM PUBLIC;` y conceder `EXECUTE` exclusivamente a `traceflow_app`.
+
 ## 14. Roles y Privilegios
 - **Rol operativo de aplicación:** `traceflow_app` (mínimo privilegio por tabla, sin `DELETE` en ninguna tabla, sin `UPDATE` en tablas append-only `audit_log`, `ecs_version`, `ccb_vote`, `ccb_resolution`, `change_authorization`).
 - **RLS (`relrowsecurity`):** `false` en las 21 tablas; la seguridad de acceso opera mediante rol `traceflow_app` sin exposición PostgREST y aislamiento multitenant en NestJS.
@@ -640,10 +647,11 @@ Conteo físico exacto de las **120 restricciones** en el esquema `traceflow`:
 ## 17. Matriz de Equivalencias Actual–Objetivo (Tablas)
 Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs/MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md).
 
-## 18. Dependencias y Riesgos de Migración (`REF-01.5`)
+## 18. Dependencias, Riesgos de Migración (`REF-01.5`) y Diseño Propuesto de Subsanación (`AMB-04`)
 1. **Triggers y funciones `SECURITY DEFINER`:** Al renombrar tablas y columnas (`ALTER TABLE ... RENAME`), las funciones PL/pgSQL (`append_audit_log`, `enforce_*`, `prevent_*`) deben actualizarse dentro de la **misma transacción migratoria** porque referencian nombres de tablas/columnas como texto compilado en tiempo de ejecución.
 2. **Cadena criptográfica histórica (`audit_log`):** No reescribir ni re-hashear `entity_name`, `operation` o `payload_diff` de registros existentes, para no invalidar `curr_log_hash`.
 3. **Repositorios NestJS y pruebas `DB-T01`..`DB-T14`:** Deben desplegarse coordinadamente con la migración SQL conforme a [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md).
+4. **Propuesta documental para `AMB-04` (múltiples ciclos de subsanación — sin implementar todavía):** Para preservar el historial completo cuando una RFC retorna repetidamente entre `CU-05` (`EN_SUBSANACION`) y `CU-04.1` (`REGISTRADA`), se propone en `SCM-01` / `REF-01.5` diferenciar en `solicitud_cambio` los atributos del estado vigente (`notas_admision`, `observaciones_subsanacion`, `respuesta_subsanacion`, `motivo_desestimacion`) y respaldar cada iteración histórica mediante una tabla dedicada **`historial_subsanacion_rfc`** (`id UUID PK`, `id_rfc UUID FK`, `numero_ciclo INT`, `observado_por UUID FK`, `fecha_observacion TIMESTAMPTZ`, `observaciones TEXT`, `subsanado_por UUID FK`, `fecha_subsanacion TIMESTAMPTZ`, `respuesta TEXT`, `estado_ciclo VARCHAR(20)`), evitando sobrescribir observaciones previas.
 
 ## 19. Trazabilidad con SRS y SAD
 - **SRS (`FD03`):** Cubre `RF-01`..`RF-18`, `RNF-01`..`RNF-09`, `RN-01`..`RN-09` y `CU-01`..`CU-30` + `CU-04.1`.

@@ -35,8 +35,8 @@
 | Interfaces | `PascalCase` (sin prefijo `I`) | `SolicitudCambio`, `InformeImpactoTecnico` |
 | Tipos y uniones | `PascalCase` | `EstadoRFC`, `Prioridad`, `NivelRiesgoTecnico` |
 | Constantes globales / catálogos | `UPPER_SNAKE_CASE` | `ROLES_CANONICOS`, `CATALOGO_ESTADOS_RFC`, `PERMISOS_ACCION` |
-| Archivos de lógica/servicios/tiendas | `kebab-case` | `solicitud-cambio.service.ts`, `autenticacion.repository.ts` |
-| Archivos de componentes React | `PascalCase.tsx` *(o `kebab-case` si se aprueba AMB-07)* | `VistaDetalleRfc.tsx`, `RutaProtegida.tsx` |
+| Archivos de lógica, servicios, tiendas y utilidades | `kebab-case` | `solicitud-cambio.service.ts`, `autenticacion.repository.ts`, `use-autenticacion.ts` |
+| Archivos de componentes y vistas React (`AMB-07`) | `PascalCase.tsx` | `VistaDetalleRfc.tsx`, `RutaProtegida.tsx`, `BarraLateral.tsx` |
 | Directorios propios | `kebab-case` | `analisis-impacto/`, `control-cambios/` |
 
 ### 2.2 Criterios Semánticos Específicos
@@ -95,7 +95,7 @@
    - Funciones/Triggers: `fn_*` o verbo descriptivo (`registrar_auditoria`, `validar_sod_*`, `prevenir_alteracion_*`) y triggers `trg_<tabla>_<proposito>`.
 3. **Fechas y zonas horarias:** Usar exclusivamente `TIMESTAMPTZ` (`TIMESTAMP WITH TIME ZONE`) con `DEFAULT NOW()` en UTC.
 4. **Migraciones:** Numeración cronológica inmutable `YYYYMMDDNNNN_descripcion.sql`. **Prohibido editar migraciones ya aplicadas** en Supabase; todo cambio posterior requiere nueva migración incremental.
-5. **Mínimo privilegio y auditoría append-only:** El rol de aplicación (`traceflow_app`) jamás recibe `DELETE` ni privilegios DDL, ni `UPDATE` sobre tablas inmutables (`registro_auditoria`, `version_ecs`, `voto_ccb`, `autorizacion_delegada`).
+5. **Mínimo privilegio y auditoría append-only:** El rol de aplicación (`traceflow_app`, conservado según `AMB-06`) jamás recibe `DELETE` ni privilegios DDL, ni `UPDATE` sobre tablas inmutables (`registro_auditoria`, `version_ecs`, `voto_ccb`, `autorizacion_cambio`). Adicionalmente, toda función `SECURITY DEFINER` debe fijar `SET search_path` explícito y revocar `EXECUTE` de `PUBLIC` concediéndolo exclusivamente a `traceflow_app`.
 6. **Objetos externos preservados:** No alterar ni renombrar esquemas o roles gestionados por Supabase (`public`, `auth`, `storage`, `supabase_migrations`).
 
 ---
@@ -126,8 +126,7 @@
 
 ## 7. Seguridad y Variables de Entorno
 
-- **Variables exigidas por frameworks/herramientas (se conservan):** `NODE_ENV`, `PORT`, `CORS_ORIGIN`, `DATABASE_URL`, `DATABASE_SSL`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `DATABASE_SSL_CA_PATH`, `VITE_API_BASE_URL` (obligatorio prefijo `VITE_` en Vite).
-- **Variables propias del dominio:** `DATABASE_MODE`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE`, `SESSION_TTL_MINUTES`, `VITE_SERVICE_MODE` — se recomienda conservar compatibilidad con estos nombres y documentarlos en español en `.env.example` (ver `AMB-05` en [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md)).
+- **Variables exigidas por frameworks/herramientas y operación (conservadas según `AMB-05`):** `NODE_ENV`, `PORT`, `CORS_ORIGIN`, `DATABASE_URL`, `DATABASE_SSL`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `DATABASE_SSL_CA_PATH`, `DATABASE_MODE`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE`, `SESSION_TTL_MINUTES`, `VITE_SERVICE_MODE`, `VITE_API_BASE_URL` (prefijo obligatorio `VITE_` en Vite).
 - **Reglas de oro:**
   - `.env` y `.env.local` siempre listados en `.gitignore`.
   - `.env.example` actualizado sin credenciales ni URLs con contraseñas.

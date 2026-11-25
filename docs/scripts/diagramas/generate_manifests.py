@@ -34,7 +34,7 @@ def get_diag_info(diag_id, content):
         doc = 'FD05'
     elif diag_id in ['DG-SAD-A01', 'DG-SAD-A02']:
         doc = 'FD04'
-    elif diag_id == 'DG-12':
+    elif diag_id in ['DG-12', 'DG-12-HIST']:
         doc = 'FD03 / FD04'
     elif diag_id.startswith('DG-AO'):
         doc = 'FD03 / FD04'
@@ -67,7 +67,7 @@ def get_diag_info(diag_id, content):
         tipo = 'Contexto Arquitectónico'
     elif diag_id == 'DG-SAD-A02':
         tipo = 'Arquitectura Lógica Conceptual'
-    elif diag_id in ['DG-01', 'DG-02', 'DG-03', 'DG-04', 'DG-05', 'DG-06', 'DG-07', 'DG-08', 'DG-09', 'DG-10', 'DG-11', 'DG-12', 'DG-13']:
+    elif diag_id in ['DG-01', 'DG-02', 'DG-03', 'DG-04', 'DG-05', 'DG-06', 'DG-07', 'DG-08', 'DG-09', 'DG-10', 'DG-11', 'DG-12', 'DG-12-HIST', 'DG-13']:
         tipo = 'Modelo General / Análisis'
     else:
         tipo = 'Modelo Arquitectónico'

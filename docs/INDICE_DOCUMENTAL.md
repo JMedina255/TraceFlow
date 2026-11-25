@@ -131,7 +131,9 @@ Ubicados en `docs/assets/`:
 | **05** | `INF-CIERRE-SAD-DISENO-ETAPA05` | Actualización Integral del SAD de Diseño v0.5 | `c7ed0b8` | ✅ Concluida |
 | **06** | `INF-CIERRE-RECURSOS-GRAFICOS-ETAPA06` | Formalización Gráfica, PlantUML y Capturas del Prototipo | `c4f95be` | ✅ Concluida |
 | **07** | `INF-AUD-INTEGRAL-ETAPA07` | Auditoría Integral, Conciliación de Trazabilidad y Preparación CCB | `f2d2e87` | ✅ Concluida |
-| **07-R**| `ADENDA-AUD-ETAPA07R` | Saneamiento de Inconsistencias Residuales y Preparación Definitiva | *En curso* | 🔄 En Ejecución |
+| **07-R**| `ADENDA-AUD-ETAPA07R` | Saneamiento de Inconsistencias Residuales y Preparación Definitiva | `9b59478` | ✅ Concluida |
+| **DB-01**| `INFORME_HITO_DB01` | Reconexión Supabase, Auditoría y Mínimo Privilegio | `ea21db7` | ✅ Concluida |
+| **DB-02 / INT-01**| `IMPLEMENTACION_BD_SUPABASE` | Despliegue Físico PG 17.12, Remediación SEC-01..05 y Certificación E2E | `354ac45` | ✅ Concluida |
 
 ---
 

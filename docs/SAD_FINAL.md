@@ -157,7 +157,15 @@ Todas aprobadas el `2026-10-01` en [`docs/adr/`](adr/README.md):
 ## 26. Trazabilidad con Requerimientos
 La trazabilidad bidireccional completa entre `RF-01`..`RF-18`, `RNF-01`..`RNF-09`, `RN-01`..`RN-09`, `CU-01`..`CU-30`/`CU-04.1`, módulos, tablas actuales/objetivo, endpoints y pruebas se mantiene en [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md).
 
-## 27. Estado Vigente vs Arquitectura Objetivo y Normalización
+## 27. Preservación de Modelos Técnicos de Análisis y Diseño (Traslado desde SRS)
+Para mantener [`FD03-EPIS-Informe_SRS.md`](FD03-EPIS-Informe_SRS.md) estrictamente enfocado en requisitos funcionales comprensibles para el cliente, todo el detalle de modelado técnico de análisis y diseño se preserva centralizado aquí y en sus entregables técnicos fuente:
+- **31 Diagramas de Secuencia de Análisis (`DG-SEQ-01`..`DG-SEQ-30` y `DG-SEQ-04.1`):** Fuentes PlantUML en [`DIAGRAMS.md`](DIAGRAMS.md) y renders vectoriales/rasterizados en [`docs/assets/diagramas/render/analisis/`](assets/diagramas/MANIFEST.md#3-catálogo-detallado-modelos-de-análisis-y-casos-de-uso-72-diagramas).
+- **31 Diagramas de Análisis de Objetos BCE (`DG-AO-01`..`DG-AO-30` y `DG-AO-04.1`):** Matriz BCE consolidada en [`FD04-EPIS-Informe_SAD_Analisis.md`](FD04-EPIS-Informe_SAD_Analisis.md#45-modelo-de-análisis-de-objetos-patrón-bce-para-los-31-casos-de-uso) y compendio gráfico en [`DIAGRAMS.md`](DIAGRAMS.md).
+- **Secuencias Técnicas de Diseño (`DG-DSEQ-04, 08, 10, 12, 17, 20, 21, 29, 30`) y Vistas UWE:** Preservadas en [`FD05-EPIS-Informe_SAD_Diseno.md`](FD05-EPIS-Informe_SAD_Diseno.md) y [`MANIFEST.md`](assets/diagramas/MANIFEST.md).
+- **Antecedente Histórico `DG-13` (DOC-025):** Declarado obsoleto para el análisis en [`FD04-EPIS-Informe_SAD_Analisis.md`](FD04-EPIS-Informe_SAD_Analisis.md#132-dictamen-formal-de-obsolescencia-de-dg-13-para-la-fase-de-análisis) por contener tecnologías prematuras; sustituido por `DG-SAD-A01`, `DG-SAD-A02` y `DG-12`.
+- **Consolidación RBAC e Identidad (`docs/refactor/`):** Las matrices técnicas [`IDENTITY_AND_ROLES.md`](refactor/IDENTITY_AND_ROLES.md), [`RBAC_ACCESS_MATRIX.md`](refactor/RBAC_ACCESS_MATRIX.md) y [`ROLE_NAVIGATION_MATRIX.md`](refactor/ROLE_NAVIGATION_MATRIX.md) complementan las secciones §15–§17 del presente SAD mientras concluye su integración definitiva en el SAD.
+
+## 28. Estado Vigente vs Arquitectura Objetivo y Normalización
 - **Ya implementado en producción/desarrollo:** Infraestructura de 21 tablas y triggers en PostgreSQL 17.12, autenticación/sesiones opacas, `ProjectsModule` (lectura), `RfcsModule` (`CU-04`), `AuditModule` base, SPA React conectada en modo `api` para flujo `CU-01`/`CU-03`/`CU-04`.
 - **Diseñado y simulado en prototipo (próximo hito `SCM-01`):** `CU-05`, `CU-04.1` y `CU-06` (seguidos por `CU-30` y `CU-07`).
 - **Diseñado pendiente de implementación (`SCM-02+`):** `CU-08`..`CU-26`, `CU-28`, `CU-29`, adaptador `StoragePort` físico y UI de las 12 pantallas en placeholder.

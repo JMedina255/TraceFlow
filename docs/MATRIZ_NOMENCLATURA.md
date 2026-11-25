@@ -4,7 +4,7 @@
 > **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
 > **Documento:** `docs/MATRIZ_NOMENCLATURA.md`  
 > **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)  
-> **Estado:** Borrador para Revisión y Aprobación del Responsable (DOC-02.1) — *Sin sustituciones aplicadas en código*  
+> **Estado:** Borrador para Revisión y Aprobación del Responsable (DOC-02.1 / Preparación de consolidación en `DICCIONARIO_DATOS.md` y `ESTANDAR_PROGRAMACION.md` según SRS-02) — *Sin sustituciones aplicadas en código*  
 > **Fecha:** 25 de noviembre de 2026  
 
 ---

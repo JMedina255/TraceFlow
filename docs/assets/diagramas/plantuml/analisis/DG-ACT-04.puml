@@ -1,0 +1,124 @@
+@startuml DG-ACT-04
+title <b>DG-ACT-04: Flujo de Actividades — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|TraceFlow SCM|
+
+|Solicitante|
+start
+:<color:white><b>FASE 1: Acceso e Información General</b></color>; <<#34495E>>
+:Solicitar registro de nueva RFC\n("Nueva Solicitud RFC");
+
+|TraceFlow SCM|
+if (¿Rol activo en sesión es Solicitante [PU-01]?) then (No)
+    :[E001] Mostrar aviso de Segregación de Funciones\ny deshabilitar botón de envío final;
+    stop
+else (Sí)
+    :Cargar proyectos asignados\ny presentar Asistente Paso 1 de 4;
+endif
+
+if (¿Existe borrador local para el proyecto?) then (Sí)
+    :Restaurar datos previos en formulario;
+else (No)
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar proyecto, ingresar título,\nprioridad y categoría del cambio;
+    note left
+      <b>[A001]</b> Guardar borrador local
+      <b>[A003]</b> Cancelar -> Confirmar descarte
+    end note
+
+    |TraceFlow SCM|
+    :Validar campos obligatorios del Paso 1;
+repeat while (¿Paso 1 válido?) is (No [E002]: Señalar campo y mostrar error)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 2: Justificación, Alcance y ECS</b></color>; <<#34495E>>
+:Habilitar Paso 2 (Justificación y Alcance);
+
+repeat
+    |Solicitante|
+    :Ingresar descripción detallada,\njustificación de negocio y propuesta opcional;
+    |TraceFlow SCM|
+    :Validar longitud y completitud del Paso 2;
+repeat while (¿Paso 2 válido?) is (No [E002]: Indicar longitud mínima faltante)
+-> Sí;
+
+|TraceFlow SCM|
+:Consultar catálogo de ECS del proyecto;
+if (¿Existen ECS registrados en el proyecto?) then (No)
+    :[E003] Mostrar aviso de catálogo vacío\n(Contactar al Administrador SCM);
+    stop
+else (Sí)
+    :Habilitar Paso 3 (ECS y Evidencias);
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar ECS afectado;
+    if (¿Desea adjuntar sustento?) then (Sí [A002])
+        :Agregar nombres o evidencias de respaldo;
+    else (No)
+    endif
+    |TraceFlow SCM|
+    :Validar selección obligatoria de ECS;
+repeat while (¿ECS seleccionado?) is (No [E002]: Exigir selección de ECS)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Revisión, Confirmación y Radicación</b></color>; <<#34495E>>
+:Presentar Paso 4 con Ficha Resumen Técnica,\ncódigo preliminar y declaración de veracidad;
+
+|Solicitante|
+if (¿Desea corregir datos previos?) then (Sí [A001/Navegar])
+    :Regresar a pasos anteriores\no guardar borrador local;
+    detach
+else (No)
+endif
+
+:Aceptar declaración de veracidad institucional\ny seleccionar "Enviar Solicitud de Cambio";
+
+|TraceFlow SCM|
+:Ejecutar validación integral en servidor\ny verificar pertenencia ECS-Proyecto;
+
+if (¿Validación y persistencia exitosas?) then (No)
+    :[E002 / E004] Mostrar error de validación\no conectividad conservando datos ingresados;
+    stop
+else (Sí)
+    :Asignar código único (RFC-AAAA-NNNN),\nregistrar solicitud en estado <b>REGISTRADA</b>\ny generar traza de auditoría SHA-256;
+    :Derivar notificación para validación inicial\n(Analista de Requerimientos / Gestor);
+    :Presentar comprobante de radicación\ny accesos (Expediente 360°, Bandeja, Nueva, Dashboard);
+    stop
+endif
+
+@enduml

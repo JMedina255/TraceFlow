@@ -1,8 +1,8 @@
 /**
  * ============================================================================
- * TRACEFLOW SCM — SUITE DE INTEGRACIÓN Y CERTIFICACIÓN FÍSICA POSTGRESQL (DB-02)
+ * TRACEFLOW SCM — SUITE DE INTEGRACIÓN Y CERTIFICACIÓN FÍSICA POSTGRESQL (DB-02 / DB-02.1)
  * Archivo: backend/test/real-postgres-integration.spec.ts
- * Hito: DB-02 — Requisito H-04 / Casos DB-T01 a DB-T14
+ * Hito: DB-02 / DB-02.1 — Requisitos H-04, SEC-01 a SEC-05 / Casos DB-T01 a DB-T14
  * 
  * [CLASIFICACIÓN: INTEGRACIÓN POSTGRESQL REAL]
  * CERTIFICACIÓN FÍSICA EN VIVO CONTRA TraceFlow-UPT (xmyfqxlvveiawnxgydtz):
@@ -15,13 +15,13 @@
  * | DB-T04 | Liberación de bloqueos              | CHECK release_reason canónico (23514)    |
  * | DB-T05 | Inmutabilidad de auditoría          | Trigger / Permisos UPDATE/DELETE/TRUNC   |
  * | DB-T06 | Cadena SHA-256 concurrente          | Advisory lock y encadenamiento cripto    |
- * | DB-T07 | Doble llave delegada (CU-30)        | Restricción uq_rfc_authorizer_role       |
- * | DB-T08 | Antiautoevaluación (SoD-01)         | SoD Solicitante vs Evaluador/Aprobador   |
+ * | DB-T07 | Doble llave delegada (CU-30/SEC-04) | Segregación física e inmutabilidad firma |
+ * | DB-T08 | Antiautoevaluación (SoD-01/SEC-05)  | Prohibición impacto, voto y autoaprob    |
  * | DB-T09 | Voto CCB duplicado (SoD-05)         | Índice UNIQUE (rfc_id, voter_user_id)    |
  * | DB-T10 | Aislamiento de proyectos            | Composite FK (target_ecs_id, project_id) |
  * | DB-T11 | Ownership de RFC                    | Restricción de acceso PU-01              |
  * | DB-T12 | Persistencia tras reinicio          | Retención de datos post-reinicio de pool |
- * | DB-T13 | Privilegios de aplicación           | Restricción DDL para traceflow_app       |
+ * | DB-T13 | Privilegios mínimos (SEC-02)        | Least Privilege y restricción DDL/DML    |
  * | DB-T14 | Desconexión PostgreSQL              | Sin fallback silencioso a mock (H-03)    |
  * ============================================================================
  */
@@ -47,7 +47,7 @@ if (!dbUrl) {
 const certPath = path.resolve(process.cwd(), process.env.DATABASE_SSL_CA_PATH || 'cert/prod-ca-2021.crt');
 const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath, 'utf8') : undefined;
 
-describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a DB-T14)', { timeout: 25000 }, () => {
+describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a DB-T14)', { timeout: 30000 }, () => {
   let poolA: pg.Pool;
   let poolB: pg.Pool;
 
@@ -154,16 +154,8 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         [ecsId]
       );
     } finally {
-      try {
-        await client1.query(`DELETE FROM traceflow.sync_lock WHERE change_order_id = $1`, [testEcnId]);
-        await client1.query(`DELETE FROM traceflow.change_order WHERE id = $1`, [testEcnId]);
-        await client1.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
-      } catch {
-        // Ignorar
-      } finally {
-        client1.release();
-        client2.release();
-      }
+      client1.release();
+      client2.release();
     }
   });
 
@@ -211,15 +203,7 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         [lockId]
       );
     } finally {
-      try {
-        await client.query(`DELETE FROM traceflow.sync_lock WHERE change_order_id = $1`, [testEcnId]);
-        await client.query(`DELETE FROM traceflow.change_order WHERE id = $1`, [testEcnId]);
-        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
-      } catch {
-        // Ignorar
-      } finally {
-        client.release();
-      }
+      client.release();
     }
   });
 
@@ -233,7 +217,7 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
       );
       const logId = res.rows[0].id;
 
-      // 2. Intento de UPDATE debe ser rechazado por trigger
+      // 2. Intento de UPDATE debe ser rechazado por trigger y revocación de permisos
       await expect(
         client.query(`UPDATE traceflow.audit_log SET operation = 'ALTERED' WHERE id = $1`, [logId])
       ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
@@ -294,14 +278,15 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
     }
   });
 
-  // DB-T07: Doble llave delegada (CU-30)
-  it('DB-T07: Doble llave delegada en cambios menores (CU-30) exige exactamente dos roles distintos (Gestor y Arquitecto)', async () => {
+  // DB-T07: Doble llave delegada (CU-30 / SEC-04)
+  it('DB-T07: Doble llave delegada (CU-30 / SEC-04): Segregación física obligatoria, prohibición de autoautorización e inmutabilidad', async () => {
     const client = await poolA.connect();
     const testRfcId = crypto.randomUUID();
     const suffix = crypto.randomUUID().slice(0, 8);
     const rfcCode = `RFC-CU30-${suffix}`;
-    const gestorId = 'a0000001-0000-0000-0000-000000000001';
-    const arquiId = 'a0000001-0000-0000-0000-000000000002';
+    const solicitanteId = 'a0000001-0000-0000-0000-000000000001'; // USR-001 Solicitante
+    const gestorId = 'a0000001-0000-0000-0000-000000000003';      // USR-003 actúa como Gestor autorizado
+    const arquiId = 'a0000001-0000-0000-0000-000000000002';       // USR-002 Arquitecto
     const ecsId = 'c0000001-0000-0000-0000-000000000001';
     const projectId = 'b0000001-0000-0000-0000-000000000001';
 
@@ -310,10 +295,20 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         `INSERT INTO traceflow.change_request 
           (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
          VALUES ($1, $2, $3, $4, 'CU-30 Test', 'Desc', 'Just', 'BAJA', 'CAMBIO_MENOR', 'EN_EVALUACION', $5)`,
-        [testRfcId, rfcCode, projectId, ecsId, gestorId]
+        [testRfcId, rfcCode, projectId, ecsId, solicitanteId]
       );
 
-      // Gestor emite primera llave
+      // 1. SEC-04 / SoD-01: El propio solicitante intenta emitir llave para su propia RFC -> Rechazo por trigger
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.change_authorization 
+            (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
+           VALUES ($1, 'GESTOR', 'PU-02', $2, 'APROBADO', 'Intento de autoautorización')`,
+          [testRfcId, solicitanteId]
+        )
+      ).rejects.toThrow(/El solicitante de la RFC no puede autoautorizar/i);
+
+      // 2. Primera llave legítima emitida por Gestor (USR-003)
       await client.query(
         `INSERT INTO traceflow.change_authorization 
           (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
@@ -321,17 +316,27 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         [testRfcId, gestorId]
       );
 
-      // Intento de duplicar rol Gestor sobre la misma RFC debe ser rechazado por restricción UNIQUE
+      // 3. SEC-04: Mismo usuario físico (USR-003) intenta emitir la segunda llave como Arquitecto -> Rechazo
       await expect(
         client.query(
           `INSERT INTO traceflow.change_authorization 
             (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
-           VALUES ($1, 'GESTOR', 'PU-02', $2, 'APROBADO', 'Intento duplicar gestor')`,
+           VALUES ($1, 'ARQUITECTO', 'PU-03', $2, 'APROBADO', 'Intento segunda llave mismo usuario')`,
           [testRfcId, gestorId]
+        )
+      ).rejects.toThrow(/La doble llave operativa exige dos identidades físicas distintas/i);
+
+      // 4. Intento de duplicar rol GESTOR sobre la misma RFC -> Rechazo por uq_rfc_authorizer_role
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.change_authorization 
+            (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
+           VALUES ($1, 'GESTOR', 'PU-02', $2, 'APROBADO', 'Duplicado de rol')`,
+          [testRfcId, arquiId]
         )
       ).rejects.toThrow(/uq_rfc_authorizer_role|unique constraint/i);
 
-      // Arquitecto emite segunda llave legítima
+      // 5. Segunda llave legítima emitida por una persona física distinta (USR-002 Arquitecto)
       await client.query(
         `INSERT INTO traceflow.change_authorization 
           (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
@@ -344,56 +349,112 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         [testRfcId]
       );
       expect(parseInt(countRes.rows[0].count, 10)).toBe(2);
+
+      // 6. SEC-03: Inmutabilidad de change_authorization -> UPDATE y DELETE deben ser rechazados
+      await expect(
+        client.query(
+          `UPDATE traceflow.change_authorization SET decision = 'RECHAZADO' WHERE rfc_id = $1`,
+          [testRfcId]
+        )
+      ).rejects.toThrow(/VIOLACIÓN DE FIRMEZA|permission denied/i);
+
+      await expect(
+        client.query(
+          `DELETE FROM traceflow.change_authorization WHERE rfc_id = $1`,
+          [testRfcId]
+        )
+      ).rejects.toThrow(/VIOLACIÓN DE FIRMEZA|permission denied/i);
     } finally {
-      try {
-        await client.query(`DELETE FROM traceflow.change_authorization WHERE rfc_id = $1`, [testRfcId]);
-        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
-      } catch {
-        // Ignorar
-      } finally {
-        client.release();
-      }
+      client.release();
     }
   });
 
-  // DB-T08: Antiautoevaluación (SoD-01)
-  it('DB-T08: Antiautoevaluación (SoD-01): Solicitante tiene prohibido emitir análisis técnico o autoaprobarse', async () => {
-    const dbService = new DatabaseService('postgres');
-    await dbService.onModuleInit();
-    const projectsRepo = new ProjectsRepository(dbService);
-    const rfcsRepo = new RfcsRepository(dbService);
-    const auditService = new AuditService(dbService);
-    const rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);
-
-    const invalidActor: AuthenticatedUser = {
-      id: 'a0000001-0000-0000-0000-000000000001',
-      code: 'USR-001',
-      username: 'jmedina',
-      email: 'jmedina@exodo.pe',
-      fullName: 'Joan Cristian Medina Quispe',
-      organization: 'ÉXODO S.A.C.',
-      position: 'Director',
-      activeRoleId: 'PU-02', // Gestor intentando registrar RFC (prohibido por CU-04)
-      allowedRoleIds: ['PU-02', 'PU-01'],
-      assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
-    };
+  // DB-T08: Antiautoevaluación (SoD-01 / SEC-05) y Blindaje de Invariantes (SEC-03)
+  it('DB-T08: Antiautoevaluación (SoD-01 / SEC-05) y Blindaje de Invariantes (SEC-03) en BD', async () => {
+    const client = await poolA.connect();
+    const testRfcId = crypto.randomUUID();
+    const testResId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-SOD-${suffix}`;
+    const resCode = `ACT-SOD-${suffix}`;
+    const solicitanteId = 'a0000001-0000-0000-0000-000000000001'; // USR-001
+    const ccbVoterId = 'a0000001-0000-0000-0000-000000000004';    // USR-004
+    const ecsId = 'c0000001-0000-0000-0000-000000000001';
+    const projectId = 'b0000001-0000-0000-0000-000000000001';
 
     try {
+      // 1. Registrar RFC formal
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, $3, $4, 'SoD Test', 'Desc', 'Just', 'ALTA', 'CAMBIO_MAYOR', 'EN_ANALISIS_TECNICO', $5)`,
+        [testRfcId, rfcCode, projectId, ecsId, solicitanteId]
+      );
+
+      // 2. SEC-05: El solicitante intenta emitir informe de impacto técnico sobre su propia RFC -> Rechazo por trigger
       await expect(
-        rfcsService.createRfc(
-          {
-            projectId: 'PRJ-001',
-            targetEcsId: 'c0000001-0000-0000-0000-000000000001',
-            title: 'Auto RFC',
-            description: 'Desc',
-            justification: 'Just',
-            priority: 'MEDIA',
-          },
-          invalidActor
+        client.query(
+          `INSERT INTO traceflow.impact_assessment 
+            (rfc_id, architect_id, classification, architecture_impact, effort_hours, estimated_cost, estimated_days, technical_risk)
+           VALUES ($1, $2, 'CAMBIO_MAYOR', 'Impacto autoemitido', 10, 500, 3, 'MEDIO')`,
+          [testRfcId, solicitanteId]
         )
-      ).rejects.toThrow(/Violación de SoD/i);
+      ).rejects.toThrow(/El solicitante de la RFC no puede emitir el informe de impacto técnico/i);
+
+      // 3. Crear sesión CCB para la RFC
+      await client.query(
+        `INSERT INTO traceflow.ccb_resolution (id, rfc_id, resolution_code, decision)
+         VALUES ($1, $2, $3, 'EN_DELIBERACION')`,
+        [testResId, testRfcId, resCode]
+      );
+
+      // 4. SEC-05: El solicitante intenta votar en el CCB sobre su propia RFC -> Rechazo por trigger
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.ccb_vote (resolution_id, rfc_id, voter_user_id, decision, justification)
+           VALUES ($1, $2, $3, 'APROBAR', 'Intento de autovoto')`,
+          [testResId, testRfcId, solicitanteId]
+        )
+      ).rejects.toThrow(/El solicitante de la RFC no puede emitir votos en el CCB/i);
+
+      // 5. Voto legítimo emitido por miembro imparcial del CCB (USR-004)
+      await client.query(
+        `INSERT INTO traceflow.ccb_vote (resolution_id, rfc_id, voter_user_id, decision, justification)
+         VALUES ($1, $2, $3, 'APROBAR', 'Voto conforme imparcial')`,
+        [testResId, testRfcId, ccbVoterId]
+      );
+
+      // 6. SEC-03: Inmutabilidad de ccb_vote -> UPDATE y DELETE deben ser rechazados
+      await expect(
+        client.query(`UPDATE traceflow.ccb_vote SET decision = 'RECHAZAR' WHERE rfc_id = $1`, [testRfcId])
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      await expect(
+        client.query(`DELETE FROM traceflow.ccb_vote WHERE rfc_id = $1`, [testRfcId])
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      // 7. SEC-03: Inmutabilidad de ecs_version -> UPDATE y DELETE deben ser rechazados
+      await expect(
+        client.query(
+          `UPDATE traceflow.ecs_version SET version_number = '9.9.9' WHERE ecs_id = $1`,
+          [ecsId]
+        )
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      await expect(
+        client.query(
+          `DELETE FROM traceflow.ecs_version WHERE ecs_id = $1`,
+          [ecsId]
+        )
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      // 8. SEC-03: Prohibición de DELETE directo en sync_lock
+      await expect(
+        client.query(`DELETE FROM traceflow.sync_lock WHERE ecs_id = $1`, [ecsId])
+      ).rejects.toThrow(/VIOLACIÓN DE CONCURRENCIA|permission denied/i);
+
     } finally {
-      await dbService.onModuleDestroy();
+      client.release();
     }
   });
 
@@ -405,7 +466,8 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
     const suffix = crypto.randomUUID().slice(0, 8);
     const rfcCode = `RFC-CCB-${suffix}`;
     const resCode = `ACT-${suffix}`;
-    const voterId = 'a0000001-0000-0000-0000-000000000004';
+    const requesterId = 'a0000001-0000-0000-0000-000000000001'; // Solicitante independiente
+    const voterId = 'a0000001-0000-0000-0000-000000000004';     // Miembro CCB
     const ecsId = 'c0000001-0000-0000-0000-000000000001';
     const projectId = 'b0000001-0000-0000-0000-000000000001';
 
@@ -414,7 +476,7 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         `INSERT INTO traceflow.change_request 
           (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
          VALUES ($1, $2, $3, $4, 'CCB Test', 'Desc', 'Just', 'ALTA', 'CAMBIO_MAYOR', 'EN_EVALUACION', $5)`,
-        [testRfcId, rfcCode, projectId, ecsId, voterId]
+        [testRfcId, rfcCode, projectId, ecsId, requesterId]
       );
       await client.query(
         `INSERT INTO traceflow.ccb_resolution (id, rfc_id, resolution_code, decision)
@@ -438,15 +500,7 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         )
       ).rejects.toThrow(/uq_ccb_vote_per_member|unique constraint/i);
     } finally {
-      try {
-        await client.query(`DELETE FROM traceflow.ccb_vote WHERE rfc_id = $1`, [testRfcId]);
-        await client.query(`DELETE FROM traceflow.ccb_resolution WHERE id = $1`, [testResId]);
-        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
-      } catch {
-        // Ignorar
-      } finally {
-        client.release();
-      }
+      client.release();
     }
   });
 
@@ -515,14 +569,8 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         /Ownership SoD/i
       );
     } finally {
-      try {
-        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [otherUserRfcId]);
-      } catch {
-        // Ignorar
-      } finally {
-        client.release();
-        await dbService.onModuleDestroy();
-      }
+      client.release();
+      await dbService.onModuleDestroy();
     }
   });
 
@@ -561,9 +609,6 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
         expect(res.rows.length).toBe(1);
         expect(res.rows[0].code).toBe(rfcCode);
         expect(res.rows[0].title).toBe('Reboot Test');
-
-        // Limpieza
-        await rebootClient.query('DELETE FROM traceflow.change_request WHERE id = $1', [testRfcId]);
       } finally {
         rebootClient.release();
       }
@@ -572,16 +617,23 @@ describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a 
     }
   });
 
-  // DB-T13: Privilegios de aplicación
-  it('DB-T13: Privilegios de aplicación: traceflow_app tiene prohibido ejecutar operaciones DDL destructivas', async () => {
+  // DB-T13: Privilegios de aplicación (SEC-02 Least Privilege)
+  it('DB-T13: Privilegios de aplicación (SEC-02): traceflow_app tiene prohibido ejecutar operaciones DDL destructivas y DELETE no autorizado', async () => {
     const client = await poolA.connect();
     try {
+      // 1. Prohibido DDL destructivo
       await expect(client.query('CREATE TABLE traceflow.unauthorized_table (id int)')).rejects.toThrow(
         /permission denied/i
       );
       await expect(client.query('DROP SCHEMA traceflow CASCADE')).rejects.toThrow(
         /permission denied|must be owner/i
       );
+
+      // 2. Prohibido DELETE en tablas canónicas de solo lectura o append-only
+      await expect(client.query('DELETE FROM traceflow.project')).rejects.toThrow(/permission denied/i);
+      await expect(client.query('DELETE FROM traceflow.app_role')).rejects.toThrow(/permission denied/i);
+      await expect(client.query('DELETE FROM traceflow.change_authorization')).rejects.toThrow(/permission denied|VIOLACIÓN DE FIRMEZA/i);
+      await expect(client.query('DELETE FROM traceflow.ccb_resolution')).rejects.toThrow(/permission denied/i);
     } finally {
       client.release();
     }

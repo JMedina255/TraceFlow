@@ -25,6 +25,7 @@
  * | DB-T14 | Desconexión PostgreSQL              | Sin fallback silencioso a mock (H-03)    |
  * ============================================================================
  */
+import 'dotenv/config';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -39,7 +40,10 @@ import { RfcsService } from '../src/modules/rfcs/rfcs.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
 import type { AuthenticatedUser } from '../src/common/types/index.js';
 
-const dbUrl = process.env.DATABASE_URL || 'postgresql://traceflow_app:TF_SecApp_2026_xmyfqxlv@db.xmyfqxlvveiawnxgydtz.supabase.co:5432/postgres';
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error('[SEC-01] DATABASE_URL no configurada. Las pruebas de integración en vivo requieren variables de entorno explícitas.');
+}
 const certPath = path.resolve(process.cwd(), process.env.DATABASE_SSL_CA_PATH || 'cert/prod-ca-2021.crt');
 const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath, 'utf8') : undefined;
 

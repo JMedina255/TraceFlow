@@ -18,6 +18,7 @@
  * 10. Logout e invalidación de sesión (/api/v1/auth/logout)
  * ============================================================================
  */
+import 'dotenv/config';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { NestFactory } from '@nestjs/core';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
@@ -31,7 +32,10 @@ import * as path from 'node:path';
 import { AppModule } from '../src/app.module.js';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter.js';
 
-const dbUrl = process.env.DATABASE_URL || 'postgresql://traceflow_app:TF_SecApp_2026_xmyfqxlv@db.xmyfqxlvveiawnxgydtz.supabase.co:5432/postgres';
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error('[SEC-01] DATABASE_URL no configurada. Las pruebas de integración en vivo requieren variables de entorno explícitas.');
+}
 const certPath = path.resolve(process.cwd(), process.env.DATABASE_SSL_CA_PATH || 'cert/prod-ca-2021.crt');
 const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath, 'utf8') : undefined;
 

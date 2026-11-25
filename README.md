@@ -3,10 +3,10 @@
 <div align="center">
 
 [![Documento Maestro](https://img.shields.io/badge/Documento-SRS%20V1.0-blue.svg)](docs/FD03-EPIS-Informe_SRS.md)
-[![Estado del Proyecto](https://img.shields.io/badge/Fase-FD03%20Requerimientos%20%26%20Diseño%20Lógico-success.svg)](#etapa-actual-del-proyecto)
-[![Gobernanza SSOT](https://img.shields.io/badge/Gobernanza-SSOT%20Activa-orange.svg)](docs/DOCUMENTATION_RULES.md)
-[![Diagramas PlantUML](https://img.shields.io/badge/Diagramas-41%20Aprobados-brightgreen.svg)](docs/DIAGRAMS.md)
-[![Integridad SHA-256](https://img.shields.io/badge/Seguridad-SHA--256-blueviolet.svg)](#principios-técnicos-de-scm)
+[![Estado del Proyecto](https://img.shields.io/badge/Fase-DB--02%20%7C%20INT--01%20Certificado-success.svg)](#7-etapa-actual-del-proyecto)
+[![Backend NestJS](https://img.shields.io/badge/Backend-NestJS%2011%20%7C%20TypeScript-red.svg)](backend/)
+[![Database PostgreSQL](https://img.shields.io/badge/Database-Supabase%20PG%2017.12-blue.svg)](docs/IMPLEMENTACION_BD_SUPABASE.md)
+[![Pruebas E2E](https://img.shields.io/badge/Playwright-18%2F18%20Passed-brightgreen.svg)](docs/evidence/int-01/)
 
 **Plataforma Web Centralizada para el Control de Cambios, Trazabilidad de Artefactos y Gestión de Bibliotecas de Configuración**
 
@@ -96,17 +96,29 @@ La plataforma opera bajo un modelo de Control de Acceso Basado en Roles (**RBAC*
 
 La documentación de TraceFlow SCM adopta el principio de **Fuente Única de Verdad (Single Source of Truth - SSOT)**, distribuida modularmente para prevenir redundancias y divergencias:
 
-```
+```text
 TraceFlow/
-├── prototype/                   # Código y componentes del prototipo navegable
-├── README.md                    # Presentación técnica, resumen ejecutivo y estado del proyecto
-├── docs/
-│   ├── FD01-EPIS-Informe_Factibilidad.md # Informes de Factibilidad y Arquitectura (FD01 a FD05)
-│   ├── FD03-EPIS-Informe_SRS.md     # Documento maestro consolidado de Requerimientos (SRS)
-│   ├── DOCUMENTATION_RULES.md   # Marco normativo de gobernanza, convenciones (RF, RN, CU, DG) y versionamiento
-│   ├── TABLES.md                # SSOT de tablas estructuradas, catálogos funcionales y matrices de trazabilidad
-│   └── DIAGRAMS.md              # Catálogo oficial SSOT de 41 diagramas en código PlantUML con metadatos
-└── assets/                      # Artefactos gráficos compilados en formatos PNG y SVG (DG-01 a DG-28)
+├── backend/                     # API REST NestJS (Monolito Modular, ADR-003)
+│   ├── cert/                    # Certificado CA raíz oficial (prod-ca-2021.crt)
+│   ├── src/                     # Módulos: auth, projects, rfcs, audit, database
+│   └── test/                    # Pruebas unitarias, e2e e integración PostgreSQL real
+├── prototype/                   # Frontend SPA React 18 + Vite + TailwindCSS + Zustand
+│   ├── src/features/            # Vistas operativas de los 7 roles canónicos
+│   ├── src/services/api/        # Adaptador de transporte unificado (Mock / REST API)
+│   └── src/store/               # Estados globales con persistencia de sesión
+├── supabase/                    # Migraciones relacionales e infraestructura de datos
+│   ├── migrations/              # Migraciones versionadas (0001, 0002, 0003)
+│   ├── roles/                   # Definición de roles de mínimo privilegio (traceflow_app)
+│   └── seed/                    # Semillas estructurales de desarrollo
+├── scripts/                     # Automatizaciones y runner de certificación E2E Playwright
+├── docs/                        # Repositorio documental normativo (IEEE 828, ISO 12207)
+│   ├── FD03-EPIS-Informe_SRS.md # SRS v1.1 con 31 Casos de Uso
+│   ├── FD04-EPIS-Informe_SAD_Analisis.md # SAD de Análisis
+│   ├── FD05-EPIS-Informe_SAD_Diseno.md   # SAD de Diseño
+│   ├── IMPLEMENTACION_BD_SUPABASE.md     # Especificación de DB y evidencia de certificación
+│   ├── adr/                     # Registros de Decisiones Arquitectónicas (ADR-001 a ADR-010)
+│   └── evidence/int-01/         # Evidencias visuales de integración E2E (capturas de pantalla)
+└── README.md                    # Este documento
 ```
 
 ### Índice de Referencia Documental
@@ -160,54 +172,120 @@ npm test
 
 ---
 
-## 7. Etapa Actual del Proyecto
+## 7. Estado Actual del Proyecto (Hitos DB-01, DB-02, DB-02.1 e INT-01 Certificados)
 
-Actualmente, el proyecto se encuentra en la etapa:
+TraceFlow SCM ha alcanzado la madurez operativa en sus capas de backend, base de datos e integración:
 
-> ### **FASE 3: Cierre de Especificación Formal de Requerimientos y Diseño Lógico Arquitectural (Hito FD03)**
-
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────────────┐     ┌──────────────┐
-│   FASE 1     │     │   FASE 2     │     │        FASE 3        │     │   FASE 4     │
-│ Levantamiento│ ──> │  Análisis de │ ──> │   Especificación SRS │ ──> │ Desarrollo e │
-│  del Negocio │     │  Procesos    │     │  & Modelado Lógico   │     │Implementación│
-│  (Completado)│     │ (Completado) │     │ (★ ETAPA ACTUAL - 100%)    │  (Siguiente) │
-└──────────────┘     └──────────────┘     └──────────────────────┘     └──────────────┘
+```text
+┌────────────────────────┐      ┌────────────────────────┐      ┌────────────────────────┐
+│     PROTOTIPO SPA      │      │     BACKEND NESTJS     │      │  SUPABASE POSTGRESQL   │
+│  React 18 + Zustand    │ <──> │  Monolito Modular 11   │ <──> │  17.12 (AWS us-west-2) │
+│  Modo API / HTTP Rest  │      │  Sesiones Opacas + TLS │      │  21 Tablas / 10 Trigg. │
+└────────────────────────┘      └────────────────────────┘      └────────────────────────┘
 ```
 
-### Logros Consolidados en esta Fase:
-- [x] **Ingeniería de Requerimientos Completa:**
-  - **18 Requerimientos Funcionales (`RF-01` a `RF-18`)** estandarizados y clasificados por prioridad.
-  - **9 Requerimientos No Funcionales (`RNF-01` a `RNF-09`)** con métricas de rendimiento, seguridad e interoperabilidad.
-  - **9 Reglas de Negocio (`RN-01` a `RN-09`)** con niveles de rigidez y autoridad institucional asignada.
-- [x] **Modelado de Comportamiento e Interacción:**
-  - **28 Casos de Uso (`CU-01` a `CU-28`)** narrativos formalizados en tablas de detalle.
-  - **28 Diagramas de Secuencia (`DG-SEQ-01` a `DG-SEQ-28`)** que modelan la interacción temporal exacta entre frontend, capas de servicio y base de datos.
-  - **Diagrama de Estados (`DG-11`)** con los 13 estados del ciclo de vida de la RFC.
-- [x] **Modelado Estructural y Arquitectural:**
-  - **Diagrama de Clases del Dominio (`DG-12`)** que define las 12 entidades principales y sus relaciones cardinales.
-  - **Modelo Lógico Arquitectural (`DG-13`)** que especifica la distribución en 4 capas de software.
-  - **Diagrama de Paquetes (`DG-04`)** y diagrama de actividades con swimlanes (**`DG-03`**).
-- [x] **Artefactos Visuales Compilados:**
-  - **41 diagramas renderizados en PNG** de alta calidad integrados directamente en el documento SRS y el catálogo oficial.
-- [x] **Matrices de Trazabilidad Cruzada:**
-  - Cobertura bidireccional entre requerimientos, reglas de negocio y casos de uso verificada sin discrepancias.
+### Logros Consolidados y Certificados:
+- [x] **Base de Datos PostgreSQL 17.12 en Supabase (`TraceFlow-UPT`):**
+  - Esquema privado `traceflow` con 21 tablas relacionales, 11 secuencias unívocas y aislamiento de PostgREST (`anon`/`authenticated` bloqueados).
+  - 10 triggers físicos de gobernanza (inmutabilidad estricta de `audit_log`, `ecs_version`, `ccb_vote`, `change_authorization`, líneas base congeladas, exclusividad de `sync_lock`, doble llave obligatoria y anti-autoevaluación en informes de impacto y votos CCB).
+  - Rol de aplicación de mínimo privilegio (`traceflow_app`) con cifrado TLS 1.3 y certificado CA oficial.
+  - 14/14 pruebas de certificación física de base de datos aprobadas (`DB-T01` a `DB-T14`).
+- [x] **Backend NestJS (Monolito Modular):**
+  - Módulos de autenticación (`AuthModule`), proyectos (`ProjectsModule`), solicitudes de cambio (`RfcsModule`), auditoría (`AuditModule`) y base de datos (`DatabaseModule`).
+  - Autenticación criptográfica con Argon2id (`@node-rs/argon2`), sesiones opacas en base de datos y cookies `HttpOnly` (`SameSite=Strict`).
+  - Control de acceso RBAC, Segregación de Funciones (SoD) y aislamiento multitenant estricto por proyecto.
+  - 44/44 pruebas backend aprobadas (unitarias, servicios y flujo vertical real).
+- [x] **Integración Vertical en Vivo y Certificación E2E (Playwright):**
+  - 18/18 pruebas de integración vertical aprobadas en navegador Chromium headless (`INT-T01` a `INT-T18`).
+  - Creación asíncrona real de RFCs (`POST /rfcs`), asignación de código unívoco (`RFC-2026-0020`), inserción en PostgreSQL y bitácora con hash SHA-256.
+  - Cero fallbacks silenciosos a mock en modo API (`VITE_SERVICE_MODE=api`).
+  - Evidencias visuales archivadas en [docs/evidence/int-01/](docs/evidence/int-01/).
 
-### Próximos Pasos (Fase 4: Desarrollo e Implementación - FD04):
-1. **Configuración del Entorno de Desarrollo y Repositorio de Código:**
-   - Inicialización del proyecto Frontend (React / Vite / TailwindCSS).
-   - Inicialización del proyecto Backend API (Node.js / Express / TypeScript o Python / FastAPI).
-   - Migraciones iniciales de base de datos relacional (PostgreSQL).
-2. **Implementación del Módulo Core de SCM:**
-   - Servicios de Check-In / Check-Out con manipulación de almacenamiento de archivos.
-   - Algoritmo de bloqueo concurrente transaccional.
-   - Generación y verificación automática de sumas de comprobación SHA-256.
-3. **Automatización de Pruebas y CI/CD:**
-   - Suite de pruebas unitarias y de integración para las reglas de negocio críticas (`RN-01` a `RN-09`).
+### Estado de Implementación de los 31 Casos de Uso (SRS v1.1):
+- **Implementados y Certificados en Integración Vertical Real (React ↔ NestJS ↔ PostgreSQL):**
+  - `CU-01` (Gestión de usuarios y autenticación con roles canónicos)
+  - `CU-02` (Aprovisionamiento y administración de proyectos multitenant)
+  - `CU-03` (Consulta y filtrado de proyectos por membresía)
+  - `CU-04` (Registro formal de Solicitud de Cambio RFC con persistencia)
+  - `CU-09` (Resolución e inventario de Elementos de Configuración ECS)
+  - `CU-26` (Validación de integridad de datos y hashing criptográfico SHA-256)
+  - `CU-27` (Auditoría inmutable de eventos del sistema en base de datos)
+- **Implementados en Prototipo + Esquema Físico y Triggers en PostgreSQL (Preparados para endpoints NestJS en fases posteriores):**
+  - `CU-04.1` a `CU-08` (Subsanación, clasificación, análisis de impacto técnico, deliberación CCB, orden de cambio ECN/ECO).
+  - `CU-10` a `CU-25` (Check-Out, bloqueos, Check-In, versiones, implementación, testing unitario/QA, conformidad, no conformidades, líneas base, rollback, cancelación e incidencias).
+  - `CU-28` a `CU-30` (Reportes SCM, aceptación de usuario UAT y autorización de cambios menores con doble llave).
 
 ---
 
-## 7. Equipo de Desarrollo — C-SharkTeam
+## 8. Instrucciones de Instalación y Ejecución Local Reproducible
+
+### Requisitos Previos:
+- **Node.js:** v22.x o superior (LTS recomendado).
+- **npm:** v10.x o superior.
+- **Git:** v2.40 o superior.
+
+### 8.1. Puesta en Marcha del Backend NestJS
+```bash
+cd backend
+
+# 1. Instalar dependencias exactas
+npm ci
+
+# 2. Configurar variables de entorno locales (a partir del ejemplo seguro)
+cp .env.example .env
+# Configurar DATABASE_URL con las credenciales autorizadas de PostgreSQL en Supabase
+
+# 3. Compilar TypeScript
+npm run build
+
+# 4. Iniciar el servidor API (puerto 3001)
+npm start
+```
+El backend estará disponible en `http://localhost:3001/api/v1` (Health: `GET /api/v1/health`).
+
+### 8.2. Puesta en Marcha del Frontend React
+```bash
+cd ../prototype
+
+# 1. Instalar dependencias exactas
+npm ci
+
+# 2. Configurar variables de entorno locales
+# Para operar conectado al Backend NestJS real:
+echo "VITE_SERVICE_MODE=api" > .env.local
+echo "VITE_API_BASE_URL=http://localhost:3001/api/v1" >> .env.local
+
+# 3. Compilar y empaquetar
+npm run build
+
+# 4. Iniciar servidor de desarrollo Vite (puerto 5173)
+npm run dev
+```
+La aplicación web estará disponible en `http://localhost:5173`.
+
+### 8.3. Ejecución de Pruebas Automatizadas
+```bash
+# Backend: Pruebas unitarias e integración en memoria
+cd backend
+npm test
+
+# Backend: Flujo vertical real contra Supabase PostgreSQL
+npx vitest run test/real-postgres-integration.spec.ts test/real-postgres-vertical-flow.spec.ts
+
+# Frontend: Linter, compilación y 9 suites de pruebas unitarias
+cd ../prototype
+npm run lint
+npm run build
+npm test
+
+# Certificación E2E Playwright en vivo (requiere backend en :3001 y frontend en :5173)
+cd ..
+node scripts/e2e-int01-runner.mjs
+```
+
+---
+
+## 9. Equipo de Desarrollo — C-SharkTeam
 
 Proyecto desarrollado bajo la asesoría académica del **Dr. Ricardo Eduardo Valcarcel Alvarado** en el curso de *Gestión de la Configuración de Software* (EPIS - UPT, 2026):
 
@@ -220,6 +298,6 @@ Proyecto desarrollado bajo la asesoría académica del **Dr. Ricardo Eduardo Val
 
 ---
 
-## 8. Licencia y Uso Académico
+## 10. Licencia y Uso Académico
 
 Este proyecto ha sido desarrollado con fines estrictamente académicos y de investigación aplicada para la Escuela Profesional de Ingeniería de Sistemas de la Universidad Privada de Tacna. Todos los derechos sobre la especificación y el código fuente corresponden al equipo de desarrollo **C-SharkTeam**.

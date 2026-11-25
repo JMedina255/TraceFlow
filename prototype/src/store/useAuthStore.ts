@@ -4,6 +4,7 @@ import { CANONICAL_ROLES } from '../types';
 import { INITIAL_USER_ACCOUNTS, INITIAL_DEMO_USERS, type DemoUserConfig } from '../data/initialUsers';
 import { authService } from '../services/auth.service';
 import { storageService } from '../services/storage.service';
+import { traceFlowAdapter } from '../services/api/apiAdapter';
 
 interface AuthState {
   currentUser: User | null;
@@ -30,6 +31,17 @@ const getInitialSession = (): {
   roleId: CanonicalRoleId | null;
   isAuthenticated: boolean;
 } => {
+  const apiUser = storageService.get<any>('tf_api_user', null);
+  const apiRoleId = storageService.get<any>('tf_api_role_id', null);
+  if (apiUser) {
+    return {
+      user: apiUser,
+      role: apiUser.role || (apiRoleId ? CANONICAL_ROLES[apiRoleId as CanonicalRoleId] : null),
+      roleId: (apiRoleId || apiUser.activeRoleId || apiUser.roleId) as CanonicalRoleId,
+      isAuthenticated: true,
+    };
+  }
+
   const persisted = authService.validatePersistedSession();
   if (persisted) {
     return {
@@ -60,9 +72,25 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   /**
    * Inicio de sesión formal empresarial con correo institucional y contraseña.
-   * Valida credenciales con hash SHA-256 y establece un único rol efectivo por sesión.
+   * Valida credenciales mediante traceFlowAdapter (API NestJS o Mock local seguro).
    */
   loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId) => {
+    if (traceFlowAdapter.isApiMode()) {
+      const user = await traceFlowAdapter.auth.login(email, password, requestedRoleId);
+      const effectiveRole = (requestedRoleId || user.activeRoleId || user.roleId || 'PU-01') as CanonicalRoleId;
+      const roleDef = user.role || CANONICAL_ROLES[effectiveRole];
+      const hydratedUser = { ...user, role: roleDef, roleId: effectiveRole };
+      storageService.set('tf_api_user', hydratedUser);
+      storageService.set('tf_api_role_id', effectiveRole);
+      set({
+        currentUser: hydratedUser,
+        activeRoleId: effectiveRole,
+        activeRole: roleDef,
+        isAuthenticated: true,
+      });
+      return;
+    }
+
     const result = await authService.authenticate(email, password, requestedRoleId);
     set({
       currentUser: result.sessionUser,
@@ -73,10 +101,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   /**
-   * Cierre formal de sesión activa y revocación de tokens.
+   * Cierre formal de sesión activa y revocación de tokens vía traceFlowAdapter.
    */
   logout: () => {
-    authService.logout();
+    storageService.remove('tf_api_user');
+    storageService.remove('tf_api_role_id');
+    if (traceFlowAdapter.isApiMode()) {
+      traceFlowAdapter.auth.logout().catch(console.error);
+    } else {
+      authService.logout();
+    }
     set({
       currentUser: null,
       activeRoleId: null,

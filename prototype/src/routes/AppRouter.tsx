@@ -63,6 +63,7 @@ export const AppRouter: React.FC = () => {
             {/* Rutas Restringidas: Exclusivo Solicitante (PU-01) */}
             <Route element={<RoleGuard allowedRoles={['PU-01']} moduleName="Registro y Subsanación de RFCs" />}>
               <Route path="/rfcs/new" element={<RfcCreateView />} />
+              <Route path="/rfcs/create" element={<Navigate to="/rfcs/new" replace />} />
               <Route path="/rfcs/:rfcId/edit" element={<RfcEditView />} />
               <Route
                 path="/rfcs/:rfcId/uat"

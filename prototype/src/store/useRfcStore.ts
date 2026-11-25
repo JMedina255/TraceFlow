@@ -3,13 +3,16 @@ import type { RFC, CreateRfcDTO, SubsanarRfcDTO, User } from '../types';
 import { INITIAL_RFCS } from '../data/initialRfcs';
 import { storageService } from '../services/storage.service';
 import { rfcService } from '../services/rfc.service';
+import { traceFlowAdapter } from '../services/api/apiAdapter';
 
 interface RfcState {
   rfcs: RFC[];
   getRfcsByProject: (projectId: string) => RFC[];
   getRfcById: (rfcId: string) => RFC | undefined;
   reloadRfcs: () => void;
+  fetchRfcsFromApi: (projectId?: string) => Promise<RFC[]>;
   createRfc: (dto: CreateRfcDTO, user: User) => RFC;
+  createRfcAsync: (dto: CreateRfcDTO, user: User) => Promise<RFC>;
   admitRfc: (rfcId: string, notes: string, user: User) => RFC;
   observeRfc: (rfcId: string, observations: string, user: User) => RFC;
   dismissRfc: (rfcId: string, reason: string, user: User) => RFC;
@@ -37,7 +40,38 @@ export const useRfcStore = create<RfcState>((set, get) => ({
     set({ rfcs: loadRfcs() });
   },
 
+  fetchRfcsFromApi: async (projectId?: string): Promise<RFC[]> => {
+    try {
+      const list = await traceFlowAdapter.rfcs.getRfcs(projectId);
+      set({ rfcs: list });
+      return list;
+    } catch (err) {
+      console.warn('[useRfcStore] Fallo al sincronizar RFCs con traceFlowAdapter:', err);
+      return get().rfcs;
+    }
+  },
+
   createRfc: (dto: CreateRfcDTO, user: User) => {
+    if (traceFlowAdapter.isApiMode()) {
+      traceFlowAdapter.rfcs.createRfc(dto, user).then((newRfc) => {
+        set((state) => ({
+          rfcs: [newRfc, ...state.rfcs.filter((r) => r.id !== newRfc.id)],
+        }));
+      }).catch(console.error);
+    }
+    const newRfc = rfcService.create(dto, user);
+    set((state) => ({ rfcs: [newRfc, ...state.rfcs] }));
+    return newRfc;
+  },
+
+  createRfcAsync: async (dto: CreateRfcDTO, user: User): Promise<RFC> => {
+    if (traceFlowAdapter.isApiMode()) {
+      const newRfc = await traceFlowAdapter.rfcs.createRfc(dto, user);
+      set((state) => ({
+        rfcs: [newRfc, ...state.rfcs.filter((r) => r.id !== newRfc.id)],
+      }));
+      return newRfc;
+    }
     const newRfc = rfcService.create(dto, user);
     set((state) => ({ rfcs: [newRfc, ...state.rfcs] }));
     return newRfc;

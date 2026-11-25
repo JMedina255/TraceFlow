@@ -1,0 +1,116 @@
+{
+  "timestamp": "2026-11-25T18:37:14.785Z",
+  "total": 18,
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "id": "INT-T01",
+      "name": "Login con credenciales válidas",
+      "status": "PASSED",
+      "details": "Autenticación exitosa (USR-001/PU-01), cookie tf_session emitida"
+    },
+    {
+      "id": "INT-T02",
+      "name": "Rechazo de credenciales inválidas",
+      "status": "PASSED",
+      "details": "Rechazo 401: \"Credenciales institucionales incorrectas. Verifique correo y contraseña.\""
+    },
+    {
+      "id": "INT-T03",
+      "name": "Selección de rol autorizado",
+      "status": "PASSED",
+      "details": "Operando bajo PU-02 Analista / Gestor"
+    },
+    {
+      "id": "INT-T04",
+      "name": "Rechazo de rol no asignado",
+      "status": "PASSED",
+      "details": "Bloqueo SoD exitoso: Violación de SoD (RN-01 / RN-04): El rol 'PU-05' no está asignado a la cuenta 'USR-001'."
+    },
+    {
+      "id": "INT-T05",
+      "name": "Navegación de dashboard según rol",
+      "status": "PASSED",
+      "details": "Dashboard contextual renderizado para PU-01"
+    },
+    {
+      "id": "INT-T06",
+      "name": "Consulta de proyectos desde API",
+      "status": "PASSED",
+      "details": "Proyectos recuperados: PRJ-001, PRJ-002, PRJ-003"
+    },
+    {
+      "id": "INT-T07",
+      "name": "Aislamiento multitenant de proyectos",
+      "status": "PASSED",
+      "details": "USR-004 vetoed en PRJ-003"
+    },
+    {
+      "id": "INT-T08",
+      "name": "Selección de ECS perteneciente al proyecto",
+      "status": "PASSED",
+      "details": "4 ECS catalogados para PRJ-001"
+    },
+    {
+      "id": "INT-T09",
+      "name": "Creación de RFC desde formulario React",
+      "status": "PASSED",
+      "details": "RFC creada formalmente: RFC-2026-0020"
+    },
+    {
+      "id": "INT-T10",
+      "name": "Verificación en base de datos remota",
+      "status": "PASSED",
+      "details": "RFC: RFC-2026-0020 (REGISTRADA), Audit Hash: 9a923576abb3b426..."
+    },
+    {
+      "id": "INT-T11",
+      "name": "Consulta de detalle de RFC recién creada",
+      "status": "PASSED",
+      "details": "Bandeja de RFCs consultada con datos reales"
+    },
+    {
+      "id": "INT-T12",
+      "name": "Rechazo de consulta por Ownership (SoD)",
+      "status": "PASSED",
+      "details": "Acceso anónimo/no-autorizado estrictamente bloqueado"
+    },
+    {
+      "id": "INT-T13",
+      "name": "Persistencia tras refresco de navegador",
+      "status": "PASSED",
+      "details": "Sesión conservada tras F5"
+    },
+    {
+      "id": "INT-T14",
+      "name": "Persistencia tras reinicio de NestJS",
+      "status": "PASSED",
+      "details": "20 RFCs persisten íntegramente en PostgreSQL"
+    },
+    {
+      "id": "INT-T15",
+      "name": "Logout e invalidación de sesión",
+      "status": "PASSED",
+      "details": "Sesión cerrada y redirigido a /login"
+    },
+    {
+      "id": "INT-T16",
+      "name": "Redirección de rutas protegidas",
+      "status": "PASSED",
+      "details": "Acceso anónimo a /rfcs redirige a /login"
+    },
+    {
+      "id": "INT-T17",
+      "name": "Desconexión del backend controlada",
+      "status": "PASSED",
+      "details": "Servicio maneja errores HTTP sin fallback silencioso"
+    },
+    {
+      "id": "INT-T18",
+      "name": "Ausencia estricta de mock fallback en modo API",
+      "status": "PASSED",
+      "details": "VITE_SERVICE_MODE=api verificado activamente"
+    }
+  ]
+}

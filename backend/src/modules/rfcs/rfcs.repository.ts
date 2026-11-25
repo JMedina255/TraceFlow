@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import type { RFCStatus, Priority, ChangeClassification } from '../../common/types/index.js';
 
@@ -110,13 +110,14 @@ export class RfcsRepository {
     },
   ];
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   async findAll(): Promise<RfcEntity[]> {
     if (this.db.getDatabaseMode() === 'postgres') {
       const query = `
-        SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
+        SELECT r.*, p.code as project_code, e.code as target_ecs_code, u.code as requester_code, u.full_name as requester_name
         FROM traceflow.change_request r
+        LEFT JOIN traceflow.project p ON r.project_id = p.id
         LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
         LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
         ORDER BY r.created_at DESC;
@@ -130,8 +131,9 @@ export class RfcsRepository {
   async findByIdOrCode(idOrCode: string): Promise<RfcEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
       const query = `
-        SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
+        SELECT r.*, p.code as project_code, e.code as target_ecs_code, u.code as requester_code, u.full_name as requester_name
         FROM traceflow.change_request r
+        LEFT JOIN traceflow.project p ON r.project_id = p.id
         LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
         LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
         WHERE r.id::text = $1 OR r.code = $1
@@ -145,7 +147,13 @@ export class RfcsRepository {
 
   async findEcsByIdOrCode(idOrCode: string): Promise<EcsEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      const query = `SELECT * FROM traceflow.config_item WHERE id::text = $1 OR code = $1 LIMIT 1`;
+      const query = `
+        SELECT c.*, p.code as project_code 
+        FROM traceflow.config_item c
+        JOIN traceflow.project p ON c.project_id = p.id
+        WHERE c.id::text = $1 OR c.code = $1 
+        LIMIT 1
+      `;
       const res = await this.db.query<EcsEntity>(query, [idOrCode]);
       return res.rows.length > 0 ? res.rows[0] : null;
     }
@@ -154,6 +162,25 @@ export class RfcsRepository {
 
   async create(entity: RfcEntity): Promise<RfcEntity> {
     if (this.db.getDatabaseMode() === 'postgres') {
+      let projectId = entity.project_id;
+      let requestedBy = entity.requested_by;
+
+      if (!projectId.includes('-') || projectId.startsWith('PRJ-')) {
+        const pRes = await this.db.query<{ id: string }>(
+          'SELECT id FROM traceflow.project WHERE code = $1 OR id::text = $1 LIMIT 1',
+          [projectId]
+        );
+        if (pRes.rows.length > 0) projectId = pRes.rows[0].id;
+      }
+
+      if (!requestedBy.includes('-') || requestedBy.startsWith('USR-')) {
+        const uRes = await this.db.query<{ id: string }>(
+          'SELECT id FROM traceflow.app_user WHERE code = $1 OR id::text = $1 LIMIT 1',
+          [requestedBy]
+        );
+        if (uRes.rows.length > 0) requestedBy = uRes.rows[0].id;
+      }
+
       const query = `
         INSERT INTO traceflow.change_request 
           (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by, created_at, updated_at)
@@ -163,7 +190,7 @@ export class RfcsRepository {
       const res = await this.db.query<RfcEntity>(query, [
         entity.id,
         entity.code,
-        entity.project_id,
+        projectId,
         entity.target_ecs_id,
         entity.title,
         entity.description,
@@ -171,7 +198,7 @@ export class RfcsRepository {
         entity.priority,
         entity.classification,
         entity.status,
-        entity.requested_by,
+        requestedBy,
         entity.created_at,
         entity.updated_at,
       ]);

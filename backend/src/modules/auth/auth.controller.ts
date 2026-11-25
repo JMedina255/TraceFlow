@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, Res, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Res, UseGuards, HttpCode, HttpStatus, Inject } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dtos/login.dto.js';
@@ -9,7 +9,7 @@ import type { AuthenticatedUser } from '../../common/types/index.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)

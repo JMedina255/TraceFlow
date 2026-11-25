@@ -39,7 +39,11 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       let sslConfig: pg.ConnectionConfig['ssl'] = undefined;
 
       // Configuración TLS segura (H-06: Sin rejectUnauthorized: false no justificado)
-      if (config.databaseUrl.includes('supabase.co') || process.env.DATABASE_SSL === 'true') {
+      if (
+        config.databaseUrl.includes('supabase.co') ||
+        config.databaseUrl.includes('pooler.supabase.com') ||
+        process.env.DATABASE_SSL === 'true'
+      ) {
         sslConfig = {
           rejectUnauthorized: config.databaseSslRejectUnauthorized,
           ca: config.databaseCaCert ? config.databaseCaCert : undefined,

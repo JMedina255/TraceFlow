@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, Logger, Inject } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { verify } from '@node-rs/argon2';
 import { AuthRepository, UserAccountEntity } from './auth.repository.js';
@@ -31,8 +31,8 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly authRepo: AuthRepository,
-    private readonly auditService: AuditService,
+    @Inject(AuthRepository) private readonly authRepo: AuthRepository,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   async login(email: string, plainPassword: string, requestedRoleId?: CanonicalRoleId, ipAddress?: string, userAgent?: string) {

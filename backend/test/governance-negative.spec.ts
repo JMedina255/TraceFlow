@@ -21,7 +21,7 @@ describe('Pruebas Negativas Obligatorias de Gobernanza SCM (RN-02, RN-06, SoD, C
   let auditService: AuditService;
 
   beforeEach(() => {
-    const db = new DatabaseService();
+    const db = new DatabaseService('mock');
     auditService = new AuditService(db);
   });
 

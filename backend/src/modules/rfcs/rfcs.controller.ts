@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query, Body, Req, UseGuards, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, Req, UseGuards, HttpStatus, HttpCode, Inject } from '@nestjs/common';
 import type { Request } from 'express';
 import { RfcsService } from './rfcs.service.js';
 import { CreateRfcDto } from './dtos/create-rfc.dto.js';
@@ -11,7 +11,7 @@ import type { AuthenticatedUser } from '../../common/types/index.js';
 @Controller('rfcs')
 @UseGuards(AuthGuard, RolesGuard)
 export class RfcsController {
-  constructor(private readonly rfcsService: RfcsService) {}
+  constructor(@Inject(RfcsService) private readonly rfcsService: RfcsService) {}
 
   @Get()
   async getRfcs(

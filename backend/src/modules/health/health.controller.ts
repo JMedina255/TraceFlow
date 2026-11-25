@@ -1,9 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 
 @Controller('health')
 export class HealthController {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   @Get()
   async getHealth() {
@@ -22,13 +22,15 @@ export class HealthController {
 
     return {
       status: 'ok',
+      database: isDbConnected ? 'connected' : 'disconnected',
+      mode: this.db.getDatabaseMode(),
       service: 'TraceFlow SCM Backend Core',
       version: '2.0.0-enterprise',
       timestamp: new Date().toISOString(),
-      database: {
+      details: {
         connected: isDbConnected,
         latencyMs: isDbConnected ? latencyMs : null,
-        mode: isDbConnected ? 'PostgreSQL (Supabase)' : 'Local Resilient Adapter',
+        engine: isDbConnected ? 'PostgreSQL (Supabase)' : 'Local Resilient Adapter',
       },
     };
   }

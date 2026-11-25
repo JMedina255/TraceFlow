@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 
 export interface ProjectEntity {
@@ -15,6 +15,7 @@ export interface ProjectEntity {
   librarian_id?: string;
   created_at: string;
   updated_at: string;
+  ecs?: any[];
 }
 
 @Injectable()
@@ -67,7 +68,7 @@ export class ProjectsRepository {
     },
   ];
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   async findAll(): Promise<ProjectEntity[]> {
     if (this.db.getDatabaseMode() === 'postgres') {
@@ -86,5 +87,20 @@ export class ProjectsRepository {
       return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.projects.find((p) => p.id === idOrCode || p.code === idOrCode) || null;
+  }
+
+  async findEcsByProjectId(projectIdOrCode: string): Promise<any[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query(
+        `SELECT c.* 
+         FROM traceflow.config_item c
+         JOIN traceflow.project p ON c.project_id = p.id
+         WHERE c.project_id::text = $1 OR p.code = $1
+         ORDER BY c.code ASC`,
+        [projectIdOrCode]
+      );
+      return res.rows;
+    }
+    return [];
   }
 }

@@ -21,7 +21,7 @@ describe('Backend Multitenant Projects Isolation (ADR-006, RBAC Matrix)', () => 
   let projectsService: ProjectsService;
 
   beforeEach(() => {
-    const db = new DatabaseService();
+    const db = new DatabaseService('mock');
     const repo = new ProjectsRepository(db);
     projectsService = new ProjectsService(repo);
   });

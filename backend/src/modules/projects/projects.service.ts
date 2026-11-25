@@ -1,10 +1,10 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, Inject } from '@nestjs/common';
 import { ProjectsRepository, ProjectEntity } from './projects.repository.js';
 import type { AuthenticatedUser } from '../../common/types/index.js';
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly projectsRepo: ProjectsRepository) {}
+  constructor(@Inject(ProjectsRepository) private readonly projectsRepo: ProjectsRepository) {}
 
   async getProjectsForUser(user: AuthenticatedUser): Promise<ProjectEntity[]> {
     const allProjects = await this.projectsRepo.findAll();
@@ -30,6 +30,10 @@ export class ProjectsService {
       );
     }
 
-    return project;
+    const ecs = await this.projectsRepo.findEcsByProjectId(project.id);
+    return {
+      ...project,
+      ecs,
+    };
   }
 }

@@ -24,7 +24,7 @@ describe('Backend RFCs Management (CU-04, SoD, Ownership & Audit)', () => {
   let auditService: AuditService;
 
   beforeEach(() => {
-    const db = new DatabaseService();
+    const db = new DatabaseService('mock');
     auditService = new AuditService(db);
     const projectsRepo = new ProjectsRepository(db);
     const rfcsRepo = new RfcsRepository(db);

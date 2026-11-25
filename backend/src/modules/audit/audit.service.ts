@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import * as crypto from 'node:crypto';
 
@@ -44,21 +44,46 @@ export class AuditService {
   private lastHash = '0000000000000000000000000000000000000000000000000000000000000000';
   private writeMutex: Promise<void> = Promise.resolve();
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   async logEvent(input: AuditEventInput): Promise<string> {
     if (this.db.getDatabaseMode() === 'postgres') {
+      let projectId = input.projectId || null;
+      if (projectId && (!projectId.includes('-') || projectId.startsWith('PRJ-'))) {
+        const pRes = await this.db.query<{ id: string }>(
+          'SELECT id FROM traceflow.project WHERE code = $1 OR id::text = $1 LIMIT 1',
+          [projectId]
+        );
+        projectId = pRes.rows.length > 0 ? pRes.rows[0].id : null;
+      }
+      let actorUserId = input.actorUserId || null;
+      if (actorUserId && (!actorUserId.includes('-') || actorUserId.startsWith('USR-'))) {
+        const uRes = await this.db.query<{ id: string }>(
+          'SELECT id FROM traceflow.app_user WHERE code = $1 OR id::text = $1 LIMIT 1',
+          [actorUserId]
+        );
+        actorUserId = uRes.rows.length > 0 ? uRes.rows[0].id : null;
+      }
+      let relatedEcnId = input.relatedEcnId || null;
+      if (relatedEcnId && (!relatedEcnId.includes('-') || relatedEcnId.startsWith('ECN-'))) {
+        const eRes = await this.db.query<{ id: string }>(
+          'SELECT id FROM traceflow.change_order WHERE code = $1 OR id::text = $1 LIMIT 1',
+          [relatedEcnId]
+        );
+        relatedEcnId = eRes.rows.length > 0 ? eRes.rows[0].id : null;
+      }
+
       const res = await this.db.query(
         `SELECT traceflow.append_audit_log($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) as id`,
         [
           input.eventCode,
-          input.actorUserId || null,
+          actorUserId,
           input.actorRole,
           input.operation,
           input.entityName,
           input.entityId,
-          input.projectId || null,
-          input.relatedEcnId || null,
+          projectId,
+          relatedEcnId,
           input.resultStatus,
           JSON.stringify(input.payloadDiff || {}),
           input.ipAddress || '127.0.0.1',

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Inject } from '@nestjs/common';
 import { ProjectsService } from './projects.service.js';
 import { AuthGuard } from '../../common/guards/auth.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
@@ -7,7 +7,7 @@ import type { AuthenticatedUser } from '../../common/types/index.js';
 @Controller('projects')
 @UseGuards(AuthGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(@Inject(ProjectsService) private readonly projectsService: ProjectsService) {}
 
   @Get()
   async getProjects(@CurrentUser() user: AuthenticatedUser) {

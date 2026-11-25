@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { RfcsRepository, RfcEntity } from './rfcs.repository.js';
 import { ProjectsRepository } from '../projects/projects.repository.js';
@@ -9,9 +9,9 @@ import type { AuthenticatedUser } from '../../common/types/index.js';
 @Injectable()
 export class RfcsService {
   constructor(
-    private readonly rfcsRepo: RfcsRepository,
-    private readonly projectsRepo: ProjectsRepository,
-    private readonly auditService: AuditService,
+    @Inject(RfcsRepository) private readonly rfcsRepo: RfcsRepository,
+    @Inject(ProjectsRepository) private readonly projectsRepo: ProjectsRepository,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   async getRfcsForUser(user: AuthenticatedUser, projectId?: string): Promise<RfcEntity[]> {
@@ -42,13 +42,19 @@ export class RfcsService {
     }
 
     // Verificación de pertenencia al proyecto
-    if (!user.assignedProjectIds.includes(rfc.project_id)) {
+    const hasProjectAccess =
+      user.assignedProjectIds.includes(rfc.project_id) ||
+      (Boolean((rfc as any).project_code) && user.assignedProjectIds.includes((rfc as any).project_code));
+    if (!hasProjectAccess) {
       throw new ForbiddenException(`Acceso no autorizado al proyecto de la RFC '${rfc.code}'.`);
     }
 
     // Regla de Ownership estricta para PU-01
     if (user.activeRoleId === 'PU-01') {
-      const isOwner = rfc.requested_by === user.id || rfc.requested_by === user.code;
+      const isOwner =
+        rfc.requested_by === user.id ||
+        rfc.requested_by === user.code ||
+        (Boolean((rfc as any).requester_code) && (rfc as any).requester_code === user.code);
       if (!isOwner) {
         throw new ForbiddenException(
           `Acceso denegado (Ownership SoD): El solicitante '${user.code}' solo puede consultar sus propios expedientes.`
@@ -89,7 +95,7 @@ export class RfcsService {
 
     // 4. Blindaje contra contaminación entre proyectos: El ECS debe pertenecer al mismo proyecto
     const ecsProjectMatches =
-      ecs.project_id === project.id || ecs.project_id === project.code;
+      ecs.project_id === project.id || ecs.project_id === project.code || (ecs as any).project_code === project.code;
     if (!ecsProjectMatches) {
       throw new BadRequestException(
         `Violación de Integridad: El ECS '${ecs.code}' pertenece a un proyecto distinto (${ecs.project_id}) al especificado (${project.code}).`

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import type { AuthenticatedUser, CanonicalRoleId } from '../../common/types/index.js';
 
@@ -98,7 +98,7 @@ export class AuthRepository {
 
   private mockSessions: Map<string, SessionRecord> = new Map();
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   async findByEmail(email: string): Promise<UserAccountEntity | null> {
     const normalized = email.trim().toLowerCase();
@@ -122,9 +122,10 @@ export class AuthRepository {
             WHERE ura.user_id = u.id
           ), ARRAY[]::varchar[]) as assigned_role_codes,
           COALESCE((
-            SELECT array_agg(p.code) 
+            SELECT array_agg(DISTINCT pval) 
             FROM traceflow.user_project_assignment upa 
-            JOIN traceflow.project p ON upa.project_id = p.id 
+            JOIN traceflow.project p ON upa.project_id = p.id,
+            LATERAL (VALUES (p.code), (p.id::text)) AS val(pval)
             WHERE upa.user_id = u.id
           ), ARRAY[]::varchar[]) as assigned_project_codes
         FROM traceflow.app_user u
@@ -158,9 +159,10 @@ export class AuthRepository {
             WHERE ura.user_id = u.id
           ), ARRAY[]::varchar[]) as assigned_role_codes,
           COALESCE((
-            SELECT array_agg(p.code) 
+            SELECT array_agg(DISTINCT pval) 
             FROM traceflow.user_project_assignment upa 
-            JOIN traceflow.project p ON upa.project_id = p.id 
+            JOIN traceflow.project p ON upa.project_id = p.id,
+            LATERAL (VALUES (p.code), (p.id::text)) AS val(pval)
             WHERE upa.user_id = u.id
           ), ARRAY[]::varchar[]) as assigned_project_codes
         FROM traceflow.app_user u

@@ -28,7 +28,7 @@ describe('Flujo Vertical Completo E2E (Login -> Proyectos -> Crear RFC -> Consul
   let auditService: AuditService;
 
   beforeEach(() => {
-    const db = new DatabaseService();
+    const db = new DatabaseService('mock');
     auditService = new AuditService(db);
     const authRepo = new AuthRepository(db);
     authService = new AuthService(authRepo, auditService);

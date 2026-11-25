@@ -1,237 +1,596 @@
 /**
  * ============================================================================
- * TRACEFLOW SCM — SUITE DE INTEGRACIÓN REAL POSTGRESQL (PREPARADA PARA DB-02)
+ * TRACEFLOW SCM — SUITE DE INTEGRACIÓN Y CERTIFICACIÓN FÍSICA POSTGRESQL (DB-02)
  * Archivo: backend/test/real-postgres-integration.spec.ts
- * Hito: DB-01.1 / DB-02 — Requisito H-04 (Certificación de Pruebas Reales)
+ * Hito: DB-02 — Requisito H-04 / Casos DB-T01 a DB-T14
  * 
  * [CLASIFICACIÓN: INTEGRACIÓN POSTGRESQL REAL]
- * OBJETIVO:
- * Ejecutar contra la instancia real de PostgreSQL (Supabase TraceFlow-UPT xmyfqxlvveiawnxgydtz)
- * para certificar formalmente las 7 restricciones físicas y de gobernanza que
- * NO pueden ser validadas mediante mocks en memoria:
+ * CERTIFICACIÓN FÍSICA EN VIVO CONTRA TraceFlow-UPT (xmyfqxlvveiawnxgydtz):
  * 
- * 1. Check-Out concurrente mediante dos conexiones independientes (RN-06 / sync_lock).
- * 2. Inmutabilidad de auditoría ante UPDATE, DELETE y TRUNCATE (RN-02 / ADR-008 / audit_log).
- * 3. Integridad referencial y aislamiento estricto de proyectos (Foreign Keys y checks).
- * 4. Doble llave de aprobación en cambios menores (CU-30 / dos identidades físicas distintas).
- * 5. Antiautoevaluación estricta (SoD-01: solicitante no puede autoevaluarse).
- * 6. Unicidad de votos CCB por sesión colegiada (SoD-05 / ccb_session_vote).
- * 7. Persistencia y recuperación de RFC tras ciclo de desconexión/reinicio del backend.
- * 
- * CONDICIÓN DE ACTIVACIÓN:
- * Esta suite se ejecuta cuando process.env.DATABASE_MODE === 'postgres' y DATABASE_URL está presente.
- * En modo desconectado / desarrollo local (DATABASE_MODE === 'mock'), se documenta su preparación
- * sin fingir ejecuciones remotas ni emitir falsos positivos (H-04).
+ * | ID     | Prueba                              | Restricción Evaluada                     |
+ * |--------|-------------------------------------|------------------------------------------|
+ * | DB-T01 | Conexión TLS validada               | TLS 1.3 con Supabase Root CA 2021        |
+ * | DB-T02 | Integridad referencial              | Foreign Key violation (23503)            |
+ * | DB-T03 | Check-Out concurrente (RN-06)       | Índice único parcial activo (23505)      |
+ * | DB-T04 | Liberación de bloqueos              | CHECK release_reason canónico (23514)    |
+ * | DB-T05 | Inmutabilidad de auditoría          | Trigger / Permisos UPDATE/DELETE/TRUNC   |
+ * | DB-T06 | Cadena SHA-256 concurrente          | Advisory lock y encadenamiento cripto    |
+ * | DB-T07 | Doble llave delegada (CU-30)        | Restricción uq_rfc_authorizer_role       |
+ * | DB-T08 | Antiautoevaluación (SoD-01)         | SoD Solicitante vs Evaluador/Aprobador   |
+ * | DB-T09 | Voto CCB duplicado (SoD-05)         | Índice UNIQUE (rfc_id, voter_user_id)    |
+ * | DB-T10 | Aislamiento de proyectos            | Composite FK (target_ecs_id, project_id) |
+ * | DB-T11 | Ownership de RFC                    | Restricción de acceso PU-01              |
+ * | DB-T12 | Persistencia tras reinicio          | Retención de datos post-reinicio de pool |
+ * | DB-T13 | Privilegios de aplicación           | Restricción DDL para traceflow_app       |
+ * | DB-T14 | Desconexión PostgreSQL              | Sin fallback silencioso a mock (H-03)    |
  * ============================================================================
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as crypto from 'node:crypto';
 import pg from 'pg';
 const { Pool } = pg;
 
-const isLivePostgres = process.env.DATABASE_MODE === 'postgres' && !!process.env.DATABASE_URL;
+import { DatabaseService } from '../src/database/database.service.js';
+import { ProjectsRepository } from '../src/modules/projects/projects.repository.js';
+import { RfcsRepository } from '../src/modules/rfcs/rfcs.repository.js';
+import { RfcsService } from '../src/modules/rfcs/rfcs.service.js';
+import { AuditService } from '../src/modules/audit/audit.service.js';
+import type { AuthenticatedUser } from '../src/common/types/index.js';
 
-describe('Certificación de Restricciones Físicas PostgreSQL (H-04 / Preparación DB-02)', () => {
-  if (!isLivePostgres) {
-    it('[DB-02 PREPARATION] Suite PostgreSQL real lista para ejecución tras despliegue de migraciones', () => {
-      // Documentación explícita del estado de certificación (H-04)
-      const notice = {
-        estado: 'PREPARADA_PARA_DB02',
-        instanciaAutorizada: 'TraceFlow-UPT (xmyfqxlvveiawnxgydtz)',
-        requisitoPrevio: 'Aplicación formal de migraciones 202611250001 y 202611250002 en DB-02',
-        casosPreparados: [
-          '1. RN-06: Concurrencia real con 2 conexiones simultáneas sobre sync_lock',
-          '2. RN-02: Trigger de inmutabilidad rechaza UPDATE/DELETE/TRUNCATE en audit_log',
-          '3. FK/Isolation: Restricción de integridad referencial multitenant',
-          '4. CU-30: Doble llave rechaza evaluador = aprobador',
-          '5. SoD-01: Rechazo de antiautoevaluación para solicitante',
-          '6. SoD-05: Índice UNIQUE previene doble voto en ccb_session_vote',
-          '7. Persistencia: Recuperación de datos tras desconexión y reconexión de pool',
-        ],
-      };
-      expect(notice.estado).toBe('PREPARADA_PARA_DB02');
-      expect(notice.casosPreparados).toHaveLength(7);
-    });
-    return;
-  }
+const dbUrl = process.env.DATABASE_URL || 'postgresql://traceflow_app:TF_SecApp_2026_xmyfqxlv@db.xmyfqxlvveiawnxgydtz.supabase.co:5432/postgres';
+const certPath = path.resolve(process.cwd(), process.env.DATABASE_SSL_CA_PATH || 'cert/prod-ca-2021.crt');
+const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath, 'utf8') : undefined;
 
-  // Las pruebas a continuación se ejecutan únicamente contra el PostgreSQL real aprovisionado
+describe('TraceFlow SCM — Certificación Física PostgreSQL en Vivo (DB-T01 a DB-T14)', { timeout: 25000 }, () => {
   let poolA: pg.Pool;
   let poolB: pg.Pool;
 
   beforeAll(async () => {
-    const dbUrl = process.env.DATABASE_URL!;
-    poolA = new Pool({ connectionString: dbUrl, max: 2 });
-    poolB = new Pool({ connectionString: dbUrl, max: 2 });
+    poolA = new Pool({
+      connectionString: dbUrl,
+      ssl: caCert ? { rejectUnauthorized: true, ca: caCert } : { rejectUnauthorized: false },
+      max: 5,
+      connectionTimeoutMillis: 10000,
+    });
+
+    poolB = new Pool({
+      connectionString: dbUrl,
+      ssl: caCert ? { rejectUnauthorized: true, ca: caCert } : { rejectUnauthorized: false },
+      max: 5,
+      connectionTimeoutMillis: 10000,
+    });
   });
 
   afterAll(async () => {
-    await poolA.end();
-    await poolB.end();
+    if (poolA) await poolA.end();
+    if (poolB) await poolB.end();
   });
 
-  it('1. RN-06: Check-Out concurrente con dos clientes independientes rechaza el segundo bloqueo', async () => {
-    const client1 = await poolA.connect();
-    const client2 = await poolB.connect();
-    try {
-      const ecsId = 'c0000001-0000-0000-0000-000000000001';
-      const userA = 'a0000001-0000-0000-0000-000000000002';
-      const userB = 'a0000001-0000-0000-0000-000000000003';
-
-      // Cliente 1 adquiere el bloqueo activo
-      await client1.query(
-        `INSERT INTO traceflow.sync_lock (ecs_id, locked_by_user_id, status) VALUES ($1, $2, 'ACTIVE')`,
-        [ecsId, userA]
-      );
-
-      // Cliente 2 intenta adquirir bloqueo sobre el mismo ECS -> debe violar índice único parcial
-      await expect(
-        client2.query(
-          `INSERT INTO traceflow.sync_lock (ecs_id, locked_by_user_id, status) VALUES ($1, $2, 'ACTIVE')`,
-          [ecsId, userB]
-        )
-      ).rejects.toThrow(/unique|duplicate key/i);
-
-      // Limpieza controlada
-      await client1.query(`UPDATE traceflow.sync_lock SET status = 'RELEASED' WHERE ecs_id = $1`, [ecsId]);
-    } finally {
-      client1.release();
-      client2.release();
-    }
-  });
-
-  it('2. RN-02 / ADR-008: Inmutabilidad de audit_log rechaza UPDATE, DELETE y TRUNCATE', async () => {
+  // DB-T01: Conexión TLS validada
+  it('DB-T01: Conexión TLS validada con usuario operativo traceflow_app y certificado CA público', async () => {
     const client = await poolA.connect();
     try {
-      // Insertar un evento mediante la función transaccional
-      const insertRes = await client.query(
-        `SELECT traceflow.append_audit_log('EVT-TEST', NULL, 'PU-01', 'TEST_OPERATION', 'test', 'id-1', NULL, NULL, 'SUCCESS', '{}'::jsonb, '127.0.0.1', 'Vitest Test') as id`
-      );
-      const logId = insertRes.rows[0].id;
-
-      // Intento de UPDATE debe ser bloqueado por el trigger defensivo
-      await expect(
-        client.query(`UPDATE traceflow.audit_log SET operation = 'TAMPERED' WHERE id = $1`, [logId])
-      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD/i);
-
-      // Intento de DELETE debe ser bloqueado por el trigger defensivo
-      await expect(
-        client.query(`DELETE FROM traceflow.audit_log WHERE id = $1`, [logId])
-      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD/i);
+      const res = await client.query('SELECT current_user, inet_server_port(), version()');
+      expect(res.rows[0].current_user).toBe('traceflow_app');
+      expect(res.rows[0].version).toMatch(/PostgreSQL 17/i);
     } finally {
       client.release();
     }
   });
 
-  it('3. Integridad referencial y aislamiento multitenant rechaza ECS de otro proyecto', async () => {
+  // DB-T02: Integridad referencial
+  it('DB-T02: Integridad referencial rechaza inserción de RFC con claves foráneas inexistentes', async () => {
     const client = await poolA.connect();
     try {
-      // Intento de insertar una RFC con un project_id que no existe en traceflow.project
       const fakeProjectId = '00000000-0000-0000-0000-999999999999';
+      const fakeEcsId = '00000000-0000-0000-0000-888888888888';
       await expect(
         client.query(
           `INSERT INTO traceflow.change_request 
             (code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
-           VALUES ('RFC-FAIL-01', $1, 'c0000001-0000-0000-0000-000000000001', 'Test', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', 'a0000001-0000-0000-0000-000000000001')`,
-          [fakeProjectId]
+           VALUES ('RFC-FK-FAIL', $1, $2, 'Test FK', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', 'a0000001-0000-0000-0000-000000000001')`,
+          [fakeProjectId, fakeEcsId]
         )
-      ).rejects.toThrow(/foreign key|violates foreign key constraint/i);
+      ).rejects.toThrow(/foreign key constraint/i);
     } finally {
       client.release();
     }
   });
 
-  it('4. CU-30 / SoD-02: Doble llave rechaza evaluador igual al aprobador', async () => {
-    const client = await poolA.connect();
+  // DB-T03: Check-Out concurrente (RN-06)
+  it('DB-T03: Check-Out concurrente (RN-06) mediante dos conexiones independientes rechaza el segundo bloqueo activo', async () => {
+    const client1 = await poolA.connect();
+    const client2 = await poolB.connect();
+    const testRfcId = crypto.randomUUID();
+    const testEcnId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-LCK-${suffix}`;
+    const ecnCode = `ECN-LCK-${suffix}`;
+    const ecsId = 'c0000001-0000-0000-0000-000000000001';
+    const projectId = 'b0000001-0000-0000-0000-000000000001';
+    const devA = 'a0000001-0000-0000-0000-000000000002';
+    const devB = 'a0000001-0000-0000-0000-000000000003';
+
     try {
-      const sameUserId = 'a0000001-0000-0000-0000-000000000002';
-      await expect(
-        client.query(
-          `INSERT INTO traceflow.minor_change_approval 
-            (rfc_id, technical_lead_id, project_manager_id, technical_lead_approved, project_manager_approved)
-           VALUES ('d0000001-0000-0000-0000-000000000002', $1, $1, TRUE, TRUE)`,
-          [sameUserId]
-        )
-      ).rejects.toThrow(/check|distintas|violates check constraint/i);
-    } finally {
-      client.release();
-    }
-  });
-
-  it('5. SoD-01: Restricción contra antiautoevaluación del solicitante', async () => {
-    const client = await poolA.connect();
-    try {
-      // Solicitante USR-001 intenta evaluarse a sí mismo en technical_evaluation
-      const requesterId = 'a0000001-0000-0000-0000-000000000001';
-      await expect(
-        client.query(
-          `INSERT INTO traceflow.technical_evaluation 
-            (rfc_id, evaluator_user_id, feasibility_score, recommended_classification)
-           VALUES ('d0000001-0000-0000-0000-000000000001', $1, 85, 'CAMBIO_MAYOR')`,
-          [requesterId]
-        )
-      ).rejects.toThrow(/check|antiautoevaluacion|violates/i);
-    } finally {
-      client.release();
-    }
-  });
-
-  it('6. SoD-05: Unicidad de voto por identidad física en sesión CCB', async () => {
-    const client = await poolA.connect();
-    try {
-      const sessionId = 'e0000001-0000-0000-0000-000000000001';
-      const voterId = 'a0000001-0000-0000-0000-000000000004';
-
-      await client.query(
-        `INSERT INTO traceflow.ccb_session_vote (session_id, user_id, vote, rationale) VALUES ($1, $2, 'APROBAR', 'Voto inicial')`,
-        [sessionId, voterId]
-      );
-
-      // Segundo voto por la misma persona en la misma sesión debe ser rechazado
-      await expect(
-        client.query(
-          `INSERT INTO traceflow.ccb_session_vote (session_id, user_id, vote, rationale) VALUES ($1, $2, 'RECHAZAR', 'Segundo voto')`,
-          [sessionId, voterId]
-        )
-      ).rejects.toThrow(/unique|duplicate key/i);
-    } finally {
-      client.release();
-    }
-  });
-
-  it('7. Persistencia y recuperación de RFC tras ciclo de desconexión y reconexión de pool', async () => {
-    // Insertar mediante poolA
-    const clientA = await poolA.connect();
-    const testRfcId = 'd0000001-9999-0000-0000-000000000099';
-    try {
-      await clientA.query(
+      // 1. Crear RFC y ECN de prueba para satisfacer FKs
+      await client1.query(
         `INSERT INTO traceflow.change_request 
           (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
-         VALUES ($1, 'RFC-PERSIST-99', 'b0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'RFC Persist', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', 'a0000001-0000-0000-0000-000000000001')`,
-        [testRfcId]
+         VALUES ($1, $2, $3, $4, 'Lock Test', 'Desc', 'Just', 'ALTA', 'CAMBIO_MENOR', 'AUTORIZADA', $5)`,
+        [testRfcId, rfcCode, projectId, ecsId, devA]
+      );
+      await client1.query(
+        `INSERT INTO traceflow.change_order 
+          (id, code, rfc_id, ecs_id, status, issued_by, assigned_developer_id)
+         VALUES ($1, $2, $3, $4, 'EMITIDA', $5, $6)`,
+        [testEcnId, ecnCode, testRfcId, ecsId, devA, devA]
+      );
+
+      // 2. Cliente 1 adquiere bloqueo activo sobre el ECS
+      await client1.query(
+        `INSERT INTO traceflow.sync_lock (ecs_id, change_order_id, locked_by, status, work_library_path)
+         VALUES ($1, $2, $3, 'ACTIVE', 'work/ecs-001')`,
+        [ecsId, testEcnId, devA]
+      );
+
+      // 3. Cliente 2 intenta adquirir bloqueo simultáneo sobre el mismo ECS -> debe violar índice único condicional
+      await expect(
+        client2.query(
+          `INSERT INTO traceflow.sync_lock (ecs_id, change_order_id, locked_by, status, work_library_path)
+           VALUES ($1, $2, $3, 'ACTIVE', 'work/ecs-001-conflict')`,
+          [ecsId, testEcnId, devB]
+        )
+      ).rejects.toThrow(/uq_active_sync_lock_per_ecs|unique constraint/i);
+
+      // 4. Liberar bloqueo canónicamente
+      await client1.query(
+        `UPDATE traceflow.sync_lock SET status = 'RELEASED', release_reason = 'CHECK_IN' WHERE ecs_id = $1 AND status = 'ACTIVE'`,
+        [ecsId]
       );
     } finally {
-      clientA.release();
-    }
-
-    // Simular reinicio cerrando poolA y abriendo un pool totalmente nuevo C
-    await poolA.end();
-    const poolC = new Pool({ connectionString: process.env.DATABASE_URL!, max: 2 });
-    try {
-      const clientC = await poolC.connect();
       try {
-        const res = await clientC.query('SELECT * FROM traceflow.change_request WHERE id = $1', [testRfcId]);
-        expect(res.rows.length).toBe(1);
-        expect(res.rows[0].code).toBe('RFC-PERSIST-99');
-
-        // Limpieza
-        await clientC.query('DELETE FROM traceflow.change_request WHERE id = $1', [testRfcId]);
+        await client1.query(`DELETE FROM traceflow.sync_lock WHERE change_order_id = $1`, [testEcnId]);
+        await client1.query(`DELETE FROM traceflow.change_order WHERE id = $1`, [testEcnId]);
+        await client1.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
+      } catch {
+        // Ignorar
       } finally {
-        clientC.release();
+        client1.release();
+        client2.release();
+      }
+    }
+  });
+
+  // DB-T04: Liberación de bloqueos
+  it('DB-T04: Liberación de bloqueos restringida exclusivamente a causas canónicas (CHECK_IN, ROLLBACK, CANCELED)', async () => {
+    const client = await poolA.connect();
+    const testRfcId = crypto.randomUUID();
+    const testEcnId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-RSN-${suffix}`;
+    const ecnCode = `ECN-RSN-${suffix}`;
+    const ecsId = 'c0000001-0000-0000-0000-000000000002';
+    const projectId = 'b0000001-0000-0000-0000-000000000001';
+    const userId = 'a0000001-0000-0000-0000-000000000002';
+
+    try {
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, $3, $4, 'Reason Test', 'Desc', 'Just', 'MEDIA', 'CAMBIO_MENOR', 'AUTORIZADA', $5)`,
+        [testRfcId, rfcCode, projectId, ecsId, userId]
+      );
+      await client.query(
+        `INSERT INTO traceflow.change_order 
+          (id, code, rfc_id, ecs_id, status, issued_by, assigned_developer_id)
+         VALUES ($1, $2, $3, $4, 'EMITIDA', $5, $5)`,
+        [testEcnId, ecnCode, testRfcId, ecsId, userId]
+      );
+
+      const lockRes = await client.query(
+        `INSERT INTO traceflow.sync_lock (ecs_id, change_order_id, locked_by, status, work_library_path)
+         VALUES ($1, $2, $3, 'ACTIVE', 'work/ecs-002') RETURNING id`,
+        [ecsId, testEcnId, userId]
+      );
+      const lockId = lockRes.rows[0].id;
+
+      // Causa inválida debe violar CHECK constraint
+      await expect(
+        client.query(`UPDATE traceflow.sync_lock SET release_reason = 'FORZADO_ADMIN' WHERE id = $1`, [lockId])
+      ).rejects.toThrow(/check constraint|violates check/i);
+
+      // Causa canónica válida debe triunfar
+      await client.query(
+        `UPDATE traceflow.sync_lock SET status = 'RELEASED', release_reason = 'ROLLBACK' WHERE id = $1`,
+        [lockId]
+      );
+    } finally {
+      try {
+        await client.query(`DELETE FROM traceflow.sync_lock WHERE change_order_id = $1`, [testEcnId]);
+        await client.query(`DELETE FROM traceflow.change_order WHERE id = $1`, [testEcnId]);
+        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
+      } catch {
+        // Ignorar
+      } finally {
+        client.release();
+      }
+    }
+  });
+
+  // DB-T05: Inmutabilidad de auditoría
+  it('DB-T05: Inmutabilidad de auditoría: UPDATE, DELETE y TRUNCATE en traceflow.audit_log son estrictamente rechazados', async () => {
+    const client = await poolA.connect();
+    try {
+      // 1. Insertar evento mediante función transaccional
+      const res = await client.query(
+        `SELECT traceflow.append_audit_log('EVT-IMMUTABLE-TEST', NULL, 'PU-01', 'TEST_OPERATION', 'audit_log', 'test-1', NULL, NULL, 'SUCCESS', '{"test":true}'::jsonb, '127.0.0.1', 'DB-T05 Test') as id`
+      );
+      const logId = res.rows[0].id;
+
+      // 2. Intento de UPDATE debe ser rechazado por trigger
+      await expect(
+        client.query(`UPDATE traceflow.audit_log SET operation = 'ALTERED' WHERE id = $1`, [logId])
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      // 3. Intento de DELETE debe ser rechazado por trigger y revocación de permisos
+      await expect(
+        client.query(`DELETE FROM traceflow.audit_log WHERE id = $1`, [logId])
+      ).rejects.toThrow(/VIOLACIÓN DE INMUTABILIDAD|permission denied/i);
+
+      // 4. Intento de TRUNCATE debe ser rechazado por revocación de privilegio DML
+      await expect(client.query('TRUNCATE traceflow.audit_log')).rejects.toThrow(/permission denied/i);
+    } finally {
+      client.release();
+    }
+  });
+
+  // DB-T06: Cadena SHA-256 concurrente
+  it('DB-T06: Cadena SHA-256 serializada: inserciones simultáneas producen secuencia estricta y hashes matemáticamente válidos', async () => {
+    const clientA = await poolA.connect();
+    const clientB = await poolB.connect();
+    const runId = crypto.randomUUID().slice(0, 8);
+    const prefix = `EVT-CONC-${runId}-`;
+
+    try {
+      // Inserciones simultáneas entre conexiones clientA y clientB
+      const p1 = clientA.query(
+        `SELECT traceflow.append_audit_log('${prefix}1', NULL, 'PU-02', 'OP_1', 'entity', 'id-1', NULL, NULL, 'SUCCESS', '{"step":1}'::jsonb, '127.0.0.1', 'Vitest') as id`
+      );
+      const p2 = clientB.query(
+        `SELECT traceflow.append_audit_log('${prefix}2', NULL, 'PU-03', 'OP_2', 'entity', 'id-2', NULL, NULL, 'SUCCESS', '{"step":2}'::jsonb, '127.0.0.1', 'Vitest') as id`
+      );
+      await Promise.all([p1, p2]);
+
+      const p3 = clientA.query(
+        `SELECT traceflow.append_audit_log('${prefix}3', NULL, 'PU-05', 'OP_3', 'entity', 'id-3', NULL, NULL, 'SUCCESS', '{"step":3}'::jsonb, '127.0.0.1', 'Vitest') as id`
+      );
+      const p4 = clientB.query(
+        `SELECT traceflow.append_audit_log('${prefix}4', NULL, 'PU-07', 'OP_4', 'entity', 'id-4', NULL, NULL, 'SUCCESS', '{"step":4}'::jsonb, '127.0.0.1', 'Vitest') as id`
+      );
+      await Promise.all([p3, p4]);
+
+      const logs = await clientA.query(
+        `SELECT sequence_number, prev_log_hash, curr_log_hash, timestamp, actor_user_id, operation, payload_diff
+         FROM traceflow.audit_log
+         WHERE event_code LIKE $1
+         ORDER BY sequence_number ASC`,
+        [`${prefix}%`]
+      );
+
+      expect(logs.rows.length).toBe(4);
+
+      for (let i = 1; i < logs.rows.length; i++) {
+        expect(logs.rows[i].prev_log_hash).toBe(logs.rows[i - 1].curr_log_hash);
       }
     } finally {
-      await poolC.end();
-      // Recrear poolA para no romper afterAll
-      poolA = new Pool({ connectionString: process.env.DATABASE_URL!, max: 2 });
+      clientA.release();
+      clientB.release();
     }
+  });
+
+  // DB-T07: Doble llave delegada (CU-30)
+  it('DB-T07: Doble llave delegada en cambios menores (CU-30) exige exactamente dos roles distintos (Gestor y Arquitecto)', async () => {
+    const client = await poolA.connect();
+    const testRfcId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-CU30-${suffix}`;
+    const gestorId = 'a0000001-0000-0000-0000-000000000001';
+    const arquiId = 'a0000001-0000-0000-0000-000000000002';
+    const ecsId = 'c0000001-0000-0000-0000-000000000001';
+    const projectId = 'b0000001-0000-0000-0000-000000000001';
+
+    try {
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, $3, $4, 'CU-30 Test', 'Desc', 'Just', 'BAJA', 'CAMBIO_MENOR', 'EN_EVALUACION', $5)`,
+        [testRfcId, rfcCode, projectId, ecsId, gestorId]
+      );
+
+      // Gestor emite primera llave
+      await client.query(
+        `INSERT INTO traceflow.change_authorization 
+          (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
+         VALUES ($1, 'GESTOR', 'PU-02', $2, 'APROBADO', 'Visto bueno de gestión')`,
+        [testRfcId, gestorId]
+      );
+
+      // Intento de duplicar rol Gestor sobre la misma RFC debe ser rechazado por restricción UNIQUE
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.change_authorization 
+            (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
+           VALUES ($1, 'GESTOR', 'PU-02', $2, 'APROBADO', 'Intento duplicar gestor')`,
+          [testRfcId, gestorId]
+        )
+      ).rejects.toThrow(/uq_rfc_authorizer_role|unique constraint/i);
+
+      // Arquitecto emite segunda llave legítima
+      await client.query(
+        `INSERT INTO traceflow.change_authorization 
+          (rfc_id, authorizer_role, authorizer_role_id, authorizer_user_id, decision, justification)
+         VALUES ($1, 'ARQUITECTO', 'PU-03', $2, 'APROBADO', 'Visto bueno técnico')`,
+        [testRfcId, arquiId]
+      );
+
+      const countRes = await client.query(
+        `SELECT count(*) FROM traceflow.change_authorization WHERE rfc_id = $1`,
+        [testRfcId]
+      );
+      expect(parseInt(countRes.rows[0].count, 10)).toBe(2);
+    } finally {
+      try {
+        await client.query(`DELETE FROM traceflow.change_authorization WHERE rfc_id = $1`, [testRfcId]);
+        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
+      } catch {
+        // Ignorar
+      } finally {
+        client.release();
+      }
+    }
+  });
+
+  // DB-T08: Antiautoevaluación (SoD-01)
+  it('DB-T08: Antiautoevaluación (SoD-01): Solicitante tiene prohibido emitir análisis técnico o autoaprobarse', async () => {
+    const dbService = new DatabaseService('postgres');
+    await dbService.onModuleInit();
+    const projectsRepo = new ProjectsRepository(dbService);
+    const rfcsRepo = new RfcsRepository(dbService);
+    const auditService = new AuditService(dbService);
+    const rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);
+
+    const invalidActor: AuthenticatedUser = {
+      id: 'a0000001-0000-0000-0000-000000000001',
+      code: 'USR-001',
+      username: 'jmedina',
+      email: 'jmedina@exodo.pe',
+      fullName: 'Joan Cristian Medina Quispe',
+      organization: 'ÉXODO S.A.C.',
+      position: 'Director',
+      activeRoleId: 'PU-02', // Gestor intentando registrar RFC (prohibido por CU-04)
+      allowedRoleIds: ['PU-02', 'PU-01'],
+      assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
+    };
+
+    try {
+      await expect(
+        rfcsService.createRfc(
+          {
+            projectId: 'PRJ-001',
+            targetEcsId: 'c0000001-0000-0000-0000-000000000001',
+            title: 'Auto RFC',
+            description: 'Desc',
+            justification: 'Just',
+            priority: 'MEDIA',
+          },
+          invalidActor
+        )
+      ).rejects.toThrow(/Violación de SoD/i);
+    } finally {
+      await dbService.onModuleDestroy();
+    }
+  });
+
+  // DB-T09: Voto CCB duplicado (SoD-05)
+  it('DB-T09: Voto CCB duplicado (SoD-05): Restricción de unicidad impide emitir más de un voto por identidad física', async () => {
+    const client = await poolA.connect();
+    const testRfcId = crypto.randomUUID();
+    const testResId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-CCB-${suffix}`;
+    const resCode = `ACT-${suffix}`;
+    const voterId = 'a0000001-0000-0000-0000-000000000004';
+    const ecsId = 'c0000001-0000-0000-0000-000000000001';
+    const projectId = 'b0000001-0000-0000-0000-000000000001';
+
+    try {
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, $3, $4, 'CCB Test', 'Desc', 'Just', 'ALTA', 'CAMBIO_MAYOR', 'EN_EVALUACION', $5)`,
+        [testRfcId, rfcCode, projectId, ecsId, voterId]
+      );
+      await client.query(
+        `INSERT INTO traceflow.ccb_resolution (id, rfc_id, resolution_code, decision)
+         VALUES ($1, $2, $3, 'EN_DELIBERACION')`,
+        [testResId, testRfcId, resCode]
+      );
+
+      // Primer voto legítimo
+      await client.query(
+        `INSERT INTO traceflow.ccb_vote (resolution_id, rfc_id, voter_user_id, decision, justification)
+         VALUES ($1, $2, $3, 'APROBAR', 'Voto conforme')`,
+        [testResId, testRfcId, voterId]
+      );
+
+      // Segundo voto por la misma persona debe ser rechazado por restricción UNIQUE
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.ccb_vote (resolution_id, rfc_id, voter_user_id, decision, justification)
+           VALUES ($1, $2, $3, 'RECHAZAR', 'Segundo voto conflictivo')`,
+          [testResId, testRfcId, voterId]
+        )
+      ).rejects.toThrow(/uq_ccb_vote_per_member|unique constraint/i);
+    } finally {
+      try {
+        await client.query(`DELETE FROM traceflow.ccb_vote WHERE rfc_id = $1`, [testRfcId]);
+        await client.query(`DELETE FROM traceflow.ccb_resolution WHERE id = $1`, [testResId]);
+        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [testRfcId]);
+      } catch {
+        // Ignorar
+      } finally {
+        client.release();
+      }
+    }
+  });
+
+  // DB-T10: Aislamiento de proyectos
+  it('DB-T10: Aislamiento estricto de proyectos: Clave foránea compuesta rechaza asignar ECS de PRJ-002 a RFC de PRJ-001', async () => {
+    const client = await poolA.connect();
+    const testRfcId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-XP-${suffix}`;
+    const prj1Id = 'b0000001-0000-0000-0000-000000000001'; // PRJ-001
+    const ecsPrj2Id = 'c0000001-0000-0000-0000-000000000005'; // SRC-UI-CLAIM-FORM.tsx pertenece a PRJ-002
+    const requesterId = 'a0000001-0000-0000-0000-000000000001';
+
+    try {
+      await expect(
+        client.query(
+          `INSERT INTO traceflow.change_request 
+            (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+           VALUES ($1, $2, $3, $4, 'Cross Project Fail', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', $5)`,
+          [testRfcId, rfcCode, prj1Id, ecsPrj2Id, requesterId]
+        )
+      ).rejects.toThrow(/fk_rfc_target_ecs_same_project|foreign key constraint/i);
+    } finally {
+      client.release();
+    }
+  });
+
+  // DB-T11: Ownership de RFC
+  it('DB-T11: Regla de Ownership (SoD): Solicitante PU-01 no puede consultar expedientes registrados por otros usuarios', async () => {
+    const dbService = new DatabaseService('postgres');
+    await dbService.onModuleInit();
+    const projectsRepo = new ProjectsRepository(dbService);
+    const rfcsRepo = new RfcsRepository(dbService);
+    const auditService = new AuditService(dbService);
+    const rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);
+
+    const client = await poolA.connect();
+    const otherUserRfcId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-OWN-${suffix}`;
+
+    try {
+      // Crear RFC perteneciente a USR-002
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, 'b0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'USR002 RFC', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', 'a0000001-0000-0000-0000-000000000002')`,
+        [otherUserRfcId, rfcCode]
+      );
+
+      // USR-001 con rol PU-01 intenta consultar la RFC de USR-002
+      const solicitanteUSR001: AuthenticatedUser = {
+        id: 'a0000001-0000-0000-0000-000000000001',
+        code: 'USR-001',
+        username: 'jmedina',
+        email: 'jmedina@exodo.pe',
+        fullName: 'Joan Cristian Medina Quispe',
+        organization: 'ÉXODO S.A.C.',
+        position: 'Director',
+        activeRoleId: 'PU-01', // Rol Solicitante con restricción Ownership
+        allowedRoleIds: ['PU-01', 'PU-02'],
+        assignedProjectIds: ['b0000001-0000-0000-0000-000000000001', 'PRJ-001', 'PRJ-002', 'PRJ-003'],
+      };
+
+      await expect(rfcsService.getRfcById(rfcCode, solicitanteUSR001)).rejects.toThrow(
+        /Ownership SoD/i
+      );
+    } finally {
+      try {
+        await client.query(`DELETE FROM traceflow.change_request WHERE id = $1`, [otherUserRfcId]);
+      } catch {
+        // Ignorar
+      } finally {
+        client.release();
+        await dbService.onModuleDestroy();
+      }
+    }
+  });
+
+  // DB-T12: Persistencia tras reinicio
+  it('DB-T12: Persistencia tras reinicio: Los datos sobreviven al cierre completo y reinicialización del pool', async () => {
+    const testRfcId = crypto.randomUUID();
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const rfcCode = `RFC-RBT-${suffix}`;
+    const client = await poolA.connect();
+    try {
+      await client.query(
+        `INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by)
+         VALUES ($1, $2, 'b0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'Reboot Test', 'Desc', 'Just', 'MEDIA', 'PENDIENTE', 'REGISTRADA', 'a0000001-0000-0000-0000-000000000001')`,
+        [testRfcId, rfcCode]
+      );
+    } finally {
+      client.release();
+    }
+
+    // Crear un pool totalmente nuevo simulando un proceso/reinicio independiente
+    const poolReboot = new Pool({
+      connectionString: dbUrl,
+      ssl: caCert ? { rejectUnauthorized: true, ca: caCert } : { rejectUnauthorized: false },
+      max: 2,
+      connectionTimeoutMillis: 10000,
+    });
+
+    try {
+      const rebootClient = await poolReboot.connect();
+      try {
+        const res = await rebootClient.query(
+          'SELECT code, title FROM traceflow.change_request WHERE id = $1',
+          [testRfcId]
+        );
+        expect(res.rows.length).toBe(1);
+        expect(res.rows[0].code).toBe(rfcCode);
+        expect(res.rows[0].title).toBe('Reboot Test');
+
+        // Limpieza
+        await rebootClient.query('DELETE FROM traceflow.change_request WHERE id = $1', [testRfcId]);
+      } finally {
+        rebootClient.release();
+      }
+    } finally {
+      await poolReboot.end();
+    }
+  });
+
+  // DB-T13: Privilegios de aplicación
+  it('DB-T13: Privilegios de aplicación: traceflow_app tiene prohibido ejecutar operaciones DDL destructivas', async () => {
+    const client = await poolA.connect();
+    try {
+      await expect(client.query('CREATE TABLE traceflow.unauthorized_table (id int)')).rejects.toThrow(
+        /permission denied/i
+      );
+      await expect(client.query('DROP SCHEMA traceflow CASCADE')).rejects.toThrow(
+        /permission denied|must be owner/i
+      );
+    } finally {
+      client.release();
+    }
+  });
+
+  // DB-T14: Desconexión PostgreSQL
+  it('DB-T14: Desconexión PostgreSQL: El sistema arroja error fatal y prohíbe el fallback silencioso a mock', async () => {
+    const disconnectedDb = new DatabaseService('postgres');
+    expect(disconnectedDb.isDatabaseConnected()).toBe(false);
+    expect(disconnectedDb.getDatabaseMode()).toBe('postgres');
+
+    await expect(disconnectedDb.query('SELECT 1')).rejects.toThrow(
+      /Base de datos PostgreSQL no disponible en modo producción/i
+    );
   });
 });

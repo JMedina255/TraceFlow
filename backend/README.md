@@ -55,15 +55,50 @@ backend/src/
 
 ---
 
-## 4. Comandos de Operación y Pruebas
+## 4. Configuración de Conexión Segura (PostgreSQL / Supabase)
+
+El backend soporta dos modos de operación gobernados por `DATABASE_MODE`:
+
+1. **Modo `postgres` (Producción / Integración Real):**
+   - Requiere conexión cifrada TLS con validación estricta del certificado CA público de Supabase (`backend/cert/prod-ca-2021.crt`).
+   - Prohibido terminantemente el uso de `rejectUnauthorized: false` (vulnerabilidad MITM).
+   - Variables requeridas en `backend/.env`:
+     ```dotenv
+     NODE_ENV=development
+     PORT=3000
+     DATABASE_MODE=postgres
+     DATABASE_URL=postgresql://traceflow_app:<PASSWORD>@db.xmyfqxlvveiawnxgydtz.supabase.co:5432/postgres
+     DATABASE_SSL=true
+     DATABASE_SSL_CA_PATH=./cert/prod-ca-2021.crt
+     CORS_ORIGIN=http://localhost:5173
+     SESSION_COOKIE_SECURE=false
+     SESSION_COOKIE_SAMESITE=lax
+     ```
+
+2. **Modo `mock` (Pruebas Unitarias Desconectadas):**
+   - Utilizado exclusivamente para pruebas unitarias de contratos en memoria.
+   - En modo `postgres`, cualquier fallo de conexión arroja una excepción fatal inmediata sin fallback silencioso (`H-03`).
+
+---
+
+## 5. Comandos de Operación y Pruebas
 
 ```bash
-# Compilar TypeScript
+# Compilar TypeScript con verificación estricta
 npm run build
 
-# Ejecutar en modo desarrollo
+# Ejecutar el backend en modo desarrollo con recarga en caliente
 npm run start:dev
 
-# Ejecutar suite de pruebas unitarias, negativas y E2E
+# Ejecutar toda la batería de pruebas (44 pruebas en 7 suites)
 npm test
+
+# Ejecutar exclusivamente la certificación física PostgreSQL (DB-T01 a DB-T14)
+npx vitest run test/real-postgres-integration.spec.ts
+
+# Ejecutar exclusivamente el flujo vertical real E2E
+npx vitest run test/real-postgres-vertical-flow.spec.ts
+
+# Aprovisionar usuarios institucionales con Argon2id
+npm run provision:users
 ```

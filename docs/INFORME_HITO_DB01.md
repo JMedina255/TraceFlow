@@ -46,8 +46,45 @@ En estricta sujeción a las directrices de seguridad, gobernanza documental (IEE
 
 ---
 
-## 3. Estado de Parada Obligatoria y Próximos Pasos (DB-02)
+## 3. Certificación y Cierre del Hito DB-02: Despliegue y Certificación Real en Supabase
 
-En cumplimiento de las normas de control de cambios, **no se ha ejecutado ninguna sentencia SQL de escritura sobre el proyecto remoto `TraceFlow-UPT`**.
+Con la autorización explícita del responsable del proyecto, se ejecutó y completó el Hito DB-02 sobre la instancia autorizada **TraceFlow-UPT** (`xmyfqxlvveiawnxgydtz`):
 
-El repositorio queda listo en la rama `feat/db01-supabase-nestjs`, preparado para el despliegue formal de migraciones y pruebas reales en el **Hito DB-02**.
+1. **Despliegue del Esquema Relacional `traceflow`:**
+   - 21 tablas relacionales creadas y verificadas vía Supabase MCP.
+   - Triggers de inmutabilidad en `audit_log`, índices únicos condicionales para locks en `sync_lock` e índices compuestos de proyecto.
+   - PostgREST aislado: esquemas `anon` y `authenticated` sin acceso al esquema `traceflow`.
+2. **Rol Operativo de Mínimo Privilegio (`traceflow_app`):**
+   - Conexión cifrada TLS 1.3 con validación obligatoria del certificado CA `backend/cert/prod-ca-2021.crt`.
+   - Permisos DML restringidos exclusivamente a tablas de operación, con revocación de `UPDATE`, `DELETE`, `TRUNCATE` en `audit_log`, `DELETE`, `TRUNCATE` en `ecs_version` y `TRUNCATE` en `sync_lock`.
+3. **Aprovisionamiento Criptográfico Seguro:**
+   - Catálogo de roles `PU-01` a `PU-07` registrado.
+   - Proyectos `PRJ-001`, `PRJ-002`, `PRJ-003` y 6 ECS canónicos inicializados.
+   - 4 usuarios de ÉXODO S.A.C. (`USR-001` a `USR-004`) aprovisionados con hashes independientes Argon2id generados mediante `@node-rs/argon2`.
+4. **Certificación Física en Vivo (DB-T01 a DB-T14):**
+   - 14 casos de prueba de restricciones físicas de motor ejecutados contra PostgreSQL 17.12 en vivo.
+   - **14/14 pruebas superadas satisfactoriamente (100% de éxito).**
+5. **Verificación de Flujo Vertical NestJS:**
+   - 10/10 pasos E2E HTTP (`real-postgres-vertical-flow.spec.ts`) validados en vivo con persistencia y reinicio de servidor.
+
+---
+
+## 4. Métricas Consolidadas de Calidad de Código y Pruebas
+
+| Componente | Herramienta | Suites / Archivos | Pruebas | Resultado |
+| :--- | :--- | :---: | :---: | :---: |
+| **Backend NestJS** | TypeScript (`tsc`) | 27 archivos | N/A | **Compilación Limpia (0 errores)** |
+| **Backend NestJS** | Vitest v3.2.7 | 7 suites | 44 | **44 Pasadas (100% éxito)** |
+| **Frontend Prototype** | oxlint | 75 archivos | N/A | **0 Advertencias, 0 Errores** |
+| **Frontend Prototype** | Vite / Rollup | Bundle producción | N/A | **Build Exitoso (1.06s)** |
+| **Frontend Prototype** | Node Test Runner | 9 suites | 71 pruebas | **Todas Aprobadas (100% éxito)** |
+
+---
+
+## 5. Parada de Seguridad Previa al Hito INT-01
+
+Con la finalización de los hitos **DB-01**, **DB-01.1** y **DB-02**:
+- La base de datos PostgreSQL en Supabase se encuentra totalmente operativa, securizada y certificada.
+- El backend NestJS opera en modo real con TLS estricto y sin datos ficticios.
+- Se mantiene el prototipo de React y sus 9 suites de pruebas intactos.
+- **Condición de Parada:** Se detiene el proceso antes de iniciar el hito siguiente (**INT-01: Integración React ↔ NestJS ↔ PostgreSQL en el navegador**) a la espera de la autorización del responsable del proyecto.

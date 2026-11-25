@@ -1,0 +1,77 @@
+@startuml DG-ACT-06
+title <b>DG-ACT-06: Flujo de Actividades — Realizar análisis de impacto técnico (CU-06)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F8F5|Arquitecto / Especialista Técnico|
+|#EBF5FB|TraceFlow SCM|
+
+|Arquitecto / Especialista Técnico|
+start
+:<color:white><b>FASE 1: Acceso y Validación SoD</b></color>; <<#34495E>>
+:Seleccionar evaluación técnica para RFC admitida;
+
+|TraceFlow SCM|
+if (¿Rol activo es Arquitecto [PU-03] con proyecto asignado?) then (No)
+    :[E001] Denegar acceso por perfil o aislamiento;
+    stop
+elseif (¿Usuario es distinto al Solicitante original?) then (No)
+    :[E001] Bloquear por Segregación de Funciones\n(prohibida autoevaluación según RN-05);
+    stop
+elseif (¿Estado válido CLASIFICADA/EN_ANALISIS_TECNICO\ny sin informe previo?) then (No)
+    :[E002] Informar estado incompatible\no informe ya congelado;
+    stop
+else (Sí)
+    :Situar trámite en análisis técnico y presentar\ncontexto RFC, notas de admisión y catálogo ECS;
+endif
+
+|Arquitecto / Especialista Técnico|
+if (¿Requiere aclaración de alcance? [A001]) then (Sí)
+    :Formular consulta técnica al Gestor / Solicitante\ny recibir precisión para continuar evaluación;
+else (No)
+endif
+
+:<color:white><b>FASE 2: Triple Restricción, Riesgos y Clasificación</b></color>; <<#34495E>>
+repeat
+    |Arquitecto / Especialista Técnico|
+    :Estimar esfuerzo (h), costo (S/.) e impacto en días;\nseleccionar ECS afectados/dependientes, fundamentación técnica,\nnivel y lista de riesgos, plan de rollback y dictamen;
+    :Pulsar "Firmar y Emitir Informe Técnico";
+
+    |TraceFlow SCM|
+    :Validar esfuerzo (>0), costo (>=0), días (>=0),\nfundamentación (>=15 car.) y ECS del proyecto;
+repeat while (¿Parámetros del informe válidos?) is (No [E003]: Indicar dato faltante o inválido)
+-> Sí;
+
+:<color:white><b>FASE 3: Congelamiento de Informe y Enrutamiento</b></color>; <<#34495E>>
+:Registrar Informe Técnico de Impacto (TIA) inmutable\ny transicionar estado a <b>EN_EVALUACION</b>;
+
+if (¿Clasificación y dictamen emitidos?) then (Cambio Menor [PROCEDE_MENOR])
+    :Enrutar a Autorización Delegada Doble Llave (CU-30)\n(Gestor + Arquitecto);
+elseif (Cambio Mayor [PROCEDE_MAYOR]) then
+    :Enrutar a Deliberación Colegiada del CCB (CU-07);
+else ([E004] Inviable técnicamente [RECHAZO_TECNICO])
+    :Enrutar a CCB (CU-07) con recomendación\nformal de rechazo técnico;
+endif
+
+:Registrar auditoría, notificar instancia evaluadora\ny mostrar confirmación de emisión exitosa;
+stop
+@enduml

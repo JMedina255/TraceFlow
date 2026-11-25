@@ -1,0 +1,79 @@
+@startuml DG-ACT-05
+title <b>DG-ACT-05: Flujo de Actividades — Validar y clasificar la solicitud (CU-05)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#EAEDED|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor|
+start
+:<color:white><b>FASE 1: Recepción y Revisión Formal</b></color>; <<#34495E>>
+:Abrir expediente RFC en estado REGISTRADA;
+
+|TraceFlow SCM|
+if (¿Rol activo es Gestor [PU-02] con proyecto asignado?) then (No)
+    :[E001] Mostrar restricción de revisión\nreservada al Analista de Requerimientos / Gestor;
+    stop
+elseif (¿Estado de la RFC es REGISTRADA?) then (No)
+    :[E002] Informar que la solicitud no está\nen etapa de revisión inicial;
+    stop
+else (Sí)
+    :Presentar Expediente 360° y panel de decisiones\n(Admitir, Observar o Desestimar);
+endif
+
+|Analista de Requerimientos / Gestor|
+:Inspeccionar descripción, justificación, prioridad,\nECS asociado, anexos y eventual duplicidad;
+
+if (¿Anexos legibles y consistentes?) then (No [E004])
+    :Alertar falla o ilegibilidad de anexos\ny derivar a formulación de observaciones;
+else (Sí)
+endif
+
+:<color:white><b>FASE 2: Emisión de Dictamen Inicial</b></color>; <<#34495E>>
+if (¿Decisión de admisibilidad?) then (Opción A: Admitir)
+    :Registrar observaciones o confirmación de admisión\ny pulsar "Admitir Solicitud";
+    |TraceFlow SCM|
+    :Actualizar estado a <b>CLASIFICADA</b>,\nregistrar auditoría y notificar al Arquitecto (PU-03);
+    stop
+elseif (Opción B: Observar [A001]) then
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Redactar pliego de observaciones\ny pulsar "Emitir Pliego de Observaciones";
+        |TraceFlow SCM|
+        :Validar extensión mínima del pliego (10 car.);
+    repeat while (¿Pliego válido?) is (No [E003]: Exigir detalle suficiente)
+    -> Sí;
+    :Transicionar estado a <b>EN_SUBSANACION</b>,\nregistrar auditoría y notificar al Solicitante (CU-04.1);
+    stop
+else (Opción C: Desestimar [A002])
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Ingresar justificación obligatoria, marcar confirmación\ny pulsar "Desestimar Definitivamente";
+        |TraceFlow SCM|
+        :Validar justificación (>= 10 car.) y casilla de confirmación;
+    repeat while (¿Justificación y confirmación válidas?) is (No [E003]: Exigir fundamentación)
+    -> Sí;
+    :Transicionar estado terminal a <b>DESESTIMADA</b> (RN-07),\nregistrar auditoría y notificar cierre al Solicitante;
+    stop
+endif
+@enduml

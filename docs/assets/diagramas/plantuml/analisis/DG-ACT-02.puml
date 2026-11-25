@@ -1,0 +1,64 @@
+@startuml DG-ACT-02
+title <b>DG-ACT-02: Flujo de Actividades — Crear y administrar proyectos (CU-02)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#EAEDED|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor|
+start
+:<color:white><b>FASE 1: Apertura y Selección de Acción</b></color>; <<#34495E>>
+:Acceder al módulo de Administración de Proyectos;
+
+|TraceFlow SCM|
+if (¿Usuario autenticado con perfil Gestor autorizado?) then (No)
+    :[E001] Denegar operación administrativa\nsegún control de acceso;
+    stop
+else (Sí)
+    :Presentar catálogo de proyectos\ny opciones de creación/edición;
+endif
+
+|Analista de Requerimientos / Gestor|
+if (¿Acción sobre el proyecto?) then (Nuevo proyecto)
+    :<color:white><b>FASE 2: Configuración y Aislamiento</b></color>; <<#34495E>>
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Ingresar código, nombre, cliente de ÉXODO S.A.C.,\ndescripción, fechas contractuales y equipo asignado;
+        |TraceFlow SCM|
+        :Validar unicidad de código/nombre\ny coherencia de plazos contractuales;
+    repeat while (¿Datos del proyecto válidos?) is (No [E002/E003]: Indicar duplicado o fecha inválida)
+    -> Sí;
+    :Crear proyecto con espacio lógico aislado,\nasignar participantes y habilitar las 3 bibliotecas\n(Trabajo, Soporte y Maestra);
+elseif (Actualizar parámetros o equipo [A001]) then
+    :Seleccionar proyecto existente y editar\nparámetros o integrantes asignados;
+    :Validar cambios y actualizar expediente\nconservando historial de auditoría;
+else (Archivar / cerrar proyecto [A002])
+    :Seleccionar proyecto finalizado y confirmar cierre;
+    :Cambiar estado a Archivado conservando\nLíneas Base en modo solo lectura;
+endif
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Confirmación y Aviso</b></color>; <<#34495E>>
+:Registrar evento en auditoría, confirmar en pantalla\ny notificar al Bibliotecario (PU-05) para alta de ECS;
+stop
+@enduml

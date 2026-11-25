@@ -1,0 +1,79 @@
+@startuml DG-ACT-04.1
+title <b>DG-ACT-04.1: Flujo de Actividades — Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|TraceFlow SCM|
+
+|Solicitante|
+start
+:<color:white><b>FASE 1: Acceso y Verificación de Condiciones</b></color>; <<#34495E>>
+:Seleccionar RFC observada en Bandeja o Expediente\ny pulsar "Subsanar Solicitud";
+
+|TraceFlow SCM|
+if (¿RFC existe y pertenece al proyecto activo?) then (No)
+    :[E001] Informar expediente inexistente\no solicitar conmutar al proyecto del trámite;
+    stop
+elseif (¿Estado actual es EN_SUBSANACION?) then (No)
+    :[E002] Indicar que solo solicitudes observadas\nadmiten subsanación;
+    stop
+elseif (¿Usuario es Solicitante [PU-01] y autor original?) then (No)
+    :[E001] Denegar acceso por RBAC / titularidad\n(reservado al solicitante original);
+    stop
+elseif (¿Dentro del plazo reglamentario?) then (No)
+    :[E004] Bloquear edición por plazo expirado\ny declarar cierre en estado <b>DESESTIMADA</b>;
+    stop
+else (Sí)
+    :Mostrar Pliego de Observaciones del Gestor\ny formulario precargado con datos de la RFC;
+endif
+
+|Solicitante|
+:<color:white><b>FASE 2: Corrección de Campos o Desistimiento</b></color>; <<#34495E>>
+if (¿Decide desistir de la solicitud? [A001]) then (Sí)
+    repeat
+        |Solicitante|
+        :Pulsar "Desistir de la Solicitud",\ningresar motivo y marcar confirmación;
+        |TraceFlow SCM|
+        :Validar motivo descriptivo y confirmación;
+    repeat while (¿Motivo y confirmación válidos?) is (No [E003]: Exigir justificación)
+    -> Sí;
+    :Registrar cierre voluntario en estado <b>DESESTIMADA</b>\ny actualizar bitácora de auditoría;
+    stop
+else (No)
+endif
+
+repeat
+    |Solicitante|
+    :Corregir título, prioridad, categoría, descripción,\njustificación, ECS, adjuntos [A002] y notas de descargo;
+    :Pulsar "Reingresar Solicitud Subsanada";
+    |TraceFlow SCM|
+    :Validar campos obligatorios y pertenencia del ECS;
+repeat while (¿Validación satisfactoria?) is (No [E003]: Señalar campos observados)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Reingreso Formal</b></color>; <<#34495E>>
+:Actualizar expediente y transicionar estado:\n<b>EN_SUBSANACION -> REGISTRADA</b>;
+:Registrar auditoría, notificar al Gestor (PU-02)\ny mostrar confirmación de reingreso;
+stop
+@enduml

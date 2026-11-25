@@ -38,14 +38,14 @@ start
 
 |TraceFlow SCM|
 if (¿Rol activo en sesión es Solicitante [PU-01]?) then (No)
-    :[E001] Mostrar aviso de Segregación de Funciones\ny deshabilitar botón de envío final;
+    :[E001] Mostrar aviso de Segregación de Funciones\ny deshabilitar envío definitivo;
     stop
 else (Sí)
     :Cargar proyectos asignados\ny presentar Asistente Paso 1 de 4;
 endif
 
-if (¿Existe borrador local para el proyecto?) then (Sí)
-    :Restaurar datos previos en formulario;
+if (¿Existe borrador temporal previo para el proyecto?) then (Sí)
+    :Restaurar datos previos en el formulario;
 else (No)
 endif
 
@@ -53,7 +53,7 @@ repeat
     |Solicitante|
     :Seleccionar proyecto, ingresar título,\nprioridad y categoría del cambio;
     note left
-      <b>[A001]</b> Guardar borrador local
+      <b>[A001]</b> Guardar borrador temporal
       <b>[A003]</b> Cancelar -> Confirmar descarte
     end note
 
@@ -87,7 +87,7 @@ repeat
     |Solicitante|
     :Seleccionar ECS afectado;
     if (¿Desea adjuntar sustento?) then (Sí [A002])
-        :Agregar nombres o evidencias de respaldo;
+        :Adjuntar documentación técnica o probatoria;
     else (No)
     endif
     |TraceFlow SCM|
@@ -97,26 +97,38 @@ repeat while (¿ECS seleccionado?) is (No [E002]: Exigir selección de ECS)
 
 |TraceFlow SCM|
 :<color:white><b>FASE 3: Revisión, Confirmación y Radicación</b></color>; <<#34495E>>
-:Presentar Paso 4 con Ficha Resumen Técnica,\ncódigo preliminar y declaración de veracidad;
+:Presentar Paso 4 con Ficha Resumen Técnica,\ncódigo preliminar y confirmación de envío;
 
 |Solicitante|
 if (¿Desea corregir datos previos?) then (Sí [A001/Navegar])
-    :Regresar a pasos anteriores\no guardar borrador local;
+    :Regresar a pasos anteriores\no guardar borrador temporal;
     detach
 else (No)
 endif
 
-:Aceptar declaración de veracidad institucional\ny seleccionar "Enviar Solicitud de Cambio";
+:Confirmar envío (declaración de veracidad\nsegún política vigente) y pulsar "Enviar Solicitud de Cambio";
 
 |TraceFlow SCM|
-:Ejecutar validación integral en servidor\ny verificar pertenencia ECS-Proyecto;
-
-if (¿Validación y persistencia exitosas?) then (No)
-    :[E002 / E004] Mostrar error de validación\no conectividad conservando datos ingresados;
+:Ejecutar validación integral en el servidor;
+if (¿Longitud y formato de datos válidos?) then (No)
+    :[E002] Informar observación de validación\nconservando los datos en pantalla;
     stop
 else (Sí)
-    :Asignar código único (RFC-AAAA-NNNN),\nregistrar solicitud en estado <b>REGISTRADA</b>\ny generar traza de auditoría SHA-256;
-    :Derivar notificación para validación inicial\n(Analista de Requerimientos / Gestor);
+endif
+
+if (¿El ECS pertenece al proyecto y está disponible?) then (No)
+    :[E004] Rechazar por inconsistencia Proyecto-ECS\no indisponibilidad del elemento;
+    stop
+else (Sí)
+endif
+
+:Intentar radicar RFC con código único\nen estado <b>REGISTRADA</b>;
+
+if (¿Conexión y registro en servidor exitosos?) then (No)
+    :[E005] Informar error de conectividad\nconservando los datos capturados para reintento;
+    stop
+else (Sí)
+    :Registrar evento en bitácora inmutable de auditoría\ny derivar notificación al Gestor (PU-02);
     :Presentar comprobante de radicación\ny accesos (Expediente 360°, Bandeja, Nueva, Dashboard);
     stop
 endif

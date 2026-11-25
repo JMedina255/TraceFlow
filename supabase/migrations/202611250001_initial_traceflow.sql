@@ -366,10 +366,16 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_audit_log_immutable ON traceflow.audit_log;
-CREATE TRIGGER trg_audit_log_immutable
-BEFORE UPDATE OR DELETE ON traceflow.audit_log
-FOR EACH ROW EXECUTE FUNCTION traceflow.prevent_audit_log_tampering();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'trg_audit_log_immutable'
+    ) THEN
+        CREATE TRIGGER trg_audit_log_immutable
+        BEFORE UPDATE OR DELETE ON traceflow.audit_log
+        FOR EACH ROW EXECUTE FUNCTION traceflow.prevent_audit_log_tampering();
+    END IF;
+END $$;
 
 -- 24. FUNCIÓN TRANSACCIONAL DE INSERCIÓN SERIALIZADA PARA CADENA HASH SHA-256 (SIN CONDICIONES DE CARRERA)
 CREATE OR REPLACE FUNCTION traceflow.append_audit_log(
@@ -454,7 +460,7 @@ BEGIN
 
     RETURN v_inserted_id;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- 25. POLÍTICA DE SEGURIDAD Y MÍNIMO PRIVILEGIO (ADR-004, ADR-006, ADR-008)
 -- Revocar accesos por defecto a roles de PostgREST / web si existen

@@ -70,28 +70,20 @@ export class ProjectsRepository {
   constructor(private readonly db: DatabaseService) {}
 
   async findAll(): Promise<ProjectEntity[]> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const res = await this.db.query('SELECT * FROM traceflow.project ORDER BY code ASC');
-        return res.rows;
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query<ProjectEntity>('SELECT * FROM traceflow.project ORDER BY code ASC');
+      return res.rows;
     }
     return [...this.projects];
   }
 
   async findByIdOrCode(idOrCode: string): Promise<ProjectEntity | null> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const res = await this.db.query(
-          'SELECT * FROM traceflow.project WHERE id::text = $1 OR code = $1 LIMIT 1',
-          [idOrCode]
-        );
-        if (res.rows.length > 0) return res.rows[0];
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query<ProjectEntity>(
+        'SELECT * FROM traceflow.project WHERE id::text = $1 OR code = $1 LIMIT 1',
+        [idOrCode]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.projects.find((p) => p.id === idOrCode || p.code === idOrCode) || null;
   }

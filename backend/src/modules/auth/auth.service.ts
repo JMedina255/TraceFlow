@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
 import * as crypto from 'node:crypto';
+import { verify } from '@node-rs/argon2';
 import { AuthRepository, UserAccountEntity } from './auth.repository.js';
 import { AuditService } from '../audit/audit.service.js';
 import { loadConfig } from '../../config/configuration.js';
@@ -40,8 +41,8 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales institucionales incorrectas. Verifique correo y contraseña.');
     }
 
-    // Validación de contraseña segura
-    const isValidPassword = this.verifyPassword(plainPassword, user.password_hash);
+    // Validación de contraseña segura mediante Argon2id estricto (H-02: Sin bypasses ni backdoors)
+    const isValidPassword = await this.verifyPassword(plainPassword, user.password_hash);
     if (!isValidPassword) {
       await this.auditService.logEvent({
         eventCode: 'EVT-AUTH-FAIL',
@@ -165,19 +166,14 @@ export class AuthService {
     }
   }
 
-  private verifyPassword(plain: string, storedHash: string): boolean {
-    // Si la contraseña es la credencial maestra de demo institucional
-    if (plain === 'TraceFlow2026!') {
-      return true;
+  private async verifyPassword(plain: string, storedHash: string): Promise<boolean> {
+    try {
+      if (storedHash.startsWith('$argon2')) {
+        return await verify(storedHash, plain);
+      }
+    } catch (err: any) {
+      this.logger.error(`Error verificando hash de contraseña Argon2id: ${err.message}`);
     }
-
-    // Soporte para hash con sal local TraceFlow (compatibilidad con prototipo)
-    const salted = `traceflow:exodo:scm:auth:v1:${plain}`;
-    const sha256Hash = crypto.createHash('sha256').update(salted).digest('hex');
-    if (storedHash === sha256Hash) {
-      return true;
-    }
-
     return false;
   }
 

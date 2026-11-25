@@ -113,92 +113,81 @@ export class RfcsRepository {
   constructor(private readonly db: DatabaseService) {}
 
   async findAll(): Promise<RfcEntity[]> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `
-          SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
-          FROM traceflow.change_request r
-          LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
-          LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
-          ORDER BY r.created_at DESC;
-        `;
-        const res = await this.db.query(query);
-        return res.rows;
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `
+        SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
+        FROM traceflow.change_request r
+        LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
+        LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
+        ORDER BY r.created_at DESC;
+      `;
+      const res = await this.db.query<RfcEntity>(query);
+      return res.rows;
     }
     return [...this.rfcs];
   }
 
   async findByIdOrCode(idOrCode: string): Promise<RfcEntity | null> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `
-          SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
-          FROM traceflow.change_request r
-          LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
-          LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
-          WHERE r.id::text = $1 OR r.code = $1
-          LIMIT 1;
-        `;
-        const res = await this.db.query(query, [idOrCode]);
-        if (res.rows.length > 0) return res.rows[0];
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `
+        SELECT r.*, e.code as target_ecs_code, u.full_name as requester_name
+        FROM traceflow.change_request r
+        LEFT JOIN traceflow.config_item e ON r.target_ecs_id = e.id
+        LEFT JOIN traceflow.app_user u ON r.requested_by = u.id
+        WHERE r.id::text = $1 OR r.code = $1
+        LIMIT 1;
+      `;
+      const res = await this.db.query<RfcEntity>(query, [idOrCode]);
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.rfcs.find((r) => r.id === idOrCode || r.code === idOrCode) || null;
   }
 
   async findEcsByIdOrCode(idOrCode: string): Promise<EcsEntity | null> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `SELECT * FROM traceflow.config_item WHERE id::text = $1 OR code = $1 LIMIT 1`;
-        const res = await this.db.query(query, [idOrCode]);
-        if (res.rows.length > 0) return res.rows[0];
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `SELECT * FROM traceflow.config_item WHERE id::text = $1 OR code = $1 LIMIT 1`;
+      const res = await this.db.query<EcsEntity>(query, [idOrCode]);
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.ecsList.find((e) => e.id === idOrCode || e.code === idOrCode) || null;
   }
 
   async create(entity: RfcEntity): Promise<RfcEntity> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `
-          INSERT INTO traceflow.change_request 
-            (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by, created_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-          RETURNING *;
-        `;
-        const res = await this.db.query(query, [
-          entity.id,
-          entity.code,
-          entity.project_id,
-          entity.target_ecs_id,
-          entity.title,
-          entity.description,
-          entity.justification,
-          entity.priority,
-          entity.classification,
-          entity.status,
-          entity.requested_by,
-          entity.created_at,
-          entity.updated_at,
-        ]);
-        return res.rows[0];
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `
+        INSERT INTO traceflow.change_request 
+          (id, code, project_id, target_ecs_id, title, description, justification, priority, classification, status, requested_by, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        RETURNING *;
+      `;
+      const res = await this.db.query<RfcEntity>(query, [
+        entity.id,
+        entity.code,
+        entity.project_id,
+        entity.target_ecs_id,
+        entity.title,
+        entity.description,
+        entity.justification,
+        entity.priority,
+        entity.classification,
+        entity.status,
+        entity.requested_by,
+        entity.created_at,
+        entity.updated_at,
+      ]);
+      return res.rows[0];
     }
 
     this.rfcs.unshift(entity);
     return entity;
   }
 
-  getNextCode(): string {
+  async getNextCode(): Promise<string> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query<{ count: string }>('SELECT count(*) as count FROM traceflow.change_request');
+      const nextNum = parseInt(res.rows[0]?.count || '0', 10) + 1;
+      return `RFC-2026-${String(nextNum).padStart(4, '0')}`;
+    }
     const nextNum = this.rfcs.length + 1;
     return `RFC-2026-${String(nextNum).padStart(4, '0')}`;
   }

@@ -47,30 +47,25 @@ export class AuditService {
   constructor(private readonly db: DatabaseService) {}
 
   async logEvent(input: AuditEventInput): Promise<string> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const res = await this.db.query(
-          `SELECT traceflow.append_audit_log($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) as id`,
-          [
-            input.eventCode,
-            input.actorUserId || null,
-            input.actorRole,
-            input.operation,
-            input.entityName,
-            input.entityId,
-            input.projectId || null,
-            input.relatedEcnId || null,
-            input.resultStatus,
-            JSON.stringify(input.payloadDiff || {}),
-            input.ipAddress || '127.0.0.1',
-            input.userAgent || 'TraceFlow Core Backend',
-          ]
-        );
-        return res.rows[0].id;
-      } catch (err: any) {
-        this.logger.error(`Fallo al persistir evento de auditoría en PostgreSQL: ${err.message}`);
-        // Fallback a auditoría local en memoria si la BD falla
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query(
+        `SELECT traceflow.append_audit_log($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) as id`,
+        [
+          input.eventCode,
+          input.actorUserId || null,
+          input.actorRole,
+          input.operation,
+          input.entityName,
+          input.entityId,
+          input.projectId || null,
+          input.relatedEcnId || null,
+          input.resultStatus,
+          JSON.stringify(input.payloadDiff || {}),
+          input.ipAddress || '127.0.0.1',
+          input.userAgent || 'TraceFlow Core Backend',
+        ]
+      );
+      return res.rows[0].id;
     }
 
     // Serialización en memoria sin condiciones de carrera (ADR-008)

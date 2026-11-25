@@ -97,7 +97,7 @@ export class RfcsService {
     }
 
     const id = crypto.randomUUID();
-    const code = this.rfcsRepo.getNextCode();
+    const code = await this.rfcsRepo.getNextCode();
     const now = new Date().toISOString();
 
     const entity: RfcEntity = {

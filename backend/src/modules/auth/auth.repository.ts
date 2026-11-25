@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import type { AuthenticatedUser, CanonicalRoleId } from '../../common/types/index.js';
 
@@ -33,14 +33,17 @@ export interface SessionRecord {
 
 @Injectable()
 export class AuthRepository {
-  // Almacén seguro en memoria para cuando opera sin conexión PostgreSQL directa
-  private users: UserAccountEntity[] = [
+  private readonly logger = new Logger(AuthRepository.name);
+
+  // Almacén seguro exclusivo para modo mock / pruebas unitarias desconectadas (H-03)
+  // Cada usuario cuenta con un hash Argon2id independiente generado con sal criptográfica única (H-02)
+  private mockUsers: UserAccountEntity[] = [
     {
       id: 'a0000001-0000-0000-0000-000000000001',
       code: 'USR-001',
       username: 'jmedina',
       email: 'jmedina@exodo.pe',
-      password_hash: '$argon2id$v=19$m=65536,t=3,p=4$dHJhY2VmbG93c2FsdA$VnS1Y8u0lQjXzP3Z8N9t6K2w5Y8u0lQjXzP3Z8N9t6I',
+      password_hash: '$argon2id$v=19$m=19456,t=2,p=1$DfJ7vr4XL13i4+9McOGBig$N9B9GQHn7emS+Et4b0knNa3EnTbenHzZ0wH6X0CkUgE',
       full_name: 'Joan Cristian Medina Quispe',
       organization: 'ÉXODO S.A.C.',
       position: 'Director de Calidad y Procesos',
@@ -54,7 +57,7 @@ export class AuthRepository {
       code: 'USR-002',
       username: 'rantayhua',
       email: 'rantayhua@exodo.pe',
-      password_hash: '$argon2id$v=19$m=65536,t=3,p=4$dHJhY2VmbG93c2FsdA$VnS1Y8u0lQjXzP3Z8N9t6K2w5Y8u0lQjXzP3Z8N9t6I',
+      password_hash: '$argon2id$v=19$m=19456,t=2,p=1$Pz0lMqDi3iM5GCiKmtdiQA$toYBcyj1l44TUU/5RbRLYPjPTyQ/0vwKr9R4LOD9Nb4',
       full_name: 'Renzo Antonio Antayhua Mamani',
       organization: 'ÉXODO S.A.C.',
       position: 'Arquitecto de Software Principal',
@@ -68,7 +71,7 @@ export class AuthRepository {
       code: 'USR-003',
       username: 'arivera',
       email: 'arivera@exodo.pe',
-      password_hash: '$argon2id$v=19$m=65536,t=3,p=4$dHJhY2VmbG93c2FsdA$VnS1Y8u0lQjXzP3Z8N9t6K2w5Y8u0lQjXzP3Z8N9t6I',
+      password_hash: '$argon2id$v=19$m=19456,t=2,p=1$HShCQV/w5JAvLmYn5ysJKg$qdzfRx+iGNQ5xYQHHHZoYOMarUQ+qnKDimHbUtU9V+Y',
       full_name: 'Augusto Joaquin Rivera Muñoz',
       organization: 'ÉXODO S.A.C.',
       position: 'Jefe de SCM y Aseguramiento',
@@ -82,7 +85,7 @@ export class AuthRepository {
       code: 'USR-004',
       username: 'rloyola',
       email: 'rloyola@exodo.pe',
-      password_hash: '$argon2id$v=19$m=65536,t=3,p=4$dHJhY2VmbG93c2FsdA$VnS1Y8u0lQjXzP3Z8N9t6K2w5Y8u0lQjXzP3Z8N9t6I',
+      password_hash: '$argon2id$v=19$m=19456,t=2,p=1$ggNFQqt7NFqHJ0d8WPl1qw$Oq69LlMFoDcd6u6F8d+Dy5tm6mX4A6ekG5KhJV/h4i4',
       full_name: 'Renzo Fernando Loyola Vilca Choque',
       organization: 'ÉXODO S.A.C.',
       position: 'Coordinador de Proyectos y CCB',
@@ -93,178 +96,150 @@ export class AuthRepository {
     },
   ];
 
-  private sessions: Map<string, SessionRecord> = new Map();
+  private mockSessions: Map<string, SessionRecord> = new Map();
 
   constructor(private readonly db: DatabaseService) {}
 
   async findByEmail(email: string): Promise<UserAccountEntity | null> {
     const normalized = email.trim().toLowerCase();
 
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `
-          SELECT 
-            u.id, u.code, u.username, u.email, u.password_hash, u.full_name, u.organization, u.position, u.status,
-            COALESCE((
-              SELECT r.code 
-              FROM traceflow.user_role_assignment ura 
-              JOIN traceflow.app_role r ON ura.role_id = r.id 
-              WHERE ura.user_id = u.id AND ura.is_primary = TRUE 
-              LIMIT 1
-            ), 'PU-01') as primary_role_code,
-            COALESCE((
-              SELECT array_agg(r.code) 
-              FROM traceflow.user_role_assignment ura 
-              JOIN traceflow.app_role r ON ura.role_id = r.id 
-              WHERE ura.user_id = u.id
-            ), ARRAY[]::varchar[]) as assigned_role_codes,
-            COALESCE((
-              SELECT array_agg(p.code) 
-              FROM traceflow.user_project_assignment upa 
-              JOIN traceflow.project p ON upa.project_id = p.id 
-              WHERE upa.user_id = u.id
-            ), ARRAY[]::varchar[]) as assigned_project_codes
-          FROM traceflow.app_user u
-          WHERE LOWER(u.email) = $1 AND u.status = 'ACTIVE'
-          LIMIT 1;
-        `;
-        const res = await this.db.query(query, [normalized]);
-        if (res.rows.length > 0) {
-          return res.rows[0];
-        }
-      } catch (err) {
-        // Fallback a repositorio local si la consulta falla
-      }
+    // Modo PostgreSQL Real (H-03: Sin fallback silencioso)
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `
+        SELECT 
+          u.id, u.code, u.username, u.email, u.password_hash, u.full_name, u.organization, u.position, u.status,
+          COALESCE((
+            SELECT r.code 
+            FROM traceflow.user_role_assignment ura 
+            JOIN traceflow.app_role r ON ura.role_id = r.id 
+            WHERE ura.user_id = u.id AND ura.is_primary = TRUE 
+            LIMIT 1
+          ), 'PU-01') as primary_role_code,
+          COALESCE((
+            SELECT array_agg(r.code) 
+            FROM traceflow.user_role_assignment ura 
+            JOIN traceflow.app_role r ON ura.role_id = r.id 
+            WHERE ura.user_id = u.id
+          ), ARRAY[]::varchar[]) as assigned_role_codes,
+          COALESCE((
+            SELECT array_agg(p.code) 
+            FROM traceflow.user_project_assignment upa 
+            JOIN traceflow.project p ON upa.project_id = p.id 
+            WHERE upa.user_id = u.id
+          ), ARRAY[]::varchar[]) as assigned_project_codes
+        FROM traceflow.app_user u
+        WHERE LOWER(u.email) = $1 AND u.status = 'ACTIVE'
+        LIMIT 1;
+      `;
+      const res = await this.db.query(query, [normalized]);
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
 
-    return this.users.find((u) => u.email.toLowerCase() === normalized) || null;
+    // Modo Mock en memoria exclusivo para pruebas
+    return this.mockUsers.find((u) => u.email.toLowerCase() === normalized) || null;
   }
 
   async findById(id: string): Promise<UserAccountEntity | null> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const query = `
-          SELECT 
-            u.id, u.code, u.username, u.email, u.password_hash, u.full_name, u.organization, u.position, u.status,
-            COALESCE((
-              SELECT r.code 
-              FROM traceflow.user_role_assignment ura 
-              JOIN traceflow.app_role r ON ura.role_id = r.id 
-              WHERE ura.user_id = u.id AND ura.is_primary = TRUE 
-              LIMIT 1
-            ), 'PU-01') as primary_role_code,
-            COALESCE((
-              SELECT array_agg(r.code) 
-              FROM traceflow.user_role_assignment ura 
-              JOIN traceflow.app_role r ON ura.role_id = r.id 
-              WHERE ura.user_id = u.id
-            ), ARRAY[]::varchar[]) as assigned_role_codes,
-            COALESCE((
-              SELECT array_agg(p.code) 
-              FROM traceflow.user_project_assignment upa 
-              JOIN traceflow.project p ON upa.project_id = p.id 
-              WHERE upa.user_id = u.id
-            ), ARRAY[]::varchar[]) as assigned_project_codes
-          FROM traceflow.app_user u
-          WHERE u.id = $1
-          LIMIT 1;
-        `;
-        const res = await this.db.query(query, [id]);
-        if (res.rows.length > 0) {
-          return res.rows[0];
-        }
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const query = `
+        SELECT 
+          u.id, u.code, u.username, u.email, u.password_hash, u.full_name, u.organization, u.position, u.status,
+          COALESCE((
+            SELECT r.code 
+            FROM traceflow.user_role_assignment ura 
+            JOIN traceflow.app_role r ON ura.role_id = r.id 
+            WHERE ura.user_id = u.id AND ura.is_primary = TRUE 
+            LIMIT 1
+          ), 'PU-01') as primary_role_code,
+          COALESCE((
+            SELECT array_agg(r.code) 
+            FROM traceflow.user_role_assignment ura 
+            JOIN traceflow.app_role r ON ura.role_id = r.id 
+            WHERE ura.user_id = u.id
+          ), ARRAY[]::varchar[]) as assigned_role_codes,
+          COALESCE((
+            SELECT array_agg(p.code) 
+            FROM traceflow.user_project_assignment upa 
+            JOIN traceflow.project p ON upa.project_id = p.id 
+            WHERE upa.user_id = u.id
+          ), ARRAY[]::varchar[]) as assigned_project_codes
+        FROM traceflow.app_user u
+        WHERE u.id = $1
+        LIMIT 1;
+      `;
+      const res = await this.db.query(query, [id]);
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
 
-    return this.users.find((u) => u.id === id || u.code === id) || null;
+    return this.mockUsers.find((u) => u.id === id || u.code === id) || null;
   }
 
   async createSession(record: SessionRecord): Promise<void> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        await this.db.query(
-          `INSERT INTO traceflow.user_session 
-            (id, user_id, active_role_id, session_token_hash, ip_address, user_agent, is_revoked, created_at, last_activity_at, expires_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [
-            record.id,
-            record.user_id,
-            record.active_role_id,
-            record.session_token_hash,
-            record.ip_address,
-            record.user_agent,
-            record.is_revoked,
-            record.created_at,
-            record.last_activity_at,
-            record.expires_at,
-          ]
-        );
-        return;
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      await this.db.query(
+        `INSERT INTO traceflow.user_session 
+          (id, user_id, active_role_id, session_token_hash, ip_address, user_agent, is_revoked, created_at, last_activity_at, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          record.id,
+          record.user_id,
+          record.active_role_id,
+          record.session_token_hash,
+          record.ip_address,
+          record.user_agent,
+          record.is_revoked,
+          record.created_at,
+          record.last_activity_at,
+          record.expires_at,
+        ]
+      );
+      return;
     }
 
-    this.sessions.set(record.session_token_hash, record);
+    this.mockSessions.set(record.session_token_hash, record);
   }
 
   async findSessionByTokenHash(tokenHash: string): Promise<SessionRecord | null> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        const res = await this.db.query(
-          `SELECT s.*, r.code as active_role_code
-           FROM traceflow.user_session s
-           JOIN traceflow.app_role r ON s.active_role_id = r.id
-           WHERE s.session_token_hash = $1
-           LIMIT 1`,
-          [tokenHash]
-        );
-        if (res.rows.length > 0) {
-          return res.rows[0];
-        }
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const res = await this.db.query(
+        `SELECT s.*, r.code as active_role_code
+         FROM traceflow.user_session s
+         JOIN traceflow.app_role r ON s.active_role_id = r.id
+         WHERE s.session_token_hash = $1
+         LIMIT 1`,
+        [tokenHash]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
 
-    return this.sessions.get(tokenHash) || null;
+    return this.mockSessions.get(tokenHash) || null;
   }
 
   async updateSessionActivity(tokenHash: string, lastActivity: Date): Promise<void> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        await this.db.query(
-          `UPDATE traceflow.user_session SET last_activity_at = $1 WHERE session_token_hash = $2`,
-          [lastActivity, tokenHash]
-        );
-        return;
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      await this.db.query(
+        `UPDATE traceflow.user_session SET last_activity_at = $1 WHERE session_token_hash = $2`,
+        [lastActivity, tokenHash]
+      );
+      return;
     }
 
-    const session = this.sessions.get(tokenHash);
+    const session = this.mockSessions.get(tokenHash);
     if (session) {
       session.last_activity_at = lastActivity;
     }
   }
 
   async revokeSession(tokenHash: string): Promise<void> {
-    if (this.db.isDatabaseConnected()) {
-      try {
-        await this.db.query(
-          `UPDATE traceflow.user_session SET is_revoked = TRUE WHERE session_token_hash = $1`,
-          [tokenHash]
-        );
-        return;
-      } catch (err) {
-        // Fallback
-      }
+    if (this.db.getDatabaseMode() === 'postgres') {
+      await this.db.query(
+        `UPDATE traceflow.user_session SET is_revoked = TRUE WHERE session_token_hash = $1`,
+        [tokenHash]
+      );
+      return;
     }
 
-    const session = this.sessions.get(tokenHash);
+    const session = this.mockSessions.get(tokenHash);
     if (session) {
       session.is_revoked = true;
     }

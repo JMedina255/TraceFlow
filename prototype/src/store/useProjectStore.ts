@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Project, User } from '../types';
 import { INITIAL_PROJECTS } from '../data/initialProjects';
 import { storageService } from '../services/storage.service';
+import { traceFlowAdapter } from '../services/api/apiAdapter';
 import { useAuthStore } from './useAuthStore';
 
 interface ProjectState {
@@ -9,6 +10,7 @@ interface ProjectState {
   activeProject: Project;
   setActiveProject: (projectId: string, user?: User) => void;
   reloadProjects: () => void;
+  loadProjectsFromApi: (user?: User) => Promise<Project[]>;
 }
 
 const STORAGE_KEY_PROJECT_ID = 'active_project_id';
@@ -59,5 +61,21 @@ export const useProjectStore = create<ProjectState>((set) => ({
       projects: updated,
       activeProject: getInitialActiveProject(updated),
     });
+  },
+
+  loadProjectsFromApi: async (user?: User): Promise<Project[]> => {
+    try {
+      const list = await traceFlowAdapter.projects.getAll(user);
+      if (list && list.length > 0) {
+        set((state) => ({
+          projects: list,
+          activeProject: list.find((p) => p.id === state.activeProject?.id) || list[0],
+        }));
+      }
+      return list;
+    } catch (err) {
+      console.warn('[useProjectStore] Fallo al cargar proyectos desde traceFlowAdapter:', err);
+      return getInitialProjectList();
+    }
   },
 }));

@@ -4,6 +4,7 @@ import { CANONICAL_ROLES } from '../types';
 import { INITIAL_USER_ACCOUNTS, INITIAL_DEMO_USERS, type DemoUserConfig } from '../data/initialUsers';
 import { authService } from '../services/auth.service';
 import { storageService } from '../services/storage.service';
+import { traceFlowAdapter } from '../services/api/apiAdapter';
 
 interface AuthState {
   currentUser: User | null;
@@ -60,9 +61,20 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   /**
    * Inicio de sesión formal empresarial con correo institucional y contraseña.
-   * Valida credenciales con hash SHA-256 y establece un único rol efectivo por sesión.
+   * Valida credenciales mediante traceFlowAdapter (API NestJS o Mock local seguro).
    */
   loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId) => {
+    if (traceFlowAdapter.isApiMode()) {
+      const user = await traceFlowAdapter.auth.login(email, password, requestedRoleId);
+      set({
+        currentUser: user,
+        activeRoleId: requestedRoleId || user.roleId,
+        activeRole: user.role,
+        isAuthenticated: true,
+      });
+      return;
+    }
+
     const result = await authService.authenticate(email, password, requestedRoleId);
     set({
       currentUser: result.sessionUser,
@@ -73,10 +85,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   /**
-   * Cierre formal de sesión activa y revocación de tokens.
+   * Cierre formal de sesión activa y revocación de tokens vía traceFlowAdapter.
    */
   logout: () => {
-    authService.logout();
+    if (traceFlowAdapter.isApiMode()) {
+      traceFlowAdapter.auth.logout().catch(console.error);
+    } else {
+      authService.logout();
+    }
     set({
       currentUser: null,
       activeRoleId: null,

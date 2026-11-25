@@ -1,3 +1,16 @@
+/**
+ * ============================================================================
+ * TRACEFLOW SCM — SUITE DE GESTIÓN Y CICLO DE VIDA DE RFCS
+ * Archivo: backend/test/rfcs.spec.ts
+ * Hito: DB-01 / DB-01.1 — Requisito H-04 (Certificación de Pruebas)
+ * 
+ * [CLASIFICACIÓN: UNITARIAS / REPOSITORIOS EN MEMORIA]
+ * ADVERTENCIA DE CERTIFICACIÓN (H-04):
+ * Esta suite valida las reglas de solicitud de cambio (CU-04, SoD, Ownership y hashing SHA-256)
+ * ejecutando con repositorios en memoria.
+ * NO certifica restricciones de claves foráneas ni serialización concurrente de PostgreSQL.
+ * ============================================================================
+ */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';

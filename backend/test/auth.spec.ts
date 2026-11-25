@@ -1,3 +1,18 @@
+/**
+ * ============================================================================
+ * TRACEFLOW SCM — SUITE DE PRUEBAS DE AUTENTICACIÓN Y SESIONES
+ * Archivo: backend/test/auth.spec.ts
+ * Hito: DB-01 / DB-01.1 — Requisito H-04 (Certificación de Pruebas)
+ * 
+ * [CLASIFICACIÓN: UNITARIAS / REPOSITORIOS EN MEMORIA]
+ * ADVERTENCIA DE CERTIFICACIÓN (H-04):
+ * Esta suite ejecuta sobre repositorios y almacenes en memoria (mock mode).
+ * Valida la lógica de negocio, derivación de tokens SHA-256, hashing Argon2id
+ * y reglas SoD a nivel de servicio NestJS.
+ * NO constituye evidencia de restricciones físicas ni conectividad de PostgreSQL en vivo.
+ * Las pruebas de integración contra PostgreSQL real residen en real-postgres-integration.spec.ts.
+ * ============================================================================
+ */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';

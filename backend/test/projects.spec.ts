@@ -1,3 +1,16 @@
+/**
+ * ============================================================================
+ * TRACEFLOW SCM — SUITE DE AISLAMIENTO MULTITENANT DE PROYECTOS
+ * Archivo: backend/test/projects.spec.ts
+ * Hito: DB-01 / DB-01.1 — Requisito H-04 (Certificación de Pruebas)
+ * 
+ * [CLASIFICACIÓN: UNITARIAS / REPOSITORIOS EN MEMORIA]
+ * ADVERTENCIA DE CERTIFICACIÓN (H-04):
+ * Esta suite verifica el aislamiento multitenant a nivel del servicio de aplicación.
+ * Ejecuta con el repositorio simulado en memoria.
+ * NO constituye prueba de restricciones de integridad referencial ni esquemas de PostgreSQL.
+ * ============================================================================
+ */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { ProjectsRepository } from '../src/modules/projects/projects.repository.js';

@@ -1,3 +1,18 @@
+/**
+ * ============================================================================
+ * TRACEFLOW SCM — SUITE DE PRUEBAS NEGATIVAS DE GOBERNANZA SCM
+ * Archivo: backend/test/governance-negative.spec.ts
+ * Hito: DB-01 / DB-01.1 — Requisito H-04 (Certificación de Pruebas)
+ * 
+ * [CLASIFICACIÓN: UNITARIAS / ESPECIFICACIÓN ALGORÍTMICA EN MEMORIA]
+ * ADVERTENCIA DE CERTIFICACIÓN (H-04):
+ * Esta suite valida las restricciones normativas (RN-02, RN-06, SoD, CCB, Doble Llave)
+ * como especificación de contrato algorítmico y reglas de negocio del servicio.
+ * NO ejecuta sobre una base de datos PostgreSQL real ni prueba triggers/locks del motor.
+ * La verificación contra las tablas, triggers e índices condicionales de PostgreSQL
+ * está preparada en real-postgres-integration.spec.ts para ejecución en DB-02.
+ * ============================================================================
+ */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AuditService } from '../src/modules/audit/audit.service.js';
 import { DatabaseService } from '../src/database/database.service.js';

@@ -1,3 +1,16 @@
+/**
+ * ============================================================================
+ * TRACEFLOW SCM — FLUJO VERTICAL MODULAR COMPLETO
+ * Archivo: backend/test/vertical-flow.e2e-spec.ts
+ * Hito: DB-01 / DB-01.1 — Requisito H-04 (Certificación de Pruebas)
+ * 
+ * [CLASIFICACIÓN: INTEGRACIÓN DE SERVICIOS EN MEMORIA / E2E MODULAR]
+ * ADVERTENCIA DE CERTIFICACIÓN (H-04):
+ * Esta suite valida la integración de extremo a extremo entre los módulos de aplicación
+ * (AuthService -> ProjectsService -> RfcsService -> AuditService) en modo memoria desconectado.
+ * NO sustituye la verificación de la red, latencia, TLS ni persistencia en PostgreSQL real.
+ * ============================================================================
+ */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';

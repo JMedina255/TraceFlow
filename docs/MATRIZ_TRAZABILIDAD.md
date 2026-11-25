@@ -1,0 +1,53 @@
+# Matriz Integral de Trazabilidad — TraceFlow SCM
+
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
+> **Documento:** `docs/MATRIZ_TRAZABILIDAD.md`  
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`  
+> **Estado:** Candidato a Aprobación (DOC-02.7)  
+> **Fecha:** 25 de noviembre de 2026  
+
+---
+
+## 1. Matriz de Trazabilidad Funcional (RF-01..RF-18 / CU-01..CU-30 + CU-04.1)
+
+| Requerimiento | Regla de negocio | Caso de uso | Módulo | Componente | Tabla actual | Tabla objetivo | Endpoint | Prueba | Estado |
+|---|---|---|---|---|---|---|---|---|---|
+| **RF-01** Gestión de Usuarios y Roles RBAC | `RN-01` | `CU-01` | `MOD-01` | `AuthController` / `LoginView` | `app_role`, `app_user`, `user_role_assignment`, `user_session` | `rol_aplicacion`, `usuario`, `asignacion_rol_usuario`, `sesion_usuario` | `/api/v1/auth/login`, `/me`, `/logout` | `auth.spec.ts`, `auth.spec.mjs`, `enterprise.rbac.spec.mjs`, `INT-T01..06`, `INT-T15` | **Parcial** (Login/Sesión real; CRUD UI usuarios pendiente) |
+| **RF-02** Gestión de Proyectos | `RN-03`, `RN-04` | `CU-02`, `CU-03` | `MOD-02` | `ProjectsController` / `useProjectStore` | `project`, `user_project_assignment` | `proyecto`, `asignacion_proyecto_usuario` | `GET /api/v1/projects`, `/:id` | `projects.spec.ts`, `DB-T11`, `INT-T07..08` | **Parcial** (Lectura API real; creación/UI placeholder) |
+| **RF-03** Identificación y Catálogo de ECS | `RN-02`, `RN-04` | `CU-09` | `MOD-03` | `ProjectsRepository` / `ecsService` | `config_item` | `elemento_configuracion` | `GET /api/v1/projects/:id` (lectura ECS) | `DB-T10`, `INT-T08` | **Parcial** (Lectura real en BD; CRUD UI placeholder) |
+| **RF-04** Registro y Subsanación de RFC | `RN-01`, `RN-07` | `CU-04`, `CU-04.1` | `MOD-04` | `RfcsController` / `RfcCreateView`, `RfcEditView` | `change_request` | `solicitud_cambio` | `POST /api/v1/rfcs` *(Pend: `POST /rfcs/:id/rectification`)* | `rfcs.spec.ts`, `rfc.service.spec.mjs`, `rfc.validation.spec.mjs`, `INT-T09..12` | **`CU-04` Real** / **`CU-04.1` Simulado** |
+| **RF-05** Clasificación y Análisis de Impacto | `RN-05`, `RN-07` | `CU-05`, `CU-06` | `MOD-04` | `RfcDetailView`, `RfcImpactAnalysisView`, `impactAnalysisService` | `change_request`, `impact_assessment` | `solicitud_cambio`, `informe_impacto` | *(Pendiente: `/rfcs/:id/classify`, `/impact-assessment`)* | `rfc.validation.spec.mjs`, `impactAnalysis.spec.mjs`, `governance-negative.spec.ts` | **Simulado en prototipo** (objetivo `SCM-01`) |
+| **RF-06** Evaluación Colegiada CCB y Delegada | `RN-01`, `RN-05` | `CU-07`, `CU-30` | `MOD-04` | `RfcCcbDeliberationView`, `RfcMinorApprovalView`, `ccbService`, `minorApprovalService` | `change_authorization`, `ccb_resolution`, `ccb_vote` | `autorizacion_delegada`, `resolucion_ccb`, `voto_ccb` | *(Pendiente: `/rfcs/:id/minor-approval`, `/ccb-votes`)* | `minorApproval.spec.mjs`, `ccb.spec.mjs`, `DB-T07..09` | **Simulado en prototipo** (triggers físicos listos en BD) |
+| **RF-07** Emisión y Gestión de Órdenes (ECN/ECO) | `RN-01`, `RN-03` | `CU-08` | `MOD-04` | `contracts.ts` / `ScreenPlaceholder` | `change_order` | `orden_cambio` | *(Pendiente: `/api/v1/change-orders`)* | — | **Pendiente** (Tabla desplegada; lógica pendiente) |
+| **RF-08** Gestión de Bibliotecas (Trabajo/Soporte/Maestra) | `RN-04`, `RN-09` | `CU-10`, `CU-12` | `MOD-05` | `ScreenPlaceholder` / `StoragePort` | `config_item`, `ecs_version` | `elemento_configuracion`, `version_ecs` | *(Pendiente: `/api/v1/scm/check-out`, `/check-in`)* | — | **Pendiente** (Diseño `DG-D04` listo) |
+| **RF-09** Control de Versiones y Bloqueo Exclusivo | `RN-02`, `RN-06` | `CU-10`, `CU-11`, `CU-12`, `CU-13`, `CU-14` | `MOD-05` | `contracts.ts` / `ScreenPlaceholder` | `sync_lock`, `ecs_version` | `bloqueo_sincronizacion`, `version_ecs` | *(Pendiente: `/api/v1/scm/locks`)* | `DB-T03`, `DB-T04` (concurrencia PG verificada) | **Pendiente** (Invariante física `DB-T03/04` certificada) |
+| **RF-10** Pruebas, Certificación QA y UAT | `RN-09` | `CU-15`, `CU-16`, `CU-17`, `CU-29` | `MOD-06` | `ScreenPlaceholder` | `qa_certification`, `uat_acceptance` | `certificacion_qa`, `aceptacion_uat` | *(Pendiente: `/api/v1/qa-certifications`, `/uat-acceptances`)* | `enterprise.rbac.spec.mjs` (Test 10 SoD Dev/QA) | **Pendiente** (Tablas desplegadas) |
+| **RF-11** Reporte de No Conformidad y Re-testeo | `RN-08`, `RN-09` | `CU-18`, `CU-19` | `MOD-06` | `ScreenPlaceholder` | `qa_certification`, `change_request` | `certificacion_qa`, `solicitud_cambio` | *(Pendiente: `/api/v1/qa-certifications/non-conformity`)* | — | **Pendiente** |
+| **RF-12** Rollback y Cancelación de Orden | `RN-06`, `RN-08` | `CU-21`, `CU-22` | `MOD-05` | `ScreenPlaceholder` | `sync_lock`, `change_order`, `change_request` | `bloqueo_sincronizacion`, `orden_cambio`, `solicitud_cambio` | *(Pendiente: `/api/v1/scm/rollback`, `/change-orders/:id/cancel`)* | `DB-T04` | **Pendiente** |
+| **RF-13** Gestión de Líneas Base Congeladas | `RN-02`, `RN-04` | `CU-20` | `MOD-05` | `ScreenPlaceholder` | `baseline`, `baseline_item` | `linea_base`, `elemento_linea_base` | *(Pendiente: `/api/v1/baselines`)* | Triggers `trg_baseline*_frozen_guard` | **Pendiente** (Inmutabilidad física lista) |
+| **RF-14** Cierre Formal del Cambio (Estados Terminales) | `RN-07`, `RN-09` | `CU-05`, `CU-07`, `CU-20`, `CU-22`, `CU-29`, `CU-30` | `MOD-04`, `MOD-05` | `RfcDetailView` / `ScreenPlaceholder` | `change_request` | `solicitud_cambio` | `/api/v1/rfcs/*` | `rfc.views.spec.mjs` (14 estados TB-07) | **Parcial** (Estados en BD/UI; transiciones terminales simuladas/pend.) |
+| **RF-15** Gestión de Incidencias y Derivación a RFC | `RN-03` | `CU-23`, `CU-24`, `CU-25` | `MOD-08` | `ScreenPlaceholder` | `incident_ticket`, `change_request` | `incidencia`, `solicitud_cambio` | *(Pendiente: `/api/v1/incidents`)* | — | **Pendiente** (Tabla desplegada) |
+| **RF-16** Trazabilidad de Configuración y Checksum | `RN-02`, `RN-03` | `CU-13`, `CU-26` | `MOD-05`, `MOD-07` | `ScreenPlaceholder` | `ecs_version`, `change_request`, `change_order` | `version_ecs`, `solicitud_cambio`, `orden_cambio` | *(Pendiente: `/api/v1/scm/verify-checksum`)* | — | **Pendiente** |
+| **RF-17** Auditoría Inmutable Append-Only SHA-256 | `RN-03` | `CU-27` | `MOD-07` | `AuditService` / `ScreenPlaceholder` | `audit_log` | `registro_auditoria` | *(Pendiente visor REST: `/api/v1/audit-logs`)* | `DB-T05`, `DB-T06`, `vertical-flow.e2e-spec.ts` | **Parcial** (Motor BD y servicio backend activos; falta UI) |
+| **RF-18** Generación de Reportes y Tableros | `RN-03` | `CU-28` | `MOD-09` | `DashboardView` / `ScreenPlaceholder` | Vistas/Consultas sobre `change_request`, `project` | `solicitud_cambio`, `proyecto` | `GET /api/v1/rfcs`, `GET /api/v1/projects` | `INT-T05` | **Parcial** (Dashboard operativo; exportación pendiente) |
+
+---
+
+## 2. Matriz de Trazabilidad No Funcional (RNF-01..RNF-09)
+
+| RNF | Atributo / Norma | Regla / Decisión | Módulo(s) | Mecanismo en Backend / BD | Prueba / Evidencia | Estado |
+|---|---|---|---|---|---|---|
+| **RNF-01** Seguridad, RBAC, SoD y Sesiones | `ADR-006`, `RN-01` | `MOD-01`, `MOD-04` | Argon2id, cookie `HttpOnly`, Guards NestJS, triggers SoD | `DB-T07..11`, `DB-T13`, `enterprise.rbac.spec.mjs`, `INT-T01..06`, `INT-T14..16` | **Implementado en módulos activos** |
+| **RNF-02** Disponibilidad y Recuperación | `ADR-010`, `RN-08` | `MOD-05`, Infraestructura | Supabase managed PostgreSQL + diseño multi-stage Docker | `DB-T12`, `DB-T14` (sin fallback silencioso) | **Parcial** (BD nube activa; pipeline backup/Docker objetivo) |
+| **RNF-03** Integridad Criptográfica SHA-256 | `ADR-008`, `RN-02` | `MOD-05`, `MOD-07` | `append_audit_log()` SHA-256 y `ecs_version.sha256_checksum` | `DB-T05`, `DB-T06`, `audit.service.ts` | **Parcial** (Auditoría activa; Check-In binario pendiente) |
+| **RNF-04** Usabilidad y Experiencia SPA | `ADR-002` | `MOD-09`, UI transversal | React 19 + Tailwind CSS + navegación contextual por rol | `navigation.spec.mjs` (8/8), 17 capturas `1440x900` | **Implementado en 8 pantallas** |
+| **RNF-05** Rendimiento y Latencia API | `ADR-001`, `ADR-004` | Transversal | Pool PostgreSQL (`max: 10`), índices en `(project_id, status)` | `/api/v1/health` (~169 ms), `DB-T01..12` | **Verificado en módulos activos** |
+| **RNF-06** Portabilidad | `ADR-003`, `ADR-010` | Transversal | Variables `.env`, TLS CA relativo, Session Pooler IPv4 | Verificación `SCM-00` en Windows + Node 24 | **Verificado** |
+| **RNF-07** Compatibilidad y Estándares API | `ADR-009` | Transversal | API REST JSON `/api/v1`, `ValidationPipe` estricto | `real-postgres-vertical-flow.spec.ts`, `INT-T01..18` | **Verificado en endpoints activos** |
+| **RNF-08** Mantenibilidad Modular | `ADR-001`, `ADR-003` | `MOD-01`..`MOD-09` | Monolito Modular + `ESTANDAR_PROGRAMACION.md` | `oxlint` (`0` errores), `tsc --noEmit` | **Verificado** |
+| **RNF-09** Cumplimiento Normativo y Legal | Ley 29733 / D.L. 822 / IEEE 828 | `MOD-07`, Transversal | Mínimo privilegio `traceflow_app`, TLS 1.3, bitácora inmutable | `202611250003_secure_app_role_least_privilege.sql` | **Implementado en capa de datos** |
+
+---
+
+*Matriz Integral de Trazabilidad de TraceFlow SCM — Etapa DOC-02.7 — C-SharkTeam / ÉXODO S.A.C.*

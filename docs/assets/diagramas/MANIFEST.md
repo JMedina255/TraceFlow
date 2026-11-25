@@ -14,9 +14,9 @@
 |---|---|:---:|:---:|:---:|---|:---:|
 | **Generales** | Modelos Generales del Sistema | 13 | 13 | 13 | FD03 (SRS) | ✅ 100% |
 | **Analisis** | Modelos de Análisis y Casos de Uso (BCE/Secuencias) | 65 | 65 | 65 | FD03 (SRS) / FD04 (SAD Análisis) | ✅ 100% |
-| **Diseno** | Modelos Arquitectónicos y Secuencias de Diseño | 15 | 15 | 15 | FD05 (SAD Diseño) | ✅ 100% |
+| **Diseno** | Modelos Arquitectónicos, ER y Secuencias de Diseño | 17 | 17 | 17 | FD05 / DICCIONARIO_DATOS / SAD_FINAL | ✅ 100% |
 | **Uwe** | Modelos UWE de Navegación y Presentación UI | 21 | 21 | 21 | FD05 (SAD Diseño) | ✅ 100% |
-| **TOTAL CONSOLIDADO** | **Inventario Gráfico Oficial de TraceFlow SCM** | **114** | **114** | **114** | **FD03, FD04, FD05** | **✅ 100%** |
+| **TOTAL CONSOLIDADO** | **Inventario Gráfico Oficial de TraceFlow SCM** | **116** | **116** | **116** | **FD03, FD04, FD05, DICCIONARIO_DATOS, SAD_FINAL** | **✅ 100%** |
 
 ---
 
@@ -115,6 +115,8 @@
 | `DG-D01` | Arquitectura Física | Arquitectura Física de Software de TraceFlow SCM | [`DG-D01.puml`](plantuml/diseno/DG-D01.puml) | [SVG](render/diseno/DG-D01.svg) | [PNG](render/diseno/DG-D01.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D02` | Monolito Modular | Componentes del Monolito Modular Backend (MOD-01 a MOD-09) | [`DG-D02.puml`](plantuml/diseno/DG-D02.puml) | [SVG](render/diseno/DG-D02.svg) | [PNG](render/diseno/DG-D02.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D03` | Modelo Relacional Lógico | Modelo Relacional Lógico de Base de Datos - TraceFlow SCM | [`DG-D03.puml`](plantuml/diseno/DG-D03.puml) | [SVG](render/diseno/DG-D03.svg) | [PNG](render/diseno/DG-D03.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
+| `DG-ER-ACTUAL` | Modelo Relacional Físico | Modelo Relacional Físico Vigente (Supabase `traceflow` - 21 Tablas) | [`DG-ER-ACTUAL.puml`](plantuml/diseno/DG-ER-ACTUAL.puml) | [SVG](render/diseno/DG-ER-ACTUAL.svg) | [PNG](render/diseno/DG-ER-ACTUAL.png) | `DICCIONARIO_DATOS` / `SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
+| `DG-ER-OBJETIVO` | Modelo Relacional Objetivo | Modelo Relacional Objetivo en Español (`traceflow` - 21 Tablas) | [`DG-ER-OBJETIVO.puml`](plantuml/diseno/DG-ER-OBJETIVO.puml) | [SVG](render/diseno/DG-ER-OBJETIVO.svg) | [PNG](render/diseno/DG-ER-OBJETIVO.png) | `DICCIONARIO_DATOS` / `SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
 | `DG-D04` | Arquitectura de Storage | Arquitectura de Storage y Transición entre las 3 Bibliotecas SCM | [`DG-D04.puml`](plantuml/diseno/DG-D04.puml) | [SVG](render/diseno/DG-D04.svg) | [PNG](render/diseno/DG-D04.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D05` | Autenticación y SoD | Flujo Técnico de Autenticación, RBAC y Segregación de Funciones (SoD) | [`DG-D05.puml`](plantuml/diseno/DG-D05.puml) | [SVG](render/diseno/DG-D05.svg) | [PNG](render/diseno/DG-D05.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D06` | Despliegue (Deployment) | Diagrama de Despliegue de TraceFlow SCM (Docker / Compose) | [`DG-D06.puml`](plantuml/diseno/DG-D06.puml) | [SVG](render/diseno/DG-D06.svg) | [PNG](render/diseno/DG-D06.png) | `FD05` | ✅ Renderizado (SVG + PNG) |

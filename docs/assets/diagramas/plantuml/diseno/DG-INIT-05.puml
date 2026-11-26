@@ -1,0 +1,67 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-INIT-05: Flujo de Actividades del Asistente de Inicialización (DA-05)</b>
+
+|Gestor del Proyecto (PU-02)|
+start
+:Selecciona "Nuevo Proyecto";
+:Elige Organización asignada (DA-02);
+
+partition "Paso 1: Identidad, Objetivos y Alcance" {
+    :Ingresa Código, Nombre, Clave Nemotécnica,\nCliente, Objetivos y Fechas estimadas;
+    :Guarda Borrador Inicial;
+}
+
+partition "Paso 2: Equipo y Asignación de Roles (DA-06)" {
+    :Selecciona miembros registrados de la organización;
+    note right
+      <b>DA-06:</b> Solo usuarios registrados
+      con membresía activa en la organización
+    end note
+    :Asigna roles canónicos por proyecto\n(Líder Gestor, Arquitecto, Bibliotecario, QA, etc.);
+    :Guarda Asignaciones;
+}
+
+partition "Paso 3: Metodología y Planificación" {
+    :Selecciona Metodología (Scrum / Cascada / Híbrida);
+    :Define Fases, Hitos y Entregables clave;
+    :Guarda Cronograma Base;
+}
+
+partition "Paso 4: Integración GitHub (DA-03, DA-04)" {
+    if (¿Modalidad de Integración?) then (Vincular Repositorio Existente)
+        :Ingresa Owner/Repo o selecciona de lista autorizada;
+        :Proporciona credenciales / autoriza GitHub App;
+    else (Crear Nuevo Repositorio)
+        :Define nombre de repo, visibilidad (Privado/Público)\ny plantilla institucional de ramas;
+        :Solicita aprovisionamiento en GitHub;
+    endif
+    :Ejecuta prueba de diagnóstico y webhook;
+}
+
+partition "Paso 5: Resumen, Auditoría y Activación" {
+    :Revisa resumen consolidado de configuración;
+    if (¿GitHub Validado y Roles Mínimos Cubiertos?) then (Sí)
+        :Confirma Activación del Proyecto;
+        |Sistema TraceFlow|
+        :Transiciona estado de proyecto a ACTIVO;
+        :Inicializa las 3 bibliotecas (Trabajo, Soporte, Maestra);
+        :Registra evento inmutable en audit_log (SHA-256);
+        :Habilita operaciones SCM completas (RFC, ECN);
+        |Gestor del Proyecto (PU-02)|
+        :Recibe confirmación y accede al Panel de Control;
+    else (No)
+        |Sistema TraceFlow|
+        :Mantiene en estado BORRADOR / EN_CONFIGURACION;
+        :Señala requisitos faltantes en pantalla (DA-04);
+        |Gestor del Proyecto (PU-02)|
+        :Reanuda configuración o accede al Panel de Ajustes;
+    endif
+}
+
+stop
+
+@enduml

@@ -2,8 +2,8 @@
 
 > **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software  
 > **Organización:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
-> **Línea Base Documental:** Etapa 06 (Formalización Gráfica y Renderizado)  
-> **Fecha de Generación:** 25/11/2026 | **Total de Diagramas:** 123  
+> **Línea Base Documental:** Etapa 06 (Formalización Gráfica y Renderizado)<br>
+> **Fecha de Generación:** 25/11/2026 | **Total de Diagramas:** 133<br>
 > **Estado Global:** 100% de especificaciones PlantUML modularizadas y renderizadas en formatos vectoriales (SVG) y rasterizados (PNG).  
 
 ---
@@ -13,10 +13,10 @@
 | Categoría | Descripción y Dominio | Fuentes PUML | Renders SVG | Renders PNG | Documentos Destino | Estado |
 |---|---|:---:|:---:|:---:|---|:---:|
 | **Generales** | Modelos Generales del Sistema | 13 | 13 | 13 | FD03 (SRS) | ✅ 100% |
-| **Analisis** | Modelos de Análisis y Casos de Uso (Actividades/BCE/Secuencias) | 72 | 72 | 72 | FD03 (SRS) / FD04 (SAD Análisis) | ✅ 100% |
-| **Diseno** | Modelos Arquitectónicos, ER y Secuencias de Diseño | 17 | 17 | 17 | FD05 / DICCIONARIO_DATOS / SAD_FINAL | ✅ 100% |
+| **Analisis** | Modelos de Análisis y Casos de Uso (BCE/Secuencias) | 72 | 72 | 72 | FD03 (SRS) / FD04 (SAD Análisis) | ✅ 100% |
+| **Diseno** | Modelos Arquitectónicos y Secuencias de Diseño | 27 | 27 | 27 | FD05 (SAD Diseño) | ✅ 100% |
 | **Uwe** | Modelos UWE de Navegación y Presentación UI | 21 | 21 | 21 | FD05 (SAD Diseño) | ✅ 100% |
-| **TOTAL CONSOLIDADO** | **Inventario Gráfico Oficial de TraceFlow SCM** | **123** | **123** | **123** | **FD03, FD04, FD05, DICCIONARIO_DATOS, SAD_FINAL** | **✅ 100%** |
+| **TOTAL CONSOLIDADO** | **Inventario Gráfico Oficial de TraceFlow SCM** | **133** | **133** | **133** | **FD03, FD04, FD05** | **✅ 100%** |
 
 ---
 
@@ -35,7 +35,7 @@
 | `DG-09` | Modelo General / Análisis | TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad | [`DG-09.puml`](plantuml/generales/DG-09.puml) | [SVG](render/generales/DG-09.svg) | [PNG](render/generales/DG-09.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-10` | Modelo General / Análisis | TraceFlow SCM - Casos de Uso: Trazabilidad, Auditoría e Integridad | [`DG-10.puml`](plantuml/generales/DG-10.puml) | [SVG](render/generales/DG-10.svg) | [PNG](render/generales/DG-10.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-11` | Modelo General / Análisis | TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales) | [`DG-11.puml`](plantuml/generales/DG-11.puml) | [SVG](render/generales/DG-11.svg) | [PNG](render/generales/DG-11.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
-| `DG-12-HIST` | Diagrama de Clases (Histórico) | Diagrama de Clases del Dominio TraceFlow SCM (Histórico) | [`DG-12-HIST.puml`](plantuml/generales/DG-12-HIST.puml) | [SVG](render/generales/DG-12-HIST.svg) | [PNG](render/generales/DG-12-HIST.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-12-HIST` | Diagrama de Clases (Histórico) | Diagrama de Clases del Dominio TraceFlow SCM (Histórico) | [`DG-12-HIST.puml`](plantuml/generales/DG-12-HIST.puml) | [SVG](render/generales/DG-12-HIST.svg) | [PNG](render/generales/DG-12-HIST.png) | `FD03 / FD04` | ✅ Renderizado (SVG + PNG) |
 | `DG-13` | Modelo General / Análisis | Modelo Lógico de la Arquitectura de Software TraceFlow SCM | [`DG-13.puml`](plantuml/generales/DG-13.puml) | [SVG](render/generales/DG-13.svg) | [PNG](render/generales/DG-13.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 
 ## 3. Catálogo Detallado: Modelos de Análisis y Casos de Uso (72 Diagramas)
@@ -115,15 +115,13 @@
 | `DG-SEQ-29` | Secuencia de Análisis | Validar aceptación del cambio por el usuario (UAT) (CU-29) | [`DG-SEQ-29.puml`](plantuml/analisis/DG-SEQ-29.puml) | [SVG](render/analisis/DG-SEQ-29.svg) | [PNG](render/analisis/DG-SEQ-29.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-SEQ-30` | Secuencia de Análisis | Autorizar Cambio Menor (CU-30) | [`DG-SEQ-30.puml`](plantuml/analisis/DG-SEQ-30.puml) | [SVG](render/analisis/DG-SEQ-30.svg) | [PNG](render/analisis/DG-SEQ-30.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 
-## 4. Catálogo Detallado: Modelos Arquitectónicos y Secuencias Técnicas de Diseño (15 Diagramas)
+## 4. Catálogo Detallado: Modelos Arquitectónicos y Secuencias Técnicas de Diseño (27 Diagramas)
 
 | Identificador Canónico | Tipo de Modelo | Título / Nombre Formal | Código PUML | Render SVG | Render PNG | Doc. Primario | Estado de Render |
 |---|---|---|:---:|:---:|:---:|:---:|:---:|
 | `DG-D01` | Arquitectura Física | Arquitectura Física de Software de TraceFlow SCM | [`DG-D01.puml`](plantuml/diseno/DG-D01.puml) | [SVG](render/diseno/DG-D01.svg) | [PNG](render/diseno/DG-D01.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D02` | Monolito Modular | Componentes del Monolito Modular Backend (MOD-01 a MOD-09) | [`DG-D02.puml`](plantuml/diseno/DG-D02.puml) | [SVG](render/diseno/DG-D02.svg) | [PNG](render/diseno/DG-D02.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D03` | Modelo Relacional Lógico | Modelo Relacional Lógico de Base de Datos - TraceFlow SCM | [`DG-D03.puml`](plantuml/diseno/DG-D03.puml) | [SVG](render/diseno/DG-D03.svg) | [PNG](render/diseno/DG-D03.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
-| `DG-ER-ACTUAL` | Modelo Relacional Físico | Modelo Relacional Físico Vigente (Supabase `traceflow` - 21 Tablas) | [`DG-ER-ACTUAL.puml`](plantuml/diseno/DG-ER-ACTUAL.puml) | [SVG](render/diseno/DG-ER-ACTUAL.svg) | [PNG](render/diseno/DG-ER-ACTUAL.png) | `DICCIONARIO_DATOS` / `SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
-| `DG-ER-OBJETIVO` | Modelo Relacional Objetivo | Modelo Relacional Objetivo en Español (`traceflow` - 21 Tablas) | [`DG-ER-OBJETIVO.puml`](plantuml/diseno/DG-ER-OBJETIVO.puml) | [SVG](render/diseno/DG-ER-OBJETIVO.svg) | [PNG](render/diseno/DG-ER-OBJETIVO.png) | `DICCIONARIO_DATOS` / `SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
 | `DG-D04` | Arquitectura de Storage | Arquitectura de Storage y Transición entre las 3 Bibliotecas SCM | [`DG-D04.puml`](plantuml/diseno/DG-D04.puml) | [SVG](render/diseno/DG-D04.svg) | [PNG](render/diseno/DG-D04.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D05` | Autenticación y SoD | Flujo Técnico de Autenticación, RBAC y Segregación de Funciones (SoD) | [`DG-D05.puml`](plantuml/diseno/DG-D05.puml) | [SVG](render/diseno/DG-D05.svg) | [PNG](render/diseno/DG-D05.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-D06` | Despliegue (Deployment) | Diagrama de Despliegue de TraceFlow SCM (Docker / Compose) | [`DG-D06.puml`](plantuml/diseno/DG-D06.puml) | [SVG](render/diseno/DG-D06.svg) | [PNG](render/diseno/DG-D06.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
@@ -136,6 +134,18 @@
 | `DG-DSEQ-21` | Secuencia Técnica de Diseño | Revertir Versión de ECS - Rollback en Biblioteca de Trabajo (CU-21, RN-08) | [`DG-DSEQ-21.puml`](plantuml/diseno/DG-DSEQ-21.puml) | [SVG](render/diseno/DG-DSEQ-21.svg) | [PNG](render/diseno/DG-DSEQ-21.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-DSEQ-29` | Secuencia Técnica de Diseño | Validar Aceptación del Cambio por el Usuario (UAT) (CU-29, RN-09) | [`DG-DSEQ-29.puml`](plantuml/diseno/DG-DSEQ-29.puml) | [SVG](render/diseno/DG-DSEQ-29.svg) | [PNG](render/diseno/DG-DSEQ-29.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
 | `DG-DSEQ-30` | Secuencia Técnica de Diseño | Autorizar Cambio Menor por Autoridad Delegada Compartida (CU-30, RN-01, RN-05) | [`DG-DSEQ-30.puml`](plantuml/diseno/DG-DSEQ-30.puml) | [SVG](render/diseno/DG-DSEQ-30.svg) | [PNG](render/diseno/DG-DSEQ-30.png) | `FD05` | ✅ Renderizado (SVG + PNG) |
+| `DG-ER-ACTUAL` | Modelo Relacional Físico | Modelo Relacional Físico Vigente (Supabase traceflow - 21 Tablas) | [`DG-ER-ACTUAL.puml`](plantuml/diseno/DG-ER-ACTUAL.puml) | [SVG](render/diseno/DG-ER-ACTUAL.svg) | [PNG](render/diseno/DG-ER-ACTUAL.png) | `DICCIONARIO_DATOS / SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
+| `DG-ER-OBJETIVO` | Modelo Relacional Objetivo | Modelo Relacional Objetivo en Español (Esquema traceflow - 21 Tablas) | [`DG-ER-OBJETIVO.puml`](plantuml/diseno/DG-ER-OBJETIVO.puml) | [SVG](render/diseno/DG-ER-OBJETIVO.svg) | [PNG](render/diseno/DG-ER-OBJETIVO.png) | `DICCIONARIO_DATOS / SAD_FINAL` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-01` | Modelo Arquitectónico | Diagrama de Contexto del Sistema (TraceFlow SCM TO-BE) | [`DG-INIT-01.puml`](plantuml/diseno/DG-INIT-01.puml) | [SVG](render/diseno/DG-INIT-01.svg) | [PNG](render/diseno/DG-INIT-01.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-02` | Modelo Arquitectónico | Arquitectura por Componentes Backend TO-BE (Monolito Modular) | [`DG-INIT-02.puml`](plantuml/diseno/DG-INIT-02.puml) | [SVG](render/diseno/DG-INIT-02.svg) | [PNG](render/diseno/DG-INIT-02.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-03` | Modelo Arquitectónico | Modelo de Organización y Multiproyecto (DA-01, DA-02, DA-06) | [`DG-INIT-03.puml`](plantuml/diseno/DG-INIT-03.puml) | [SVG](render/diseno/DG-INIT-03.svg) | [PNG](render/diseno/DG-INIT-03.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-04` | Modelo Arquitectónico | Máquina de Estados del Ciclo de Vida del Proyecto | [`DG-INIT-04.puml`](plantuml/diseno/DG-INIT-04.puml) | [SVG](render/diseno/DG-INIT-04.svg) | [PNG](render/diseno/DG-INIT-04.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-05` | Modelo Arquitectónico | Flujo de Actividades del Asistente de Inicialización (DA-05) | [`DG-INIT-05.puml`](plantuml/diseno/DG-INIT-05.puml) | [SVG](render/diseno/DG-INIT-05.svg) | [PNG](render/diseno/DG-INIT-05.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-06` | Modelo Arquitectónico | Modelo Entidad-Relación Conceptual TO-BE | [`DG-INIT-06.puml`](plantuml/diseno/DG-INIT-06.puml) | [SVG](render/diseno/DG-INIT-06.svg) | [PNG](render/diseno/DG-INIT-06.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-07` | Modelo Arquitectónico | Secuencia de Vinculación de Repositorio GitHub Existente (DA-03) | [`DG-INIT-07.puml`](plantuml/diseno/DG-INIT-07.puml) | [SVG](render/diseno/DG-INIT-07.svg) | [PNG](render/diseno/DG-INIT-07.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-08` | Modelo Arquitectónico | Secuencia de Creación de Nuevo Repositorio GitHub (DA-03) | [`DG-INIT-08.puml`](plantuml/diseno/DG-INIT-08.puml) | [SVG](render/diseno/DG-INIT-08.svg) | [PNG](render/diseno/DG-INIT-08.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-09` | Modelo Arquitectónico | Secuencia de Activación del Proyecto con Salvaguarda SCM (DA-04) | [`DG-INIT-09.puml`](plantuml/diseno/DG-INIT-09.puml) | [SVG](render/diseno/DG-INIT-09.svg) | [PNG](render/diseno/DG-INIT-09.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-10` | Modelo Arquitectónico | Mapa de Navegación del Frontend TO-BE (React 19 Router) | [`DG-INIT-10.puml`](plantuml/diseno/DG-INIT-10.puml) | [SVG](render/diseno/DG-INIT-10.svg) | [PNG](render/diseno/DG-INIT-10.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 
 ## 5. Catálogo Detallado: Modelos UWE de Navegación y Presentación (21 Diagramas)
 

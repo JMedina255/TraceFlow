@@ -1,0 +1,166 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-06: Modelo Entidad-Relación Conceptual TO-BE</b>
+
+entity "organization\n(Organización)" as ORG {
+    * id : UUID [PK]
+    --
+    * code : VARCHAR(30) [UQ]
+    * name : VARCHAR(120)
+    * slug : VARCHAR(60) [UQ]
+    * status : VARCHAR(20)
+    created_at : TIMESTAMPTZ
+}
+
+entity "organization_member\n(Membresía Org)" as ORG_MEM {
+    * id : UUID [PK]
+    --
+    * organization_id : UUID [FK]
+    * user_id : UUID [FK]
+    * role_in_org : VARCHAR(30)
+    * status : VARCHAR(20)
+}
+
+entity "app_user\n(Usuario)" as USR {
+    * id : UUID [PK]
+    --
+    * code : VARCHAR(30) [UQ]
+    * username : VARCHAR(50) [UQ]
+    * email : VARCHAR(100) [UQ]
+    * full_name : VARCHAR(120)
+    * status : VARCHAR(20)
+}
+
+entity "project\n(Proyecto)" as PRJ {
+    * id : UUID [PK]
+    --
+    * organization_id : UUID [FK]
+    * code : VARCHAR(30) [UQ]
+    * project_key : VARCHAR(30) [UQ]
+    * name : VARCHAR(120)
+    * status : VARCHAR(30)
+    active_baseline_version : VARCHAR(30)
+}
+
+entity "project_setup\n(Config Asistente)" as SETUP {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK, UQ]
+    * wizard_step : INT
+    * wizard_completed : BOOLEAN
+    * draft_payload : JSONB
+    updated_at : TIMESTAMPTZ
+}
+
+entity "project_team_role\n(Rol en Proyecto)" as PROJ_ROLE {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    * user_id : UUID [FK]
+    * role_id : INT [FK]
+    functional_title : VARCHAR(100)
+    is_lead : BOOLEAN
+}
+
+entity "project_methodology\n(Metodología)" as METH {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK, UQ]
+    * methodology_type : VARCHAR(30)
+    iteration_duration_weeks : INT
+    active_phase_code : VARCHAR(30)
+}
+
+entity "project_phase\n(Fases)" as PHASE {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    * phase_code : VARCHAR(30)
+    * name : VARCHAR(100)
+    sequence_order : INT
+    start_date : DATE
+    end_date : DATE
+}
+
+entity "project_milestone\n(Hitos)" as MILE {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    phase_id : UUID [FK]
+    * code : VARCHAR(30)
+    * title : VARCHAR(150)
+    target_date : DATE
+}
+
+entity "project_deliverable\n(Entregables)" as DELIV {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    milestone_id : UUID [FK]
+    * code : VARCHAR(30)
+    * name : VARCHAR(150)
+    expected_type : VARCHAR(50)
+}
+
+entity "github_integration\n(Integración GitHub)" as GH {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK, UQ]
+    * integration_mode : VARCHAR(20)
+    * repo_owner : VARCHAR(100)
+    * repo_name : VARCHAR(100)
+    * repo_full_name : VARCHAR(200)
+    * github_repo_id : BIGINT
+    * default_branch : VARCHAR(50)
+    encrypted_access_token : BYTEA
+    * validation_status : VARCHAR(30)
+    last_validated_at : TIMESTAMPTZ
+}
+
+entity "github_event\n(Eventos / Webhooks)" as GHEVT {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    * github_delivery_id : VARCHAR(64) [UQ]
+    * event_type : VARCHAR(50)
+    * payload : JSONB
+    signature_verified : BOOLEAN
+    created_at : TIMESTAMPTZ
+}
+
+entity "config_item\n(ECS)" as ECS {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    * code : VARCHAR(50)
+    * current_library : VARCHAR(20)
+}
+
+entity "change_request\n(RFC)" as RFC {
+    * id : UUID [PK]
+    --
+    * project_id : UUID [FK]
+    * code : VARCHAR(30) [UQ]
+    * status : VARCHAR(30)
+}
+
+ORG ||--o{ PRJ : agrupa (DA-02)
+ORG ||--o{ ORG_MEM : tiene
+USR ||--o{ ORG_MEM : participa
+PRJ ||--|| SETUP : asiste
+PRJ ||--o{ PROJ_ROLE : asigna
+USR ||--o{ PROJ_ROLE : ejerce
+PRJ ||--o| METH : define
+PRJ ||--o{ PHASE : planifica
+PHASE ||--o{ MILE : contiene
+MILE ||--o{ DELIV : produce
+PRJ ||--|| GH : vincula (DA-04)
+PRJ ||--o{ GHEVT : recibe
+PRJ ||--o{ ECS : delimita
+PRJ ||--o{ RFC : gobierna
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-INIT-07: Secuencia de Vinculación de Repositorio GitHub Existente (DA-03)</b>
+
+actor "Gestor / Arquitecto\n(PU-02 / PU-03)" as User
+boundary "Panel / Asistente UI\n(React SPA)" as UI
+control "ProjectsController\n(NestJS)" as ProjCtrl
+control "GitHubController\n(NestJS)" as GHCtrl
+control "GitHubAppClientService\n(Backend Service)" as GHService
+control "GitHubCryptoService\n(AES-256-GCM)" as Crypto
+entity "GitHub API v3/v4\n(Remote)" as GitHub
+database "PostgreSQL 17\n(traceflow)" as DB
+control "AuditService\n(SHA-256)" as Audit
+
+User -> UI : 1. Selecciona "Vincular Repositorio Existente" e ingresa Owner/Repo
+UI -> GHCtrl : POST /api/v1/projects/:id/github/link\n{ repoOwner: "ÉXODO-ORG", repoName: "TraceFlow-Core" }
+activate GHCtrl
+
+GHCtrl -> GHService : validateAndLinkRepository(projectId, owner, repo, user)
+activate GHService
+
+GHService -> GitHub : GET /repos/{owner}/{repo} (Verificar existencia y metadatos)
+GitHub --> GHService : 200 OK { id, full_name, default_branch, permissions }
+
+alt Permisos insuficientes (requiere push / admin)
+    GHService --> GHCtrl : Excepción: Permisos insuficientes en el repositorio
+    GHCtrl --> UI : 403 Forbidden { code: 'GH_INSUFFICIENT_PERMISSIONS' }
+    UI --> User : Muestra mensaje de error y permisos requeridos
+else Permisos suficientes
+    GHService -> GitHub : POST /repos/{owner}/{repo}/hooks (Configura Webhook con secret)
+    GitHub --> GHService : 201 Created { id: webhook_id, active: true }
+
+    GHService -> Crypto : encryptSecret(webhookSecret)
+    Crypto --> GHService : { encryptedSecret, iv, tag }
+
+    GHService -> DB : INSERT / UPDATE traceflow.github_integration\n(status: 'VALIDATED', last_validated_at: NOW())
+    DB --> GHService : OK
+
+    GHService -> Audit : logEvent('GH_REPO_LINKED', projectId, user, 'SUCCESS')
+    Audit --> GHService : auditRecordId
+
+    GHService --> GHCtrl : { status: 'VALIDATED', repo: 'ÉXODO-ORG/TraceFlow-Core' }
+    GHCtrl --> UI : 200 OK { success: true, integration: {...} }
+    UI --> User : Muestra estado de integración "VALIDADO" y listo para activación
+end
+
+deactivate GHService
+deactivate GHCtrl
+
+@enduml

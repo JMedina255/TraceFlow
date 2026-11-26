@@ -1,0 +1,71 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-INIT-09: Secuencia de Activación del Proyecto con Salvaguarda SCM (DA-04)</b>
+
+actor "Gestor de Configuración\n(PU-02)" as Gestor
+boundary "Asistente / Ficha de Proyecto\n(React SPA)" as UI
+control "ProjectsController\n(NestJS)" as ProjCtrl
+control "ProjectLifecycleService\n(Backend)" as LifeService
+control "GitHubIntegrationRepository\n(Repo)" as GHRepo
+database "PostgreSQL 17\n(traceflow)" as DB
+control "AuditService\n(SHA-256)" as Audit
+actor "Solicitante\n(PU-01)" as Solicitante
+control "RfcsController\n(NestJS)" as RfcsCtrl
+control "ProjectActiveGuard\n(NestJS Guard)" as Guard
+
+Gestor -> UI : 1. Solicita activación del proyecto en Paso 5 del Asistente
+UI -> ProjCtrl : POST /api/v1/projects/:id/activate
+activate ProjCtrl
+
+ProjCtrl -> LifeService : activateProject(projectId, gestorUser)
+activate LifeService
+
+LifeService -> GHRepo : findByProjectId(projectId)
+GHRepo --> LifeService : integrationRecord
+
+alt Integración GitHub no existe o validation_status != 'VALIDATED' (DA-04)
+    LifeService --> ProjCtrl : PreconditionFailedException\n("DA-04: La integración con GitHub debe estar validada para activar el proyecto.")
+    ProjCtrl --> UI : 412 Precondition Failed { error: "GITHUB_VALIDATION_REQUIRED" }
+    UI --> Gestor : Alerta en pantalla: Bloqueo de activación (Falta GitHub)
+else Integración GitHub VALIDADA
+    LifeService -> DB : UPDATE traceflow.project SET status = 'ACTIVO' WHERE id = :projectId
+    DB --> LifeService : OK
+
+    LifeService -> DB : Inicializar las 3 Bibliotecas (Trabajo, Soporte, Maestra)
+    DB --> LifeService : OK
+
+    LifeService -> Audit : logEvent('PROJECT_ACTIVATED', projectId, gestorUser, 'SUCCESS')
+    Audit --> LifeService : auditId
+
+    LifeService --> ProjCtrl : { status: 'ACTIVO', activatedAt: NOW() }
+    ProjCtrl --> UI : 200 OK { message: "Proyecto formalmente activado." }
+    UI --> Gestor : Proyecto ACTIVO; procesos SCM habilitados
+end
+
+deactivate LifeService
+deactivate ProjCtrl
+
+== Demostración de Salvaguarda SCM en Operación ==
+
+Solicitante -> RfcsCtrl : POST /api/v1/rfcs (Intento de registro de cambio)
+activate RfcsCtrl
+RfcsCtrl -> Guard : canActivate(context)
+activate Guard
+Guard -> DB : SELECT status FROM traceflow.project WHERE id = :projectId
+DB --> Guard : status
+
+alt status != 'ACTIVO'
+    Guard --> RfcsCtrl : 412 Precondition Failed\n("Operación SCM denegada: El proyecto no se encuentra en estado ACTIVO.")
+    RfcsCtrl --> Solicitante : Rechazo formal de registro de RFC (DA-04)
+else status == 'ACTIVO'
+    Guard --> RfcsCtrl : true (Acceso autorizado)
+    RfcsCtrl -> RfcsCtrl : Procede con creación y auditoría de RFC
+    RfcsCtrl --> Solicitante : 201 Created
+end
+deactivate Guard
+deactivate RfcsCtrl
+
+@enduml

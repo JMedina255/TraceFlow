@@ -73,6 +73,8 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-07** Auditoría e Integridad | Bitácora SHA-256 append-only e inspección de cadena | `CU-27` | **Operativo base** (`AuditModule` + `append_audit_log()`); falta visor UI |
 | **MOD-08** Incidencias y Soporte | Tickets de falla y derivación a RFC | `CU-23..25` | Tabla `incident_ticket` desplegada; endpoints/UI pendientes |
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
+| **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | Diseñado en `INIT-H01` (`ADR-011`) |
+| **MOD-11 (Nuevo)** Integración GitHub | Vinculación/Creación de repositorios, webhooks HMAC-SHA256, tokens AES-256 (DA-03, DA-04) | `CU-33` | Diseñado en `INIT-H01` (`ADR-011`) |
 
 ## 11. Modelo de Dominio (`DG-12`)
 *(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
@@ -150,9 +152,9 @@ El puerto `StoragePort` (`ADR-005`) desacopla los metadatos relacionales del alm
 ## 24. Disponibilidad y Recuperación (`ADR-010`)
 Metas de diseño: respaldos diarios automatizados de PostgreSQL/storage (`RPO <= 24h`, `RTO <= 2h`) y protocolo de rollback controlado de ECS ante fallos en QA/UAT (`CU-21`, `DG-DSEQ-21`).
 
-## 25. Decisiones Arquitectónicas (`ADR-001` a `ADR-010`)
-Todas aprobadas el `2026-10-01` en [`docs/adr/`](adr/README.md):
-`ADR-001` (Monolito Modular), `ADR-002` (React SPA), `ADR-003` (NestJS/Node 24), `ADR-004` (PostgreSQL), `ADR-005` (`StoragePort` + 3 Bibliotecas), `ADR-006` (Sesiones Opacas `HttpOnly`; Keycloak diferido), `ADR-007` (Bloqueo Exclusivo en BD), `ADR-008` (Auditoría Append-Only SHA-256), `ADR-009` (API REST JSON/OpenAPI), `ADR-010` (Docker & Continuidad).
+## 25. Decisiones Arquitectónicas (`ADR-001` a `ADR-011`)
+Todas aprobadas el `2026-10-01` en [`docs/adr/`](adr/README.md) y `ADR-011` propuesto en `2026-11-25`:
+`ADR-001` (Monolito Modular), `ADR-002` (React SPA), `ADR-003` (NestJS/Node 24), `ADR-004` (PostgreSQL), `ADR-005` (`StoragePort` + 3 Bibliotecas), `ADR-006` (Sesiones Opacas `HttpOnly`; Keycloak diferido), `ADR-007` (Bloqueo Exclusivo en BD), `ADR-008` (Auditoría Append-Only SHA-256), `ADR-009` (API REST JSON/OpenAPI), `ADR-010` (Docker & Continuidad), `ADR-011` (Inicialización, Gobernanza GitHub y Salvaguardas SCM).
 
 ## 26. Trazabilidad con Requerimientos
 La trazabilidad bidireccional completa entre `RF-01`..`RF-18`, `RNF-01`..`RNF-09`, `RN-01`..`RN-09`, `CU-01`..`CU-30`/`CU-04.1`, módulos, tablas actuales/objetivo, endpoints y pruebas se mantiene en [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md).
@@ -171,6 +173,14 @@ Para mantener [`FD03-EPIS-Informe_SRS.md`](FD03-EPIS-Informe_SRS.md) estrictamen
 - **Diseñado pendiente de implementación (`SCM-02+`):** `CU-08`..`CU-26`, `CU-28`, `CU-29`, adaptador `StoragePort` físico y UI de las 12 pantallas en placeholder.
 - **Propuesta de normalización (`REF-01`):** La traducción al español de código, rutas y tablas (`DG-ER-OBJETIVO`) es una **arquitectura objetivo documental pendiente de aprobación** conforme a [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md); **no ha sido desplegada aún en Supabase ni en código fuente**.
 
+## 29. Inicialización de Proyectos, Gobernanza GitHub y Salvaguardas SCM (INIT-H01)
+Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) y [`docs/adr/ADR-011.md`](adr/ADR-011.md):
+- **Gobernanza Multitenant (`DA-01`, `DA-02`, `DA-06`):** Entidades `organization` y `organization_member`, membresía activa obligatoria para incorporación a proyectos (`RN-10`, `RN-11`).
+- **Asistente Híbrido 5 Pasos (`DA-05`, `RN-14`):** Entidad `project_setup` con `draft_payload JSONB` para autosave sin alterar restricciones relacionales (`DG-INIT-05`).
+- **Integración GitHub Segura (`DA-03`, `DA-04`):** Soporte de vinculación y creación de repositorios (`DG-INIT-07`, `DG-INIT-08`), credenciales cifradas con AES-256-GCM, webhooks HMAC-SHA256 y tabla idempotente `github_event`.
+- **Salvaguarda Operacional SCM (`DA-04`, `RN-12`, `RN-13`):** El guardián `ProjectActiveGuard` bloquea formalmente (HTTP 412) todo registro de RFC u operación en bibliotecas en proyectos que no cuenten con GitHub validado y estado `ACTIVO` (`DG-INIT-09`).
+- **Compendio Gráfico Canónico:** 10 modelos compilados `DG-INIT-01` a `DG-INIT-10` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01 — C-SharkTeam / ÉXODO S.A.C.*

@@ -660,3 +660,23 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 
 ---
 *Diccionario de Datos de TraceFlow SCM — Etapa DOC-02.2 / Auditado DOC-03 — C-SharkTeam / ÉXODO S.A.C.*
+
+
+---
+
+## 20. Entidades Candidatas para la Etapa de Inicialización y Gobierno GitHub (INIT-H01 / INIT-H02)
+
+*(Diseño propuesto en `PLAN_INICIALIZACION_PROYECTOS.md` y `ADR-011`; **no ejecutado** en PostgreSQL durante H01).*
+
+| ID | Tabla Actual Propuesta | Equivalente Objetivo Español | Propósito y Cardinalidad | Claves y Restricciones | Privilegios `traceflow_app` |
+|---|---|---|---|---|---|
+| **22** | `organization` | `organizacion` | Tenant raíz institucional (DA-02). 1:N con `project` y `organization_member`. | PK `id UUID`, UQ `code`, UQ `slug`, CHECK `status IN ('ACTIVE','SUSPENDED','ARCHIVED')`. | `SELECT, INSERT, UPDATE` |
+| **23** | `organization_member` | `miembro_organizacion` | Membresía previa obligatoria para asignación (DA-06). N:M entre `organization` y `app_user`. | PK `id UUID`, FK `organization_id`, FK `user_id`, UQ `(organization_id, user_id)`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **24** | `project_setup` | `configuracion_asistente` | Estado y autosave del Asistente de 5 pasos (DA-05). 1:1 con `project`. | PK `id UUID`, UQ `project_id`, `draft_payload JSONB`, CHECK `wizard_step BETWEEN 1 AND 5`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **25** | `project_team_role` | `rol_equipo_proyecto` | Especialidades y roles funcionales del equipo en el proyecto. N:M con rol canónico. | PK `id UUID`, FK `project_id`, FK `user_id`, FK `role_id`, UQ `(project_id, user_id, role_id)`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **26** | `project_methodology` | `metodologia_proyecto` | Adopción metodológica (Scrum, Cascada, Híbrida). 1:1 con `project`. | PK `id UUID`, UQ `project_id`, CHECK `methodology_type`. | `SELECT, INSERT, UPDATE` |
+| **27** | `project_phase` | `fase_proyecto` | Fases cronológicas planificadas. 1:N con `project`. | PK `id UUID`, FK `project_id`, UQ `(project_id, sequence_order)`, CHECK `end_date >= start_date`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **28** | `project_milestone` | `hito_proyecto` | Hitos clave de control temporal. 1:N con `project`. | PK `id UUID`, FK `project_id`, FK `phase_id`, UQ `(project_id, code)`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **29** | `project_deliverable` | `entregable_proyecto` | Entregables técnicos asociados a ECS. 1:N con `project`. | PK `id UUID`, FK `project_id`, FK `milestone_id`, FK `associated_ecs_id`. | `SELECT, INSERT, UPDATE, DELETE` |
+| **30** | `github_integration` | `integracion_github` | Integración GitHub obligatoria (DA-03, DA-04). 1:1 con `project`. | PK `id UUID`, UQ `project_id`, UQ `(repo_owner, repo_name)`, tokens cifrados AES-256-GCM. | `SELECT, INSERT, UPDATE` |
+| **31** | `github_event` | `evento_github` | Registro idempotente de webhooks HMAC-SHA256. 1:N con `project`. | PK `id UUID`, FK `project_id`, UQ `github_delivery_id`, `payload JSONB`. | `SELECT, INSERT, UPDATE` |

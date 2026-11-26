@@ -84,6 +84,7 @@ Cada ADR individual documenta el contexto del problema, los criterios de evaluac
 | [**ADR-009**](ADR-009.md) | Contratos de Comunicación API — RESTful, JSON y OpenAPI 3.0 | **APROBADO** | 2026-10-01 | API REST sobre HTTPS, DTOs JSON, errores RFC 7807 y especificación OpenAPI 3.0. Rutas como ejemplos de diseño. |
 
 | [**ADR-010**](ADR-010.md) | Estrategia de Empaquetado, Despliegue, Continuidad y Respaldo Operacional | **APROBADO** | 2026-10-01 | Docker multi-stage, reverse proxy Nginx, réplicas stateless y respaldo de Unidad Lógica (DB + Storage + Manifest). |
+| [**ADR-011**](ADR-011.md) | Arquitectura de Inicialización, Organización Multiproyecto y Salvaguarda de Integración GitHub | **PROPUESTO** | 2026-11-25 | Tenant raíz Organización (DA-02), Asistente híbrido 5 pasos con autosave (DA-05), membresía previa (DA-06), integración GitHub App (DA-03) y salvaguarda de activación SCM (DA-04). |
 
 
 
@@ -118,6 +119,7 @@ Cada ADR individual documenta el contexto del problema, los criterios de evaluac
 | **ADR-009** | API RESTful + JSON + OpenAPI 3.0 | **APROBADO** | **NINGUNO** | RF-01..18, CU-01..30, CU-04.1. Todas las rutas se marcan como ejemplos de diseño. Catálogo definitivo se derivará en SAD de Diseño. |
 
 | **ADR-010** | Docker Multi-Stage + Unidad de Respaldo | **APROBADO** | **NINGUNO** | RNF-02, RNF-08, RNF-09. Corrección crítica de respaldo: `Backup = Snapshot DB + Snapshot Storage + Manifest`. 02:00 y 30 días como diseño operativo. |
+| **ADR-011** | Inicialización Multiorganización y GitHub | **PROPUESTO** | **ADITIVO** | DA-01..DA-06, MOD-10, MOD-11, RF-19..RF-23, RN-10..RN-15. Tenant raíz, membresía DA-06, GitHub App con AES-256-GCM y salvaguarda ProjectActiveGuard. |
 
 
 

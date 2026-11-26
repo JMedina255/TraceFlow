@@ -138,6 +138,16 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-UWE-PRES-11](#dg-uwe-pres-11--centro-de-suscripción-de-acta-uat) | Centro de Suscripción de Acta UAT | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 | [DG-UWE-PRES-12](#dg-uwe-pres-12--gestión-de-línea-base-y-rollback-scm) | Gestión de Línea Base y Rollback SCM | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
 | [DG-UWE-PRES-13](#dg-uwe-pres-13--auditoría-inmutable-y-reportes-scm) | Auditoría Inmutable y Reportes SCM | Presentación (UWE) | BORRADOR — DISEÑO UWE | 0.1 |
+| [DG-INIT-01](#dg-init-01--contexto-del-sistema-to-be) | Contexto del Sistema (TraceFlow SCM TO-BE) | Contexto C4 / Inicialización | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-02](#dg-init-02--arquitectura-por-componentes-backend-to-be) | Arquitectura por Componentes Backend TO-BE | Componentes / Monolito Modular | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-03](#dg-init-03--modelo-de-organización-y-multiproyecto) | Modelo de Organización y Multiproyecto | Jerarquía / Multitenant | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-04](#dg-init-04--ciclo-de-vida-del-proyecto) | Máquina de Estados del Ciclo de Vida del Proyecto | Estados / Ciclo de Vida | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-05](#dg-init-05--asistente-de-inicialización) | Flujo de Actividades del Asistente de Inicialización | Actividades / Asistente 5 Pasos | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-06](#dg-init-06--modelo-entidad-relación-conceptual-to-be) | Modelo Entidad-Relación Conceptual TO-BE | Entidad-Relación Conceptual | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-07](#dg-init-07--secuencia-de-vinculación-de-repositorio-github) | Secuencia de Vinculación de Repositorio GitHub Existente | Secuencia de Integración | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-08](#dg-init-08--secuencia-de-creación-de-nuevo-repositorio-github) | Secuencia de Creación de Nuevo Repositorio GitHub | Secuencia de Aprovisionamiento | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-09](#dg-init-09--secuencia-de-activación-del-proyecto-con-salvaguarda-scm) | Secuencia de Activación del Proyecto con Salvaguarda SCM | Secuencia / Salvaguarda DA-04 | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-10](#dg-init-10--mapa-de-navegación-del-frontend-to-be) | Mapa de Navegación del Frontend TO-BE (React Router) | Navegación UI / Frontend | CANDIDATO (INIT-H01) | 1.0 |
 
 ---
 
@@ -8205,3 +8215,70 @@ endif
 stop
 @enduml
 ```
+
+
+---
+
+## 11. Diagramas de Inicialización de Proyectos y Gobernanza GitHub (INIT-H01)
+
+### DG-INIT-01 — Contexto del Sistema (TraceFlow SCM TO-BE)
+Fuente: [`DG-INIT-01.puml`](assets/diagramas/plantuml/diseno/DG-INIT-01.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-01.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-01.png)
+
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-01: Diagrama de Contexto del Sistema (TraceFlow SCM TO-BE)</b>
+
+actor "Administrador de Organización\n(PU-02 / Gestor)" as UserOrg
+actor "Líder Técnico / Arquitecto\n(PU-03)" as UserArch
+actor "Comité CCB y Equipo SCM\n(PU-04, PU-05, PU-06, PU-07)" as UserSCM
+
+boundary "TraceFlow SCM\nPortal Web (SPA React 19)" as Frontend
+control "TraceFlow Core Backend\n(NestJS 11 Monolito Modular)" as Backend
+database "Base de Datos Central\n(PostgreSQL 17 / Supabase)" as Database
+entity "Plataforma GitHub\n(GitHub REST & GraphQL API v3/v4)" as GitHubAPI
+entity "GitHub Webhooks\n(HMAC-SHA256 Signatures)" as GitHubHooks
+
+UserOrg --> Frontend : 1. Gestiona organización, crea proyecto\ny configura equipo autorizado (DA-02, DA-06)
+UserArch --> Frontend : 2. Configura metodología, cronograma\ny vincula/crea repositorio GitHub (DA-03)
+UserSCM --> Frontend : 3. Opera procesos SCM (RFC, ECN, Check-In/Out)\n[Condicionado a Proyecto ACTIVO (DA-04)]
+
+Frontend --> Backend : Llamadas REST seguras (/api/v1/*)\nCookie HttpOnly tf_session + CSRF
+
+Backend --> Database : Persistencia ACID, aislamiento multitenant\nCadena SHA-256 de auditoría (ADR-008)
+
+Backend --> GitHubAPI : Vincula/Crea repositorios, verifica permisos\nInstalación de GitHub App / OAuth (DA-03, DA-04)
+GitHubHooks --> Backend : Eventos asíncronos (push, pull_request, release)\nValidación de firma X-Hub-Signature-256
+@enduml
+```
+
+### DG-INIT-02 — Arquitectura por Componentes Backend TO-BE
+Fuente: [`DG-INIT-02.puml`](assets/diagramas/plantuml/diseno/DG-INIT-02.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-02.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-02.png)
+
+### DG-INIT-03 — Modelo de Organización y Multiproyecto
+Fuente: [`DG-INIT-03.puml`](assets/diagramas/plantuml/diseno/DG-INIT-03.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-03.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-03.png)
+
+### DG-INIT-04 — Ciclo de Vida del Proyecto
+Fuente: [`DG-INIT-04.puml`](assets/diagramas/plantuml/diseno/DG-INIT-04.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-04.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-04.png)
+
+### DG-INIT-05 — Asistente de Inicialización
+Fuente: [`DG-INIT-05.puml`](assets/diagramas/plantuml/diseno/DG-INIT-05.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-05.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-05.png)
+
+### DG-INIT-06 — Modelo Entidad-Relación Conceptual TO-BE
+Fuente: [`DG-INIT-06.puml`](assets/diagramas/plantuml/diseno/DG-INIT-06.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-06.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-06.png)
+
+### DG-INIT-07 — Secuencia de Vinculación de Repositorio GitHub
+Fuente: [`DG-INIT-07.puml`](assets/diagramas/plantuml/diseno/DG-INIT-07.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-07.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-07.png)
+
+### DG-INIT-08 — Secuencia de Creación de Nuevo Repositorio GitHub
+Fuente: [`DG-INIT-08.puml`](assets/diagramas/plantuml/diseno/DG-INIT-08.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-08.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-08.png)
+
+### DG-INIT-09 — Secuencia de Activación del Proyecto con Salvaguarda SCM
+Fuente: [`DG-INIT-09.puml`](assets/diagramas/plantuml/diseno/DG-INIT-09.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-09.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-09.png)
+
+### DG-INIT-10 — Mapa de Navegación del Frontend TO-BE
+Fuente: [`DG-INIT-10.puml`](assets/diagramas/plantuml/diseno/DG-INIT-10.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-10.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-10.png)

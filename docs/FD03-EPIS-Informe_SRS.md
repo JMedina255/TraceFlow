@@ -2,11 +2,11 @@
 
 > **Documento de Especificación de Requerimientos de Software (SRS)** — Revisión Funcional v2.0 (Consolidación SRS-02, Bloques 01 y 02 — Pendiente de Aprobación CCB)
 
-**Institución:** Universidad Privada de Tacna — Facultad de Ingeniería — Escuela Profesional de Ingeniería de Sistemas (EPIS)  
-**Curso:** Gestión de la Configuración de Software  
-**Docente:** Dr. Ricardo Eduardo Valcarcel Alvarado  
-**Organización Cliente:** ÉXODO S.A.C.  
-**Equipo de Desarrollo:** C-SharkTeam — Antayhua Mamani, Renzo Antonio (2022073504); Medina Quispe, Joan Cristian (2022074255); Loyola Vilca Choque, Renzo Fernando (2021072615); Rivera Muñoz, Augusto Joaquin (2022073505)  
+**Institución:** Universidad Privada de Tacna — Facultad de Ingeniería — Escuela Profesional de Ingeniería de Sistemas (EPIS)
+**Curso:** Gestión de la Configuración de Software
+**Docente:** Dr. Ricardo Eduardo Valcarcel Alvarado
+**Organización Cliente:** ÉXODO S.A.C.
+**Equipo de Desarrollo:** C-SharkTeam — Antayhua Mamani, Renzo Antonio (2022073504); Medina Quispe, Joan Cristian (2022074255); Loyola Vilca Choque, Renzo Fernando (2021072615); Rivera Muñoz, Augusto Joaquin (2022073505)
 **Ubicación y Año:** Tacna – Perú, 2026
 
 ---
@@ -304,6 +304,8 @@ Nota: Elaboración Propia
 | RF-21 | Integración y Vinculación de Repositorios GitHub (INIT-H01) | El sistema debe permitir vincular repositorios remotos existentes o crear nuevos repositorios en GitHub mediante GitHub App y webhooks seguros (DA-03). | Alta |
 | RF-22 | Planificación de Metodologías, Fases y Entregables (INIT-H01) | El sistema debe permitir definir la metodología (Scrum, Cascada, Híbrida), cronograma de fases, hitos de control y entregables asociados a ECS. | Media |
 | RF-23 | Salvaguardas de Ciclo de Vida y Activación SCM (INIT-H01) | El sistema debe exigir la validación de la integración GitHub para activar el proyecto (DA-04) y bloquear operaciones SCM en proyectos inactivos. | Crítica |
+| RF-24 | Identificación, Mapeo y Trazabilidad Git de ECS (INIT-H01-R) | El sistema debe mapear de forma unívoca cada ECS con el repositorio GitHub del proyecto (`github_repo_id`), su ruta relativa (`file_path`) y sus versiones físicas (`git_blob_sha`, `git_commit_sha`), manteniendo el historial inmutable de renombres/movimientos (`config_item_path_history`) y retiro lógico. | Alta |
+| RF-25 | Supervisión y Puertas de Gobernanza SCM en GitHub (INIT-H01-R) | El sistema debe evaluar las 5 Puertas de Gobernanza SCM en Pull Requests vía GitHub Checks API (`Policy Gate`) y detectar automáticamente cambios fuera de flujo (*out-of-band*), generando incidencias y alertas de auditoría. | Alta |
 
 ## 4.2. Requisitos No Funcionales (`RNF-01` a `RNF-09`)
 
@@ -355,6 +357,8 @@ Nota: Elaboración Propia
 | RN-13 | Bloqueo Estricto de Operaciones SCM en Proyectos Inactivos | Se prohíbe registrar RFCs, emitir órdenes o modificar bibliotecas en proyectos en estado `BORRADOR`, `EN_CONFIGURACION`, `SUSPENDIDO` o `ARCHIVADO`. | Guardián del Sistema (`ProjectActiveGuard`) | Se admitían RFCs sobre proyectos incompletos o cerrados. |
 | RN-14 | Persistencia Parcial de Estado Borrador (DA-05) | El progreso del asistente de inicialización se almacena de forma incremental en borrador (`JSONB`) sin forzar restricciones relacionales duras. | Sistema TraceFlow | La creación requería un solo envío síncrono sin posibilidad de pausa. |
 | RN-15 | Inmutabilidad de Transición de Estados de Proyecto | Toda activación, suspensión o archivado de proyecto debe registrarse en la bitácora inmutable de auditoría mediante encadenamiento criptográfico de integridad SHA-256 (hash-chaining inmutable). | Sistema TraceFlow / Módulo de Auditoría | Los cambios de estado no contaban con encadenamiento criptográfico. |
+| RN-16 | Correlación Obligatoria Commit/PR con Expediente SCM | Todo commit o Pull Request en ramas controladas debe correlacionarse obligatoriamente con una RFC admisible y una Orden de Cambio autorizada (`ECN`). Commits sin correlación activan protocolo de incidencia por cambio no autorizado. | Módulo de Integración GitHub / Motor SCM | Commits directos en Git se realizaban sin expediente de cambio. |
+| RN-17 | Custodia e Historial Inmutable de Rutas de ECS | Queda prohibida la eliminación física (`DELETE`) de un ECS ante un `git rm` (debe transicionar a `RETIRED`). Todo `git mv` debe registrarse en `config_item_path_history` asociando la ruta previa, nueva ruta y commit SHA. | Gestor de Configuración / Motor SCM | Los renombres de archivos rompían la trazabilidad histórica de versiones. |
 
 Nota: Elaboración Propia
 
@@ -734,9 +738,9 @@ Nota: Elaboración Propia
 | | **11.** El sistema registra el evento en la bitácora inmutable de auditoría, deriva la notificación al **Analista de Requerimientos / Gestor (`PU-02`)** *(requisito pendiente de automatización en envío)*, elimina el borrador temporal del proyecto y muestra el comprobante **"¡Solicitud de Cambio Registrada Exitosamente!"** con accesos a **Ver Expediente 360°**, **Ir a la Bandeja RFC**, **Registrar Otra** e **Ir al Dashboard**. |
 
 > [!IMPORTANT]
-> **Discrepancia detectada (`DEV-01` / SRS-02) y regla uniforme propuesta para aprobación:**  
-> 1. *Longitudes mínimas:* la interfaz de captura valida actualmente **5** caracteres en título y **15** en descripción y justificación, mientras que el servidor exige **10** caracteres en título y **20** en descripción y justificación (rechazando el envío final si el usuario digitó textos entre esos rangos). **Regla uniforme propuesta:** estandarizar **mínimo 10 y máximo 120 caracteres en título**, y **mínimo 20 caracteres en descripción y justificación** tanto en pantalla como en servidor.  
-> 2. *Campos adicionales y adjuntos:* la captura de **Categoría**, **Propuesta Técnica Sugerida** y **Archivos adjuntos** se ofrece en la interfaz; actualmente el servidor registra los campos principales y los anexos reales en almacenamiento centralizado permanecen pendientes de implementación física.  
+> **Discrepancia detectada (`DEV-01` / SRS-02) y regla uniforme propuesta para aprobación:**
+> 1. *Longitudes mínimas:* la interfaz de captura valida actualmente **5** caracteres en título y **15** en descripción y justificación, mientras que el servidor exige **10** caracteres en título y **20** en descripción y justificación (rechazando el envío final si el usuario digitó textos entre esos rangos). **Regla uniforme propuesta:** estandarizar **mínimo 10 y máximo 120 caracteres en título**, y **mínimo 20 caracteres en descripción y justificación** tanto en pantalla como en servidor.
+> 2. *Campos adicionales y adjuntos:* la captura de **Categoría**, **Propuesta Técnica Sugerida** y **Archivos adjuntos** se ofrece en la interfaz; actualmente el servidor registra los campos principales y los anexos reales en almacenamiento centralizado permanecen pendientes de implementación física.
 > 3. *Declaración de veracidad:* el formulario exige marcar una casilla de declaración de veracidad antes de enviar; dicha condición **no consta en `RF-04` ni en la narrativa original aprobada**, por lo que queda sometida a ratificación o simplificación del CCB.
 
 ##### 4.3. Flujos alternativos
@@ -1196,29 +1200,29 @@ Nota: Elaboración Propia
 
 #### Flujos Alternativos
 
-- **A1 — Dictamen de rechazo colegiado del Cambio Mayor**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** El CCB determina que el cambio es inviable por costos, plazos contractuales, riesgos excesivos o desalineación con el cliente.  
-  - **Secuencia:**  
-    1. El Comité de Control de Cambios (CCB) registra la votación denegatoria y fundamenta formalmente las causales de rechazo en el acta.  
-    2. TraceFlow SCM registra el acta resolutiva y transiciona el estado oficial de la RFC a `Rechazada` (estado terminal).  
-    3. TraceFlow SCM notifica el rechazo fundamentado al Solicitante y a las partes interesadas según RN-07.  
+- **A1 — Dictamen de rechazo colegiado del Cambio Mayor**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** El CCB determina que el cambio es inviable por costos, plazos contractuales, riesgos excesivos o desalineación con el cliente.
+  - **Secuencia:**
+    1. El Comité de Control de Cambios (CCB) registra la votación denegatoria y fundamenta formalmente las causales de rechazo en el acta.
+    2. TraceFlow SCM registra el acta resolutiva y transiciona el estado oficial de la RFC a `Rechazada` (estado terminal).
+    3. TraceFlow SCM notifica el rechazo fundamentado al Solicitante y a las partes interesadas según RN-07.
   - **Convergencia:** Concluye el ciclo de vida de la RFC como expediente archivado.
 
-- **A2 — Solicitud de ampliación de información técnica por el CCB**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El CCB considera insuficiente la evaluación de impacto para tomar una decisión informada.  
-  - **Secuencia:**  
-    1. El CCB solicita una reevaluación o ampliación del análisis técnico al Arquitecto.  
-    2. TraceFlow SCM mantiene el estado `En Evaluación` y notifica al Arquitecto los puntos a profundizar.  
+- **A2 — Solicitud de ampliación de información técnica por el CCB**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El CCB considera insuficiente la evaluación de impacto para tomar una decisión informada.
+  - **Secuencia:**
+    1. El CCB solicita una reevaluación o ampliación del análisis técnico al Arquitecto.
+    2. TraceFlow SCM mantiene el estado `En Evaluación` y notifica al Arquitecto los puntos a profundizar.
   - **Convergencia:** El expediente queda a la espera de la actualización del Informe de Impacto.
 
 #### Excepciones
 
-- **E1 — Falta de cuórum reglamentario en la votación del CCB**  
-  - **Origen:** Paso 5 del Flujo Principal.  
-  - **Condición de fallo:** No se cuenta con el número mínimo de integrantes autorizados para emitir resolución válida.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la formalización de la votación e indica la falta de cuórum.  
+- **E1 — Falta de cuórum reglamentario en la votación del CCB**
+  - **Origen:** Paso 5 del Flujo Principal.
+  - **Condición de fallo:** No se cuenta con el número mínimo de integrantes autorizados para emitir resolución válida.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la formalización de la votación e indica la falta de cuórum.
   - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta convocar una nueva sesión válida.
 
 #### Reglas aplicadas
@@ -1276,20 +1280,20 @@ ightarrow$ Autorizada (o Rechazada)
 
 #### Flujos Alternativos
 
-- **A1 — Corrección de datos de asignación de la orden antes de expedir**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Se identifica indisponibilidad del desarrollador seleccionado antes de la emisión final.  
-  - **Secuencia:**  
-    1. El emisor reasigna la orden a un desarrollador alternativo calificado.  
-    2. TraceFlow SCM actualiza la asignación técnica en el borrador de la orden.  
+- **A1 — Corrección de datos de asignación de la orden antes de expedir**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** Se identifica indisponibilidad del desarrollador seleccionado antes de la emisión final.
+  - **Secuencia:**
+    1. El emisor reasigna la orden a un desarrollador alternativo calificado.
+    2. TraceFlow SCM actualiza la asignación técnica en el borrador de la orden.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Intento de emisión sobre RFC no autorizada**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La solicitud no cuenta con estado oficial Autorizada o el dictamen previo fue revocado.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la generación de la orden e informa la inconsistencia de estado según RN-01.  
+- **E1 — Intento de emisión sobre RFC no autorizada**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La solicitud no cuenta con estado oficial Autorizada o el dictamen previo fue revocado.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la generación de la orden e informa la inconsistencia de estado según RN-01.
   - **Resultado:** No se emite la orden; el flujo se cancela de forma inmediata.
 
 #### Reglas aplicadas
@@ -1345,25 +1349,25 @@ ightarrow$ Orden Emitida
 
 #### Flujos Alternativos
 
-- **A1 — Registro de ECS de especificación documental o manual de usuario**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El elemento a incorporar es un documento formal y no código ejecutable.  
-  - **Secuencia:**  
-    1. El Arquitecto selecciona la categoría documental y consigna los metadatos de formato y aprobación.  
+- **A1 — Registro de ECS de especificación documental o manual de usuario**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El elemento a incorporar es un documento formal y no código ejecutable.
+  - **Secuencia:**
+    1. El Arquitecto selecciona la categoría documental y consigna los metadatos de formato y aprobación.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Denominación de ECS duplicada en el proyecto**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Ya existe un elemento registrado con idéntica denominación y ruta lógica en el proyecto.  
-  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e instruye asignar un identificador unívoco según RN-02.  
+- **E1 — Denominación de ECS duplicada en el proyecto**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Ya existe un elemento registrado con idéntica denominación y ruta lógica en el proyecto.
+  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e instruye asignar un identificador unívoco según RN-02.
   - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se incorpora el elemento.
 
-- **E2 — Estándar de versión inicial no conforme**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La versión ingresada no respeta la nomenclatura mayor.menor.parche.  
-  - **Respuesta del sistema:** TraceFlow SCM exige corregir la versión según la regla oficial RN-02.  
+- **E2 — Estándar de versión inicial no conforme**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La versión ingresada no respeta la nomenclatura mayor.menor.parche.
+  - **Respuesta del sistema:** TraceFlow SCM exige corregir la versión según la regla oficial RN-02.
   - **Resultado:** Retorna al Paso 3 del Flujo Principal para su subsanación.
 
 #### Reglas aplicadas
@@ -1420,20 +1424,20 @@ ightarrow$ Orden Emitida
 
 #### Flujos Alternativos
 
-- **A1 — Verificación y reintento por retardo en la transferencia de repositorio**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** Se produce una inconsistencia temporal en la lectura de la Biblioteca de Soporte.  
-  - **Secuencia:**  
-    1. TraceFlow SCM reintenta la lectura de integridad del artefacto.  
-    2. El sistema confirma la integridad del archivo de origen.  
+- **A1 — Verificación y reintento por retardo en la transferencia de repositorio**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** Se produce una inconsistencia temporal en la lectura de la Biblioteca de Soporte.
+  - **Secuencia:**
+    1. TraceFlow SCM reintenta la lectura de integridad del artefacto.
+    2. El sistema confirma la integridad del archivo de origen.
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — ECS bloqueado concurrentemente por otra orden de cambio**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El ECS se encuentra retenido bajo bloqueo de sincronización por otro desarrollo en curso según RN-06.  
-  - **Respuesta del sistema:** TraceFlow SCM deniega el Check-Out, muestra los datos del usuario que mantiene el bloqueo y registra la colisión en auditoría.  
+- **E1 — ECS bloqueado concurrentemente por otra orden de cambio**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El ECS se encuentra retenido bajo bloqueo de sincronización por otro desarrollo en curso según RN-06.
+  - **Respuesta del sistema:** TraceFlow SCM deniega el Check-Out, muestra los datos del usuario que mantiene el bloqueo y registra la colisión en auditoría.
   - **Resultado:** La operación se detiene sin transferir archivos; la orden permanece en espera de liberación del bloqueo.
 
 #### Reglas aplicadas
@@ -1490,19 +1494,19 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Consulta de estado de bloqueo previo**  
-  - **Origen:** Paso 2 del Flujo Principal.  
-  - **Condición de activación:** El Administrador verifica si un ECS ya posee bloqueo antes de planificar una asignación.  
-  - **Secuencia:**  
-    1. TraceFlow SCM presenta el detalle del bloqueo vigente (usuario, fecha y orden asociada).  
+- **A1 — Consulta de estado de bloqueo previo**
+  - **Origen:** Paso 2 del Flujo Principal.
+  - **Condición de activación:** El Administrador verifica si un ECS ya posee bloqueo antes de planificar una asignación.
+  - **Secuencia:**
+    1. TraceFlow SCM presenta el detalle del bloqueo vigente (usuario, fecha y orden asociada).
   - **Convergencia:** Concluye la consulta sin modificar el catálogo.
 
 #### Excepciones
 
-- **E1 — Conflicto de bloqueo por concurrencia simultánea**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de fallo:** Otra transacción estableció el bloqueo milisegundos antes sobre el mismo ECS.  
-  - **Respuesta del sistema:** TraceFlow SCM rechaza la solicitud de bloqueo y notifica la colisión de concurrencia.  
+- **E1 — Conflicto de bloqueo por concurrencia simultánea**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de fallo:** Otra transacción estableció el bloqueo milisegundos antes sobre el mismo ECS.
+  - **Respuesta del sistema:** TraceFlow SCM rechaza la solicitud de bloqueo y notifica la colisión de concurrencia.
   - **Resultado:** La operación se cancela salvaguardando la integridad del repositorio.
 
 #### Reglas aplicadas
@@ -1557,25 +1561,25 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Check-In intermedio hacia Biblioteca de Soporte para pruebas**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** La transferencia corresponde al paso de desarrollo a pruebas en el ciclo de integración.  
-  - **Secuencia:**  
-    1. El Administrador transfiere el ECS a la Biblioteca de Soporte sin levantar el bloqueo exclusivo de desarrollo.  
+- **A1 — Check-In intermedio hacia Biblioteca de Soporte para pruebas**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** La transferencia corresponde al paso de desarrollo a pruebas en el ciclo de integración.
+  - **Secuencia:**
+    1. El Administrador transfiere el ECS a la Biblioteca de Soporte sin levantar el bloqueo exclusivo de desarrollo.
   - **Convergencia:** Permite la ejecución de pruebas de integración en CU-16.
 
 #### Excepciones
 
-- **E1 — Incumplimiento de la regla de doble validación (Falta QA o UAT)**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Se intenta ejecutar el Check-In hacia la Biblioteca Maestra faltando la Certificación de QA o el Acta UAT.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la operación e indica la ausencia de la doble validación según RN-09.  
+- **E1 — Incumplimiento de la regla de doble validación (Falta QA o UAT)**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Se intenta ejecutar el Check-In hacia la Biblioteca Maestra faltando la Certificación de QA o el Acta UAT.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la operación e indica la ausencia de la doble validación según RN-09.
   - **Resultado:** El ECS permanece en la biblioteca intermedia; no se realiza la integración a la Biblioteca Maestra.
 
-- **E2 — Inconsistencia en la comprobación de integridad (Checksum alterado)**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La suma de verificación del archivo no coincide con el artefacto certificado.  
-  - **Respuesta del sistema:** TraceFlow SCM alerta sobre alteración no autorizada de integridad y aborta la transferencia.  
+- **E2 — Inconsistencia en la comprobación de integridad (Checksum alterado)**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La suma de verificación del archivo no coincide con el artefacto certificado.
+  - **Respuesta del sistema:** TraceFlow SCM alerta sobre alteración no autorizada de integridad y aborta la transferencia.
   - **Resultado:** Se cancela la operación y se genera una alerta de seguridad en la bitácora de auditoría.
 
 #### Reglas aplicadas
@@ -1632,20 +1636,20 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Comparación de diferencias entre dos versiones históricas del ECS**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** El actor requiere auditar qué modificaciones específicas se aplicaron entre dos versiones distintas.  
-  - **Secuencia:**  
-    1. El Administrador selecciona dos versiones del historial y solicita comparación.  
-    2. TraceFlow SCM presenta la vista comparativa de diferencias conceptuales entre ambos estados del artefacto.  
+- **A1 — Comparación de diferencias entre dos versiones históricas del ECS**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** El actor requiere auditar qué modificaciones específicas se aplicaron entre dos versiones distintas.
+  - **Secuencia:**
+    1. El Administrador selecciona dos versiones del historial y solicita comparación.
+    2. TraceFlow SCM presenta la vista comparativa de diferencias conceptuales entre ambos estados del artefacto.
   - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — ECS sin historial de modificaciones (versión inicial sin cambios)**  
-  - **Origen:** Paso 2 del Flujo Principal.  
-  - **Condición de fallo:** El elemento únicamente cuenta con su versión de catalogación base sin operaciones de cambio posteriores.  
-  - **Respuesta del sistema:** TraceFlow SCM informa que el ECS se encuentra en su versión inicial sin transacciones de Check-In adicionales.  
+- **E1 — ECS sin historial de modificaciones (versión inicial sin cambios)**
+  - **Origen:** Paso 2 del Flujo Principal.
+  - **Condición de fallo:** El elemento únicamente cuenta con su versión de catalogación base sin operaciones de cambio posteriores.
+  - **Respuesta del sistema:** TraceFlow SCM informa que el ECS se encuentra en su versión inicial sin transacciones de Check-In adicionales.
   - **Resultado:** Se muestra únicamente la ficha de creación base.
 
 #### Reglas aplicadas
@@ -1701,20 +1705,20 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Solicitud de ajuste de alcance técnico durante la implementación**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Desarrollador identifica una dependencia imprevista que requiere alterar el alcance de la orden.  
-  - **Secuencia:**  
-    1. El Desarrollador registra una consulta de alcance formal dirigida al Arquitecto.  
-    2. El Arquitecto evalúa si la consulta requiere una ampliación formal o se resuelve dentro de los parámetros de la ECN/ECO vigente.  
+- **A1 — Solicitud de ajuste de alcance técnico durante la implementación**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El Desarrollador identifica una dependencia imprevista que requiere alterar el alcance de la orden.
+  - **Secuencia:**
+    1. El Desarrollador registra una consulta de alcance formal dirigida al Arquitecto.
+    2. El Arquitecto evalúa si la consulta requiere una ampliación formal o se resuelve dentro de los parámetros de la ECN/ECO vigente.
   - **Convergencia:** Retorna al Paso 3 con la instrucción técnica clarificada.
 
 #### Excepciones
 
-- **E1 — Pérdida de integridad de la copia de trabajo local**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Corrupción accidental del espacio de trabajo del desarrollador.  
-  - **Respuesta del sistema:** TraceFlow SCM permite reestablecer una copia limpia desde la Biblioteca de Soporte respetando el bloqueo vigente.  
+- **E1 — Pérdida de integridad de la copia de trabajo local**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Corrupción accidental del espacio de trabajo del desarrollador.
+  - **Respuesta del sistema:** TraceFlow SCM permite reestablecer una copia limpia desde la Biblioteca de Soporte respetando el bloqueo vigente.
   - **Resultado:** Se reanuda la implementación en el Paso 3 sin vulnerar el repositorio central.
 
 #### Reglas aplicadas
@@ -1770,20 +1774,20 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Corrección inmediata de fallo unitario menor**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** Uno o más casos de prueba unitarios arrojan fallo en lógica local.  
-  - **Secuencia:**  
-    1. El Desarrollador ajusta la codificación local.  
-    2. El Desarrollador reinicia la suite de pruebas unitarias.  
+- **A1 — Corrección inmediata de fallo unitario menor**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** Uno o más casos de prueba unitarios arrojan fallo en lógica local.
+  - **Secuencia:**
+    1. El Desarrollador ajusta la codificación local.
+    2. El Desarrollador reinicia la suite de pruebas unitarias.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Fallo persistente en casos de prueba unitarios**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La suite no logra aprobarse tras múltiples ejecuciones locales.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la promoción del ECS hacia pruebas de integración.  
+- **E1 — Fallo persistente en casos de prueba unitarios**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La suite no logra aprobarse tras múltiples ejecuciones locales.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la promoción del ECS hacia pruebas de integración.
   - **Resultado:** El Desarrollador debe continuar la labor de depuración en CU-14; no se permite el paso a QA.
 
 #### Reglas aplicadas
@@ -1839,20 +1843,20 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Detección de fallas durante la ejecución de integración**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** Uno o más casos de prueba críticos arrojan defectos o no conformidades.  
-  - **Secuencia:**  
-    1. El Equipo de Calidad suspende la ejecución regular de la suite.  
-    2. TraceFlow SCM deriva el flujo hacia el caso de uso CU-18 (Reportar no conformidad).  
+- **A1 — Detección de fallas durante la ejecución de integración**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** Uno o más casos de prueba críticos arrojan defectos o no conformidades.
+  - **Secuencia:**
+    1. El Equipo de Calidad suspende la ejecución regular de la suite.
+    2. TraceFlow SCM deriva el flujo hacia el caso de uso CU-18 (Reportar no conformidad).
   - **Convergencia:** Concluye la ejecución con registro de defectos pendientes de corrección.
 
 #### Excepciones
 
-- **E1 — Inconsistencia en el entorno de despliegue de la Biblioteca de Soporte**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de fallo:** Falla en la disponibilidad del entorno de integración o datos de prueba desactualizados.  
-  - **Respuesta del sistema:** TraceFlow SCM alerta sobre la anomalía del entorno y preserva el estado de la batería.  
+- **E1 — Inconsistencia en el entorno de despliegue de la Biblioteca de Soporte**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de fallo:** Falla en la disponibilidad del entorno de integración o datos de prueba desactualizados.
+  - **Respuesta del sistema:** TraceFlow SCM alerta sobre la anomalía del entorno y preserva el estado de la batería.
   - **Resultado:** Se coordina el reajuste del ambiente de pruebas sin alterar la trazabilidad del cambio.
 
 #### Reglas aplicadas
@@ -1908,20 +1912,20 @@ ightarrow$ En Implementación
 
 #### Flujos Alternativos
 
-- **A1 — Emisión de certificación técnica con observaciones menores no bloqueantes**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Existen observaciones estéticas o de documentación que no afectan la funcionalidad ni la estabilidad.  
-  - **Secuencia:**  
-    1. El Equipo de Calidad asienta las observaciones como compromisos menores en el certificado.  
-    2. TraceFlow SCM registra las notas de conformidad condicionada sin detener el flujo.  
+- **A1 — Emisión de certificación técnica con observaciones menores no bloqueantes**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** Existen observaciones estéticas o de documentación que no afectan la funcionalidad ni la estabilidad.
+  - **Secuencia:**
+    1. El Equipo de Calidad asienta las observaciones como compromisos menores en el certificado.
+    2. TraceFlow SCM registra las notas de conformidad condicionada sin detener el flujo.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Detección tardía de incidencia crítica no resuelta**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El sistema identifica que un caso de prueba crítico fue marcado como fallido o quedó pendiente de ejecución.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la emisión del certificado e indica el defecto no cerrado según RN-09.  
+- **E1 — Detección tardía de incidencia crítica no resuelta**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El sistema identifica que un caso de prueba crítico fue marcado como fallido o quedó pendiente de ejecución.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la emisión del certificado e indica el defecto no cerrado según RN-09.
   - **Resultado:** No se emite la certificación técnica; la solicitud permanece en estado `En Pruebas`.
 
 #### Reglas aplicadas
@@ -1978,20 +1982,20 @@ ightarrow$ En Aceptación
 
 #### Flujos Alternativos
 
-- **A1 — Clasificación del defecto como observación subsanable en línea**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El defecto se debe únicamente a un parámetro de configuración corregible de forma inmediata.  
-  - **Secuencia:**  
-    1. El Equipo de Calidad coordina la corrección del parámetro.  
-    2. Se asienta la incidencia sin requerir nuevo empaquetado de software.  
+- **A1 — Clasificación del defecto como observación subsanable en línea**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El defecto se debe únicamente a un parámetro de configuración corregible de forma inmediata.
+  - **Secuencia:**
+    1. El Equipo de Calidad coordina la corrección del parámetro.
+    2. Se asienta la incidencia sin requerir nuevo empaquetado de software.
   - **Convergencia:** Retorna a ejecución de pruebas en CU-16.
 
 #### Excepciones
 
-- **E1 — Agotamiento de ciclos máximos de corrección permitidos**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El contador de ciclos de prueba acumulados excede el límite contractual o reglamentario del proyecto.  
-  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad como fallo técnico insubsanable y bloquea nuevos ciclos de desarrollo según RN-08.  
+- **E1 — Agotamiento de ciclos máximos de corrección permitidos**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El contador de ciclos de prueba acumulados excede el límite contractual o reglamentario del proyecto.
+  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad como fallo técnico insubsanable y bloquea nuevos ciclos de desarrollo según RN-08.
   - **Resultado:** Se cancela la vía de re-testeo y se activa de forma obligatoria el flujo de Rollback (CU-21) y Cancelación (CU-22).
 
 #### Reglas aplicadas
@@ -2046,20 +2050,20 @@ ightarrow$ En Aceptación
 
 #### Flujos Alternativos
 
-- **A1 — Persistencia de defectos en el re-testeo dentro del margen de reintentos**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** La corrección no solucionó integralmente el fallo, pero aún restan ciclos de corrección autorizados.  
-  - **Secuencia:**  
-    1. El Equipo de Calidad registra las fallas residuales.  
-    2. TraceFlow SCM actualiza el pliego de defectos en CU-18.  
+- **A1 — Persistencia de defectos en el re-testeo dentro del margen de reintentos**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** La corrección no solucionó integralmente el fallo, pero aún restan ciclos de corrección autorizados.
+  - **Secuencia:**
+    1. El Equipo de Calidad registra las fallas residuales.
+    2. TraceFlow SCM actualiza el pliego de defectos en CU-18.
   - **Convergencia:** Retorna a corrección en la Biblioteca de Trabajo.
 
 #### Excepciones
 
-- **E1 — Fallo definitivo de re-testeo por agotamiento de instancias**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El re-testeo arroja fallos bloqueantes y se ha alcanzado el límite de ciclos de prueba permitido por el proyecto.  
-  - **Respuesta del sistema:** TraceFlow SCM dictamina formalmente el fallo no subsanado y bloquea cualquier nueva entrega de código según RN-08.  
+- **E1 — Fallo definitivo de re-testeo por agotamiento de instancias**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El re-testeo arroja fallos bloqueantes y se ha alcanzado el límite de ciclos de prueba permitido por el proyecto.
+  - **Respuesta del sistema:** TraceFlow SCM dictamina formalmente el fallo no subsanado y bloquea cualquier nueva entrega de código según RN-08.
   - **Resultado:** Se cancela la vía de pruebas y se activa de forma obligatoria la ejecución del Rollback (CU-21) y la Cancelación de la ECN/ECO (CU-22).
 
 #### Reglas aplicadas
@@ -2115,20 +2119,20 @@ ightarrow$ En Aceptación (o vía a Cancelada)
 
 #### Flujos Alternativos
 
-- **A1 — Generación de Línea Base intermedia de desarrollo o pruebas**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Se requiere congelar un hito intermedio de integración en la Biblioteca de Soporte.  
-  - **Secuencia:**  
-    1. El Administrador etiqueta una línea base de soporte identificada como preliminar.  
-    2. TraceFlow SCM registra el hito sin cerrar la RFC.  
+- **A1 — Generación de Línea Base intermedia de desarrollo o pruebas**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** Se requiere congelar un hito intermedio de integración en la Biblioteca de Soporte.
+  - **Secuencia:**
+    1. El Administrador etiqueta una línea base de soporte identificada como preliminar.
+    2. TraceFlow SCM registra el hito sin cerrar la RFC.
   - **Convergencia:** Concluye el hito intermedio sin transicionar la RFC a estado terminal.
 
 #### Excepciones
 
-- **E1 — Intento de congelamiento con ECS pendientes de integración en Biblioteca Maestra**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Uno de los artefactos componentes aún se encuentra en la Biblioteca de Trabajo o no completó el Check-In.  
-  - **Respuesta del sistema:** TraceFlow SCM cancela el congelamiento e informa la inconsistencia en el catálogo de bibliotecas según RN-04.  
+- **E1 — Intento de congelamiento con ECS pendientes de integración en Biblioteca Maestra**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Uno de los artefactos componentes aún se encuentra en la Biblioteca de Trabajo o no completó el Check-In.
+  - **Respuesta del sistema:** TraceFlow SCM cancela el congelamiento e informa la inconsistencia en el catálogo de bibliotecas según RN-04.
   - **Resultado:** No se crea la Línea Base; se preserva la integridad del repositorio central.
 
 #### Reglas aplicadas
@@ -2186,19 +2190,19 @@ ightarrow$ Implementada
 
 #### Flujos Alternativos
 
-- **A1 — Respaldo de evidencias técnicas previas a la purga de trabajo**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Desarrollador o el Administrador solicitan archivar los logs de fallo para análisis forense posterior.  
-  - **Secuencia:**  
-    1. TraceFlow SCM empaqueta los archivos de trabajo no conformes en un repositorio de auditoría aislado.  
+- **A1 — Respaldo de evidencias técnicas previas a la purga de trabajo**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El Desarrollador o el Administrador solicitan archivar los logs de fallo para análisis forense posterior.
+  - **Secuencia:**
+    1. TraceFlow SCM empaqueta los archivos de trabajo no conformes en un repositorio de auditoría aislado.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Intento inválido de rollback sobre artefacto integrado en Biblioteca Maestra**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La solicitud pretende revertir un cambio que ya fue consolidado en la Biblioteca Maestra.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la acción e informa que un artefacto en Biblioteca Maestra solo puede corregirse mediante un nuevo ciclo formal de RFC según RN-04.  
+- **E1 — Intento inválido de rollback sobre artefacto integrado en Biblioteca Maestra**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La solicitud pretende revertir un cambio que ya fue consolidado en la Biblioteca Maestra.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la acción e informa que un artefacto en Biblioteca Maestra solo puede corregirse mediante un nuevo ciclo formal de RFC según RN-04.
   - **Resultado:** Se cancela la operación de rollback directo protegiendo el repositorio congelado.
 
 #### Reglas aplicadas
@@ -2254,19 +2258,19 @@ ightarrow$ Implementada
 
 #### Flujos Alternativos
 
-- **A1 — Registro de lecciones aprendidas técnicas en la cancelación**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** La gerencia solicita anexar un dictamen de lecciones aprendidas para evitar fallos futuros en el ECS.  
-  - **Secuencia:**  
-    1. El Administrador adjunta el informe de análisis de causas raíz al expediente.  
+- **A1 — Registro de lecciones aprendidas técnicas en la cancelación**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** La gerencia solicita anexar un dictamen de lecciones aprendidas para evitar fallos futuros en el ECS.
+  - **Secuencia:**
+    1. El Administrador adjunta el informe de análisis de causas raíz al expediente.
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Intento de cancelación sin constancia de rollback previo**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Se intenta cancelar la orden manteniendo modificaciones activas o el bloqueo sin liberar en la Biblioteca de Trabajo.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la cancelación e instruye la ejecución obligatoria del rollback según RN-08.  
+- **E1 — Intento de cancelación sin constancia de rollback previo**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Se intenta cancelar la orden manteniendo modificaciones activas o el bloqueo sin liberar en la Biblioteca de Trabajo.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la cancelación e instruye la ejecución obligatoria del rollback según RN-08.
   - **Resultado:** No se cancela la orden; se deriva al usuario a completar CU-21.
 
 #### Reglas aplicadas
@@ -2323,20 +2327,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Descarte voluntario del registro del ticket**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El usuario desiste de formular el reporte.  
-  - **Secuencia:**  
-    1. El Solicitante selecciona la opción cancelar.  
-    2. TraceFlow SCM limpia el formulario sin registrar datos.  
+- **A1 — Descarte voluntario del registro del ticket**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El usuario desiste de formular el reporte.
+  - **Secuencia:**
+    1. El Solicitante selecciona la opción cancelar.
+    2. TraceFlow SCM limpia el formulario sin registrar datos.
   - **Convergencia:** Concluye la interacción sin persistir transacciones.
 
 #### Excepciones
 
-- **E1 — Omisión de descripción o pasos de reproducción**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El usuario no ingresa la explicación suficiente para reproducir el fallo.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la creación del ticket e instruye detallar el error.  
+- **E1 — Omisión de descripción o pasos de reproducción**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El usuario no ingresa la explicación suficiente para reproducir el fallo.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la creación del ticket e instruye detallar el error.
   - **Resultado:** Retorna al Paso 3 del Flujo Principal para completar los datos requeridos.
 
 #### Reglas aplicadas
@@ -2391,20 +2395,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Incorporación de comentarios adicionales al ticket en atención**  
-  - **Origen:** Paso 6 del Flujo Principal.  
-  - **Condición de activación:** El usuario aporta nuevos antecedentes solicitados por el equipo de soporte.  
-  - **Secuencia:**  
-    1. El Solicitante ingresa el comentario y adjunta nuevas evidencias.  
-    2. TraceFlow SCM registra el comentario en la bitácora del ticket y notifica al Analista.  
+- **A1 — Incorporación de comentarios adicionales al ticket en atención**
+  - **Origen:** Paso 6 del Flujo Principal.
+  - **Condición de activación:** El usuario aporta nuevos antecedentes solicitados por el equipo de soporte.
+  - **Secuencia:**
+    1. El Solicitante ingresa el comentario y adjunta nuevas evidencias.
+    2. TraceFlow SCM registra el comentario en la bitácora del ticket y notifica al Analista.
   - **Convergencia:** Concluye la actualización del ticket.
 
 #### Excepciones
 
-- **E1 — Ticket de soporte inexistente o perteneciente a otro proyecto no autorizado**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de fallo:** Búsqueda de un código erróneo o restringido.  
-  - **Respuesta del sistema:** TraceFlow SCM informa que el ticket no existe o no se tienen privilegios de consulta según RBAC.  
+- **E1 — Ticket de soporte inexistente o perteneciente a otro proyecto no autorizado**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de fallo:** Búsqueda de un código erróneo o restringido.
+  - **Respuesta del sistema:** TraceFlow SCM informa que el ticket no existe o no se tienen privilegios de consulta según RBAC.
   - **Resultado:** No se despliega información; el usuario retorna a la bandeja general.
 
 #### Reglas aplicadas
@@ -2459,19 +2463,19 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Ajuste de datos pre-cargados antes de formalizar la RFC**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** El Analista requiere redactar con mayor precisión técnica la justificación de cambio respecto al reporte original del usuario.  
-  - **Secuencia:**  
-    1. El Analista complementa la descripción y justificación en el formulario pre-cargado.  
+- **A1 — Ajuste de datos pre-cargados antes de formalizar la RFC**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** El Analista requiere redactar con mayor precisión técnica la justificación de cambio respecto al reporte original del usuario.
+  - **Secuencia:**
+    1. El Analista complementa la descripción y justificación en el formulario pre-cargado.
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal para proseguir con el registro de CU-04.
 
 #### Excepciones
 
-- **E1 — Ticket de soporte ya derivado previamente**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El ticket ya cuenta con una RFC vinculada en el historial.  
-  - **Respuesta del sistema:** TraceFlow SCM deniega la operación e informa el identificador de la RFC preexistente.  
+- **E1 — Ticket de soporte ya derivado previamente**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El ticket ya cuenta con una RFC vinculada en el historial.
+  - **Respuesta del sistema:** TraceFlow SCM deniega la operación e informa el identificador de la RFC preexistente.
   - **Resultado:** No se duplica la solicitud; el caso de uso finaliza.
 
 #### Reglas aplicadas
@@ -2526,20 +2530,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Verificación integral masiva sobre todos los ECS de una Línea Base**  
-  - **Origen:** Paso 1 del Flujo Principal.  
-  - **Condición de activación:** Auditoría periódica de integridad sobre la Biblioteca Maestra.  
-  - **Secuencia:**  
-    1. El Administrador selecciona la Línea Base completa para verificación.  
-    2. TraceFlow SCM ejecuta la comprobación de integridad secuencial sobre cada ECS componente.  
+- **A1 — Verificación integral masiva sobre todos los ECS de una Línea Base**
+  - **Origen:** Paso 1 del Flujo Principal.
+  - **Condición de activación:** Auditoría periódica de integridad sobre la Biblioteca Maestra.
+  - **Secuencia:**
+    1. El Administrador selecciona la Línea Base completa para verificación.
+    2. TraceFlow SCM ejecuta la comprobación de integridad secuencial sobre cada ECS componente.
   - **Convergencia:** Presenta el reporte consolidado de integridad en el Paso 6.
 
 #### Excepciones
 
-- **E1 — Discrepancia en la validación de integridad (Firma alterada)**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** La firma calculada sobre el archivo no coincide con la firma oficial registrada en el catálogo.  
-  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad por alteración o corrupción del archivo, bloquea de inmediato su extracción o integración y genera una alerta crítica de seguridad en auditoría.  
+- **E1 — Discrepancia en la validación de integridad (Firma alterada)**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** La firma calculada sobre el archivo no coincide con la firma oficial registrada en el catálogo.
+  - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad por alteración o corrupción del archivo, bloquea de inmediato su extracción o integración y genera una alerta crítica de seguridad en auditoría.
   - **Resultado:** La operación en curso se cancela protegiendo el repositorio contra artefactos adulterados según RN-04.
 
 #### Reglas aplicadas
@@ -2595,20 +2599,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Rastreo específico de la cadena de trazabilidad de una Solicitud de Cambio**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El CCB requiere inspeccionar el ciclo de vida completo de una RFC particular desde su registro hasta su cierre.  
-  - **Secuencia:**  
-    1. El CCB ingresa el código de la RFC.  
-    2. TraceFlow SCM presenta la línea de vida completa de la solicitud enlazando la RFC, los informes de impacto, actas, órdenes, operaciones de biblioteca y certificaciones.  
+- **A1 — Rastreo específico de la cadena de trazabilidad de una Solicitud de Cambio**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El CCB requiere inspeccionar el ciclo de vida completo de una RFC particular desde su registro hasta su cierre.
+  - **Secuencia:**
+    1. El CCB ingresa el código de la RFC.
+    2. TraceFlow SCM presenta la línea de vida completa de la solicitud enlazando la RFC, los informes de impacto, actas, órdenes, operaciones de biblioteca y certificaciones.
   - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Intento de acceso a registros de auditoría por usuario sin privilegios**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Un usuario con rol no autorizado intenta consultar la bitácora general de auditoría.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la consulta, registra el intento no autorizado en la bitácora de seguridad y notifica al Administrador.  
+- **E1 — Intento de acceso a registros de auditoría por usuario sin privilegios**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Un usuario con rol no autorizado intenta consultar la bitácora general de auditoría.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la consulta, registra el intento no autorizado en la bitácora de seguridad y notifica al Administrador.
   - **Resultado:** No se despliega información confidencial; el acceso queda denegado.
 
 #### Reglas aplicadas
@@ -2664,28 +2668,28 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Generación del Reporte de Inventario de ECS**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El usuario requiere auditar el estado de los componentes por biblioteca y versiones activas.  
-  - **Secuencia:**  
-    1. El Administrador selecciona "Reporte de Inventario de ECS".  
-    2. TraceFlow SCM compila los ECS clasificados por biblioteca (Trabajo, Soporte, Maestra), versiones vigentes, bloqueos activos y líneas base.  
+- **A1 — Generación del Reporte de Inventario de ECS**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El usuario requiere auditar el estado de los componentes por biblioteca y versiones activas.
+  - **Secuencia:**
+    1. El Administrador selecciona "Reporte de Inventario de ECS".
+    2. TraceFlow SCM compila los ECS clasificados por biblioteca (Trabajo, Soporte, Maestra), versiones vigentes, bloqueos activos y líneas base.
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
-- **A2 — Generación del Reporte Consolidado de Actas de Cambios**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El usuario requiere compilar las actas de deliberación del CCB y autorizaciones delegadas del periodo.  
-  - **Secuencia:**  
-    1. El Administrador selecciona "Reporte Consolidado de Actas de Cambios".  
-    2. TraceFlow SCM compila las resoluciones aprobatorias, actas de rechazo, ECN/ECO expedidas y actas de aceptación UAT.  
+- **A2 — Generación del Reporte Consolidado de Actas de Cambios**
+  - **Origen:** Paso 3 del Flujo Principal.
+  - **Condición de activación:** El usuario requiere compilar las actas de deliberación del CCB y autorizaciones delegadas del periodo.
+  - **Secuencia:**
+    1. El Administrador selecciona "Reporte Consolidado de Actas de Cambios".
+    2. TraceFlow SCM compila las resoluciones aprobatorias, actas de rechazo, ECN/ECO expedidas y actas de aceptación UAT.
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
 #### Excepciones
 
-- **E1 — Inexistencia de transacciones en el periodo o proyecto consultado**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Los parámetros de fecha ingresados no registran movimientos en el sistema.  
-  - **Respuesta del sistema:** TraceFlow SCM informa que no existen datos que cumplan los criterios seleccionados.  
+- **E1 — Inexistencia de transacciones en el periodo o proyecto consultado**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** Los parámetros de fecha ingresados no registran movimientos en el sistema.
+  - **Respuesta del sistema:** TraceFlow SCM informa que no existen datos que cumplan los criterios seleccionados.
   - **Resultado:** No se genera el reporte; se instruye ajustar los parámetros de búsqueda en el Paso 3.
 
 #### Reglas aplicadas
@@ -2741,20 +2745,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Formulación de observaciones funcionales menores de usuario**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de activación:** El Solicitante requiere ajustes estéticos o aclaraciones funcionales no estructurales.  
-  - **Secuencia:**  
-    1. El Solicitante asienta las observaciones en el acta de validación.  
-    2. El sistema remite las notas a la gestión del proyecto para su programación coordinada.  
+- **A1 — Formulación de observaciones funcionales menores de usuario**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de activación:** El Solicitante requiere ajustes estéticos o aclaraciones funcionales no estructurales.
+  - **Secuencia:**
+    1. El Solicitante asienta las observaciones en el acta de validación.
+    2. El sistema remite las notas a la gestión del proyecto para su programación coordinada.
   - **Convergencia:** Si no impiden la aceptación, el Solicitante suscribe el acta conforme.
 
 #### Excepciones
 
-- **E1 — Rechazo funcional de usuario por insatisfacción de la necesidad original**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El Solicitante dictamina que la solución no resuelve el requerimiento planteado o altera negativamente la operación.  
-  - **Respuesta del sistema:** TraceFlow SCM registra el Acta de No Aceptación UAT detallando las discrepancias de negocio.  
+- **E1 — Rechazo funcional de usuario por insatisfacción de la necesidad original**
+  - **Origen:** Paso 4 del Flujo Principal.
+  - **Condición de fallo:** El Solicitante dictamina que la solución no resuelve el requerimiento planteado o altera negativamente la operación.
+  - **Respuesta del sistema:** TraceFlow SCM registra el Acta de No Aceptación UAT detallando las discrepancias de negocio.
   - **Resultado:** Si el rechazo es insubsanable, se bloquea el Check-In a Biblioteca Maestra conforme a RN-09 y se activa el flujo de Rollback (CU-21) y Cancelación de la ECN/ECO (CU-22).
 
 #### Reglas aplicadas
@@ -2810,20 +2814,20 @@ ightarrow$ Cancelada
 
 #### Flujos Alternativos
 
-- **A1 — Rechazo por rebasamiento de límites delegados o impacto no previsto**  
-  - **Origen:** Paso 3 o 4 del Flujo Principal.  
-  - **Condición de activación:** Alguno de los dos actores detecta que el cambio afectará plazos contractuales o costos, superando el marco de cambio menor.  
-  - **Secuencia:**  
-    1. El actor deniega el visto bueno delegado fundamentando el motivo en el sistema.  
-    2. TraceFlow SCM reescala formalmente la RFC reclasificándola a Cambio Mayor para tratamiento por el CCB (CU-07), o transiciona a `Rechazada` si resulta improcedente.  
+- **A1 — Rechazo por rebasamiento de límites delegados o impacto no previsto**
+  - **Origen:** Paso 3 o 4 del Flujo Principal.
+  - **Condición de activación:** Alguno de los dos actores detecta que el cambio afectará plazos contractuales o costos, superando el marco de cambio menor.
+  - **Secuencia:**
+    1. El actor deniega el visto bueno delegado fundamentando el motivo en el sistema.
+    2. TraceFlow SCM reescala formalmente la RFC reclasificándola a Cambio Mayor para tratamiento por el CCB (CU-07), o transiciona a `Rechazada` si resulta improcedente.
   - **Convergencia:** Se canaliza por la vía colegiada del CCB o finaliza como rechazo según corresponda.
 
 #### Excepciones
 
-- **E1 — Aprobación unilateral incompleta**  
-  - **Origen:** Paso 5 del Flujo Principal.  
-  - **Condición de fallo:** Solo uno de los dos roles requeridos registró su visto bueno en el sistema.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la transición a Autorizada e informa que la aprobación requiere autorización compartida obligatoria según RN-01.  
+- **E1 — Aprobación unilateral incompleta**
+  - **Origen:** Paso 5 del Flujo Principal.
+  - **Condición de fallo:** Solo uno de los dos roles requeridos registró su visto bueno en el sistema.
+  - **Respuesta del sistema:** TraceFlow SCM bloquea la transición a Autorizada e informa que la aprobación requiere autorización compartida obligatoria según RN-01.
   - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta registrarse la segunda conformidad requerida.
 
 #### Reglas aplicadas
@@ -2859,8 +2863,8 @@ ightarrow$ Autorizada (o Rechazada)
 
 ### TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso
 
-**Estado:** APROBADO  
-**Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 y actualización TO-BE v2  
+**Estado:** APROBADO
+**Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 y actualización TO-BE v2
 
 | ID RF | Nombre del Requerimiento Funcional | Casos de Uso que lo Instrumentan (Código Oficial / Original) | Sustento Documental (Campo Requerimiento Asociado en CU) |
 | :--- | :--- | :--- | :--- |
@@ -2887,8 +2891,8 @@ ightarrow$ Autorizada (o Rechazada)
 
 ### TB-13 — Matriz de Trazabilidad: Reglas de Negocio vs Casos de Uso
 
-**Estado:** APROBADO  
-**Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3 actualizados con TO-BE v2  
+**Estado:** APROBADO
+**Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3 actualizados con TO-BE v2
 
 > [!NOTE]
 > Las relaciones directas se sustentan en los flujos principales, alternativos y de excepción de cada caso de uso conforme a la gobernanza TO-BE v2.
@@ -2909,8 +2913,8 @@ ightarrow$ Autorizada (o Rechazada)
 
 ### TB-14 — Matriz General de Trazabilidad SCM
 
-**Estado:** APROBADO  
-**Fuente:** Consolidada a partir de `TB-03`, `TB-04`, `TB-06`, `TB-09` y `TB-10`  
+**Estado:** APROBADO
+**Fuente:** Consolidada a partir de `TB-03`, `TB-04`, `TB-06`, `TB-09` y `TB-10`
 
 | Necesidad Detectada (TB-03) | Requerimiento Funcional (TB-04) | Regla de Negocio Asociada (TB-06) | Casos de Uso Instrumentadores (TB-10) | Actor / Rol Responsable Principal (TB-09) |
 | :--- | :--- | :--- | :--- | :--- |

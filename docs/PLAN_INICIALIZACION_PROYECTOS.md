@@ -117,8 +117,14 @@ La inspección detallada del código fuente, esquema de base de datos, pruebas y
 - **`RF-23` — Salvaguardas de Ciclo de Vida y Activación SCM (DA-04):**
   - El sistema debe impedir la transición del proyecto al estado `ACTIVO` si no cuenta con una integración GitHub verificada y validada (`validation_status = 'VALIDATED'`).
   - Debe rechazar toda operación de gestión de cambios (creación de RFCs, emisión de órdenes ECN, modificaciones en bibliotecas) si el proyecto no se encuentra en estado `ACTIVO`.
+- **`RF-24` — Identificación, Mapeo y Trazabilidad Git de ECS:**
+  - El sistema debe mapear de forma unívoca cada Elemento de Configuración (`ECS`) con el repositorio GitHub del proyecto (`github_repo_id`), su ruta relativa (`file_path`) y sus versiones físicas (`git_blob_sha`, `git_commit_sha`, `git_ref`).
+  - Debe preservar la identidad lógica inmutable del ECS ante cambios de nombre o reubicaciones de directorios mediante el historial de rutas (`config_item_path_history`), y gestionar el retiro lógico inmutable ante eliminaciones en Git.
+- **`RF-25` — Supervisión y Puertas de Gobernanza SCM en GitHub:**
+  - El sistema debe inspeccionar eventos de GitHub mediante webhooks criptográficos (`push`, `pull_request`, `create`), evaluando las 5 Puertas de Gobernanza SCM vía GitHub Checks API (`TraceFlow SCM / Policy Gate`) antes de permitir el merge a ramas protegidas.
+  - Debe detectar automáticamente modificaciones de código sin RFC autorizada (cambios fuera de flujo u *out-of-band*), generando de inmediato un ticket de incidencia SCM y registrando el evento en auditoría.
 
-### 5.2 Nuevas Reglas de Negocio (RN-10 a RN-15)
+### 5.2 Nuevas Reglas de Negocio (RN-10 a RN-17)
 
 - **`RN-10` (Pertenencia Obligatoria a Organización):** Todo proyecto debe pertenecer indefectiblemente a una única organización registrada. No se admiten proyectos globales ni huérfanos.
 - **`RN-11` (Incorporación Exclusiva de Registrados - DA-06):** La asignación de personal a un proyecto (`project_team_role`) solo puede realizarse sobre usuarios físicos que posean estado `ACTIVE` en `app_user` y estado `ACTIVE` en `organization_member`.
@@ -126,6 +132,8 @@ La inspección detallada del código fuente, esquema de base de datos, pruebas y
 - **`RN-13` (Bloqueo Estricto de Operaciones SCM en Proyectos Inactivos):** Las solicitudes de cambio (RFC), órdenes de cambio (ECN), bloqueos de sincronización y check-in/out solo pueden ejecutarse en proyectos con estado `ACTIVO`. Proyectos en `BORRADOR`, `EN_CONFIGURACION`, `PENDIENTE_VALIDACION`, `SUSPENDIDO` o `ARCHIVADO` bloquean estas operaciones con error HTTP 412 / 403.
 - **`RN-14` (Persistencia y Recuperación de Estado Borrador):** El asistente de inicialización debe persistir automáticamente el avance de cada paso en `project_setup.draft_payload` sin alterar las restricciones relacionales duras hasta la activación final.
 - **`RN-15` (Inmutabilidad de Transición de Estados):** Todo cambio en el estado del proyecto (`BORRADOR` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `ARCHIVADO`) debe registrarse en la bitácora inmutable de auditoría mediante encadenamiento criptográfico de integridad SHA-256 (`append_audit_log` con `prev_log_hash` y `curr_log_hash`), diferenciado técnicamente de firmas digitales asimétricas (PKI/RSA/ECDSA).
+- **`RN-16` (Correlación Obligatoria Commit/PR con Expediente SCM):** Todo commit o pull request que afecte rutas registradas de ECS en ramas controladas debe correlacionarse obligatoriamente con una RFC admisible y una Orden de Cambio autorizada (`ECN`). Commits sin correlación activan el protocolo de incidencia por cambio no autorizado.
+- **`RN-17` (Custodia e Historial Inmutable de Rutas de ECS):** Queda prohibida la eliminación física (`DELETE`) de un ECS ante un `git rm` (debe transicionar a `RETIRED`). Todo `git mv` debe registrarse en `config_item_path_history` asociando la ruta previa, la nueva ruta y el hash del commit.
 
 ### 5.3 Nuevos Casos de Uso del Bloque de Inicialización
 
@@ -175,6 +183,9 @@ Se han formalizado y compilado 10 diagramas canónicos en formato PlantUML (`doc
 10. **Navegación del Frontend (`DG-INIT-10`):**
     Fuente: [`DG-INIT-10.puml`](assets/diagramas/plantuml/diseno/DG-INIT-10.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-10.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-10.png)
     *Estructura de enrutamiento React Router: `/projects/new/*`, `/projects/:id/settings/*` y guardianes de ruta.*
+11. **Arquitectura Operativa GitHub-SCM (`DG-INIT-11`):**
+    Fuente: [`DG-INIT-11.puml`](assets/diagramas/plantuml/diseno/DG-INIT-11.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-11.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-11.png)
+    *Puente operativo entre GitHub (autoridad de contenido) y TraceFlow (autoridad de gobernanza): mapeo de ECS, correlación de commits/PRs, webhooks, líneas base y puertas de calidad.*
 
 ---
 
@@ -410,6 +421,19 @@ CREATE TABLE IF NOT EXISTS traceflow.github_event (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- 10. TABLA DE HISTORIAL DE RUTAS Y RENOMBRES DE ECS (TRAZABILIDAD GIT)
+-- Preserva la trazabilidad cuando un archivo cambia de nombre, se mueve de directorio o se retira.
+CREATE TABLE IF NOT EXISTS traceflow.config_item_path_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ecs_id UUID NOT NULL REFERENCES traceflow.config_item(id) ON DELETE RESTRICT,
+    previous_path VARCHAR(255) NOT NULL,
+    new_path VARCHAR(255) NOT NULL,
+    change_type VARCHAR(20) NOT NULL CHECK (change_type IN ('MODIFIED', 'RENAMED', 'MOVED', 'RETIRED')),
+    change_order_id UUID REFERENCES traceflow.change_order(id) ON DELETE RESTRICT,
+    git_commit_sha VARCHAR(64) NOT NULL,
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- 10. DISPARADOR DE INTEGRIDAD ORGANIZACIONAL (DA-06 EN BASE DE DATOS)
 -- Garantiza que ningún usuario ajeno a la organización propietaria pueda ser asignado a un proyecto.
 CREATE OR REPLACE FUNCTION traceflow.enforce_project_member_organization_integrity()
@@ -468,6 +492,7 @@ GRANT SELECT, INSERT, UPDATE ON TABLE
     traceflow.project_phase,
     traceflow.project_milestone,
     traceflow.project_deliverable,
+    traceflow.config_item_path_history,
     traceflow.github_integration,
     traceflow.github_event
 TO traceflow_app;
@@ -553,9 +578,148 @@ Para garantizar la exactitud terminológica y metodológica del sistema:
 | **PU-06 (Desarrollador)** | Miembro Operativo | Ingeniero de Software | Consulta de ficha de proyecto y metodología | Lectura/escritura de código en Git según ramas autorizadas | Check-Out a Trabajo, implementación técnica de cambios (`CU-10`) |
 | **PU-07 (Calidad / QA)** | Miembro de Control | Evaluador QA | Consulta de fases y entregables planificados | Verificación de releases y tags en Git | Pruebas de conformidad, certificación y no conformidades (`CU-16..19`) |
 
----
+### 8.5 GitHub como Fundamento Operativo del SCM (Dualidad Git y Gobernanza)
 
-## 9. Contratos Preliminares de API REST (`/api/v1/*`)
+TraceFlow SCM establece una **división arquitectónica estricta de autoridad** entre el sistema de control de versiones y el motor de gobernanza de cambios:
+- **GitHub** mantiene la autoridad indiscutible sobre el contenido versionado, árboles de directorios, historial de commits, blobs de archivos, ramas físicas y pull requests.
+- **TraceFlow SCM** administra con exclusividad la clasificación formal, la evaluación de impacto, las autorizaciones colegiadas (CCB), la custodia por bibliotecas, la trazabilidad bidireccional, la bitácora inmutable de auditoría (SHA-256) y el estado reglamentario de los Elementos de Configuración de Software (`ECS`).
+
+```mermaid
+flowchart TD
+    subgraph GitHub ["GitHub (Autoridad de Versionado Físico)"]
+        G_REPO["Repositorio Remoto (repo_id, full_name)"]
+        G_COMMIT["Commits Físicos (git_commit_sha, git_tree_sha)"]
+        G_PR["Pull Requests (head_sha, base_branch)"]
+        G_TAG["Git Tags / Releases (refs/tags/vX.Y.Z)"]
+        G_HOOKS["Webhooks Criptográficos (HMAC-SHA256)"]
+    end
+
+    subgraph TraceFlow ["TraceFlow SCM (Autoridad de Gobernanza y Calidad)"]
+        TF_ECS["Config Item (ECS Lógico: code, file_path)"]
+        TF_PATH["Historial de Rutas (config_item_path_history)"]
+        TF_VER["Versión Inmutable (ecs_version: blob_sha, commit_sha)"]
+        TF_GATE["Policy Gate (GitHub Checks API: RFC + CCB + QA)"]
+        TF_BL["Línea Base SCM (baseline: git_tag_name, commit_sha)"]
+        TF_INC["Detección Out-of-Band (incident_ticket automático)"]
+    end
+
+    G_REPO -->|Integración DA-03| TF_ECS
+    G_COMMIT -->|Mapeo por Diff / Git Trailers| TF_VER
+    G_PR -->|Validación Pre-Merge| TF_GATE
+    G_TAG -->|Ancla Física Inmutable| TF_BL
+    G_HOOKS -->|Idempotencia X-GitHub-Delivery| TraceFlow
+    G_COMMIT -.->|Push sin RFC activa| TF_INC
+    G_COMMIT -->|Detección git mv / git rm| TF_PATH
+```
+
+#### 8.5.1 Identificación Canónica de ECS mediante Repositorio, Ruta y Versión
+Cada Elemento de Configuración (`ECS`) en TraceFlow posee una doble naturaleza:
+1. **Identidad Lógica (Gobernanza TraceFlow):**
+   - Identificador inmutable del sistema: `config_item.id UUID`.
+   - Código nemotécnico de negocio: `config_item.code VARCHAR(50)` (ej. `ECS-CORE-001`, `SRC-AUTH-JWT.ts`).
+   - Estado de biblioteca actual: `current_library` (`TRABAJO`, `SOPORTE`, `MAESTRA`).
+   - Estado de ciclo de vida: `status` (`ACTIVE`, `RETIRED`).
+2. **Anclaje Físico en GitHub (Contenido Versionado):**
+   - Repositorio anfitrión: `github_repo_id BIGINT` y `repo_full_name VARCHAR(200)` (heredado de `github_integration` del proyecto).
+   - Ruta relativa al repositorio: `config_item.file_path VARCHAR(255)` (ej. `backend/src/modules/auth/auth.service.ts`), o patrón glob para módulos compuestos (`packages/core/**`).
+   - Versión de contenido (`traceflow.ecs_version`):
+     * `git_blob_sha VARCHAR(40)`: Hash SHA del objeto Blob en Git, identificador inmutable del contenido del archivo en el árbol Git.
+     * `git_commit_sha VARCHAR(64)`: Hash del commit Git específico que dio origen a la versión del ECS.
+     * `git_ref VARCHAR(100)`: Referencia de rama o tag donde se integró (ej. `refs/heads/main`).
+     * `sha256_checksum VARCHAR(64)`: Resumen criptográfico SHA-256 canónico calculado sobre el contenido binario para validación independiente de plataforma.
+
+#### 8.5.2 Asociación de Commits y Pull Requests con Uno o Varios ECS
+TraceFlow implementa dos mecanismos complementarios y concurrentes para correlacionar cambios de código con los ECS gobernados:
+1. **Correlación Automática por Inspección de Diff de Archivos (Tree Diff):**
+   - Al recibir un evento webhook `push` o `pull_request`, el servicio `GitHubEventProcessorService` invoca `GET /repos/{owner}/{repo}/commits/{ref}` o analiza la lista de archivos modificados (`files: [{ filename, status, previous_filename }]`).
+   - Cada ruta tocada en el commit se compara de forma determinista contra el catálogo de `file_path` de los ECS activos del proyecto.
+   - Si un commit modifica `backend/src/auth.service.ts` y `backend/src/users.service.ts`, TraceFlow asocia automáticamente el commit tanto a `ECS-AUTH-001` como a `ECS-USER-001`.
+2. **Correlación Explícita por Metadatos Normativos (Git Trailers y PR Conventions):**
+   - **En Mensajes de Commit (Git Trailers estándar):**
+     ```gitcommit
+     fix(auth): corregir renovacion de token de sesion
+
+     TraceFlow-RFC: RFC-2026-004
+     TraceFlow-ECN: ECN-2026-004
+     TraceFlow-ECS: ECS-AUTH-001, ECS-AUTH-002
+     ```
+   - **En Pull Requests:**
+     * Nombres de rama estandarizados: `feature/RFC-2026-004-token-refresh` o `fix/RFC-2026-005`.
+     * Título o cuerpo del PR: Inclusión obligatoria del prefijo `[RFC-AAAA-NNN]`.
+     * Labels sincronizados automáticamente: `traceflow:rfc-2026-004`, `traceflow:major-change`.
+
+#### 8.5.3 Vinculación con el Flujo SCM y Puertas de Gobernanza (Policy Gate vía GitHub Checks API)
+Para asegurar que ningún cambio técnico se fusione a las ramas principales sin cumplir el ciclo completo de control de configuración (IEEE 828), TraceFlow se integra como un **GitHub Check Run** obligatorio (`TraceFlow SCM / Policy Gate`):
+- Cuando se abre o actualiza un PR en GitHub hacia ramas protegidas (`main`, `master`, `staging`), TraceFlow recibe el webhook `pull_request` y crea un Check Run en estado `in_progress`.
+- El motor evalúa de forma síncrona las **5 Puertas de Gobernanza SCM**:
+  1. **Puerta 1 (Expediente Activo):** ¿El PR referencia una solicitud de cambio formal en estado admisible (`AUTORIZADA` u `ORDEN_EMITIDA`)?
+  2. **Puerta 2 (Informe Técnico de Impacto):** ¿Cuenta con `TechnicalImpactReport` registrado por el Arquitecto (`PU-03`) según `CU-06`?
+  3. **Puerta 3 (Autorización Formal):**
+     - Si es *Cambio Menor*: ¿Se encuentra validada la Doble Llave con dos firmas independientes (`CU-30`)?
+     - Si es *Cambio Mayor*: ¿Cuenta con Acta de Deliberación y Resolución Aprobada por el Comité CCB (`CU-07`)?
+  4. **Puerta 4 (Certificación de Calidad QA):** ¿Se adjuntaron los informes y evidencias de prueba con dictamen favorable del Evaluador QA (`PU-07`) según `CU-16..19`?
+  5. **Puerta 5 (Conformidad UAT):** ¿El Solicitante (`PU-01`) suscribió el Acta de Aceptación de Usuario en la Biblioteca de Soporte?
+- **Resultado de la Evaluación:**
+  - Si falta cualquier puerta: Check Run concluye en `conclusion: failure` con resumen detallado en Markdown de las precondiciones insatisfechas, bloqueando la fusión en GitHub.
+  - Si todas las puertas están cumplidas: Check Run concluye en `conclusion: success`, autorizando el merge formal y la promoción a la Biblioteca Maestra.
+
+#### 8.5.4 Líneas Base Verificables con Hashes de Commits y Tags Git
+Las Líneas Base (`traceflow.baseline`) adquieren respaldo físico irrevocable en GitHub:
+- Toda línea base formal que transiciona a estado `CONGELADA` (`CU-20`) desencadena la creación de un **Git Tag inmutable y firmado** en el repositorio remoto (`refs/tags/v1.2.0` o `refs/tags/BL-2026-001`).
+- La tabla `traceflow.baseline` persiste:
+  * `git_tag_name VARCHAR(100)`: Nombre canónico del tag.
+  * `git_commit_sha VARCHAR(64)`: Hash inmutable exacto del commit congelado.
+  * `git_tree_sha VARCHAR(64)`: Hash del árbol raíz de archivos del repositorio en ese instante.
+- **Protocolo de Doble Verificación de Integridad:**
+  1. *Verificación Física Git:* Se coteja `git verify-tag` o `git cat-file -t` garantizando que el commit congelado no fue reescrito mediante `git push --force`.
+  2. *Verificación Lógica SCM:* TraceFlow suma los checksums SHA-256 de cada ECS contenido en `traceflow.baseline_item` y valida su correspondencia contra el registro inmutable asentado en `traceflow.audit_log`. Si hay divergencia de un solo byte, el sistema emite alerta crítica de integridad (RN-04).
+
+#### 8.5.5 Registro de Webhooks y Sincronización Idempotente sin Duplicación
+La sincronización de cambios remotos se blinda mediante las siguientes salvaguardas:
+- **Validación Criptográfica de Firma:** Cada solicitud entrante en `/api/v1/projects/:id/github/webhook` verifica la cabecera `X-Hub-Signature-256` calculando el HMAC-SHA256 del cuerpo crudo (`raw body`) contra `github_integration.encrypted_webhook_secret` (descifrado en memoria con AES-256-GCM), usando comparación en tiempo constante (`crypto.timingSafeEqual`).
+- **Garantía de Idempotencia Estricta:** TraceFlow almacena el identificador único de entrega `X-GitHub-Delivery` en `traceflow.github_event(github_delivery_id)` con restricción relacional `UNIQUE`. Si GitHub reenvía una entrega por timeout temporal de red, la base de datos descarta de inmediato el duplicado (`ON CONFLICT DO NOTHING`) sin procesar transiciones repetidas.
+- **Procesamiento Asíncrono Transaccional:** La recepción del webhook confirma HTTP 202 de forma inmediata y desacopla la sincronización de versiones dentro de transacciones aisladas con cerrojos a nivel de fila (`FOR UPDATE`) sobre `config_item` y `ecs_version`, previniendo condiciones de carrera.
+
+#### 8.5.6 Detección de Cambios No Autorizados / Fuera de Flujo (Out-of-Band Changes)
+Si un desarrollador realiza un `git push` directo a una rama rastreada (`develop`, `staging`, `main`) con commits que:
+1. No contienen Git Trailers ni referencias a una RFC/ECN activa, o
+2. Modifican rutas de archivos asociadas a ECS sin contar con un bloqueo de sincronización (`is_locked = TRUE`) ni una Orden de Cambio (`ECN`) en estado `EN_EJECUCION`,
+TraceFlow activa el **Protocolo de Detección de Cambio No Correlacionado**:
+- **Paso 1 (Registro de Incidencia):** Registra automáticamente una fila en `traceflow.incident_ticket` con `incident_type = 'CAMBIO_NO_AUTORIZADO_GIT'`, severidad `'ALTA'`, enlazando el `git_commit_sha`, autor, fecha y lista de archivos intervenidos.
+- **Paso 2 (Estampado en Auditoría):** Asienta el evento en `traceflow.audit_log` con tipo `'UNAUTHORIZED_GIT_COMMIT'` en la cadena inmutable SHA-256.
+- **Paso 3 (Notificación Inmediata):** Emite alerta al Gestor (`PU-02`) y al Custodio/Bibliotecario (`PU-05`).
+- **Paso 4 (Opciones de Resolución SCM):**
+  * *Opción A (Regularización Post-Hoc):* Si el cambio es necesario por emergencia técnica, el Gestor lo somete al flujo de excepción derivando el incidente a una RFC de regularización (`CU-24`), la cual debe evaluarse y certificarse retroactivamente.
+  * *Opción B (Rechazo y Reversión Mandatoria):* Si el cambio no procede o no cuenta con justificación, el Bibliotecario exige la ejecución de un `git revert <commit_sha>` en el repositorio remoto, bloqueando el avance de líneas base hasta comprobar que el árbol Git retornó al estado íntegro autorizado.
+
+#### 8.5.7 Trazabilidad ante Renombres, Movimientos y Eliminaciones de Archivos
+En Git los archivos carecen de identificador persistente; Git infiere movimientos analizando la similitud de los blobs entre árboles (`git diff -M`). En TraceFlow, cada ECS conserva su **identidad unívoca e inmutable (`config_item.id`, `config_item.code`)** durante toda la vida del sistema, independientemente de variaciones en la estructura de directorios:
+- **Entidad `traceflow.config_item_path_history`:** Mantiene la pista histórica de ubicaciones del ECS:
+  * Si un archivo se renombra o traslada (`git mv src/old.ts src/new.ts`):
+    1. La Orden de Cambio (`ECN`) debe contemplar la operación técnica de reestructuración.
+    2. Al recibirse el commit, TraceFlow detecta la tupla `{ status: 'renamed', previous_filename, filename }`.
+    3. Actualiza `config_item.file_path = 'src/new.ts'`.
+    4. Inserta en `config_item_path_history` el registro con `change_type = 'RENAMED'`, `previous_path`, `new_path` y el `git_commit_sha`.
+    5. Las consultas sobre líneas base anteriores resuelven con exactitud la ruta que el archivo tenía en el momento histórico en que fue congelado.
+  * Si un archivo se elimina del repositorio (`git rm src/deprecated.ts`):
+    1. Queda estrictamente **prohibido eliminar la fila de la tabla `config_item`** (violación de trazabilidad).
+    2. El ECS transiciona a estado `status = 'RETIRED'` (Retirado) y su biblioteca a histórico.
+    3. Se registra la baja en `config_item_path_history` con `change_type = 'RETIRED'` y en la bitácora de auditoría.
+    4. Las líneas base históricas pasadas mantienen intacta su referencia al ECS retirado.
+
+#### 8.5.8 Matriz de Separación de Autoridades: GitHub vs TraceFlow SCM
+
+| Dominio / Responsabilidad | Autoridad Operativa: GitHub | Autoridad de Gobernanza: TraceFlow SCM | Mecanismo de Sincronización y Enlace |
+| :--- | :--- | :--- | :--- |
+| **Almacenamiento de Código y Blobs** | **Autoridad Primaria.** Custodia física de blobs, árboles y commits. | Solo lectura/auditoría. Almacena checksums SHA-256 e identificadores Git. | Webhook `push` y API Git Data (`git_blob_sha`). |
+| **Historial y Grafo de Commits** | **Autoridad Primaria.** Grafo inmutable de commits con DAG. | Mapea commits a versiones de ECS (`ecs_version.git_commit_sha`). | Extracción de trailers `TraceFlow-RFC` y diff de archivos. |
+| **Ramas y Pull Requests** | **Autoridad Primaria.** Creación de ramas, revisiones de código y merges. | Supervisa y valida precondiciones mediante `Policy Gate`. | GitHub Checks API (`TraceFlow SCM / Policy Gate`). |
+| **Identificación de ECS** | Inexistente. Solo conoce rutas de archivos relativas (`file_path`). | **Autoridad Primaria.** Asigna identificador conceptual inmutable y código (`ECS-NNN`). | Mapeo determinista `file_path` $\leftrightarrow$ `config_item.id`. |
+| **Clasificación y Evaluación de Impacto** | Inexistente. Desconoce la semántica de Cambios Menores o Mayores. | **Autoridad Primaria.** Dictamen técnico del Arquitecto (`CU-06`) y evaluación en Triple Restricción. | Almacenado en `change_request` e informes técnicos de análisis. |
+| **Aprobación Colegiada de Cambios** | Inexistente. Solo gestiona revisiones informales de PR. | **Autoridad Primaria.** Votación formal del Comité CCB (`CU-07`) y Doble Llave (`CU-30`). | Actas de deliberación y resoluciones vinculadas a `change_order`. |
+| **Certificación de Calidad y Pruebas** | Ejecución de CI (GitHub Actions). | **Autoridad Primaria.** Dictamen formal de QA (`CU-16..19`) y suscripción de Acta UAT. | Certificados de conformidad requeridos para Check-In a Maestra. |
+| **Líneas Base (Baselines)** | Anclaje físico mediante Git Tags (`refs/tags/vX.Y.Z`). | **Autoridad Primaria.** Definición de alcance de ECS congelados y auditoría SHA-256. | Creación automatizada de Git Tags tras congelamiento de Línea Base. |
+| **Custodia e Inmutabilidad de Auditoría** | Registro de eventos en GitHub Audit Log. | **Autoridad Primaria.** Hash-chain SHA-256 inmutable de eventos regulatorios (`append_audit_log`). | Cómputo secuencial transaccional en PostgreSQL con advisory lock. |
 
 ### 9.1 Grupo 1: Gestión de Organizaciones (`MOD-10`)
 - **`GET /api/v1/organizations`**: Lista organizaciones donde el usuario autenticado tiene membresía activa.
@@ -674,6 +838,11 @@ flowchart LR
 | **`TDD-INIT-23`** | `INIT-H06` | E2E | Ciclo de Vida Completo | DG-INIT-04 | Flujo: `BORRADOR` $\rightarrow$ `EN_CONFIGURACION` $\rightarrow$ `PENDIENTE_VALIDACION` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `ACTIVO` $\rightarrow$ `CERRADO` $\rightarrow$ `ARCHIVADO`. |
 | **`TDD-INIT-24`** | `INIT-H06` | Regresión | `AuditService.logEvent` | RF-17, RNF-03 | Verifica encadenamiento SHA-256 (`append_audit_log`) en todas las transiciones. |
 | **`TDD-INIT-25`** | `INIT-H06` | Regresión | Expedientes y Líneas Base Históricas | Zero Data Loss | Verifica que consultas sobre RFCs y ECS preexistentes operen al 100% sin alteraciones. |
+| **`TDD-INIT-26`** | `INIT-H04` | Unitaria | `GitHubEventProcessorService.correlateDiff` | RF-24, RN-16 | Mapea deterministamente archivos modificados en un commit contra rutas registradas de ECS. |
+| **`TDD-INIT-27`** | `INIT-H04` | Integración | `GitHubChecksService.evaluatePolicyGate` | RF-24, RN-05 | Evalúa las 5 puertas SCM en GitHub Checks API y bloquea PR si falta informe de impacto o CCB. |
+| **`TDD-INIT-28`** | `INIT-H04` | Integración | `GitHubOutOfBandDetectionService` | RF-25, RN-03 | Detecta push directo sin RFC/ECN y genera automáticamente `incident_ticket` y alerta en auditoría. |
+| **`TDD-INIT-29`** | `INIT-H05` | Integración | `BaselineLifecycleService.freezeWithGitTag` | RF-13, RNF-03 | Congela Línea Base creando Git Tag inmutable en GitHub y persistiendo `git_commit_sha`. |
+| **`TDD-INIT-30`** | `INIT-H04` | Unitaria | `ConfigItemPathHistoryService.trackRename` | RF-24, RN-17 | Registra renombres/movimientos en `config_item_path_history` preservando la identidad inmutable del ECS. |
 
 ---
 

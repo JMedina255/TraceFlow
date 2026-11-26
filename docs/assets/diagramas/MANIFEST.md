@@ -1,10 +1,10 @@
 # Manifiesto Centralizado de Recursos Gráficos — TraceFlow SCM
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software  
-> **Organización:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software
+> **Organización:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam
 > **Línea Base Documental:** Etapa 06 (Formalización Gráfica y Renderizado)<br>
 > **Fecha de Generación:** 25/11/2026 | **Total de Diagramas:** 133<br>
-> **Estado Global:** 100% de especificaciones PlantUML modularizadas y renderizadas en formatos vectoriales (SVG) y rasterizados (PNG).  
+> **Estado Global:** 100% de especificaciones PlantUML modularizadas y renderizadas en formatos vectoriales (SVG) y rasterizados (PNG).
 
 ---
 
@@ -146,6 +146,7 @@
 | `DG-INIT-08` | Modelo Arquitectónico | Secuencia de Creación de Nuevo Repositorio GitHub (DA-03) | [`DG-INIT-08.puml`](plantuml/diseno/DG-INIT-08.puml) | [SVG](render/diseno/DG-INIT-08.svg) | [PNG](render/diseno/DG-INIT-08.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-INIT-09` | Modelo Arquitectónico | Secuencia de Activación del Proyecto con Salvaguarda SCM (DA-04) | [`DG-INIT-09.puml`](plantuml/diseno/DG-INIT-09.puml) | [SVG](render/diseno/DG-INIT-09.svg) | [PNG](render/diseno/DG-INIT-09.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 | `DG-INIT-10` | Modelo Arquitectónico | Mapa de Navegación del Frontend TO-BE (React 19 Router) | [`DG-INIT-10.puml`](plantuml/diseno/DG-INIT-10.puml) | [SVG](render/diseno/DG-INIT-10.svg) | [PNG](render/diseno/DG-INIT-10.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
+| `DG-INIT-11` | Modelo Arquitectónico | Arquitectura Operativa GitHub-SCM (Trazabilidad ECS, Commits, PRs y Puertas) | [`DG-INIT-11.puml`](plantuml/diseno/DG-INIT-11.puml) | [SVG](render/diseno/DG-INIT-11.svg) | [PNG](render/diseno/DG-INIT-11.png) | `FD03` | ✅ Renderizado (SVG + PNG) |
 
 ## 5. Catálogo Detallado: Modelos UWE de Navegación y Presentación (21 Diagramas)
 

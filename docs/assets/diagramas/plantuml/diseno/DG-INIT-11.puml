@@ -1,0 +1,141 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-11: Arquitectura Operativa GitHub-SCM (Trazabilidad ECS, Commits, PRs y Puertas de Gobernanza)</b>
+
+package "GitHub (Autoridad de Contenido y Versionado Git)" as GH_ENV #EBF8FF {
+    entity "Repository\n(Repositorio Remoto)" as GH_REPO {
+        * repo_id : BIGINT
+        * full_name : VARCHAR
+        * default_branch : VARCHAR
+    }
+
+    entity "Git Commit\n(Commit Físico)" as GH_COMMIT {
+        * commit_sha : VARCHAR(64)
+        * tree_sha : VARCHAR(64)
+        * message : TEXT (Trailers: TraceFlow-RFC, ECS)
+        * author_date : TIMESTAMPTZ
+    }
+
+    entity "Pull Request\n(Propuesta de Cambio)" as GH_PR {
+        * pr_number : INT
+        * source_branch : VARCHAR
+        * target_branch : VARCHAR
+        * head_sha : VARCHAR(64)
+    }
+
+    entity "Git Tag / Release\n(Etiqueta Inmutable)" as GH_TAG {
+        * tag_name : VARCHAR(100) (ej. v1.2.0, BL-001)
+        * target_commit_sha : VARCHAR(64)
+        * tagger_date : TIMESTAMPTZ
+    }
+
+    entity "Webhooks Engine\n(Eventos Criptográficos)" as GH_HOOK {
+        * X-GitHub-Delivery : UUID/Hex
+        * X-Hub-Signature-256 : HMAC-SHA256
+        * Event Payload : JSONB
+    }
+
+    GH_REPO ||--o{ GH_COMMIT : contiene
+    GH_REPO ||--o{ GH_PR : tramita
+    GH_REPO ||--o{ GH_TAG : etiqueta
+    GH_REPO ||--o{ GH_HOOK : emite
+}
+
+package "TraceFlow SCM (Autoridad de Gobernanza, Clasificación y Auditoría)" as TF_ENV #F7FAFC {
+    entity "github_integration\n(Vínculo de Proyecto)" as TF_GH {
+        * project_id : UUID [FK]
+        * github_repo_id : BIGINT
+        * installation_id : BIGINT
+        * encrypted_webhook_secret : BYTEA
+    }
+
+    entity "config_item\n(ECS Lógico)" as TF_ECS {
+        * id : UUID [PK]
+        * project_id : UUID [FK]
+        * code : VARCHAR(50) [UQ] (ej. ECS-CORE-001)
+        * file_path : VARCHAR(255) (Ruta actual en Git)
+        * current_version : VARCHAR(20)
+        * current_library : VARCHAR(20) (TRABAJO, SOPORTE, MAESTRA)
+        * status : VARCHAR(20) (ACTIVE, RETIRED)
+    }
+
+    entity "config_item_path_history\n(Historial de Rutas y Renombres)" as TF_PATH_HIST {
+        * id : UUID [PK]
+        * ecs_id : UUID [FK]
+        * previous_path : VARCHAR(255)
+        * new_path : VARCHAR(255)
+        * change_type : VARCHAR(20) (MODIFIED, RENAMED, MOVED, RETIRED)
+        * git_commit_sha : VARCHAR(64)
+        * change_order_id : UUID [FK]
+    }
+
+    entity "ecs_version\n(Versión Inmutable de ECS)" as TF_VER {
+        * id : UUID [PK]
+        * ecs_id : UUID [FK]
+        * version_number : VARCHAR(20)
+        * git_commit_sha : VARCHAR(64)
+        * git_blob_sha : VARCHAR(40)
+        * sha256_checksum : VARCHAR(64)
+        * change_order_id : UUID [FK]
+    }
+
+    entity "change_request\n(Expediente RFC)" as TF_RFC {
+        * id : UUID [PK]
+        * code : VARCHAR(30) [UQ] (ej. RFC-2026-004)
+        * classification : VARCHAR(30) (MENOR, MAYOR)
+        * status : VARCHAR(30) (REGISTRADA..AUTORIZADA..CERRADA)
+    }
+
+    entity "change_order\n(Orden ECN)" as TF_ECN {
+        * id : UUID [PK]
+        * rfc_id : UUID [FK]
+        * code : VARCHAR(30) [UQ]
+        * status : VARCHAR(20) (EMITIDA, EN_EJECUCION, CERRADA)
+    }
+
+    entity "baseline\n(Línea Base SCM)" as TF_BL {
+        * id : UUID [PK]
+        * project_id : UUID [FK]
+        * code : VARCHAR(30) [UQ]
+        * git_tag_name : VARCHAR(100)
+        * git_commit_sha : VARCHAR(64)
+        * status : VARCHAR(20) (CONGELADA, OBSOLETA)
+    }
+
+    entity "incident_ticket\n(Incidencia SCM)" as TF_INC {
+        * id : UUID [PK]
+        * project_id : UUID [FK]
+        * incident_type : VARCHAR(50) (CAMBIO_NO_AUTORIZADO_GIT)
+        * git_commit_sha : VARCHAR(64)
+        * status : VARCHAR(20) (REGISTRADO, DERIVADO_A_RFC)
+    }
+
+    entity "github_event\n(Bitácora Idempotente)" as TF_EVT {
+        * github_delivery_id : VARCHAR(64) [UQ]
+        * event_type : VARCHAR(50)
+        * signature_verified : BOOLEAN
+        * processed_status : VARCHAR(20)
+    }
+
+    TF_GH ||--o{ TF_ECS : mapea
+    TF_ECS ||--o{ TF_PATH_HIST : registra
+    TF_ECS ||--o{ TF_VER : versiona
+    TF_RFC ||--o| TF_ECN : autoriza
+    TF_ECN ||--o{ TF_VER : respalda
+    TF_BL ||--o{ TF_VER : congela
+}
+
+' Relaciones cruzadas de trazabilidad Git <-> TraceFlow
+GH_REPO .. TF_GH : Vinculación gobernada (DA-03)
+GH_COMMIT .. TF_VER : Identifica versión física (git_commit_sha)
+GH_COMMIT .. TF_PATH_HIST : Traza renombres/movimientos (git_commit_sha)
+GH_PR .. TF_RFC : Correlaciona propuesta de cambio (Check Run Policy Gate)
+GH_TAG .. TF_BL : Ancla física inmutable de línea base (git_tag_name)
+GH_HOOK .. TF_EVT : Entrega idempotente (X-GitHub-Delivery)
+GH_COMMIT .. TF_INC : Dispara incidencia ante cambio no autorizado (Out-of-band)
+
+@enduml

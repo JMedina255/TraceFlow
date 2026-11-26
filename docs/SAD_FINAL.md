@@ -1,12 +1,12 @@
 # Documento de Arquitectura de Software Consolidado (SAD Final Candidato) — TraceFlow SCM
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam (Medina Quispe, Antayhua Mamani, Loyola Vilca Choque, Rivera Muñoz)  
-> **Documento:** `docs/SAD_FINAL.md`  
-> **Fuentes Consolidadas:** `FD04-EPIS-Informe_SAD_Analisis.md` (v1.2), `FD05-EPIS-Informe_SAD_Diseno.md` (v0.5), `ADR-001`..`ADR-010`, `DICCIONARIO_DATOS.md`, `ESTANDAR_PROGRAMACION.md`  
-> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`  
-> **Estado:** Candidato a Aprobación del Responsable / CCB (DOC-02.6)  
-> **Fecha:** 25 de noviembre de 2026  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam (Medina Quispe, Antayhua Mamani, Loyola Vilca Choque, Rivera Muñoz)
+> **Documento:** `docs/SAD_FINAL.md`
+> **Fuentes Consolidadas:** `FD04-EPIS-Informe_SAD_Analisis.md` (v1.2), `FD05-EPIS-Informe_SAD_Diseno.md` (v0.5), `ADR-001`..`ADR-010`, `DICCIONARIO_DATOS.md`, `ESTANDAR_PROGRAMACION.md`
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`
+> **Estado:** Candidato a Aprobación del Responsable / CCB (DOC-02.6)
+> **Fecha:** 25 de noviembre de 2026
 
 ---
 
@@ -181,9 +181,10 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Integración GitHub Segura (`DA-03`, `DA-04`):** Soporte de vinculación y creación de repositorios (`DG-INIT-07`, `DG-INIT-08`), tokens de instalación generados bajo demanda en memoria vía JWT RS256 (sin almacenamiento en BD), webhooks HMAC-SHA256 con tiempo constante (`crypto.timingSafeEqual`) y tabla idempotente `github_event` (`X-GitHub-Delivery`).
 - **Salvaguarda Operacional SCM (`DA-04`, `RN-12`, `RN-13`):** El guardián `ProjectActiveGuard` bloquea formalmente (HTTP 412) todo registro de RFC u operación en bibliotecas en proyectos que no cuenten con GitHub validado y estado `ACTIVO` (`DG-INIT-09`).
 - **Regularización Estricta de Proyectos Históricos:** Vinculación individual y explícita por el Gestor (`PU-02`) de cada proyecto cliente (`PRJ-001`..`003`) a su propio repositorio dedicado en GitHub, prohibiendo cualquier asociación a `TraceFlow.git` y sin alteración masiva de datos.
+- **Fundamento Operativo SCM en GitHub (`DG-INIT-11`):** Mapeo de ECS lógicos (`config_item`) a repositorios y rutas de archivos Git (`file_path`, `git_blob_sha`, `git_commit_sha`), correlación automática de commits/PRs por diff y trailers Git, puertas de calidad en Pull Requests mediante GitHub Checks API (`Policy Gate`), líneas base verificables con Git Tags inmutables, detección automática de cambios no autorizados *out-of-band* con apertura de incidencias, e historial inmutable de renombres/movimientos (`config_item_path_history`).
 - **Mínimo Privilegio e Integridad Referencial:** Revocación del privilegio `DELETE` a `traceflow_app` (solo `SELECT, INSERT, UPDATE`), y uso de `ON DELETE RESTRICT` sobre entidades hijas para garantizar custodia e inmutabilidad probatoria.
-- **Hoja de Ruta en 5 Hitos (`INIT-H02` a `INIT-H06`):** Desglose secuencial con 25 pruebas TDD mapeadas exhaustivamente.
-- **Compendio Gráfico Canónico:** 10 modelos canónicos compilados `DG-INIT-01` a `DG-INIT-10` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
+- **Hoja de Ruta en 5 Hitos (`INIT-H02` a `INIT-H06`):** Desglose secuencial con 30 pruebas TDD mapeadas exhaustivamente.
+- **Compendio Gráfico Canónico:** 11 modelos canónicos compilados `DG-INIT-01` a `DG-INIT-11` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
 
 ---
 

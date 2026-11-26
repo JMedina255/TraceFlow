@@ -1,12 +1,12 @@
 # Diccionario de Datos — Modelo Físico Vigente y Modelo Objetivo en Español (TraceFlow SCM)
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
-> **Instancia Supabase:** `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`, AWS `us-west-2`)  
-> **Motor Verificado:** `PostgreSQL 17.12` (introspección de solo lectura vía `traceflow_app` sobre `information_schema` y `pg_catalog`)  
-> **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)  
-> **Estado:** Candidato a Aprobación (DOC-02.2 / Revisado en DOC-03) — *El esquema físico en Supabase NO ha sido renombrado*  
-> **Fecha:** 25 de noviembre de 2026  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam
+> **Instancia Supabase:** `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`, AWS `us-west-2`)
+> **Motor Verificado:** `PostgreSQL 17.12` (introspección de solo lectura vía `traceflow_app` sobre `information_schema` y `pg_catalog`)
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)
+> **Estado:** Candidato a Aprobación (DOC-02.2 / Revisado en DOC-03) — *El esquema físico en Supabase NO ha sido renombrado*
+> **Fecha:** 25 de noviembre de 2026
 
 > [!IMPORTANT]
 > **Cobertura de verificación y límites de privilegio (`traceflow_app`):**
@@ -680,3 +680,4 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 | **29** | `project_deliverable` | `entregable_proyecto` | Entregables técnicos asociados a ECS. 1:N con `project`. | PK `id UUID`, FK `project_id [RESTRICT]`, FK `milestone_id [RESTRICT]`, FK `associated_ecs_id [RESTRICT]`. | `SELECT, INSERT, UPDATE` |
 | **30** | `github_integration` | `integracion_github` | Integración GitHub obligatoria (DA-03, DA-04). 1:1 con `project`. | PK `id UUID`, UQ `project_id [RESTRICT]`, UQ `(repo_owner, repo_name)`, tokens bajo demanda, webhook cifrado AES-256-GCM. | `SELECT, INSERT, UPDATE` |
 | **31** | `github_event` | `evento_github` | Registro idempotente de webhooks HMAC-SHA256. 1:N con `project`. | PK `id UUID`, FK `project_id [RESTRICT]`, UQ `github_delivery_id`, `payload JSONB`. | `SELECT, INSERT, UPDATE` |
+| **32** | `config_item_path_history` | `historial_ruta_ecs` | Pista inmutable de renombres (`git mv`), traslados y bajas (`git rm`). 1:N con `config_item`. | PK `id UUID`, FK `ecs_id [RESTRICT]`, `git_commit_sha`, CHECK `change_type IN ('MODIFIED','RENAMED','MOVED','RETIRED')`. | `SELECT, INSERT, UPDATE` |

@@ -1,11 +1,11 @@
 # Matriz Integral de Trazabilidad — TraceFlow SCM
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
-> **Documento:** `docs/MATRIZ_TRAZABILIDAD.md`  
-> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`  
-> **Estado:** Candidato a Aprobación (DOC-02.7)  
-> **Fecha:** 25 de noviembre de 2026  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam
+> **Documento:** `docs/MATRIZ_TRAZABILIDAD.md`
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`
+> **Estado:** Candidato a Aprobación (DOC-02.7)
+> **Fecha:** 25 de noviembre de 2026
 
 ---
 
@@ -36,6 +36,8 @@
 | **RF-21** Integración y Vinculación GitHub | `RN-12` (DA-03, DA-04) | `CU-33` | `MOD-11` | `GitHubIntegrationModule` / `GitHubCryptoService` | `github_integration`, `github_event` | `integracion_github`, `evento_github` | `POST /api/v1/projects/:id/github/*` | `TDD-INIT-11..16` | **Propuesto INIT-H01-R** (ADR-011 / INIT-H04) |
 | **RF-22** Metodología, Fases y Entregables | `RN-01` | `CU-34` | `MOD-02` | `ProjectMethodologyService` | `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable` | `metodologia_proyecto`, `fase_proyecto`, etc. | `PUT /api/v1/projects/:id/setup/step-3` | `TDD-INIT-09..10` | **Propuesto INIT-H01-R** (ADR-011 / INIT-H03) |
 | **RF-23** Salvaguarda de Activación y Ciclo de Vida | `RN-12`, `RN-13`, `RN-15` (DA-04) | `CU-35`, `CU-02 (Ext)` | `MOD-02`, Transversal | `ProjectActiveGuard` / `ProjectLifecycleService` | `project`, `audit_log` | `proyecto`, `registro_auditoria` | `POST /api/v1/projects/:id/activate` | `TDD-INIT-05`, `18..25` | **Propuesto INIT-H01-R** (ADR-011 / INIT-H05, H06) |
+| **RF-24** Identificación y Trazabilidad Git de ECS | `RN-16`, `RN-17` | `CU-13`, `CU-33 (Ext)` | `MOD-05`, `MOD-11` | `GitHubEventProcessorService` / `ConfigItemPathHistoryService` | `config_item`, `ecs_version`, `config_item_path_history` | `elemento_configuracion`, `version_ecs`, `historial_ruta_ecs` | `/api/v1/projects/:id/ecs` | `TDD-INIT-26`, `30` | **Propuesto INIT-H01-R** (ADR-011 / INIT-H04) |
+| **RF-25** Supervisión y Puertas de Gobernanza SCM | `RN-03`, `RN-05`, `RN-16` | `CU-23`, `CU-33 (Ext)` | `MOD-08`, `MOD-11` | `GitHubChecksService` / `GitHubOutOfBandDetectionService` | `github_event`, `incident_ticket`, `change_request` | `evento_github`, `incidencia`, `solicitud_cambio` | `/api/v1/projects/:id/github/webhook` | `TDD-INIT-27`, `28` | **Propuesto INIT-H01-R** (ADR-011 / INIT-H04) |
 
 ---
 

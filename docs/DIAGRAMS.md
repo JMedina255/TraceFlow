@@ -1,12 +1,12 @@
 # Catálogo Centralizado de Diagramas PlantUML - TraceFlow SCM
 
-> **Sistema de Gestión de Configuración de Software - TraceFlow SCM**  
-> **Repositorio:** `TraceFlow`  
-> **Documento:** `docs/DIAGRAMS.md`  
-> **Fuente Oficial de Diagramas (SSOT)**  
-> **Versión:** 1.0  
-> **Fecha:** 2026-09-30  
-> **Estado General:** APROBADO  
+> **Sistema de Gestión de Configuración de Software - TraceFlow SCM**
+> **Repositorio:** `TraceFlow`
+> **Documento:** `docs/DIAGRAMS.md`
+> **Fuente Oficial de Diagramas (SSOT)**
+> **Versión:** 1.0
+> **Fecha:** 2026-09-30
+> **Estado General:** APROBADO
 
 ---
 
@@ -148,20 +148,21 @@ Durante la auditoría del documento maestro `FD03-EPIS-Informe_SRS.md` y de los 
 | [DG-INIT-08](#dg-init-08--secuencia-de-creación-de-nuevo-repositorio-github) | Secuencia de Creación de Nuevo Repositorio GitHub | Secuencia de Aprovisionamiento | CANDIDATO (INIT-H01) | 1.0 |
 | [DG-INIT-09](#dg-init-09--secuencia-de-activación-del-proyecto-con-salvaguarda-scm) | Secuencia de Activación del Proyecto con Salvaguarda SCM | Secuencia / Salvaguarda DA-04 | CANDIDATO (INIT-H01) | 1.0 |
 | [DG-INIT-10](#dg-init-10--mapa-de-navegación-del-frontend-to-be) | Mapa de Navegación del Frontend TO-BE (React Router) | Navegación UI / Frontend | CANDIDATO (INIT-H01) | 1.0 |
+| [DG-INIT-11](#dg-init-11--arquitectura-operativa-github-scm) | Arquitectura Operativa GitHub-SCM (Trazabilidad ECS, Commits, PRs y Puertas) | Arquitectura Operativa / Git-SCM | CANDIDATO (INIT-H01-R) | 1.0 |
 
 ---
 
 # DG-01 — Organigrama del C-SharkTeam y Entorno Cliente
 
-**ID:** DG-01  
-**Nombre:** Organigrama del Equipo de Desarrollo C-SharkTeam y Entorno Cliente (ÉXODO S.A.C.)  
-**Tipo:** Estructura Organizacional  
-**Estado:** APROBADO  
-**Versión:** 1.0  
-**RF relacionados:** RF-01  
-**RN relacionadas:** N/A  
-**CU relacionados:** CU-01  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 2.4 (Págs. 7-8)  
+**ID:** DG-01
+**Nombre:** Organigrama del Equipo de Desarrollo C-SharkTeam y Entorno Cliente (ÉXODO S.A.C.)
+**Tipo:** Estructura Organizacional
+**Estado:** APROBADO
+**Versión:** 1.0
+**RF relacionados:** RF-01
+**RN relacionadas:** N/A
+**CU relacionados:** CU-01
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 2.4 (Págs. 7-8)
 
 ![DG-01](assets/diagramas/render/generales/DG-01.svg)
 
@@ -245,15 +246,15 @@ DEV ..> CLIENT : Provee plataforma TraceFlow SCM
 
 # DG-02 — Diagrama de Actividades del Proceso Actual (AS-IS)
 
-**ID:** DG-02  
-**Nombre:** Diagrama de Actividades del Proceso Empírico Actual (AS-IS) de ÉXODO S.A.C.  
-**Tipo:** Actividades  
-**Estado:** REVISION  
-**Versión:** 1.0  
-**RF relacionados:** N/A (Diagnóstico inicial)  
-**RN relacionadas:** N/A  
-**CU relacionados:** N/A  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 3.6 (Pág. 17) y Sección 4.1 (Pág. 17)  
+**ID:** DG-02
+**Nombre:** Diagrama de Actividades del Proceso Empírico Actual (AS-IS) de ÉXODO S.A.C.
+**Tipo:** Actividades
+**Estado:** REVISION
+**Versión:** 1.0
+**RF relacionados:** N/A (Diagnóstico inicial)
+**RN relacionadas:** N/A
+**CU relacionados:** N/A
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 3.6 (Pág. 17) y Sección 4.1 (Pág. 17)
 
 ![DG-02](assets/diagramas/render/generales/DG-02.svg)
 
@@ -305,17 +306,17 @@ ni pruebas formales;
 |Entorno de Producción del Cliente|
 if (¿Se presenta fallo en producción?) then (Sí)
     :Detectar incidente crítico;
-    
+
     :Intentar identificar versión
     previa o autor del cambio;
-    
+
     note right
         Fallo crítico:
         No existen líneas base
         ni registro de auditoría.
         No es posible ejecutar Rollback inmediato.
     end note
-    
+
     :Retrabajo forzado y demora en servicio;
     stop
 else (No)
@@ -329,15 +330,15 @@ endif
 
 # DG-03 — Diagrama del Proceso Propuesto de Gestión de Cambios (TO-BE v2)
 
-**ID:** DG-03  
-**Nombre:** Proceso de Gestión de Cambios de Elementos de Configuración (TraceFlow SCM - TO-BE v2)  
-**Tipo:** Actividades con Calles (Swimlanes)  
-**Estado:** APROBADO  
-**Versión:** 2.0  
-**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-17  
-**RN relacionadas:** RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-08, RN-09  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y actualización TO-BE v2  
+**ID:** DG-03
+**Nombre:** Proceso de Gestión de Cambios de Elementos de Configuración (TraceFlow SCM - TO-BE v2)
+**Tipo:** Actividades con Calles (Swimlanes)
+**Estado:** APROBADO
+**Versión:** 2.0
+**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-17
+**RN relacionadas:** RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-08, RN-09
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 4.2 y actualización TO-BE v2
 
 ![DG-03](assets/diagramas/render/generales/DG-03.svg)
 
@@ -428,7 +429,7 @@ if (¿Información suficiente y consistente?) then (No)
         |Analista de Requerimientos / Gestor|
         :Emitir dictamen de no conformidad
         inicial y desestimar solicitud;
-        
+
         |Solicitante|
         :Recibir notificación de desestimación;
         note left
@@ -467,7 +468,7 @@ if (¿Afecta alcance, tiempo o costo?) then (Sí)
         de la Triple Restricción.
         Requiere aprobación del CCB.
     end note
-    
+
     ' =========================================================
     ' FASE 4A - EVALUACIÓN COLEGIADA CCB (CAMBIO MAYOR)
     ' =========================================================
@@ -686,15 +687,15 @@ stop
 
 # DG-04 — Diagrama de Paquetes Arquitecturales
 
-**ID:** DG-04  
-**Nombre:** Diagrama de Paquetes Arquitecturales de TraceFlow SCM  
-**Tipo:** Paquetes  
-**Estado:** APROBADO  
-**Versión:** 1.1  
-**RF relacionados:** RF-01 a RF-18  
-**RN relacionadas:** RN-01 a RN-09  
-**CU relacionados:** CU-01 a CU-30  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32) y actualización TO-BE v2  
+**ID:** DG-04
+**Nombre:** Diagrama de Paquetes Arquitecturales de TraceFlow SCM
+**Tipo:** Paquetes
+**Estado:** APROBADO
+**Versión:** 1.1
+**RF relacionados:** RF-01 a RF-18
+**RN relacionadas:** RN-01 a RN-09
+**CU relacionados:** CU-01 a CU-30
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.1 (Págs. 31-32) y actualización TO-BE v2
 
 ![DG-04](assets/diagramas/render/generales/DG-04.svg)
 
@@ -775,15 +776,15 @@ PKG_REP ..> PKG_LIB : consulta inventario
 
 # DG-05 — Diagrama General de Casos de Uso
 
-**ID:** DG-05  
-**Nombre:** Diagrama General de Casos de Uso del Sistema TraceFlow SCM  
-**Tipo:** Casos de Uso  
-**Estado:** APROBADO  
-**Versión:** 1.1  
-**RF relacionados:** RF-01 a RF-18  
-**RN relacionadas:** RN-01 a RN-09  
-**CU relacionados:** CU-01 a CU-30  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33), `TB-10` y actualización TO-BE v2  
+**ID:** DG-05
+**Nombre:** Diagrama General de Casos de Uso del Sistema TraceFlow SCM
+**Tipo:** Casos de Uso
+**Estado:** APROBADO
+**Versión:** 1.1
+**RF relacionados:** RF-01 a RF-18
+**RN relacionadas:** RN-01 a RN-09
+**CU relacionados:** CU-01 a CU-30
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 33), `TB-10` y actualización TO-BE v2
 
 ![DG-05](assets/diagramas/render/generales/DG-05.svg)
 
@@ -905,15 +906,15 @@ ACT_ADM --> UC28
 
 # DG-06 — Casos de Uso: Administración de Usuarios y Proyectos
 
-**ID:** DG-06  
-**Nombre:** Diagrama de Casos de Uso - Administración de Usuarios y Proyectos  
-**Tipo:** Casos de Uso Específico  
-**Estado:** APROBADO  
-**Versión:** 1.0  
-**RF relacionados:** RF-01, RF-02  
-**RN relacionadas:** N/A  
-**CU relacionados:** CU-01, CU-02, CU-03  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)  
+**ID:** DG-06
+**Nombre:** Diagrama de Casos de Uso - Administración de Usuarios y Proyectos
+**Tipo:** Casos de Uso Específico
+**Estado:** APROBADO
+**Versión:** 1.0
+**RF relacionados:** RF-01, RF-02
+**RN relacionadas:** N/A
+**CU relacionados:** CU-01, CU-02, CU-03
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34)
 
 ![DG-06](assets/diagramas/render/generales/DG-06.svg)
 
@@ -955,15 +956,15 @@ UC02 ..> ACT_ADM : <<secundario>>
 
 # DG-07 — Casos de Uso: Registro y Evaluación de RFC e Incidencias
 
-**ID:** DG-07  
-**Nombre:** Diagrama de Casos de Uso - Registro y Evaluación de RFC e Incidencias  
-**Tipo:** Casos de Uso Específico  
-**Estado:** APROBADO  
-**Versión:** 1.1  
-**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-15  
-**RN relacionadas:** RN-01, RN-05, RN-07  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25, CU-30  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34) y actualización TO-BE v2  
+**ID:** DG-07
+**Nombre:** Diagrama de Casos de Uso - Registro y Evaluación de RFC e Incidencias
+**Tipo:** Casos de Uso Específico
+**Estado:** APROBADO
+**Versión:** 1.1
+**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-15
+**RN relacionadas:** RN-01, RN-05, RN-07
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-23, CU-24, CU-25, CU-30
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 34) y actualización TO-BE v2
 
 ![DG-07](assets/diagramas/render/generales/DG-07.svg)
 
@@ -1023,15 +1024,15 @@ UC30 ..> UC08 : <<include>> (si autoriza)
 
 # DG-08 — Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)
 
-**ID:** DG-08  
-**Nombre:** Diagrama de Casos de Uso - SCM Core (Gestión de ECS, Bibliotecas y Líneas Base)  
-**Tipo:** Casos de Uso Específico  
-**Estado:** APROBADO  
-**Versión:** 1.0  
-**RF relacionados:** RF-03, RF-08, RF-09, RF-12, RF-13, RF-14  
-**RN relacionadas:** RN-02, RN-03, RN-04, RN-06, RN-07, RN-08  
-**CU relacionados:** CU-09, CU-10, CU-11, CU-12, CU-13, CU-20, CU-21, CU-22  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)  
+**ID:** DG-08
+**Nombre:** Diagrama de Casos de Uso - SCM Core (Gestión de ECS, Bibliotecas y Líneas Base)
+**Tipo:** Casos de Uso Específico
+**Estado:** APROBADO
+**Versión:** 1.0
+**RF relacionados:** RF-03, RF-08, RF-09, RF-12, RF-13, RF-14
+**RN relacionadas:** RN-02, RN-03, RN-04, RN-06, RN-07, RN-08
+**CU relacionados:** CU-09, CU-10, CU-11, CU-12, CU-13, CU-20, CU-21, CU-22
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35)
 
 ![DG-08](assets/diagramas/render/generales/DG-08.svg)
 
@@ -1077,15 +1078,15 @@ UC21 ..> UC22 : <<include>> (si re-test falla)
 
 # DG-09 — Casos de Uso: Implementación y Validación de Calidad
 
-**ID:** DG-09  
-**Nombre:** Diagrama de Casos de Uso - Implementación y Validación de la Calidad  
-**Tipo:** Casos de Uso Específico  
-**Estado:** APROBADO  
-**Versión:** 1.1  
-**RF relacionados:** RF-07, RF-09, RF-10, RF-11  
-**RN relacionadas:** RN-08, RN-09  
-**CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-29  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35) y actualización TO-BE v2  
+**ID:** DG-09
+**Nombre:** Diagrama de Casos de Uso - Implementación y Validación de la Calidad
+**Tipo:** Casos de Uso Específico
+**Estado:** APROBADO
+**Versión:** 1.1
+**RF relacionados:** RF-07, RF-09, RF-10, RF-11
+**RN relacionadas:** RN-08, RN-09
+**CU relacionados:** CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-29
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 35) y actualización TO-BE v2
 
 ![DG-09](assets/diagramas/render/generales/DG-09.svg)
 
@@ -1136,15 +1137,15 @@ UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
 
 # DG-10 — Casos de Uso: Trazabilidad, Auditoría e Integridad
 
-**ID:** DG-10  
-**Nombre:** Diagrama de Casos de Uso - Trazabilidad, Auditoría e Integridad  
-**Tipo:** Casos de Uso Específico  
-**Estado:** APROBADO  
-**Versión:** 1.0  
-**RF relacionados:** RF-16, RF-17, RF-18, RNF-03  
-**RN relacionadas:** RN-02, RN-03  
-**CU relacionados:** CU-26, CU-27, CU-28  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 36)  
+**ID:** DG-10
+**Nombre:** Diagrama de Casos de Uso - Trazabilidad, Auditoría e Integridad
+**Tipo:** Casos de Uso Específico
+**Estado:** APROBADO
+**Versión:** 1.0
+**RF relacionados:** RF-16, RF-17, RF-18, RNF-03
+**RN relacionadas:** RN-02, RN-03
+**CU relacionados:** CU-26, CU-27, CU-28
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.2 (Pág. 36)
 
 ![DG-10](assets/diagramas/render/generales/DG-10.svg)
 
@@ -1182,15 +1183,15 @@ UC28 ..> UC_EXP : <<extend>>
 
 # DG-11 — Diagrama de Estados del Ciclo de Vida de la RFC
 
-**ID:** DG-11  
-**Nombre:** Diagrama de Estados del Ciclo de Vida de una Solicitud de Cambio (RFC - 14 Estados Oficiales)  
-**Tipo:** Máquina de Estados  
-**Estado:** APROBADO  
-**Versión:** 2.0  
-**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14  
-**RN relacionadas:** RN-01, RN-05, RN-07, RN-08, RN-09  
-**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30  
-**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27), `TB-07` y actualización TO-BE v2  
+**ID:** DG-11
+**Nombre:** Diagrama de Estados del Ciclo de Vida de una Solicitud de Cambio (RFC - 14 Estados Oficiales)
+**Tipo:** Máquina de Estados
+**Estado:** APROBADO
+**Versión:** 2.0
+**RF relacionados:** RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-14
+**RN relacionadas:** RN-01, RN-05, RN-07, RN-08, RN-09
+**CU relacionados:** CU-04, CU-05, CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-14, CU-15, CU-16, CU-17, CU-18, CU-19, CU-20, CU-21, CU-22, CU-29, CU-30
+**Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Págs. 26-27), `TB-07` y actualización TO-BE v2
 
 ![DG-11](assets/diagramas/render/generales/DG-11.svg)
 
@@ -1307,7 +1308,7 @@ Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 > **Resolución DOC-030 (DOC-03.1):**
 > Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Queda formalmente reclasificado como **`DG-12-HIST`** para eliminar colisiones de identificación con el *Modelo Conceptual del Dominio de Análisis* (`analisis/DG-12.svg`), que permanece como el único **`DG-12`** canónico.
 
-**ID:** DG-12-HIST | **Tipo:** Clases (Histórico) | **Estado:** ARCHIVADO HISTÓRICO | **Versión:** 1.0  
+**ID:** DG-12-HIST | **Tipo:** Clases (Histórico) | **Estado:** ARCHIVADO HISTÓRICO | **Versión:** 1.0
 **RF:** RF-01 a RF-18 | **RN:** RN-01 a RN-09 | **CU:** CU-01 a CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2
 
 ![DG-12-HIST](assets/diagramas/render/generales/DG-12-HIST.svg)
@@ -1482,7 +1483,7 @@ RegistroAuditoria "*" --> "1" Usuario : generado por
 
 # DG-13 — Modelo Lógico de la Arquitectura TraceFlow SCM
 
-**ID:** DG-13 | **Tipo:** Componentes / Arquitectura Física | **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD) | **Versión:** 1.0  
+**ID:** DG-13 | **Tipo:** Componentes / Arquitectura Física | **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD) | **Versión:** 1.0
 **RF:** RNF-01 a RNF-09 | **RN:** RN-01 a RN-09 | **CU:** Todos | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2
 
 ![DG-13](assets/diagramas/render/generales/DG-13.svg)
@@ -1524,7 +1525,7 @@ package "Capa de Almacenamiento y Persistencia" {
         [Inventario ECS / Baselines]
         [Registro de Auditoría]
     }
-    
+
     storage "Almacén de Archivos y Bibliotecas SCM" as STORAGE {
         folder "Biblioteca de Trabajo (Work)" as LIB_WORK
         folder "Biblioteca de Soporte (Support)" as LIB_SUPPORT
@@ -1572,7 +1573,7 @@ Los diagramas de secuencia modelan la interacción temporal y sincrónica entre 
 ---
 
 ### DG-SEQ-01 — Gestionar usuarios y roles (CU-01)
-**ID:** DG-SEQ-01 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-01 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-01 | **RN:** RN-01 | **CU:** CU-01 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-01](assets/diagramas/render/analisis/DG-SEQ-01.svg)
@@ -1614,7 +1615,7 @@ end
 ---
 
 ### DG-SEQ-02 — Crear y administrar proyectos (CU-02)
-**ID:** DG-SEQ-02 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-02 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-02 | **RN:** RN-01 | **CU:** CU-02 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-02](assets/diagramas/render/analisis/DG-SEQ-02.svg)
@@ -1652,7 +1653,7 @@ end
 ---
 
 ### DG-SEQ-03 — Consultar proyecto (CU-03)
-**ID:** DG-SEQ-03 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-03 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-02 | **RN:** RN-01 | **CU:** CU-03 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-03](assets/diagramas/render/analisis/DG-SEQ-03.svg)
@@ -1687,7 +1688,7 @@ end
 ---
 
 ### DG-SEQ-04 — Registrar Solicitud de Cambio (RFC) (CU-04)
-**ID:** DG-SEQ-04 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-04 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-04 | **RN:** RN-01 | **CU:** CU-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-04](assets/diagramas/render/analisis/DG-SEQ-04.svg)
@@ -1724,7 +1725,7 @@ end
 ---
 
 ### DG-SEQ-04.1 — Subsanar Solicitud de Cambio (RFC) (CU-04.1)
-**ID:** DG-SEQ-04.1 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-04.1 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-04 | **RN:** RN-01 | **CU:** CU-04.1 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-04.1](assets/diagramas/render/analisis/DG-SEQ-04.1.svg)
@@ -1756,7 +1757,7 @@ Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
 ---
 
 ### DG-SEQ-05 — Validar y clasificar la solicitud (CU-05)
-**ID:** DG-SEQ-05 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-05 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-04, RF-05 | **RN:** RN-01, RN-07 | **CU:** CU-05 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-05](assets/diagramas/render/analisis/DG-SEQ-05.svg)
@@ -1798,7 +1799,7 @@ end
 ---
 
 ### DG-SEQ-06 — Realizar análisis de impacto técnico (CU-06)
-**ID:** DG-SEQ-06 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-06 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-05 | **RN:** RN-01, RN-05 | **CU:** CU-06 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-06](assets/diagramas/render/analisis/DG-SEQ-06.svg)
@@ -1829,7 +1830,7 @@ Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CC
 ---
 
 ### DG-SEQ-07 — Evaluar Cambio Mayor en CCB (CU-07)
-**ID:** DG-SEQ-07 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-07 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-06 | **RN:** RN-01, RN-05, RN-07 | **CU:** CU-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-07](assets/diagramas/render/analisis/DG-SEQ-07.svg)
@@ -1868,7 +1869,7 @@ end
 ---
 
 ### DG-SEQ-08 — Emitir Orden de Cambio (ECN/ECO) (CU-08)
-**ID:** DG-SEQ-08 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-08 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-07 | **RN:** RN-01 | **CU:** CU-08 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-08](assets/diagramas/render/analisis/DG-SEQ-08.svg)
@@ -1901,7 +1902,7 @@ Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
 ---
 
 ### DG-SEQ-09 — Registrar ECS (CU-09)
-**ID:** DG-SEQ-09 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-09 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-03 | **RN:** RN-01, RN-02, RN-04 | **CU:** CU-09 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-09](assets/diagramas/render/analisis/DG-SEQ-09.svg)
@@ -1933,7 +1934,7 @@ Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de ca
 ---
 
 ### DG-SEQ-10 — Efectuar Check-Out (CU-10)
-**ID:** DG-SEQ-10 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-10 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-08, RF-09 | **RN:** RN-01, RN-06 | **CU:** CU-10 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-10](assets/diagramas/render/analisis/DG-SEQ-10.svg)
@@ -1965,7 +1966,7 @@ Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de activi
 ---
 
 ### DG-SEQ-11 — Aplicar bloqueo de sincronización (CU-11)
-**ID:** DG-SEQ-11 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-11 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-09 | **RN:** RN-06 | **CU:** CU-11 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-11](assets/diagramas/render/analisis/DG-SEQ-11.svg)
@@ -1995,7 +1996,7 @@ Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en
 ---
 
 ### DG-SEQ-12 — Efectuar Check-In (CU-12)
-**ID:** DG-SEQ-12 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-12 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-08, RF-09, RF-10 | **RN:** RN-01, RN-02, RN-04, RN-06, RN-09 | **CU:** CU-12 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-12](assets/diagramas/render/analisis/DG-SEQ-12.svg)
@@ -2027,7 +2028,7 @@ Sistema --> CCB: 6. Notificar integración exitosa habilitando la creación de l
 ---
 
 ### DG-SEQ-13 — Consultar historial de versiones (CU-13)
-**ID:** DG-SEQ-13 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-13 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-09, RF-16 | **RN:** RN-02, RN-03 | **CU:** CU-13 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-13](assets/diagramas/render/analisis/DG-SEQ-13.svg)
@@ -2062,7 +2063,7 @@ end
 ---
 
 ### DG-SEQ-14 — Implementar cambio en el ECS (CU-14)
-**ID:** DG-SEQ-14 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-14 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-07, RF-09 | **RN:** RN-01, RN-03 | **CU:** CU-14 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-14](assets/diagramas/render/analisis/DG-SEQ-14.svg)
@@ -2092,7 +2093,7 @@ Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pru
 ---
 
 ### DG-SEQ-15 — Ejecutar pruebas unitarias locales (CU-15)
-**ID:** DG-SEQ-15 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-15 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-10 | **RN:** RN-01, RN-03 | **CU:** CU-15 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-15](assets/diagramas/render/analisis/DG-SEQ-15.svg)
@@ -2122,7 +2123,7 @@ Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a prueb
 ---
 
 ### DG-SEQ-16 — Ejecutar pruebas de integración (CU-16)
-**ID:** DG-SEQ-16 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-16 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-16 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-16](assets/diagramas/render/analisis/DG-SEQ-16.svg)
@@ -2152,7 +2153,7 @@ Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certifi
 ---
 
 ### DG-SEQ-17 — Certificar conformidad del cambio (CU-17)
-**ID:** DG-SEQ-17 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-17 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-17 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-17](assets/diagramas/render/analisis/DG-SEQ-17.svg)
@@ -2185,7 +2186,7 @@ Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
 ---
 
 ### DG-SEQ-18 — Reportar no conformidad (CU-18)
-**ID:** DG-SEQ-18 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-18 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-10, RF-11 | **RN:** RN-08 | **CU:** CU-18 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-18](assets/diagramas/render/analisis/DG-SEQ-18.svg)
@@ -2216,7 +2217,7 @@ Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Bibliote
 ---
 
 ### DG-SEQ-19 — Reevaluar y re-testear (CU-19)
-**ID:** DG-SEQ-19 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-19 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-11 | **RN:** RN-08 | **CU:** CU-19 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-19](assets/diagramas/render/analisis/DG-SEQ-19.svg)
@@ -2254,7 +2255,7 @@ end
 ---
 
 ### DG-SEQ-20 — Crear y congelar línea base (CU-20)
-**ID:** DG-SEQ-20 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-20 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-13, RF-14 | **RN:** RN-02, RN-04, RN-07, RN-09 | **CU:** CU-20 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-20](assets/diagramas/render/analisis/DG-SEQ-20.svg)
@@ -2288,7 +2289,7 @@ Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
 ---
 
 ### DG-SEQ-21 — Ejecutar rollback (CU-21)
-**ID:** DG-SEQ-21 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-21 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-12 | **RN:** RN-06, RN-08 | **CU:** CU-21 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-21](assets/diagramas/render/analisis/DG-SEQ-21.svg)
@@ -2322,7 +2323,7 @@ Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de
 ---
 
 ### DG-SEQ-22 — Cancelar Orden de Cambio (CU-22)
-**ID:** DG-SEQ-22 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-22 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-12, RF-14 | **RN:** RN-07, RN-08 | **CU:** CU-22 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-22](assets/diagramas/render/analisis/DG-SEQ-22.svg)
@@ -2355,7 +2356,7 @@ Sistema --> CCB: 6. Notificar resolución formal de cancelación de la orden
 ---
 
 ### DG-SEQ-23 — Registrar incidencia (CU-23)
-**ID:** DG-SEQ-23 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-23 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-15 | **RN:** RN-01 | **CU:** CU-23 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-23](assets/diagramas/render/analisis/DG-SEQ-23.svg)
@@ -2387,7 +2388,7 @@ Sistema --> Analista: 6. Notificar nuevo ticket de incidencia para evaluación y
 ---
 
 ### DG-SEQ-24 — Consultar estado de ticket (CU-24)
-**ID:** DG-SEQ-24 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-24 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-15 | **RN:** RN-01 | **CU:** CU-24 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-24](assets/diagramas/render/analisis/DG-SEQ-24.svg)
@@ -2417,7 +2418,7 @@ Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones
 ---
 
 ### DG-SEQ-25 — Derivar incidencia a RFC (CU-25)
-**ID:** DG-SEQ-25 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-25 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-04, RF-15 | **RN:** RN-01 | **CU:** CU-25 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-25](assets/diagramas/render/analisis/DG-SEQ-25.svg)
@@ -2449,7 +2450,7 @@ Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimi
 ---
 
 ### DG-SEQ-26 — Validar integridad (checksum) (CU-26)
-**ID:** DG-SEQ-26 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-26 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-17 | **RN:** RN-04, RN-09 | **CU:** CU-26 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-26](assets/diagramas/render/analisis/DG-SEQ-26.svg)
@@ -2485,7 +2486,7 @@ end
 ---
 
 ### DG-SEQ-27 — Auditar acciones del sistema (CU-27)
-**ID:** DG-SEQ-27 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-27 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-16, RF-17 | **RN:** RN-01, RN-07 | **CU:** CU-27 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-27](assets/diagramas/render/analisis/DG-SEQ-27.svg)
@@ -2515,7 +2516,7 @@ CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de 
 ---
 
 ### DG-SEQ-28 — Generar reportes de estado (CU-28)
-**ID:** DG-SEQ-28 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-28 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-18 | **RN:** RN-01, RN-07 | **CU:** CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-28](assets/diagramas/render/analisis/DG-SEQ-28.svg)
@@ -2547,7 +2548,7 @@ Sistema --> CCB: 6. Remitir reporte consolidado oficial a dirección de proyecto
 ---
 
 ### DG-SEQ-29 — Validar aceptación del cambio por el usuario (UAT) (CU-29)
-**ID:** DG-SEQ-29 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-29 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-10 | **RN:** RN-01, RN-09 | **CU:** CU-29 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-29](assets/diagramas/render/analisis/DG-SEQ-29.svg)
@@ -2585,7 +2586,7 @@ end
 ---
 
 ### DG-SEQ-30 — Autorizar Cambio Menor (CU-30)
-**ID:** DG-SEQ-30 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0  
+**ID:** DG-SEQ-30 | **Tipo:** Secuencia | **Estado:** APROBADO — Secuencia de Análisis | **Versión:** 2.0
 **RF:** RF-05, RF-07 | **RN:** RN-01, RN-05, RN-07 | **CU:** CU-30 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1
 
 ![DG-SEQ-30](assets/diagramas/render/analisis/DG-SEQ-30.svg)
@@ -4064,13 +4065,13 @@ E_DICT --> E_ECS : "habilita intervención sobre"
 Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad técnica basada en los requerimientos, reglas de negocio y casos de uso aprobados en `TABLES.md`:
 
 ### DG-SEQ-03 — Diagrama de Secuencia del Caso de Uso CU-03 (Consultar proyecto)
-- **ID:** DG-SEQ-03  
-- **Nombre:** Diagrama de Secuencia del Caso de Uso CU-03: Consultar proyecto  
-- **Tipo:** Secuencia  
-- **Estado:** APROBADO — Secuencia de Análisis  
-- **RF relacionados:** RF-02  
-- **CU relacionados:** CU-03  
-- **Fuente:** Reconstruido formalmente en `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 y `docs/DIAGRAMS.md`.  
+- **ID:** DG-SEQ-03
+- **Nombre:** Diagrama de Secuencia del Caso de Uso CU-03: Consultar proyecto
+- **Tipo:** Secuencia
+- **Estado:** APROBADO — Secuencia de Análisis
+- **RF relacionados:** RF-02
+- **CU relacionados:** CU-03
+- **Fuente:** Reconstruido formalmente en `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 y `docs/DIAGRAMS.md`.
 - **Resolución:** Reconstruido y formalizado a nivel de análisis conceptual (1:1 frente a CU-03) con correspondencia estricta de 6 pasos.
 
 ### DG-12 — Modelo Conceptual del Dominio TraceFlow SCM
@@ -4079,14 +4080,14 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 > **Nota de Auditoría SCM (Resolución DOC-030 en DOC-03.1):**
 > Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1), ratificada como único titular canónico del identificador `DG-12` (el diagrama histórico de clases se conserva como `DG-12-HIST`).
 
-- **ID:** DG-12  
-- **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM  
-- **Tipo:** Clases Conceptuales (Fase de Análisis)  
-- **Estado:** APROBADO — MODELO CONCEPTUAL DE ANÁLISIS  
-- **RF relacionados:** RF-01 a RF-18  
-- **RN relacionadas:** RN-01 a RN-09  
-- **CU relacionados:** CU-01 a CU-30 y CU-04.1  
-- **Fuente:** Derivado formalmente de los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`) en `docs/DIAGRAMS.md` y `FD03-EPIS-Informe_SRS.md`, Sección 6.2.3.  
+- **ID:** DG-12
+- **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM
+- **Tipo:** Clases Conceptuales (Fase de Análisis)
+- **Estado:** APROBADO — MODELO CONCEPTUAL DE ANÁLISIS
+- **RF relacionados:** RF-01 a RF-18
+- **RN relacionadas:** RN-01 a RN-09
+- **CU relacionados:** CU-01 a CU-30 y CU-04.1
+- **Fuente:** Derivado formalmente de los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`) en `docs/DIAGRAMS.md` y `FD03-EPIS-Informe_SRS.md`, Sección 6.2.3.
 - **Resolución Técnica:** Reconstruido a nivel conceptual puro según `docs/DOCUMENTATION_RULES.md` Sección 8: sin tipos técnicos de datos (`Long`, `String`), sin firmas de métodos de implementación, sin claves foráneas ni dependencias de frameworks/ORM. Modela exclusivamente los conceptos esenciales del negocio SCM, sus atributos semánticos, multiplicidades y asociaciones reales.
 
 ![DG-12](assets/diagramas/render/analisis/DG-12.svg)
@@ -4275,13 +4276,13 @@ RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
 ```
 
 ### DG-13 — Modelo Lógico de la Arquitectura TraceFlow SCM
-- **ID:** DG-13  
-- **Nombre:** Modelo Lógico de la Arquitectura de Software TraceFlow SCM  
-- **Tipo:** Componentes / Arquitectura Lógica y Física  
-- **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD)  
-- **RF relacionados:** RNF-01 a RNF-09  
-- **RN relacionadas:** RN-01 a RN-09  
-- **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.  
+- **ID:** DG-13
+- **Nombre:** Modelo Lógico de la Arquitectura de Software TraceFlow SCM
+- **Tipo:** Componentes / Arquitectura Lógica y Física
+- **Estado:** PENDIENTE DE FASE DE DISEÑO (SAD)
+- **RF relacionados:** RNF-01 a RNF-09
+- **RN relacionadas:** RN-01 a RN-09
+- **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.
 - **Dictamen de Auditoría de Cierre de Análisis:** El diagrama `DG-13` incorpora especificaciones físicas de implementación (SPA React, Backend API REST Node.js/TypeScript, controladores técnicos, motor de base de datos PostgreSQL, caché Redis y almacenamiento S3/Supabase Storage) que corresponden propiamente a la fase de **DISEÑO** según `docs/DOCUMENTATION_RULES.md` Sección 7, 8 y 12. Para la fase de **ANÁLISIS**, la descomposición modular y la estructuración del sistema quedan formalmente cubiertas por el **Diagrama de Paquetes Arquitecturales (`DG-04`)** y los **31 Diagramas de Análisis de Objetos (`DG-AO`)**. Se conserva la especificación de `DG-13` como entrada técnica directa para la construcción del futuro Documento de Arquitectura de Software (SAD).
 
 ---
@@ -4289,15 +4290,15 @@ RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
 # Diagramas del Documento de Arquitectura de Software (SAD - Fase de Análisis)
 
 ### DG-SAD-A01 — Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)
-- **ID:** DG-SAD-A01  
-- **Nombre:** Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)  
-- **Tipo:** Contexto / Arquitectura Conceptual  
-- **Estado:** APROBADO  
-- **Versión:** 1.0  
-- **RF relacionados:** RF-01 a RF-18  
-- **RN relacionadas:** RN-01 a RN-09  
-- **CU relacionados:** CU-01 a CU-30, CU-04.1  
-- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 3.  
+- **ID:** DG-SAD-A01
+- **Nombre:** Contexto Arquitectónico de TraceFlow SCM (Fase de Análisis)
+- **Tipo:** Contexto / Arquitectura Conceptual
+- **Estado:** APROBADO
+- **Versión:** 1.0
+- **RF relacionados:** RF-01 a RF-18
+- **RN relacionadas:** RN-01 a RN-09
+- **CU relacionados:** CU-01 a CU-30, CU-04.1
+- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 3.
 - **Descripción:** Modela la frontera del sistema TraceFlow SCM y su interacción conceptual con los 7 actores canónicos de la organización, estableciendo con rigor que TraceFlow SCM es el sistema bajo estudio y no un actor externo.
 
 ```plantuml
@@ -4361,15 +4362,15 @@ ACT_QA --> SUB_QA : "Reporta no conformidades y re-testea (CU-18, CU-19)"
 ```
 
 ### DG-SAD-A02 — Arquitectura Lógica Conceptual de TraceFlow SCM
-- **ID:** DG-SAD-A02  
-- **Nombre:** Arquitectura Lógica Conceptual de TraceFlow SCM  
-- **Tipo:** Paquetes / Dependencias Arquitectónicas Conceptuales  
-- **Estado:** APROBADO  
-- **Versión:** 1.0  
-- **RF relacionados:** RF-01 a RF-18  
-- **RN relacionadas:** RN-01 a RN-09  
-- **CU relacionados:** CU-01 a CU-30, CU-04.1  
-- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 4.  
+- **ID:** DG-SAD-A02
+- **Nombre:** Arquitectura Lógica Conceptual de TraceFlow SCM
+- **Tipo:** Paquetes / Dependencias Arquitectónicas Conceptuales
+- **Estado:** APROBADO
+- **Versión:** 1.0
+- **RF relacionados:** RF-01 a RF-18
+- **RN relacionadas:** RN-01 a RN-09
+- **CU relacionados:** CU-01 a CU-30, CU-04.1
+- **Fuente:** `FD04-EPIS-Informe_SAD_Analisis.md`, Sección 4.
 - **Descripción:** Representa los 9 módulos conceptuales del sistema, sus responsabilidades delimitadas y las relaciones de dependencia lógica y colaboración conceptual unidireccionales que garantizan alta cohesión y bajo acoplamiento.
 
 ```plantuml
@@ -4465,7 +4466,7 @@ M_AUD <-- M_BASE : "registra congelamientos y reversiones"
 
 # DG-D01 — Arquitectura Física de TraceFlow SCM
 
-**ID:** DG-D01 | **Tipo:** Componentes / Arquitectura Física | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D01 | **Tipo:** Componentes / Arquitectura Física | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** ADR-001 a ADR-010 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 3.2
 
 ![DG-D01](assets/diagramas/render/diseno/DG-D01.svg)
@@ -4485,7 +4486,7 @@ node "Dispositivo Cliente (Actor Canónico)" as ClientDevice {
 }
 
 node "Servidor Host / Plataforma de Ejecución (Docker Engine 24+)" as AppServer {
-    
+
     node "Contenedor: Reverse Proxy (Nginx 1.26+)" as NginxContainer {
         component [Nginx Proxy Inverso\\n& Servidor Estático] as NginxEngine
         folder "/usr/share/nginx/html\\n(Activos Estáticos SPA)" as StaticFolder
@@ -4534,7 +4535,7 @@ BackupService -right-> RemoteBackups : Transferencia Segura\\nPaquete Maestro (.
 
 # DG-D02 — Componentes del Monolito Modular Backend
 
-**ID:** DG-D02 | **Tipo:** Componentes / Modularidad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D02 | **Tipo:** Componentes / Modularidad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** MOD-01 a MOD-09, ADR-001, ADR-003 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 4.4
 
 ![DG-D02](assets/diagramas/render/diseno/DG-D02.svg)
@@ -4644,7 +4645,7 @@ S07 .left.> M09 : Emite evento de congelación LB
 
 # DG-D03 — Modelo Relacional Lógico de Base de Datos
 
-**ID:** DG-D03 | **Tipo:** Entidad-Relación / Lógico | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D03 | **Tipo:** Entidad-Relación / Lógico | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** Derivado de DG-12, ADR-004, ADR-007 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 7.2
 
 ![DG-D03](assets/diagramas/render/diseno/DG-D03.svg)
@@ -4928,7 +4929,7 @@ app_user ||--o{ change_authorization : "suscribe"
 
 # DG-D04 — Arquitectura de Storage y Bibliotecas
 
-**ID:** DG-D04 | **Tipo:** Componentes / Almacenamiento | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D04 | **Tipo:** Componentes / Almacenamiento | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** ADR-005, RN-04, RN-08, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 8.3
 
 ![DG-D04](assets/diagramas/render/diseno/DG-D04.svg)
@@ -4952,7 +4953,7 @@ package "Capa de Dominio & Aplicación" {
         + removeTemporary()
         + computeChecksum()
     }
-    
+
     class "VersionControlService" as VersionService
     VersionService -right-> StoragePort : consume
 }
@@ -4993,7 +4994,7 @@ F_Trabajo .[#red].> F_Trabajo : Rollback purga copia de trabajo (RN-08)
 
 # DG-D05 — Flujo Técnico de Autenticación, RBAC y SoD
 
-**ID:** DG-D05 | **Tipo:** Interacción / Seguridad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D05 | **Tipo:** Interacción / Seguridad | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** ADR-006, RN-01, RN-04, SoD | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 10.3
 
 ![DG-D05](assets/diagramas/render/diseno/DG-D05.svg)
@@ -5058,7 +5059,7 @@ end
 
 # DG-D06 — Diagrama de Despliegue de TraceFlow SCM
 
-**ID:** DG-D06 | **Tipo:** Despliegue / Nodos OCI | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-D06 | **Tipo:** Despliegue / Nodos OCI | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** ADR-010, RNF-02, RNF-08, RNF-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 13.2
 
 ![DG-D06](assets/diagramas/render/diseno/DG-D06.svg)
@@ -5076,9 +5077,9 @@ node "Dispositivo Cliente" as ClientNode <<Device>> {
 }
 
 node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostServer <<Node>> {
-    
+
     node "Red Interna Docker: tf_network (Bridge)" as DockerNet {
-        
+
         node "Contenedor: nginx_proxy" as NginxNode <<Container>> {
             component [Nginx Reverse Proxy\n& SSL Terminator] as NginxComp
             folder "/usr/share/nginx/html\n(Activos Estáticos SPA)" as StaticSPA
@@ -5104,11 +5105,11 @@ node "Servidor Físico / VM Host (Linux Ubuntu 22.04+ / Docker Engine)" as HostS
 
     folder "Volumen Host: tf_pg_data" as PGVolume <<Disk Volume>>
     folder "Volumen Host: tf_ecs_storage" as StorageVolume <<Disk Volume>>
-    
+
     PGServer -down-> PGVolume : Persistencia de Datos
     BackendA -down-> StorageVolume : LocalStorageAdapter
     BackendB -down-> StorageVolume : LocalStorageAdapter
-    
+
     BackupWorker -up-> PGServer : pg_dump (TCP 5432)
     BackupWorker -up-> StorageVolume : Empaquetado tar.gz
 }
@@ -5131,7 +5132,7 @@ BackupWorker --> RemoteDisk : Transferencia Segura Diaria (SSH/S3)
 
 # DG-DSEQ-04 — Secuencia de Diseño: Registrar Solicitud de Cambio (RFC) (CU-04)
 
-**ID:** DG-DSEQ-04 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-04 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-04, RF-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-04](assets/diagramas/render/diseno/DG-DSEQ-04.svg)
@@ -5180,7 +5181,7 @@ UI --> Actor : 16. Muestra confirmación, código RFC y estado 'REGISTRADA'
 
 # DG-DSEQ-08 — Secuencia de Diseño: Emitir Orden de Cambio (ECN/ECO) (CU-08)
 
-**ID:** DG-DSEQ-08 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-08 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-08, RF-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-08](assets/diagramas/render/diseno/DG-DSEQ-08.svg)
@@ -5231,7 +5232,7 @@ UI --> Actor : 18. Presenta Orden de Cambio formalizada ECN/ECO
 
 # DG-DSEQ-10 — Secuencia de Diseño: Efectuar Check-Out y Bloqueo (CU-10, CU-11, RN-06)
 
-**ID:** DG-DSEQ-10 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-10 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-10, CU-11, RF-08, RF-09, RN-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-10](assets/diagramas/render/diseno/DG-DSEQ-10.svg)
@@ -5291,7 +5292,7 @@ end
 
 # DG-DSEQ-12 — Secuencia de Diseño: Efectuar Check-In de Ítem de Configuración (CU-12)
 
-**ID:** DG-DSEQ-12 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-12 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-12, RF-08, RF-09, RNF-03, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-12](assets/diagramas/render/diseno/DG-DSEQ-12.svg)
@@ -5335,7 +5336,7 @@ else Checksum Válido y Conforme
     Service -> VersionRepo : 8. Inicia Transacción BD 1
     VersionRepo -> DB : 9. INSERT INTO ecs_version (sha256, storage_status='PENDING_STORAGE', ...)
     VersionRepo -> DB : 10. COMMIT Transacción 1
-    
+
     alt Variante A: Check-In Técnico (Trabajo -> Soporte para Pruebas QA)
         Service -> Storage : 11a. promote(tempPath, 'soporte', verifiedSha)
         Storage --> Service : Archivo promovido a /storage/soporte/
@@ -5349,7 +5350,7 @@ else Checksum Válido y Conforme
         Service --> Ctrl : 19a. CheckInResponseDto (Puesto a disposición de QA)
         Ctrl --> UI : 20a. 201 Created (Entrega a Soporte conforme)
         UI --> Actor : 21a. Notifica entrega lista para pruebas de QA (CU-16)
-        
+
     else Variante B: Check-In Definitivo (Soporte -> Maestra con Doble Conformidad RN-09)
         Service -> DB : 11b. Valida Certificación QA (CU-17) y Acta UAT (CU-29) (RN-09)
         alt Falta Certificación QA o Acta UAT
@@ -5385,7 +5386,7 @@ end
 
 # DG-DSEQ-17 — Secuencia de Diseño: Certificar Conformidad de Calidad en QA (CU-17)
 
-**ID:** DG-DSEQ-17 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-17 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-17, RF-10, SoD Dinámico | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-17](assets/diagramas/render/diseno/DG-DSEQ-17.svg)
@@ -5444,7 +5445,7 @@ end
 
 # DG-DSEQ-20 — Secuencia de Diseño: Crear y Congelar Línea Base (CU-20)
 
-**ID:** DG-DSEQ-20 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-20 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-20, RF-13, RN-02, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-20](assets/diagramas/render/diseno/DG-DSEQ-20.svg)
@@ -5507,7 +5508,7 @@ end
 
 # DG-DSEQ-21 — Secuencia de Diseño: Revertir Versión de ECS - Rollback en Trabajo (CU-21)
 
-**ID:** DG-DSEQ-21 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-21 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-21, RF-12, RN-08 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-21](assets/diagramas/render/diseno/DG-DSEQ-21.svg)
@@ -5566,7 +5567,7 @@ UI --> Actor : 18. Confirma reversión en Biblioteca de Trabajo, bloqueo liberad
 
 # DG-DSEQ-29 — Secuencia de Diseño: Validar Aceptación UAT (CU-29)
 
-**ID:** DG-DSEQ-29 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-29 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-29, RF-10, RN-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-29](assets/diagramas/render/diseno/DG-DSEQ-29.svg)
@@ -5622,7 +5623,7 @@ end
 
 # DG-DSEQ-30 — Secuencia de Diseño: Autorizar Cambio Menor por Vía Delegada Compartida (CU-30)
 
-**ID:** DG-DSEQ-30 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2  
+**ID:** DG-DSEQ-30 | **Tipo:** Secuencia Técnica | **Estado:** BORRADOR CONTROLADO | **Versión:** 0.2
 **Trazabilidad:** CU-30, RF-07, RN-01, RN-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 12.2
 
 ![DG-DSEQ-30](assets/diagramas/render/diseno/DG-DSEQ-30.svg)
@@ -5696,7 +5697,7 @@ end
 
 # DG-UWE-NAV-01 — Modelo General de Navegación UWE (TraceFlow SCM)
 
-**ID:** DG-UWE-NAV-01 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-01 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-01 a CU-30, CU-04.1, RF-01 a RF-18, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.3
 
 ![DG-UWE-NAV-01](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)
@@ -5816,7 +5817,7 @@ NAV02 --> NAV28 : Seguridad / IAM
 
 # DG-UWE-NAV-02 — Navegación UWE: Perfil Solicitante (PU-01)
 
-**ID:** DG-UWE-NAV-02 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-02 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-03, CU-04, CU-04.1, CU-13, CU-23, CU-24, CU-29 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.1
 
 ![DG-UWE-NAV-02](assets/diagramas/render/uwe/DG-UWE-NAV-02.svg)
@@ -5871,7 +5872,7 @@ NAV24 ..> NAV24 : [Acción Contextual: Registrar Incidencia]
 
 # DG-UWE-NAV-03 — Navegación UWE: Perfil Analista de Requerimientos / Gestor (PU-02)
 
-**ID:** DG-UWE-NAV-03 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-03 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-02, CU-03, CU-05, CU-07, CU-08, CU-13, CU-22, CU-24, CU-25, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.2
 
 ![DG-UWE-NAV-03](assets/diagramas/render/uwe/DG-UWE-NAV-03.svg)
@@ -5934,7 +5935,7 @@ NAV25 ..> NAV05 : Derivar a RFC (Crea expediente)
 
 # DG-UWE-NAV-04 — Navegación UWE: Perfil Arquitecto / Especialista Técnico (PU-03)
 
-**ID:** DG-UWE-NAV-04 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-04 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-03, CU-06, CU-07, CU-09, CU-13, CU-28, CU-30 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.3
 
 ![DG-UWE-NAV-04](assets/diagramas/render/uwe/DG-UWE-NAV-04.svg)
@@ -5990,7 +5991,7 @@ NAV06 ..> NAV11 : [Condición: Menor en Evaluación]\nConformidad Técnica
 
 # DG-UWE-NAV-05 — Navegación UWE: Perfil Comité de Control de Cambios (CCB) (PU-04)
 
-**ID:** DG-UWE-NAV-05 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-05 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-03, CU-07, CU-13, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.4
 
 ![DG-UWE-NAV-05](assets/diagramas/render/uwe/DG-UWE-NAV-05.svg)
@@ -6043,7 +6044,7 @@ NAV10 ..> NAV12 : [Condición: Aprobada]\nEmitir Orden de Cambio ECN
 
 # DG-UWE-NAV-06 — Navegación UWE: Perfil Administrador de Configuración / Bibliotecario (PU-05)
 
-**ID:** DG-UWE-NAV-06 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-06 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-01, CU-02, CU-03, CU-09, CU-13, CU-20, CU-21, CU-26, CU-27, CU-28 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.5
 
 ![DG-UWE-NAV-06](assets/diagramas/render/uwe/DG-UWE-NAV-06.svg)
@@ -6110,7 +6111,7 @@ NAV23 -down-> NAV15 : Purga Trabajo y Libera sync_lock
 
 # DG-UWE-NAV-07 — Navegación UWE: Perfil Ingeniero de Software / Desarrollador (PU-06)
 
-**ID:** DG-UWE-NAV-07 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-07 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-03, CU-10, CU-11, CU-12, CU-13, CU-14, CU-15, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.6
 
 ![DG-UWE-NAV-07](assets/diagramas/render/uwe/DG-UWE-NAV-07.svg)
@@ -6158,7 +6159,7 @@ NAV20 ..> NAV15 : Corregir defecto y preparar re-testeo
 
 # DG-UWE-NAV-08 — Navegación UWE: Perfil Equipo de Calidad / Testing (PU-07)
 
-**ID:** DG-UWE-NAV-08 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-NAV-08 | **Tipo:** Navegación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** CU-03, CU-13, CU-16, CU-17, CU-18, CU-19, CU-24 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 19.4.7
 
 ![DG-UWE-NAV-08](assets/diagramas/render/uwe/DG-UWE-NAV-08.svg)
@@ -6203,7 +6204,7 @@ NAV20 ..> NAV19 : Reevaluar y re-testear tras corrección (CU-19)
 
 # DG-UWE-PRES-01 — Estructura General de Presentación (Shell Global)
 
-**ID:** DG-UWE-PRES-01 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-01 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-01 a NAV-28, ADR-002, ADR-006 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.3
 
 ![DG-UWE-PRES-01](assets/diagramas/render/uwe/DG-UWE-PRES-01.svg)
@@ -6298,7 +6299,7 @@ WorkArea *-- ContextualBar : Inferior contextual
 
 # DG-UWE-PRES-02 — Presentación de Acceso y Autenticación
 
-**ID:** DG-UWE-PRES-02 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-02 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-01, PRES-01, ADR-006, MOD-01 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.1
 
 ![DG-UWE-PRES-02](assets/diagramas/render/uwe/DG-UWE-PRES-02.svg)
@@ -6366,7 +6367,7 @@ Card *-- Feedback
 
 # DG-UWE-PRES-03 — Dashboard Adaptativo por Rol Canónico
 
-**ID:** DG-UWE-PRES-03 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-03 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-02, PRES-02, TB-09, MOD-01 a MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.2
 
 ![DG-UWE-PRES-03](assets/diagramas/render/uwe/DG-UWE-PRES-03.svg)
@@ -6437,7 +6438,7 @@ Dashboard *-- ActivityFeed
 
 # DG-UWE-PRES-04 — Detalle y Expediente 360° de RFC
 
-**ID:** DG-UWE-PRES-04 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-04 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-06, PRES-04, CU-04 a CU-08, CU-30, TB-07, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.4
 
 ![DG-UWE-PRES-04](assets/diagramas/render/uwe/DG-UWE-PRES-04.svg)
@@ -6508,7 +6509,7 @@ Container *-- Actions
 
 # DG-UWE-PRES-05 — Registro y Subsanación de RFC
 
-**ID:** DG-UWE-PRES-05 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-05 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-07, NAV-08, PRES-05, PRES-06, CU-04, CU-04.1, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.5
 
 ![DG-UWE-PRES-05](assets/diagramas/render/uwe/DG-UWE-PRES-05.svg)
@@ -6598,7 +6599,7 @@ Container *-- Controls
 
 # DG-UWE-PRES-06 — Panel de Deliberación CCB
 
-**ID:** DG-UWE-PRES-06 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-06 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-10, PRES-07, CU-07, RN-01, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.A
 
 ![DG-UWE-PRES-06](assets/diagramas/render/uwe/DG-UWE-PRES-06.svg)
@@ -6670,7 +6671,7 @@ CCB *-- Resolution
 
 # DG-UWE-PRES-07 — Autorización Delegada de Cambio Menor (Doble Llave)
 
-**ID:** DG-UWE-PRES-07 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-07 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-11, PRES-07, CU-30, RN-01, RN-05, MOD-04 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.6.B
 
 ![DG-UWE-PRES-07](assets/diagramas/render/uwe/DG-UWE-PRES-07.svg)
@@ -6736,7 +6737,7 @@ Container *-- FinalState
 
 # DG-UWE-PRES-08 — Detalle de ECS y Estructura de Bibliotecas SCM
 
-**ID:** DG-UWE-PRES-08 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-08 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-14, NAV-15, PRES-08, CU-09, CU-14, CU-26, RN-02, RN-06, MOD-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.7
 
 ![DG-UWE-PRES-08](assets/diagramas/render/uwe/DG-UWE-PRES-08.svg)
@@ -6805,7 +6806,7 @@ Explorer *-- ECSCard
 
 # DG-UWE-PRES-09 — Operaciones SCM (Check-Out y Check-In)
 
-**ID:** DG-UWE-PRES-09 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-09 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-16, NAV-17, PRES-08, CU-10, CU-11, CU-12, RN-06, RNF-03, MOD-05 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.8
 
 ![DG-UWE-PRES-09](assets/diagramas/render/uwe/DG-UWE-PRES-09.svg)
@@ -6864,7 +6865,7 @@ ightarrow$ Maestra (Exige QA Conforme + Acta UAT)
 
 # DG-UWE-PRES-10 — Consola QA y Gestión de No Conformidades
 
-**ID:** DG-UWE-PRES-10 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-10 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-19, NAV-20, PRES-05, PRES-08, CU-16, CU-17, CU-18, CU-19, RN-09, SoD Dinámico, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.9
 
 ![DG-UWE-PRES-10](assets/diagramas/render/uwe/DG-UWE-PRES-10.svg)
@@ -6929,7 +6930,7 @@ QAContainer *-- DecisionBar
 
 # DG-UWE-PRES-11 — Centro de Suscripción de Acta UAT
 
-**ID:** DG-UWE-PRES-11 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-11 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-21, PRES-07, CU-29, RN-09, MOD-06 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.10
 
 ![DG-UWE-PRES-11](assets/diagramas/render/uwe/DG-UWE-PRES-11.svg)
@@ -6992,7 +6993,7 @@ UAT *-- Signature
 
 # DG-UWE-PRES-12 — Gestión de Línea Base y Rollback SCM
 
-**ID:** DG-UWE-PRES-12 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-12 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-22, NAV-23, PRES-08, CU-20, CU-21, RN-02, RN-08, MOD-07 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.11
 
 ![DG-UWE-PRES-12](assets/diagramas/render/uwe/DG-UWE-PRES-12.svg)
@@ -7060,7 +7061,7 @@ Gov *-- RollbackZone
 
 # DG-UWE-PRES-13 — Auditoría Inmutable y Reportes SCM
 
-**ID:** DG-UWE-PRES-13 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1  
+**ID:** DG-UWE-PRES-13 | **Tipo:** Presentación (UWE) | **Estado:** BORRADOR — DISEÑO UWE | **Versión:** 0.1
 **Trazabilidad:** NAV-26, NAV-27, PRES-03, PRES-10, CU-27, CU-28, RF-16, RF-17, RF-18, RNF-01, RNF-03, MOD-09 | **Fuente:** `FD05-EPIS-Informe_SAD_Diseno.md`, Sección 20.4.13
 
 ![DG-UWE-PRES-13](assets/diagramas/render/uwe/DG-UWE-PRES-13.svg)
@@ -7574,7 +7575,7 @@ usuario ||--o{ registro_auditoria
 
 # DG-ACT-01 — Diagrama de Actividades: Gestionar usuarios y roles (CU-01)
 
-**ID:** DG-ACT-01 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-01 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-01, RF-01, RN-01 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-01
 
 ![DG-ACT-01](assets/diagramas/render/analisis/DG-ACT-01.svg)
@@ -7650,7 +7651,7 @@ stop
 
 # DG-ACT-02 — Diagrama de Actividades: Crear y administrar proyectos (CU-02)
 
-**ID:** DG-ACT-02 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-02 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-02, RF-02, RN-01, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-02
 
 ![DG-ACT-02](assets/diagramas/render/analisis/DG-ACT-02.svg)
@@ -7726,7 +7727,7 @@ stop
 
 # DG-ACT-03 — Diagrama de Actividades: Consultar proyecto (CU-03)
 
-**ID:** DG-ACT-03 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-03 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-03, RF-02, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-03
 
 ![DG-ACT-03](assets/diagramas/render/analisis/DG-ACT-03.svg)
@@ -7801,7 +7802,7 @@ endif
 
 # DG-ACT-04 — Diagrama de Actividades: Registrar Solicitud de Cambio (RFC) (CU-04)
 
-**ID:** DG-ACT-04 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 2.0  
+**ID:** DG-ACT-04 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 2.0
 **Trazabilidad:** CU-04, RF-04, RN-01, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-04
 
 ![DG-ACT-04](assets/diagramas/render/analisis/DG-ACT-04.svg)
@@ -7949,7 +7950,7 @@ endif
 
 # DG-ACT-04.1 — Diagrama de Actividades: Subsanar Solicitud de Cambio (RFC) (CU-04.1)
 
-**ID:** DG-ACT-04.1 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-04.1 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-04.1, RF-04, RN-01, RN-04, RN-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-04.1
 
 ![DG-ACT-04.1](assets/diagramas/render/analisis/DG-ACT-04.1.svg)
@@ -8040,7 +8041,7 @@ stop
 
 # DG-ACT-05 — Diagrama de Actividades: Validar y clasificar la solicitud (CU-05)
 
-**ID:** DG-ACT-05 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-05 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-05, RF-04, RF-05, RF-14, RN-01, RN-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-05
 
 ![DG-ACT-05](assets/diagramas/render/analisis/DG-ACT-05.svg)
@@ -8131,7 +8132,7 @@ endif
 
 # DG-ACT-06 — Diagrama de Actividades: Realizar análisis de impacto técnico (CU-06)
 
-**ID:** DG-ACT-06 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**ID:** DG-ACT-06 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0
 **Trazabilidad:** CU-06, RF-05, RN-01, RN-05 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-06
 
 ![DG-ACT-06](assets/diagramas/render/analisis/DG-ACT-06.svg)
@@ -8282,3 +8283,6 @@ Fuente: [`DG-INIT-09.puml`](assets/diagramas/plantuml/diseno/DG-INIT-09.puml) | 
 
 ### DG-INIT-10 — Mapa de Navegación del Frontend TO-BE
 Fuente: [`DG-INIT-10.puml`](assets/diagramas/plantuml/diseno/DG-INIT-10.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-10.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-10.png)
+
+### DG-INIT-11 — Arquitectura Operativa GitHub-SCM
+Fuente: [`DG-INIT-11.puml`](assets/diagramas/plantuml/diseno/DG-INIT-11.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-11.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-11.png)

@@ -15,6 +15,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { ProjectsRepository } from '../src/modules/projects/projects.repository.js';
 import { ProjectsService } from '../src/modules/projects/projects.service.js';
+import { OrganizationsRepository } from '../src/modules/organizations/organizations.repository.js';
+import { AuthRepository } from '../src/modules/auth/auth.repository.js';
+import { AuditService } from '../src/modules/audit/audit.service.js';
 import type { AuthenticatedUser } from '../src/common/types/index.js';
 
 describe('Backend Multitenant Projects Isolation (ADR-006, RBAC Matrix)', () => {
@@ -22,8 +25,11 @@ describe('Backend Multitenant Projects Isolation (ADR-006, RBAC Matrix)', () => 
 
   beforeEach(() => {
     const db = new DatabaseService('mock');
+    const authRepo = new AuthRepository(db);
+    const orgRepo = new OrganizationsRepository(db, authRepo);
+    const auditService = new AuditService(db);
     const repo = new ProjectsRepository(db);
-    projectsService = new ProjectsService(repo);
+    projectsService = new ProjectsService(repo, orgRepo, auditService);
   });
 
   it('USR-001 con acceso a PRJ-001, PRJ-002 y PRJ-003 debe recibir los 3 proyectos', async () => {

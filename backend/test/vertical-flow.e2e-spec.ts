@@ -18,6 +18,7 @@ import { AuthRepository } from '../src/modules/auth/auth.repository.js';
 import { AuthService } from '../src/modules/auth/auth.service.js';
 import { ProjectsRepository } from '../src/modules/projects/projects.repository.js';
 import { ProjectsService } from '../src/modules/projects/projects.service.js';
+import { OrganizationsRepository } from '../src/modules/organizations/organizations.repository.js';
 import { RfcsRepository } from '../src/modules/rfcs/rfcs.repository.js';
 import { RfcsService } from '../src/modules/rfcs/rfcs.service.js';
 
@@ -34,7 +35,8 @@ describe('Flujo Vertical Completo E2E (Login -> Proyectos -> Crear RFC -> Consul
     authService = new AuthService(authRepo, auditService);
 
     const projectsRepo = new ProjectsRepository(db);
-    projectsService = new ProjectsService(projectsRepo);
+    const orgRepo = new OrganizationsRepository(db, authRepo);
+    projectsService = new ProjectsService(projectsRepo, orgRepo, auditService);
 
     const rfcsRepo = new RfcsRepository(db);
     rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);

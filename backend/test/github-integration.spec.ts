@@ -176,7 +176,7 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
 
     // Registrar asistente de configuración inicial para el proyecto
     await planningRepo.saveSetup(testProjectDraftId, {
-      current_step: 4,
+      wizard_step: 4,
       team_completed: true,
       methodology_completed: true,
       github_completed: false,
@@ -271,11 +271,12 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
       id: 999999,
       name: 'repo-solo-lectura',
       full_name: 'JMedina255/repo-solo-lectura',
-      owner: { login: 'JMedina255' },
+      owner: { login: 'JMedina255', id: 101, type: 'User' },
       private: true,
       visibility: 'private',
       default_branch: 'main',
       permissions: { push: false, pull: true, admin: false },
+      html_url: 'https://github.com/JMedina255/repo-solo-lectura',
     });
 
     await expect(
@@ -807,11 +808,12 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
         id: 101010101, // Mismo ID numérico
         name: 'TraceFlow-Renamed',
         full_name: 'JMedina255/TraceFlow-Renamed',
-        owner: { login: 'JMedina255' },
+        owner: { login: 'JMedina255', id: 101, type: 'User' },
         private: false,
         visibility: 'public',
         default_branch: 'main',
         permissions: { push: true, pull: true, admin: true },
+        html_url: 'https://github.com/JMedina255/TraceFlow-Renamed',
       });
 
       // Proyecto 2 intenta vincular el repositorio renombrado

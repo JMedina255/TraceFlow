@@ -1,7 +1,7 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import { Injectable, Logger } from '@nestjs/common';
-import type { GitHubRepoDetails, GitHubInstallationDetails } from './github.entity.js';
+import type { GitHubRepoDetails, GitHubInstallationDetails, GitHubCommitDetails } from './github.entity.js';
 
 export interface IGitHubApiClient {
   readonly isMock: boolean;
@@ -11,6 +11,7 @@ export interface IGitHubApiClient {
   listInstallationRepositories(installationId: number): Promise<GitHubRepoDetails[]>;
   getRepository(owner: string, repo: string, installationId?: number): Promise<GitHubRepoDetails>;
   getBranch(owner: string, repo: string, branch: string, installationId?: number): Promise<{ name: string; sha: string }>;
+  getCommit(owner: string, repo: string, commitSha: string, installationId?: number): Promise<GitHubCommitDetails>;
   validateRepoDraft(dto: { name: string; owner: string; visibility: string }): { valid: boolean; errors?: string[] };
 }
 
@@ -270,6 +271,58 @@ export class HttpGitHubApiClient implements IGitHubApiClient {
     };
   }
 
+  async getCommit(
+    owner: string,
+    repo: string,
+    commitSha: string,
+    installationId?: number
+  ): Promise<GitHubCommitDetails> {
+    if (!installationId) {
+      throw new Error('[GitHubError] installationId obligatorio para consultar commits en repositorios.');
+    }
+    const { token } = await this.getInstallationAccessToken(installationId);
+    const url = `https://api.github.com/repos/${owner}/${repo}/commits/${commitSha}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `token ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      this.logger.error(`Commit '${commitSha}' no encontrado en '${owner}/${repo}': ${errText}`);
+      const error: any = new Error(
+        `[GitHubApiError ${response.status}] Commit '${commitSha}' no encontrado en '${owner}/${repo}'`
+      );
+      error.status = response.status;
+      error.code = response.status === 404 ? 'COMMIT_NOT_FOUND' : 'GITHUB_API_ERROR';
+      throw error;
+    }
+
+    const data: any = await response.json();
+    return {
+      sha: data.sha,
+      message: data.commit?.message || '',
+      author: {
+        name: data.commit?.author?.name || 'unknown',
+        email: data.commit?.author?.email || 'unknown',
+        date: data.commit?.author?.date || new Date().toISOString(),
+      },
+      files: (data.files || []).map((f: any) => ({
+        filename: f.filename,
+        status: f.status,
+        previous_filename: f.previous_filename,
+        additions: f.additions || 0,
+        deletions: f.deletions || 0,
+        changes: f.changes || 0,
+        patch: f.patch,
+      })),
+    };
+  }
+
   validateRepoDraft(dto: { name: string; owner: string; visibility: string }): { valid: boolean; errors?: string[] } {
     const errors: string[] = [];
     if (!dto.name || !/^[a-zA-Z0-9_.-]+$/.test(dto.name)) {
@@ -462,6 +515,41 @@ export class MockGitHubApiClient implements IGitHubApiClient {
     }
 
     return { ...found };
+  }
+
+  private mockCommits: Map<string, GitHubCommitDetails> = new Map();
+
+  addMockCommit(commit: GitHubCommitDetails): void {
+    this.mockCommits.set(commit.sha, commit);
+  }
+
+  async getCommit(
+    _owner: string,
+    _repo: string,
+    commitSha: string,
+    _installationId?: number
+  ): Promise<GitHubCommitDetails> {
+    if (this.mockCommits.has(commitSha)) {
+      return this.mockCommits.get(commitSha)!;
+    }
+    return {
+      sha: commitSha,
+      message: 'feat: sincronización git de componentes ECS',
+      author: {
+        name: 'Joan Medina',
+        email: 'jmedina@exodo.pe',
+        date: new Date().toISOString(),
+      },
+      files: [
+        {
+          filename: 'src/main.ts',
+          status: 'modified',
+          additions: 10,
+          deletions: 2,
+          changes: 12,
+        },
+      ],
+    };
   }
 
   validateRepoDraft(dto: { name: string; owner: string; visibility: string }): { valid: boolean; errors?: string[] } {

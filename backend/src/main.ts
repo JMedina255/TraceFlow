@@ -10,7 +10,7 @@ async function bootstrap() {
   const logger = new Logger('TraceFlowBootstrap');
   const config = loadConfig();
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // Prefijo unificado para API REST v1
   app.setGlobalPrefix('api/v1');

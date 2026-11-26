@@ -5,8 +5,14 @@ import { AuditModule } from '../audit/audit.module.js';
 import { OrganizationsModule } from '../organizations/organizations.module.js';
 import { ProjectsModule } from '../projects/projects.module.js';
 import { GitHubController } from './github.controller.js';
+import {
+  GitHubWebhookController,
+  GitHubProjectWebhookController,
+} from './webhooks/github-webhook.controller.js';
 import { GitHubService } from './github.service.js';
 import { GitHubRepository } from './github.repository.js';
+import { GitHubWebhookService } from './webhooks/github-webhook.service.js';
+import { GitHubEventProcessorService } from './webhooks/github-event-processor.service.js';
 import {
   IGitHubApiClient,
   HttpGitHubApiClient,
@@ -83,15 +89,27 @@ export function createGitHubApiClient(): IGitHubApiClient {
     forwardRef(() => OrganizationsModule),
     forwardRef(() => ProjectsModule),
   ],
-  controllers: [GitHubController],
+  controllers: [
+    GitHubController,
+    GitHubWebhookController,
+    GitHubProjectWebhookController,
+  ],
   providers: [
     GitHubRepository,
     GitHubService,
+    GitHubWebhookService,
+    GitHubEventProcessorService,
     {
       provide: 'IGitHubApiClient',
       useFactory: createGitHubApiClient,
     },
   ],
-  exports: [GitHubService, GitHubRepository, 'IGitHubApiClient'],
+  exports: [
+    GitHubService,
+    GitHubRepository,
+    'IGitHubApiClient',
+    GitHubWebhookService,
+    GitHubEventProcessorService,
+  ],
 })
 export class GitHubModule {}

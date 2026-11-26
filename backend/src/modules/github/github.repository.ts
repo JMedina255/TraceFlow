@@ -5,11 +5,18 @@ import type {
   GitHubIntegrationEntity,
   GitHubValidationStatus,
   OrganizationGitHubInstallationEntity,
+  GitHubEventEntity,
+  GitHubEventProcessingStatus,
+  ConfigItemPathHistoryEntity,
+  ConfigItemPathHistoryChangeType,
 } from './github.entity.js';
 
 @Injectable()
 export class GitHubRepository {
   private mockIntegrations: GitHubIntegrationEntity[] = [];
+  private mockEvents: GitHubEventEntity[] = [];
+  private mockPathHistories: ConfigItemPathHistoryEntity[] = [];
+  private mockConfigItems: any[] = [];
   private mockInstallations: OrganizationGitHubInstallationEntity[] = [
     {
       id: 'inst0001-0000-0000-0000-000000000001',
@@ -38,6 +45,7 @@ export class GitHubRepository {
     return {
       ...row,
       installation_id: Number(row.installation_id),
+      target_id: row.target_id !== null && row.target_id !== undefined ? Number(row.target_id) : null,
     };
   }
 
@@ -444,5 +452,453 @@ export class GitHubRepository {
         updated_at: '2026-11-26T00:00:00.000Z',
       },
     ];
+  }
+
+  private mapEventRow(row: any): GitHubEventEntity {
+    return {
+      ...row,
+      installation_id: Number(row.installation_id),
+      github_repo_id: row.github_repo_id ? Number(row.github_repo_id) : null,
+      attempts: Number(row.attempts),
+      max_attempts: Number(row.max_attempts),
+    };
+  }
+
+  private mapPathHistoryRow(row: any): ConfigItemPathHistoryEntity {
+    return {
+      ...row,
+    };
+  }
+
+  // ==========================================================================
+  // H04B — GESTIÓN DE EVENTOS DE WEBHOOKS (traceflow.github_event)
+  // ==========================================================================
+  async saveEvent(
+    data: {
+      deliveryId: string;
+      eventType: string;
+      action?: string | null;
+      installationId: number;
+      githubRepoId?: number | null;
+      projectId?: string | null;
+      payload: any;
+      status?: GitHubEventProcessingStatus;
+    },
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity> {
+    const status = data.status || 'PENDING';
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        INSERT INTO traceflow.github_event (
+          delivery_id, event_type, action, installation_id, github_repo_id, project_id, payload, processing_status
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7::jsonb, $8
+        )
+        ON CONFLICT (delivery_id) DO UPDATE SET
+          last_attempt_at = NOW()
+        RETURNING *;
+      `;
+      const params = [
+        data.deliveryId,
+        data.eventType,
+        data.action || null,
+        data.installationId,
+        data.githubRepoId || null,
+        data.projectId || null,
+        JSON.stringify(data.payload),
+        status,
+      ];
+      const res = client
+        ? await client.query(sql, params)
+        : await this.db.query<GitHubEventEntity>(sql, params);
+      return this.mapEventRow(res.rows[0]);
+    }
+
+    const existing = this.mockEvents.find((e) => e.delivery_id === data.deliveryId);
+    if (existing) {
+      existing.last_attempt_at = new Date().toISOString();
+      return existing;
+    }
+
+    const entity: GitHubEventEntity = {
+      id: crypto.randomUUID(),
+      delivery_id: data.deliveryId,
+      event_type: data.eventType,
+      action: data.action || null,
+      installation_id: data.installationId,
+      github_repo_id: data.githubRepoId || null,
+      project_id: data.projectId || null,
+      payload: data.payload,
+      processing_status: status,
+      attempts: 0,
+      max_attempts: 3,
+      last_attempt_at: null,
+      processed_at: null,
+      error_message: null,
+      created_at: new Date().toISOString(),
+    };
+    this.mockEvents.push(entity);
+    return entity;
+  }
+
+  async findEventByDeliveryId(
+    deliveryId: string,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = 'SELECT * FROM traceflow.github_event WHERE delivery_id = $1 LIMIT 1;';
+      const res = client
+        ? await client.query(sql, [deliveryId])
+        : await this.db.query<GitHubEventEntity>(sql, [deliveryId]);
+      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
+    }
+
+    return this.mockEvents.find((e) => e.delivery_id === deliveryId) || null;
+  }
+
+  async findEventById(
+    id: string,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = 'SELECT * FROM traceflow.github_event WHERE id = $1 LIMIT 1;';
+      const res = client
+        ? await client.query(sql, [id])
+        : await this.db.query<GitHubEventEntity>(sql, [id]);
+      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
+    }
+
+    return this.mockEvents.find((e) => e.id === id) || null;
+  }
+
+  async findPendingEvents(
+    limit: number = 10,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.github_event
+        WHERE processing_status = 'PENDING'
+        ORDER BY created_at ASC
+        LIMIT $1;
+      `;
+      const res = client
+        ? await client.query(sql, [limit])
+        : await this.db.query<GitHubEventEntity>(sql, [limit]);
+      return res.rows.map((r) => this.mapEventRow(r));
+    }
+
+    return this.mockEvents
+      .filter((e) => e.processing_status === 'PENDING')
+      .slice(0, limit);
+  }
+
+  async updateEventStatus(
+    id: string,
+    status: GitHubEventProcessingStatus,
+    errorMessage?: string | null,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const processedAtClause = status === 'PROCESSED' ? ', processed_at = NOW()' : '';
+      const sql = `
+        UPDATE traceflow.github_event
+        SET processing_status = $2,
+            error_message = $3
+            ${processedAtClause}
+        WHERE id = $1
+        RETURNING *;
+      `;
+      const res = client
+        ? await client.query(sql, [id, status, errorMessage || null])
+        : await this.db.query<GitHubEventEntity>(sql, [id, status, errorMessage || null]);
+      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
+    }
+
+    const item = this.mockEvents.find((e) => e.id === id);
+    if (!item) return null;
+    item.processing_status = status;
+    item.error_message = errorMessage || null;
+    if (status === 'PROCESSED') {
+      item.processed_at = new Date().toISOString();
+    }
+    return item;
+  }
+
+  async incrementEventAttempts(
+    id: string,
+    errorMessage?: string | null,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.github_event
+        SET attempts = attempts + 1,
+            last_attempt_at = NOW(),
+            error_message = $2,
+            processing_status = CASE WHEN attempts + 1 >= max_attempts THEN 'FAILED' ELSE 'PENDING' END
+        WHERE id = $1
+        RETURNING *;
+      `;
+      const res = client
+        ? await client.query(sql, [id, errorMessage || null])
+        : await this.db.query<GitHubEventEntity>(sql, [id, errorMessage || null]);
+      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
+    }
+
+    const item = this.mockEvents.find((e) => e.id === id);
+    if (!item) return null;
+    item.attempts += 1;
+    item.last_attempt_at = new Date().toISOString();
+    item.error_message = errorMessage || null;
+    if (item.attempts >= item.max_attempts) {
+      item.processing_status = 'FAILED';
+    } else {
+      item.processing_status = 'PENDING';
+    }
+    return item;
+  }
+
+  // ==========================================================================
+  // H04B — HISTORIAL DE RUTAS DE ECS (traceflow.config_item_path_history)
+  // ==========================================================================
+  async recordPathChange(
+    data: {
+      configItemId: string;
+      projectId: string;
+      oldPath: string;
+      newPath: string;
+      changeType: ConfigItemPathHistoryChangeType;
+      gitCommitSha: string;
+    },
+    client?: pg.PoolClient | null
+  ): Promise<ConfigItemPathHistoryEntity> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        INSERT INTO traceflow.config_item_path_history (
+          config_item_id, project_id, old_path, new_path, change_type, git_commit_sha
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6
+        )
+        RETURNING *;
+      `;
+      const params = [
+        data.configItemId,
+        data.projectId,
+        data.oldPath,
+        data.newPath,
+        data.changeType,
+        data.gitCommitSha,
+      ];
+      const res = client
+        ? await client.query(sql, params)
+        : await this.db.query<ConfigItemPathHistoryEntity>(sql, params);
+      return this.mapPathHistoryRow(res.rows[0]);
+    }
+
+    const entity: ConfigItemPathHistoryEntity = {
+      id: crypto.randomUUID(),
+      config_item_id: data.configItemId,
+      project_id: data.projectId,
+      old_path: data.oldPath,
+      new_path: data.newPath,
+      change_type: data.changeType,
+      git_commit_sha: data.gitCommitSha,
+      detected_at: new Date().toISOString(),
+    };
+    this.mockPathHistories.push(entity);
+    return entity;
+  }
+
+  async findPathHistoryByConfigItemId(
+    configItemId: string,
+    client?: pg.PoolClient | null
+  ): Promise<ConfigItemPathHistoryEntity[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.config_item_path_history
+        WHERE config_item_id = $1
+        ORDER BY detected_at DESC;
+      `;
+      const res = client
+        ? await client.query(sql, [configItemId])
+        : await this.db.query<ConfigItemPathHistoryEntity>(sql, [configItemId]);
+      return res.rows.map((r) => this.mapPathHistoryRow(r));
+    }
+
+    return this.mockPathHistories.filter((h) => h.config_item_id === configItemId);
+  }
+
+  async findPathHistoryByProjectId(
+    projectId: string,
+    client?: pg.PoolClient | null
+  ): Promise<ConfigItemPathHistoryEntity[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.config_item_path_history
+        WHERE project_id = $1
+        ORDER BY detected_at DESC;
+      `;
+      const res = client
+        ? await client.query(sql, [projectId])
+        : await this.db.query<ConfigItemPathHistoryEntity>(sql, [projectId]);
+      return res.rows.map((r) => this.mapPathHistoryRow(r));
+    }
+
+    return this.mockPathHistories.filter((h) => h.project_id === projectId);
+  }
+
+  // ==========================================================================
+  // H04B — INTEGRACIÓN CON ELEMENTOS DE CONFIGURACIÓN (traceflow.config_item)
+  // ==========================================================================
+  async findConfigItemByPath(
+    projectId: string,
+    filePath: string,
+    client?: pg.PoolClient | null
+  ): Promise<any | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.config_item
+        WHERE project_id = $1 AND file_path = $2
+        LIMIT 1;
+      `;
+      const res = client
+        ? await client.query(sql, [projectId, filePath])
+        : await this.db.query(sql, [projectId, filePath]);
+      return res.rows[0] || null;
+    }
+
+    return (
+      this.mockConfigItems.find(
+        (c) => c.project_id === projectId && c.file_path === filePath
+      ) || null
+    );
+  }
+
+  async findConfigItemsByProject(
+    projectId: string,
+    client?: pg.PoolClient | null
+  ): Promise<any[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.config_item
+        WHERE project_id = $1
+        ORDER BY code ASC;
+      `;
+      const res = client
+        ? await client.query(sql, [projectId])
+        : await this.db.query(sql, [projectId]);
+      return res.rows;
+    }
+
+    return this.mockConfigItems.filter((c) => c.project_id === projectId);
+  }
+
+  async createConfigItem(
+    data: any,
+    client?: pg.PoolClient | null
+  ): Promise<any> {
+    const id = data.id || crypto.randomUUID();
+    const now = new Date().toISOString();
+    const item = {
+      id,
+      project_id: data.project_id,
+      code: data.code,
+      name: data.name,
+      description: data.description || null,
+      item_type: data.item_type || 'SOURCE_CODE',
+      current_library: data.current_library || 'TRABAJO',
+      current_version: data.current_version || '1.0.0',
+      file_path: data.file_path,
+      sha256_checksum: data.sha256_checksum || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      is_locked: data.is_locked ?? false,
+      author_id: data.author_id || null,
+      created_at: now,
+      updated_at: now,
+    };
+
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        INSERT INTO traceflow.config_item (
+          id, project_id, code, name, description, item_type, current_library,
+          current_version, file_path, sha256_checksum, is_locked, author_id
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+        )
+        RETURNING *;
+      `;
+      const res = client
+        ? await client.query(sql, [
+            item.id,
+            item.project_id,
+            item.code,
+            item.name,
+            item.description,
+            item.item_type,
+            item.current_library,
+            item.current_version,
+            item.file_path,
+            item.sha256_checksum,
+            item.is_locked,
+            item.author_id,
+          ])
+        : await this.db.query(sql, [
+            item.id,
+            item.project_id,
+            item.code,
+            item.name,
+            item.description,
+            item.item_type,
+            item.current_library,
+            item.current_version,
+            item.file_path,
+            item.sha256_checksum,
+            item.is_locked,
+            item.author_id,
+          ]);
+      return res.rows[0];
+    }
+
+    this.mockConfigItems.push(item);
+    return item;
+  }
+
+  async updateConfigItemPath(
+    configItemId: string,
+    newPath: string,
+    client?: pg.PoolClient | null
+  ): Promise<void> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.config_item
+        SET file_path = $2,
+            updated_at = NOW()
+        WHERE id = $1;
+      `;
+      if (client) {
+        await client.query(sql, [configItemId, newPath]);
+      } else {
+        await this.db.query(sql, [configItemId, newPath]);
+      }
+      return;
+    }
+
+    const item = this.mockConfigItems.find((c) => c.id === configItemId);
+    if (item) {
+      item.file_path = newPath;
+      item.updated_at = new Date().toISOString();
+    }
+  }
+
+  resetMockEvents(): void {
+    this.mockEvents = [];
+  }
+
+  resetMockPathHistories(): void {
+    this.mockPathHistories = [];
+  }
+
+  resetMockConfigItems(): void {
+    this.mockConfigItems = [];
   }
 }

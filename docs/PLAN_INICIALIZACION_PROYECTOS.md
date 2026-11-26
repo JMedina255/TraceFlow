@@ -830,12 +830,23 @@ flowchart LR
   - **H04A-R05 (Salvaguardas de Rollback y Protección de Datos):** Scripts de reversión `202611260004` y `202611260003` blindados para abortar ante registros operativos sin importar estado (`UNLINKED`, etc.); forzado exclusivo con `SET LOCAL traceflow.allow_force_h04_rollback = 'true'` en entornos de prueba descartables.
   - **Certificación Integral:** 33 pruebas unitarias TDD y 19 pruebas físicas en PostgreSQL 16 real 100% aprobadas (total 57/57 pruebas en la suite de certificación física).
 
-#### Hito INIT-H04B — Webhooks, Procesamiento Asíncrono y Sincronización Git (Siguiente Incremento)
+#### Hito INIT-H04B — Webhooks, Procesamiento Asíncrono y Sincronización Git (Completado y Certificado)
+- **Alcance Técnico Ejecutado y Certificado:**
+  - **Precondiciones de Seguridad SEC-01 a SEC-04:** Prohibición absoluta de mock de GitHub en producción con fail-closed, registro formal de instalaciones (`installed_by`), script de rollback sin exclusiones arbitrarias de semilla, y revalidación de identidad estable por identificador numérico `target_id`.
+  - **Migración Incremental 202611260006:** Tablas `traceflow.github_event` (buffer idempotente con `delivery_id` UNIQUE) y `traceflow.config_item_path_history` (rastreo inmutable de operaciones Git `git mv` y `git rm`), ampliando el catálogo a **33 tablas relacionales** en PostgreSQL real.
+  - **Recepción e Idempotencia:** `GitHubWebhookService` con verificación criptográfica HMAC-SHA256 en tiempo constante (`crypto.timingSafeEqual`) contra `X-Hub-Signature-256`, deduplicación por `X-GitHub-Delivery`, y respuesta inmediata `HTTP 202 Accepted` con estado `PENDING`.
+  - **Procesamiento Asíncrono y Máquina de Estados:** `GitHubEventProcessorService` con transiciones `PENDING -> PROCESSING -> PROCESSED` (o `FAILED` tras 3 intentos), registro de marcas temporales y auditoría inmutable en `traceflow.audit_log`.
+  - **Sincronización Git y Trazabilidad de ECS:** Inspección de commits y archivos afectados, detección de renombrados (`RENAME`), traslados de carpetas (`MOVE`) y bajas (`DELETE`), actualizando transaccionalmente `traceflow.config_item.file_path` y registrando el historial.
+  - **Supervisión de Gobernanza SCM:** Detección automática de modificaciones fuera de banda (DA-01, DA-02) emitiendo `GITHUB_OUT_OF_BAND_DETECTED` o `GITHUB_GIT_SYNC_COMPLETED` si cuentan con respaldo de una RFC formal aprobada por el CCB.
+  - **Controladores REST:** `GitHubWebhookController` y `GitHubProjectWebhookController` sin `AuthGuard` humano, asegurados exclusivamente por firma HMAC.
+  - **Salvaguardas de Rollback y Mínimo Privilegio:** Script `202611260006_..._rollback.sql` blindado con bloqueo de seguridad PITR ante registros operativos. Mínimo privilegio para `traceflow_app` (SELECT, INSERT, UPDATE; DELETE revocado).
+  - **Certificación Integral:** 21 pruebas unitarias TDD y 13 pruebas físicas en PostgreSQL 16 real 100% aprobadas (total **70/70 pruebas en la suite de certificación física**, **166/166 unitarias backend**, **333 consolidadas en verde**).
+
+#### Hito INIT-H04C — Puertas de Gobernanza SCM, Policy Gates y Bloqueo de PRs (Siguiente Incremento)
 - **Alcance Técnico:**
-  - Migración incremental: tabla `traceflow.github_event`.
-  - Controlador de webhook con verificación de firma HMAC-SHA256 e idempotencia estricta vía cabecera `X-GitHub-Delivery`.
-  - Detección de modificaciones no autorizadas (out-of-band) y políticas de protección de ramas en GitHub.
-  - Mapeo bidireccional entre commits/pull requests y Elementos de Configuración de Software (ECS) / Solicitudes de Cambio (RFC).
+  - GitHub Commit Status Checks & Check Runs API.
+  - Policy Gate para bloqueo automático de merge en Pull Requests sin RFC/CCB aprobado.
+  - Sincronización y protección de ramas (`main`, `develop`, `staging`).
 
 #### Hito INIT-H05 — Interfaz y Activación (Asistente, Panel y Salvaguarda SCM)
 - **Alcance Técnico:**

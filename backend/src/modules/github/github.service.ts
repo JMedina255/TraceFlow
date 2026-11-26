@@ -16,7 +16,13 @@ import { IGitHubApiClient } from './github-api.client.js';
 import type { AuthenticatedUser } from '../../common/types/index.js';
 import type { LinkRepoDto } from './dtos/link-repo.dto.js';
 import type { CreateRepoDraftDto } from './dtos/create-repo-draft.dto.js';
-import type { GitHubIntegrationEntity, GitHubRepoDetails, GitHubValidationStatus } from './github.entity.js';
+import type {
+  GitHubIntegrationEntity,
+  GitHubRepoDetails,
+  GitHubValidationStatus,
+  OrganizationGitHubInstallationEntity,
+  GitHubInstallationDetails,
+} from './github.entity.js';
 
 @Injectable()
 export class GitHubService {
@@ -160,24 +166,25 @@ export class GitHubService {
     const project = await this.getAuthorizedProject(projectIdOrCode, callerUser);
     await this.assertAdminOrManager(project, callerUser);
 
-    let targetInstallationId = installationId;
+    let targetInstallationId: number;
     let orgInstallation: OrganizationGitHubInstallationEntity | null = null;
 
-    if (targetInstallationId !== undefined) {
-      if (!targetInstallationId || targetInstallationId <= 0 || isNaN(targetInstallationId)) {
+    if (installationId !== undefined) {
+      if (!installationId || installationId <= 0 || isNaN(installationId)) {
         throw new BadRequestException('El installationId debe ser un número entero positivo válido.');
       }
 
       // H04A-R02: Validar que el installationId pertenezca a la organización del proyecto
       orgInstallation = await this.githubRepo.findInstallationByOrgAndId(
         project.organization_id!,
-        targetInstallationId
+        installationId
       );
       if (!orgInstallation || orgInstallation.status !== 'ACTIVE') {
         throw new ForbiddenException(
-          `Acceso denegado: La instalación GitHub ${targetInstallationId} no está autorizada para la organización del proyecto.`
+          `Acceso denegado: La instalación GitHub ${installationId} no está autorizada para la organización del proyecto.`
         );
       }
+      targetInstallationId = installationId;
     } else {
       // Buscar primera instalación activa de la organización
       const activeInstallations = await this.githubRepo.findActiveInstallationsByOrg(
@@ -219,7 +226,7 @@ export class GitHubService {
     if (
       orgInstallation.target_id &&
       installDetails.account.id &&
-      orgInstallation.target_id !== installDetails.account.id
+      Number(orgInstallation.target_id) !== Number(installDetails.account.id)
     ) {
       throw new ForbiddenException(
         `Inconsistencia crítica de identidad: El ID numérico de cuenta GitHub (${installDetails.account.id}) no coincide con el registrado (${orgInstallation.target_id}).`
@@ -290,7 +297,7 @@ export class GitHubService {
       if (
         orgInstallation.target_id &&
         installDetails.account.id &&
-        orgInstallation.target_id !== installDetails.account.id
+        Number(orgInstallation.target_id) !== Number(installDetails.account.id)
       ) {
         throw new ForbiddenException(
           `Inconsistencia crítica de identidad: El ID numérico de cuenta GitHub (${installDetails.account.id}) no coincide con el registrado (${orgInstallation.target_id}).`

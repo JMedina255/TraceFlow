@@ -88,3 +88,62 @@ export interface GitHubInstallationDetails {
   app_id?: number;
   target_type?: string;
 }
+
+// ============================================================================
+// H04B — TIPOS Y ENTIDADES DE WEBHOOKS Y SINCRONIZACIÓN GIT (DA-01, ADR-011)
+// ============================================================================
+
+export type GitHubEventProcessingStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
+
+export interface GitHubEventEntity {
+  id: string;
+  delivery_id: string;
+  event_type: string;
+  action?: string | null;
+  installation_id: number;
+  github_repo_id?: number | null;
+  project_id?: string | null;
+  payload: any;
+  processing_status: GitHubEventProcessingStatus;
+  attempts: number;
+  max_attempts: number;
+  last_attempt_at?: string | null;
+  processed_at?: string | null;
+  error_message?: string | null;
+  created_at: string;
+}
+
+export type ConfigItemPathHistoryChangeType = 'RENAME' | 'MOVE' | 'DELETE';
+
+export interface ConfigItemPathHistoryEntity {
+  id: string;
+  config_item_id: string;
+  project_id: string;
+  old_path: string;
+  new_path: string;
+  change_type: ConfigItemPathHistoryChangeType;
+  git_commit_sha: string;
+  detected_at: string;
+}
+
+export interface GitHubCommitFile {
+  filename: string;
+  status: 'added' | 'modified' | 'removed' | 'renamed' | string;
+  previous_filename?: string;
+  additions: number;
+  deletions: number;
+  changes: number;
+  patch?: string;
+}
+
+export interface GitHubCommitDetails {
+  sha: string;
+  message: string;
+  author: {
+    name: string;
+    email: string;
+    date: string;
+  };
+  files: GitHubCommitFile[];
+}
+

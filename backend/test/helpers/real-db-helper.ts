@@ -18,7 +18,7 @@ export interface RealDbSetupOptions {
   appPassword?: string;
   database?: string;
   allowDestructiveReset?: boolean;
-  targetMigration?: 'H02' | 'H03';
+  targetMigration?: 'H02' | 'H03' | 'H04A' | 'H04A-R' | 'H04B-PRE' | 'H04B';
 }
 
 export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
@@ -30,7 +30,7 @@ export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
   appPassword: process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!',
   database: process.env.TEST_DB_NAME || 'traceflow_cert',
   allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
-  targetMigration: 'H03',
+  targetMigration: 'H04B',
 };
 
 export async function resetAndMigrateRealPostgres(
@@ -257,6 +257,19 @@ export async function resetAndMigrateRealPostgres(
       await adminDbClient.query("SET traceflow.is_test_environment = 'true';");
       await adminDbClient.query(migH04BPre);
       appliedMigrations.push('202611260005_init_h04b_github_installations_remediation.sql');
+    }
+
+    // Paso 10: Migración INIT-H04B (webhooks y sincronización git con historial de rutas)
+    if (
+      opts.targetMigration !== 'H02' &&
+      opts.targetMigration !== 'H03' &&
+      opts.targetMigration !== 'H04A' &&
+      opts.targetMigration !== 'H04A-R' &&
+      opts.targetMigration !== 'H04B-PRE'
+    ) {
+      const migH04B = fs.readFileSync(path.join(migrationsDir, '202611260006_init_h04b_webhooks_and_git_sync.sql'), 'utf8');
+      await adminDbClient.query(migH04B);
+      appliedMigrations.push('202611260006_init_h04b_webhooks_and_git_sync.sql');
     }
   } finally {
     await adminDbClient.end();

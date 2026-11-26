@@ -74,7 +74,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-08** Incidencias y Soporte | Tickets de falla y derivación a RFC | `CU-23..25` | Tabla `incident_ticket` desplegada; endpoints/UI pendientes |
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
 | **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | **Operativo Backend** (`OrganizationsModule`, certificado en H02/H03) |
-| **MOD-11 (Nuevo)** Integración GitHub | Vinculación y validación de repositorios, Installation Access Tokens en memoria bajo demanda, índice uq_active_github_repo (DA-03, DA-04) | `CU-33` | **Operativo Backend** (`GitHubModule`, certificado en INIT-H04A; webhooks en INIT-H04B) |
+| **MOD-11 (Nuevo)** Integración GitHub | Vinculación y validación de repositorios, Installation Access Tokens en memoria bajo demanda, índice uq_active_github_repo_id, webhooks HMAC-SHA256, buffer idempotente github_event, sincronización asíncrona de rutas ECS y detección out-of-band (DA-03, DA-04) | `CU-33` | **Operativo Backend y Certificado** (`GitHubModule`, `GitHubWebhookService`, `GitHubEventProcessorService`; certificado en INIT-H04A y INIT-H04B) |
 
 ## 11. Modelo de Dominio (`DG-12`)
 *(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
@@ -82,7 +82,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 ![Modelo Conceptual del Dominio (DG-12 Canónico)](assets/diagramas/render/analisis/DG-12.svg)
 
 ## 12. Modelo de Datos (`DICCIONARIO_DATOS.md`)
-Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`), a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`) y a **30 tablas en INIT-H04A** (`github_integration` con índice de unicidad parcial `uq_active_github_repo` y revocación estricta de DELETE para `traceflow_app`), certificadas en PostgreSQL 16 real.
+Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`), a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`), a **31 tablas en INIT-H04A-R** (`github_integration`, `organization_github_installation`), y a **33 tablas físicas en INIT-H04B** (`github_event` con índice de entrega único `uq_github_event_delivery` y `config_item_path_history` con índice `idx_cip_history_config_item`), certificadas íntegramente sobre PostgreSQL 16 real con revocación de `DELETE` para `traceflow_app`.
 - **Modelo Físico Vigente (`DG-ER-ACTUAL`):**
 ![Modelo ER Físico Vigente](assets/diagramas/render/diseno/DG-ER-ACTUAL.svg)
 - **Modelo Objetivo en Español (`DG-ER-OBJETIVO`):** *(Propuesta para `REF-01.5`, aún NO desplegada en Supabase)*
@@ -90,7 +90,7 @@ Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base
 
 ## 13. Contratos de Comunicación (`/api/v1`) y Navegación UI
 - **Protocolo (`ADR-009`):** RESTful JSON bajo prefijo global `/api/v1` con `ValidationPipe` estricto (`whitelist`, `forbidNonWhitelisted`).
-- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/projects/:id/github{,/available-repos,/link,/validate,/unlink,/create-draft}`, `/api/v1/rfcs{,/:id}`.
+- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/projects/:id/github{,/available-repos,/link,/validate,/unlink,/create-draft}`, `/api/v1/github/webhook` (Recepción global de eventos GitHub), `/api/v1/projects/:id/github/webhook` (Recepción de eventos vinculados a proyecto), `/api/v1/rfcs{,/:id}`.
 - **Contratos diseñados para próximos hitos:** `/api/v1/rfcs/:id/{classify,rectification,impact-assessment,minor-approval,ccb-votes}`, `/api/v1/change-orders/*`, `/api/v1/scm/*` (ver `contracts.ts` y `ESTANDAR_PROGRAMACION.md` §6).
 - **Navegación SPA (`DG-UWE-NAV-01`):**
 ![Modelo General de Navegación UWE](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)
@@ -230,6 +230,29 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Salvaguardas de Rollback y Protección de Datos (H04A-R05):** Reversión en `202611260004` y `202611260003` bloqueada ante la existencia de datos operativos en las tablas de integración o instalación.
 - **Cobertura Final Consolidada:** 19 pruebas físicas en `real-postgres-h04a-certification.spec.ts`, 20 pruebas en H03, 18 pruebas en H02 (**57/57 pruebas físicas en PostgreSQL 16 real**), **136 pruebas unitarias backend** y **97 pruebas en prototipo frontend** (**290 pruebas consolidadas en verde**).
 
+## 36. Webhooks, Procesamiento Asíncrono y Sincronización Git (INIT-H04B)
+- **Topología de Integración y Principio de Autoridad Dual:** GitHub funge como autoridad exclusiva sobre archivos versionados, repositorios, ramas y commits. TraceFlow funge como autoridad soberana de gobernanza SCM, catálogo de ECS, RFCs, aprobaciones CCB, auditoría inmutable y líneas base.
+- **Recepción Segura y Validación Criptográfica:**
+  1. Los endpoints `POST /api/v1/github/webhook` y `POST /api/v1/projects/:id/github/webhook` operan sin sesión humana (`AuthGuard` bypass) y capturan el cuerpo binario crudo mediante `{ rawBody: true }`.
+  2. La autenticación perimetral valida la cabecera `X-Hub-Signature-256` utilizando HMAC-SHA256 con tiempo constante (`crypto.timingSafeEqual`). Secretos ausentes o inválidos en modo operativo/producción provocan rechazo inmediato (`401 Unauthorized` fail-closed).
+  3. Desduplicación e idempotencia absoluta mediante la cabecera `X-GitHub-Delivery`: el índice único `uq_github_event_delivery` rechaza entregas duplicadas sin reprocesamiento (HTTP 202 Accepted).
+- **Buffer Transaccional de Eventos y Desacoplamiento Asíncrono:**
+  1. Todo webhook válido se persiste de inmediato en `traceflow.github_event` con estado `PENDING` y respuesta HTTP `202 Accepted` de latencia ultrabaja (< 50 ms), garantizando la continuidad ante ráfagas de GitHub.
+  2. El procesador asíncrono `GitHubEventProcessorService` gestiona la máquina de estados del evento: `PENDING` -> `PROCESSING` -> `PROCESSED` (o `FAILED` con contador incremental hasta 3 intentos).
+- **Inspección de Commits y Sincronización de Rutas ECS:**
+  1. Ante eventos `push`, se inspecciona cada commit a través de `IGitHubApiClient.getCommit()`, extrayendo archivos agregados, modificados, eliminados y renombrados (`previous_filename`).
+  2. Mapeo bidireccional contra el catálogo de Elementos de Configuración (`traceflow.config_item`): renombres y movimientos se reflejan en la base de datos y se archivan inmutablemente en `traceflow.config_item_path_history` (`RENAME`, `MOVE`, `DELETE`).
+- **Detección de Cambios No Autorizados Fuera de Banda (Out-of-Band):**
+  1. Si un commit altera archivos correspondientes a un ECS sin existir una orden de cambio (`change_order`) autorizada o un bloqueo activo (`sync_lock`), el procesador clasifica el evento como cambio fuera de banda.
+  2. Emisión del evento de auditoría criptográfica `GITHUB_OUT_OF_BAND_DETECTED` registrando el commit SHA, autor Git, y rutas afectadas para su subsanación mediante apertura de incidencias. Los cambios legítimos se auditan como `GITHUB_GIT_SYNC_COMPLETED`.
+- **Mínimo Privilegio de Base de Datos y Salvaguardas de Rollback:**
+  1. Otorgamiento mínimo a `traceflow_app`: solo `SELECT, INSERT, UPDATE` sobre `github_event` y `config_item_path_history`. Privilegio `DELETE` revocado terminantemente.
+  2. El script de reversión `202611260006_...rollback.sql` aborta con error fatal si existen eventos o historial de rutas registrados post-migración, protegiendo la custodia forense y orientando al uso de PITR.
+- **Cobertura de Pruebas y Certificación:**
+  1. **21 pruebas unitarias** en `github-webhooks.spec.ts` certificando firmas, idempotencia, procesamiento asíncrono, detección out-of-band y reintentos.
+  2. **13 pruebas físicas** en `real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real.
+  3. **Cobertura Total Consolidada:** 166 pruebas unitarias backend, 70 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**333 pruebas consolidadas en verde**).
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B — C-SharkTeam / ÉXODO S.A.C.*

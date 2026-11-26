@@ -4,11 +4,25 @@ import { DatabaseService } from '../../database/database.service.js';
 import type {
   GitHubIntegrationEntity,
   GitHubValidationStatus,
+  OrganizationGitHubInstallationEntity,
 } from './github.entity.js';
 
 @Injectable()
 export class GitHubRepository {
   private mockIntegrations: GitHubIntegrationEntity[] = [];
+  private mockInstallations: OrganizationGitHubInstallationEntity[] = [
+    {
+      id: 'inst0001-0000-0000-0000-000000000001',
+      organization_id: 'c0000001-0000-0000-0000-000000000001', // ORG-EXODO
+      installation_id: 12345678,
+      account_login: 'exodo-org',
+      account_type: 'Organization',
+      permissions: { contents: 'read', metadata: 'read', pull_requests: 'write' },
+      status: 'ACTIVE',
+      installed_at: '2026-11-26T00:00:00.000Z',
+      updated_at: '2026-11-26T00:00:00.000Z',
+    },
+  ];
 
   constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
@@ -20,6 +34,148 @@ export class GitHubRepository {
     };
   }
 
+  private mapInstallationRow(row: any): OrganizationGitHubInstallationEntity {
+    return {
+      ...row,
+      installation_id: Number(row.installation_id),
+    };
+  }
+
+  // ==========================================================================
+  // GESTIÓN DE INSTALACIONES GITHUB POR ORGANIZACIÓN (H04A-R02)
+  // ==========================================================================
+  async findInstallationByOrgAndId(
+    organizationId: string,
+    installationId: number,
+    client?: pg.PoolClient | null
+  ): Promise<OrganizationGitHubInstallationEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.organization_github_installation
+        WHERE organization_id = $1 AND installation_id = $2
+        LIMIT 1;
+      `;
+      const res = client
+        ? await client.query(sql, [organizationId, installationId])
+        : await this.db.query<OrganizationGitHubInstallationEntity>(sql, [
+            organizationId,
+            installationId,
+          ]);
+      return res.rows[0] ? this.mapInstallationRow(res.rows[0]) : null;
+    }
+
+    return (
+      this.mockInstallations.find(
+        (inst) =>
+          inst.organization_id === organizationId && inst.installation_id === installationId
+      ) || null
+    );
+  }
+
+  async findActiveInstallationsByOrg(
+    organizationId: string,
+    client?: pg.PoolClient | null
+  ): Promise<OrganizationGitHubInstallationEntity[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.organization_github_installation
+        WHERE organization_id = $1 AND status = 'ACTIVE'
+        ORDER BY installed_at DESC;
+      `;
+      const res = client
+        ? await client.query(sql, [organizationId])
+        : await this.db.query<OrganizationGitHubInstallationEntity>(sql, [organizationId]);
+      return res.rows.map((r) => this.mapInstallationRow(r));
+    }
+
+    return this.mockInstallations.filter(
+      (inst) => inst.organization_id === organizationId && inst.status === 'ACTIVE'
+    );
+  }
+
+  async saveOrganizationInstallation(
+    data: {
+      organizationId: string;
+      installationId: number;
+      accountLogin: string;
+      accountType: 'Organization' | 'User';
+      permissions?: Record<string, string>;
+      status?: 'ACTIVE' | 'SUSPENDED' | 'REVOKED';
+    },
+    client?: pg.PoolClient | null
+  ): Promise<OrganizationGitHubInstallationEntity> {
+    const status = data.status || 'ACTIVE';
+    const permissions = data.permissions || {
+      contents: 'read',
+      metadata: 'read',
+      pull_requests: 'write',
+    };
+
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        INSERT INTO traceflow.organization_github_installation (
+          organization_id, installation_id, account_login, account_type, permissions, status
+        ) VALUES (
+          $1, $2, $3, $4, $5::jsonb, $6
+        )
+        ON CONFLICT (organization_id, installation_id) DO UPDATE SET
+          account_login = EXCLUDED.account_login,
+          account_type = EXCLUDED.account_type,
+          permissions = EXCLUDED.permissions,
+          status = EXCLUDED.status,
+          updated_at = NOW()
+        RETURNING *;
+      `;
+      const params = [
+        data.organizationId,
+        data.installationId,
+        data.accountLogin,
+        data.accountType,
+        JSON.stringify(permissions),
+        status,
+      ];
+      const res = client
+        ? await client.query(sql, params)
+        : await this.db.query<OrganizationGitHubInstallationEntity>(sql, params);
+      return this.mapInstallationRow(res.rows[0]);
+    }
+
+    const existingIndex = this.mockInstallations.findIndex(
+      (inst) =>
+        inst.organization_id === data.organizationId &&
+        inst.installation_id === data.installationId
+    );
+
+    const entity: OrganizationGitHubInstallationEntity = {
+      id:
+        existingIndex >= 0
+          ? this.mockInstallations[existingIndex].id
+          : `inst0001-${Date.now().toString(16).padStart(12, '0')}`,
+      organization_id: data.organizationId,
+      installation_id: data.installationId,
+      account_login: data.accountLogin,
+      account_type: data.accountType,
+      permissions,
+      status,
+      installed_at:
+        existingIndex >= 0
+          ? this.mockInstallations[existingIndex].installed_at
+          : new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (existingIndex >= 0) {
+      this.mockInstallations[existingIndex] = entity;
+    } else {
+      this.mockInstallations.push(entity);
+    }
+
+    return entity;
+  }
+
+  // ==========================================================================
+  // GESTIÓN DE INTEGRACIONES GITHUB (H04A / H04A-R)
+  // ==========================================================================
   async findByProjectId(
     projectId: string,
     client?: pg.PoolClient | null
@@ -33,6 +189,30 @@ export class GitHubRepository {
     }
 
     return this.mockIntegrations.find((i) => i.project_id === projectId) || null;
+  }
+
+  async findActiveByRepoId(
+    repoId: number,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubIntegrationEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT * FROM traceflow.github_integration
+        WHERE github_repo_id = $1
+          AND validation_status != 'UNLINKED'
+        LIMIT 1;
+      `;
+      const res = client
+        ? await client.query(sql, [repoId])
+        : await this.db.query<GitHubIntegrationEntity>(sql, [repoId]);
+      return res.rows[0] ? this.mapRow(res.rows[0]) : null;
+    }
+
+    return (
+      this.mockIntegrations.find(
+        (i) => i.github_repo_id === repoId && i.validation_status !== 'UNLINKED'
+      ) || null
+    );
   }
 
   async findActiveByRepo(
@@ -131,7 +311,10 @@ export class GitHubRepository {
 
     const existingIndex = this.mockIntegrations.findIndex((i) => i.project_id === data.projectId);
     const entity: GitHubIntegrationEntity = {
-      id: existingIndex >= 0 ? this.mockIntegrations[existingIndex].id : `git00001-${Date.now().toString(16).padStart(12, '0')}`,
+      id:
+        existingIndex >= 0
+          ? this.mockIntegrations[existingIndex].id
+          : `git00001-${Date.now().toString(16).padStart(12, '0')}`,
       project_id: data.projectId,
       integration_mode: data.integrationMode,
       repo_owner: data.repoOwner,
@@ -147,7 +330,10 @@ export class GitHubRepository {
       validation_error_message: data.errorMessage || null,
       unlinked_at: null,
       unlinked_by: null,
-      created_at: existingIndex >= 0 ? this.mockIntegrations[existingIndex].created_at : new Date().toISOString(),
+      created_at:
+        existingIndex >= 0
+          ? this.mockIntegrations[existingIndex].created_at
+          : new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
@@ -223,5 +409,25 @@ export class GitHubRepository {
 
   resetMockIntegrations(): void {
     this.mockIntegrations = [];
+  }
+
+  addMockInstallation(inst: OrganizationGitHubInstallationEntity): void {
+    this.mockInstallations.push(inst);
+  }
+
+  resetMockInstallations(): void {
+    this.mockInstallations = [
+      {
+        id: 'inst0001-0000-0000-0000-000000000001',
+        organization_id: 'c0000001-0000-0000-0000-000000000001', // ORG-EXODO
+        installation_id: 12345678,
+        account_login: 'exodo-org',
+        account_type: 'Organization',
+        permissions: { contents: 'read', metadata: 'read', pull_requests: 'write' },
+        status: 'ACTIVE',
+        installed_at: '2026-11-26T00:00:00.000Z',
+        updated_at: '2026-11-26T00:00:00.000Z',
+      },
+    ];
   }
 }

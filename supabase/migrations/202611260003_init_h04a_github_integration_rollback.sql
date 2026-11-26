@@ -32,13 +32,13 @@ BEGIN
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'traceflow' AND table_name = 'github_integration') THEN
+        -- H04A-R05: Bloquear si existe CUALQUIER registro de integración, independientemente de su estado
         SELECT COUNT(*) INTO v_validated_integrations
-        FROM traceflow.github_integration
-        WHERE validation_status = 'VALIDATED';
+        FROM traceflow.github_integration;
     END IF;
 
     IF v_validated_integrations > 0 THEN
-        RAISE EXCEPTION 'BLOQUEO DE SEGURIDAD (INIT-H04A): Se detectaron % integraciones GitHub validadas activas. El rollback directo está bloqueado para preservar la gobernanza SCM. Para contingencias utilice Point-In-Time Recovery (PITR) o habilite "SET LOCAL traceflow.allow_force_h04_rollback = ''true'';" para pruebas.',
+        RAISE EXCEPTION 'BLOQUEO DE SEGURIDAD (INIT-H04A-R): Se detectaron % registros en traceflow.github_integration. Ningún registro puede eliminarse automáticamente, independientemente de su estado (UNLINKED, PERMISSION_DENIED, etc.). El rollback directo está bloqueado para preservar la trazabilidad forense SCM. Para contingencias utilice Point-In-Time Recovery (PITR) o habilite "SET LOCAL traceflow.allow_force_h04_rollback = ''true'';" para pruebas.',
             v_validated_integrations;
     END IF;
 END $$;

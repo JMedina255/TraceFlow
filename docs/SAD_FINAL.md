@@ -217,6 +217,19 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Introspección de Socket PostgreSQL en Runtime y Desacoplamiento de Pruebas Externas:** En `real-db-helper.ts`, antes de ejecutar `DROP DATABASE`, se verifica en el motor PostgreSQL mediante `inet_server_addr()`, `current_database()` y `datistemplate` que la conexión sea estrictamente local (`127.0.0.1` / `::1`) y no una plantilla. En `run-supabase-tests.ts`, se eliminó la asignación automática de `ALLOW_REMOTE_TEST_DML=true`, requiriendo autorización previa y verificando que el host sea remoto vía `isRemoteDatabaseHost()`.
 - **Cobertura de Certificación Física Ampliada:** 18 pruebas físicas en `real-postgres-certification.spec.ts` (100% aprobadas, incorporando `V-13`, `V-16`, `V-17` y `V-18`), 76 pruebas backend (`npm test`) y 97 pruebas en prototipo frontend (**191 pruebas consolidadas en verde**).
 
+## 34. Implementación y Subsanación de Planificación de Proyectos (INIT-H03 / INIT-H03-R)
+- **Entidades de Planificación Multiproyecto:** Creación de `project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone` y `project_deliverable` (**29 tablas físicas** en esquema `traceflow`).
+- **Aislamiento Estricto y Transaccionalidad Atómica:** Aislamiento de mutación de roles por proyecto (HTTP 403), transaccionalidad atómica única por lote en `saveStep2Team`, y preservación acumulada sin regresión en `project_setup` (`GREATEST` y fusión `draft_payload` JSONB).
+- **Cobertura Certificada:** 20 pruebas físicas en PostgreSQL 16 real para H03, 102 pruebas unitarias backend y 97 pruebas en prototipo frontend.
+
+## 35. Integración Segura de Repositorios GitHub y Blindaje de Instalaciones (INIT-H04A / INIT-H04A-R)
+- **Blindaje de Instalaciones de GitHub App (H04A-R02):** Creación de la entidad `traceflow.organization_github_installation` (catálogo físico de **31 tablas relacionales** en `traceflow`). Restricción estricta multiorganización: ningún proyecto puede operar sobre instalaciones ajenas a su organización (HTTP 403) y se valida la coincidencia de cuentas con GitHub API.
+- **Eliminación de Modo Mock Implícito (H04A-R01):** Prohibición terminante de clientes simulados en modo operacional y producción; fail-closed en `createGitHubApiClient()` ante ausencia de credenciales de GitHub App.
+- **Unicidad Canónica de Repositorios (H04A-R03):** Creación del índice `uq_active_github_repo_id` sobre `github_repo_id` (y auxiliar `uq_active_github_repo_name`), impidiendo duplicidad aun ante renombramiento de repositorios en GitHub.
+- **Sincronización Transaccional de Estado y Degradación (H04A-R04):** `validateIntegrationAccess()` atómico en transacción: degradación de estado a `PERMISSION_DENIED`, conmutación de `project_setup.github_completed = false` y registro inmutable en auditoría SHA-256 (`GITHUB_INTEGRATION_DEGRADED`); recuperación a `true` mediante `GITHUB_INTEGRATION_VERIFIED`. Validación de ramas Git reales con `getBranch()`.
+- **Salvaguardas de Rollback y Protección de Datos (H04A-R05):** Reversión en `202611260004` y `202611260003` bloqueada ante la existencia de datos operativos en las tablas de integración o instalación.
+- **Cobertura Final Consolidada:** 19 pruebas físicas en `real-postgres-h04a-certification.spec.ts`, 20 pruebas en H03, 18 pruebas en H02 (**57/57 pruebas físicas en PostgreSQL 16 real**), **136 pruebas unitarias backend** y **97 pruebas en prototipo frontend** (**290 pruebas consolidadas en verde**).
+
 ---
 
 *SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales — C-SharkTeam / ÉXODO S.A.C.*

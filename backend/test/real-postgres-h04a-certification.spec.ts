@@ -1,19 +1,21 @@
 /**
  * ============================================================================
- * TRACEFLOW SCM — CERTIFICACIÓN OFICIAL EN POSTGRESQL REAL (HITO INIT-H04A)
+ * TRACEFLOW SCM — CERTIFICACIÓN OFICIAL EN POSTGRESQL REAL (HITO INIT-H04A / H04A-R)
  * Archivo: backend/test/real-postgres-h04a-certification.spec.ts
  * Motor: PostgreSQL 16.14 Real (Servidor dedicado aislado en 127.0.0.1:5432)
  * Marco Normativo: DA-01 a DA-06, ADR-011, Plan Maestro, IEEE 828, RNF-01, RNF-03
  *
  * VALIDACIONES OBLIGATORIAS CERTIFICADAS:
- *  1. Ejecución de las 6 migraciones oficiales en orden estricto (incluyendo 202611260003_init_h04a_github_integration.sql).
- *  2. Catálogo físico con exactamente 30 tablas en esquema traceflow.
- *  3. Integridad física de la tabla traceflow.github_integration (columnas, tipos, claves foráneas).
- *  4. Índice de unicidad parcial uq_active_github_repo (unicidad de repositorios activos y coexistencia de desvinculados).
+ *  1. Ejecución de las 7 migraciones oficiales en orden estricto (incluyendo 202611260004_init_h04a_r_github_security.sql).
+ *  2. Catálogo físico con exactamente 31 tablas en esquema traceflow.
+ *  3. Integridad física de traceflow.github_integration y traceflow.organization_github_installation.
+ *  4. Índices de unicidad parcial uq_active_github_repo_id y uq_active_github_repo_name.
  *  5. Privilegios mínimos de traceflow_app (SELECT, INSERT, UPDATE permitidos; DELETE estrictamente revocado).
  *  6. Flujo modular completo de GitHubService NestJS sobre PostgreSQL real con transacciones atómicas.
- *  7. Registro de auditoría criptográfica inmutable SHA-256 en traceflow.audit_log (GITHUB_REPO_LINKED, GITHUB_REPO_UNLINKED).
- *  8. Procedimiento de reversión y rollback seguro con salvaguarda PITR (202611260003_init_h04a_github_integration_rollback.sql).
+ *  7. Aislamiento de instalaciones GitHub por organización y validación de coincidencia de cuenta (H04A-R02).
+ *  8. Unicidad canónica de repositorios por ID numérico inmutable (H04A-R03).
+ *  9. Sincronización atómica en transacción ante degradación de permisos con GITHUB_INTEGRATION_DEGRADED (H04A-R04).
+ * 10. Procedimiento de reversión y rollback seguro con salvaguarda PITR (202611260004 y 202611260003) (H04A-R05).
  * ============================================================================
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -37,7 +39,7 @@ import { AuditService } from '../src/modules/audit/audit.service.js';
 import { AuthRepository } from '../src/modules/auth/auth.repository.js';
 import type { AuthenticatedUser } from '../src/common/types/index.js';
 
-describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)', { timeout: 60000 }, () => {
+describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / H04A-R)', { timeout: 60000 }, () => {
   let adminPool: pg.Pool;
   let appPool: pg.Pool;
   let appliedMigrations: string[];
@@ -105,12 +107,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_MODE = 'postgres';
     process.env.DATABASE_SSL = 'false';
+    process.env.ALLOW_MOCK_GITHUB = 'true';
     process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
 
-    // 2. Reiniciar y migrar base de datos real con las 6 migraciones oficiales (hasta H04A)
+    // 2. Reiniciar y migrar base de datos real con las 7 migraciones oficiales (hasta H04A-R)
     const setupResult = await resetAndMigrateRealPostgres({
       allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
-      targetMigration: 'H04A',
+      targetMigration: 'H04A-R',
     });
     adminPool = setupResult.adminPool;
     appPool = setupResult.appPool;
@@ -160,20 +163,21 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
   });
 
   // ==========================================================================
-  // BLOQUE 1: MIGRACIONES REALES Y CATÁLOGO RELACIONAL (H04A)
+  // BLOQUE 1: MIGRACIONES REALES Y CATÁLOGO RELACIONAL (H04A / H04A-R)
   // ==========================================================================
   describe('1. Verificación de Migraciones y Catálogo Físico en PostgreSQL 16 Real', () => {
-    it('CERT-H04A-01: debe haber aplicado exactamente 6 migraciones incrementales en orden estricto', () => {
-      expect(appliedMigrations).toHaveLength(6);
+    it('CERT-H04A-01: debe haber aplicado exactamente 7 migraciones incrementales en orden estricto', () => {
+      expect(appliedMigrations).toHaveLength(7);
       expect(appliedMigrations[0]).toBe('202611250001_initial_traceflow.sql');
       expect(appliedMigrations[1]).toBe('202611250002_structural_seeds.sql');
       expect(appliedMigrations[2]).toBe('202611250003_secure_app_role_least_privilege.sql');
       expect(appliedMigrations[3]).toBe('202611260001_init_h02_organizations_and_projects.sql');
       expect(appliedMigrations[4]).toBe('202611260002_init_h03_team_methodology_planning.sql');
       expect(appliedMigrations[5]).toBe('202611260003_init_h04a_github_integration.sql');
+      expect(appliedMigrations[6]).toBe('202611260004_init_h04a_r_github_security.sql');
     });
 
-    it('CERT-H04A-02: el esquema traceflow debe contener exactamente 30 tablas físicas en PostgreSQL', async () => {
+    it('CERT-H04A-02: el esquema traceflow debe contener exactamente 31 tablas físicas en PostgreSQL', async () => {
       const res = await appPool.query<{ table_name: string }>(`
         SELECT table_name
         FROM information_schema.tables
@@ -182,8 +186,9 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       `);
 
       const tables = res.rows.map((r) => r.table_name);
-      expect(tables).toHaveLength(30);
+      expect(tables).toHaveLength(31);
       expect(tables).toContain('github_integration');
+      expect(tables).toContain('organization_github_installation');
       expect(tables).toContain('project_setup');
       expect(tables).toContain('project_team_role');
       expect(tables).toContain('project_methodology');
@@ -223,17 +228,58 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       ]);
     });
 
-    it('CERT-H04A-04: debe existir el índice de unicidad parcial uq_active_github_repo', async () => {
+    it('CERT-H04A-03B: la tabla traceflow.organization_github_installation debe existir con estructura requerida', async () => {
+      const res = await appPool.query<{ column_name: string; data_type: string; is_nullable: string }>(`
+        SELECT column_name, data_type, is_nullable
+        FROM information_schema.columns
+        WHERE table_schema = 'traceflow' AND table_name = 'organization_github_installation'
+        ORDER BY ordinal_position ASC;
+      `);
+
+      const cols = res.rows.map((r) => r.column_name);
+      expect(cols).toEqual([
+        'id',
+        'organization_id',
+        'installation_id',
+        'account_login',
+        'account_type',
+        'target_id',
+        'permissions',
+        'repository_selection',
+        'status',
+        'installed_by',
+        'installed_at',
+        'updated_at',
+      ]);
+
+      // Verificar seed de instalación 12345678 para ORG-EXODO
+      const seedCheck = await appPool.query(
+        "SELECT * FROM traceflow.organization_github_installation WHERE installation_id = 12345678"
+      );
+      expect(seedCheck.rows).toHaveLength(1);
+      expect(seedCheck.rows[0].account_login).toBe('exodo-org');
+      expect(seedCheck.rows[0].status).toBe('ACTIVE');
+    });
+
+    it('CERT-H04A-04: deben existir los índices de unicidad uq_active_github_repo_id y uq_active_github_repo_name', async () => {
       const res = await appPool.query<{ indexname: string; indexdef: string }>(`
         SELECT indexname, indexdef
         FROM pg_indexes
         WHERE schemaname = 'traceflow' AND tablename = 'github_integration'
-          AND indexname = 'uq_active_github_repo';
+          AND indexname IN ('uq_active_github_repo_id', 'uq_active_github_repo_name');
       `);
 
-      expect(res.rows).toHaveLength(1);
-      expect(res.rows[0].indexdef).toContain('UNIQUE INDEX uq_active_github_repo');
-      expect(res.rows[0].indexdef).toContain('UNLINKED');
+      expect(res.rows).toHaveLength(2);
+      const idIdx = res.rows.find((r) => r.indexname === 'uq_active_github_repo_id');
+      const nameIdx = res.rows.find((r) => r.indexname === 'uq_active_github_repo_name');
+
+      expect(idIdx).toBeDefined();
+      expect(idIdx?.indexdef).toContain('github_repo_id');
+      expect(idIdx?.indexdef).toContain('UNLINKED');
+
+      expect(nameIdx).toBeDefined();
+      expect(nameIdx?.indexdef).toContain('lower((repo_owner)::text)');
+      expect(nameIdx?.indexdef).toContain('UNLINKED');
     });
   });
 
@@ -241,25 +287,38 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
   // BLOQUE 2: SEGURIDAD Y PRIVILEGIOS MÍNIMOS (traceflow_app)
   // ==========================================================================
   describe('2. Verificación de Seguridad y Mínimo Privilegio (traceflow_app)', () => {
-    it('CERT-H04A-05: traceflow_app debe tener permisos SELECT, INSERT y UPDATE sobre github_integration', async () => {
-      const res = await adminPool.query<{ privilege_type: string }>(`
-        SELECT privilege_type
+    it('CERT-H04A-05: traceflow_app debe tener permisos SELECT, INSERT y UPDATE sobre github_integration y organization_github_installation', async () => {
+      const res = await adminPool.query<{ table_name: string; privilege_type: string }>(`
+        SELECT table_name, privilege_type
         FROM information_schema.role_table_grants
         WHERE grantee = 'traceflow_app'
           AND table_schema = 'traceflow'
-          AND table_name = 'github_integration';
+          AND table_name IN ('github_integration', 'organization_github_installation');
       `);
 
-      const privileges = res.rows.map((r) => r.privilege_type);
-      expect(privileges).toContain('SELECT');
-      expect(privileges).toContain('INSERT');
-      expect(privileges).toContain('UPDATE');
+      const gitIntPrivs = res.rows
+        .filter((r) => r.table_name === 'github_integration')
+        .map((r) => r.privilege_type);
+      expect(gitIntPrivs).toContain('SELECT');
+      expect(gitIntPrivs).toContain('INSERT');
+      expect(gitIntPrivs).toContain('UPDATE');
+
+      const orgInstPrivs = res.rows
+        .filter((r) => r.table_name === 'organization_github_installation')
+        .map((r) => r.privilege_type);
+      expect(orgInstPrivs).toContain('SELECT');
+      expect(orgInstPrivs).toContain('INSERT');
+      expect(orgInstPrivs).toContain('UPDATE');
     });
 
-    it('CERT-H04A-06: DELETE debe estar estrictamente prohibido para traceflow_app en github_integration', async () => {
+    it('CERT-H04A-06: DELETE debe estar estrictamente prohibido para traceflow_app en github_integration y organization_github_installation', async () => {
       await expect(
         appPool.query("DELETE FROM traceflow.github_integration WHERE repo_name = 'dummy_check'")
       ).rejects.toThrow(/permission denied for table github_integration/i);
+
+      await expect(
+        appPool.query("DELETE FROM traceflow.organization_github_installation WHERE account_login = 'dummy_check'")
+      ).rejects.toThrow(/permission denied for table organization_github_installation/i);
     });
   });
 
@@ -315,6 +374,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       expect(status.integration).toBeNull();
     });
 
+    it('CERT-H04A-07B: getAvailableRepositories debe rechazar con 403 una instalación de otra organización', async () => {
+      // 87654321 no está autorizada para ORG-EXODO en la base de datos física
+      await expect(
+        githubService.getAvailableRepositories(testProjectId, 87654321, userJoanGestor)
+      ).rejects.toThrow(ForbiddenException);
+    });
+
     it('CERT-H04A-08: linkExistingRepository debe persistir la integración en PostgreSQL y actualizar setup', async () => {
       const integration = await githubService.linkExistingRepository(
         testProjectId,
@@ -358,7 +424,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       expect(auditCheck.rows[0].curr_log_hash).toMatch(/^[a-f0-9]{64}$/);
     });
 
-    it('CERT-H04A-09: uq_active_github_repo debe rechazar en PostgreSQL vincular el mismo repo en otro proyecto', async () => {
+    it('CERT-H04A-09: uq_active_github_repo_id y _name deben rechazar en PostgreSQL vincular el mismo repo en otro proyecto', async () => {
       // Intentar vincular JMedina255/TraceFlow en secondProjectId debe fallar por conflicto de gobernanza SCM
       await expect(
         githubService.linkExistingRepository(
@@ -373,14 +439,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       ).rejects.toThrow(ConflictException);
     });
 
-    it('CERT-H04A-10: validateIntegrationAccess debe actualizar last_validated_at en PostgreSQL', async () => {
+    it('CERT-H04A-10: validateIntegrationAccess debe sincronizar atómicamente y actualizar last_validated_at en PostgreSQL', async () => {
       const beforeRes = await appPool.query(
         'SELECT last_validated_at FROM traceflow.github_integration WHERE project_id = $1',
         [testProjectId]
       );
       const beforeTime = new Date(beforeRes.rows[0].last_validated_at).getTime();
 
-      // Pequeña pausa para asegurar diferencia de timestamp
       await new Promise((r) => setTimeout(r, 100));
 
       const validated = await githubService.validateIntegrationAccess(testProjectId, userJoanGestor);
@@ -392,6 +457,48 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       );
       const afterTime = new Date(afterRes.rows[0].last_validated_at).getTime();
       expect(afterTime).toBeGreaterThanOrEqual(beforeTime);
+
+      // Auditoría GITHUB_INTEGRATION_VERIFIED registrada en PostgreSQL
+      const auditCheck = await appPool.query(
+        "SELECT * FROM traceflow.audit_log WHERE project_id = $1 AND event_code = 'GITHUB_INTEGRATION_VERIFIED'",
+        [testProjectId]
+      );
+      expect(auditCheck.rows.length).toBeGreaterThan(0);
+    });
+
+    it('CERT-H04A-10B: si se revoca acceso, validateIntegrationAccess degrada atómicamente project_setup.github_completed a false y audita GITHUB_INTEGRATION_DEGRADED', async () => {
+      // Degradar permisos push
+      githubClient.setRepoPermissions('JMedina255', 'TraceFlow', {
+        push: false,
+        pull: true,
+        admin: false,
+      });
+
+      const degraded = await githubService.validateIntegrationAccess(testProjectId, userJoanGestor);
+      expect(degraded.validation_status).toBe('PERMISSION_DENIED');
+
+      // Verificar en PostgreSQL físico que project_setup.github_completed es false
+      const setupCheck = await appPool.query(
+        'SELECT github_completed FROM traceflow.project_setup WHERE project_id = $1',
+        [testProjectId]
+      );
+      expect(setupCheck.rows[0].github_completed).toBe(false);
+
+      // Verificar evento GITHUB_INTEGRATION_DEGRADED en PostgreSQL
+      const auditCheck = await appPool.query(
+        "SELECT * FROM traceflow.audit_log WHERE project_id = $1 AND event_code = 'GITHUB_INTEGRATION_DEGRADED'",
+        [testProjectId]
+      );
+      expect(auditCheck.rows.length).toBeGreaterThan(0);
+      expect(auditCheck.rows[0].result_status).toBe('FAILURE');
+
+      // Restaurar permisos para pruebas posteriores
+      githubClient.setRepoPermissions('JMedina255', 'TraceFlow', {
+        push: true,
+        pull: true,
+        admin: true,
+      });
+      await githubService.validateIntegrationAccess(testProjectId, userJoanGestor);
     });
 
     it('CERT-H04A-11: unlinkRepository debe desvincular lógicamente (UNLINKED) y actualizar setup', async () => {
@@ -425,8 +532,8 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
       expect(auditCheck.rows[0].curr_log_hash).toMatch(/^[a-f0-9]{64}$/);
     });
 
-    it('CERT-H04A-12: tras desvincular, el índice parcial uq_active_github_repo permite vincular el repositorio en otro proyecto', async () => {
-      // Como testProjectId ahora está UNLINKED, secondProjectId puede vincular JMedina255/TraceFlow sin violar uq_active_github_repo
+    it('CERT-H04A-12: tras desvincular, el índice parcial uq_active_github_repo_id permite vincular el repositorio en otro proyecto', async () => {
+      // Como testProjectId ahora está UNLINKED, secondProjectId puede vincular JMedina255/TraceFlow sin violar uq_active_github_repo_id
       const linkedSecond = await githubService.linkExistingRepository(
         secondProjectId,
         {
@@ -461,11 +568,26 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
   });
 
   // ==========================================================================
-  // BLOQUE 4: PROCEDIMIENTO DE ROLLBACK SEGURO Y SALVAGUARDAS (H04A)
+  // BLOQUE 4: PROCEDIMIENTO DE ROLLBACK SEGURO Y SALVAGUARDAS (H04A-R & H04A)
   // ==========================================================================
-  describe('4. Verificación de Rollback Seguro y Salvaguardas PITR (202611260003)', () => {
-    it('CERT-H04A-14: el rollback debe abortar con excepción si existen integraciones activas validadas', async () => {
-      // En secondProjectId tenemos una integración VALIDATED activa
+  describe('4. Verificación de Rollback Seguro y Salvaguardas PITR (H04A-R05)', () => {
+    it('CERT-H04A-14: el rollback 202611260004 debe abortar con excepción si existen integraciones registradas', async () => {
+      const rollbackSqlPath = path.resolve(
+        process.cwd(),
+        '..',
+        'supabase',
+        'migrations',
+        '202611260004_init_h04a_r_github_security_rollback.sql'
+      );
+      const rollbackSql = fs.readFileSync(rollbackSqlPath, 'utf8');
+
+      // Ejecutar con adminPool debe abortar por la salvaguarda DO $$
+      await expect(adminPool.query(rollbackSql)).rejects.toThrow(
+        /BLOQUEO DE SEGURIDAD \(INIT-H04A-R\): Se detectaron registros operativos en traceflow/i
+      );
+    });
+
+    it('CERT-H04A-14B: el rollback 202611260003 debe abortar con excepción si existen registros en github_integration', async () => {
       const rollbackSqlPath = path.resolve(
         process.cwd(),
         '..',
@@ -477,26 +599,54 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
 
       // Ejecutar con adminPool debe abortar por la salvaguarda DO $$
       await expect(adminPool.query(rollbackSql)).rejects.toThrow(
-        /BLOQUEO DE SEGURIDAD \(INIT-H04A\): Se detectaron \d+ integraciones GitHub validadas activas/i
+        /BLOQUEO DE SEGURIDAD \(INIT-H04A-R\): Se detectaron \d+ registros en traceflow\.github_integration/i
       );
     });
 
-    it('CERT-H04A-15: con traceflow.allow_force_h04_rollback=true, el rollback se ejecuta limpiamente y retorna el esquema a 29 tablas', async () => {
-      const rollbackSqlPath = path.resolve(
+    it('CERT-H04A-15: con traceflow.allow_force_h04_rollback=true, el rollback de 202611260004 y 202611260003 se ejecuta limpiamente', async () => {
+      const rollbackRPath = path.resolve(
+        process.cwd(),
+        '..',
+        'supabase',
+        'migrations',
+        '202611260004_init_h04a_r_github_security_rollback.sql'
+      );
+      const rollbackRSql = fs.readFileSync(rollbackRPath, 'utf8');
+
+      const rollbackH04APath = path.resolve(
         process.cwd(),
         '..',
         'supabase',
         'migrations',
         '202611260003_init_h04a_github_integration_rollback.sql'
       );
-      const rollbackSql = fs.readFileSync(rollbackSqlPath, 'utf8');
+      const rollbackH04ASql = fs.readFileSync(rollbackH04APath, 'utf8');
 
-      // Forzar rollback con variable de configuración local
+      // 1. Forzar rollback de H04A-R (202611260004)
       const client = await adminPool.connect();
       try {
         await client.query('BEGIN;');
         await client.query("SET LOCAL traceflow.allow_force_h04_rollback = 'true';");
-        await client.query(rollbackSql);
+        await client.query(rollbackRSql);
+        await client.query('COMMIT;');
+      } catch (err) {
+        await client.query('ROLLBACK;');
+        throw err;
+      }
+
+      // Verificar que organization_github_installation ya no existe y catálogo tiene 30 tablas
+      const orgInstCheck = await adminPool.query(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'traceflow' AND table_name = 'organization_github_installation';
+      `);
+      expect(orgInstCheck.rows).toHaveLength(0);
+
+      // 2. Forzar rollback de H04A (202611260003)
+      try {
+        await client.query('BEGIN;');
+        await client.query("SET LOCAL traceflow.allow_force_h04_rollback = 'true';");
+        await client.query(rollbackH04ASql);
         await client.query('COMMIT;');
       } catch (err) {
         await client.query('ROLLBACK;');
@@ -505,7 +655,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A)',
         client.release();
       }
 
-      // Verificar que la tabla traceflow.github_integration ya no existe
+      // Verificar que github_integration ya no existe
       const tableCheck = await adminPool.query(`
         SELECT table_name
         FROM information_schema.tables

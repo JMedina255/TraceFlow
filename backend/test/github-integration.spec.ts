@@ -21,7 +21,7 @@
  * 14. TDD-H04A-14: Aislamiento multitenant y SoD: rechazo 403 a usuarios no asignados (incluido PU-02 no asignado).
  * ============================================================================
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
 import { AuthRepository } from '../src/modules/auth/auth.repository.js';
@@ -30,6 +30,7 @@ import { ProjectsRepository } from '../src/modules/projects/projects.repository.
 import { ProjectPlanningRepository } from '../src/modules/projects/project-planning.repository.js';
 import { GitHubRepository } from '../src/modules/github/github.repository.js';
 import { GitHubService } from '../src/modules/github/github.service.js';
+import { createGitHubApiClient } from '../src/modules/github/github.module.js';
 import { MockGitHubApiClient } from '../src/modules/github/github-api.client.js';
 import {
   ForbiddenException,
@@ -582,5 +583,383 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
         userRenzoArqui
       )
     ).rejects.toThrow(ForbiddenException);
+  });
+
+  // ==========================================================================
+  // H04A-R01: Eliminación del modo mock implícito y configuración fail-closed
+  // ==========================================================================
+  describe('H04A-R01: Eliminación de mock implícito y blindaje de configuración', () => {
+    const originalEnv = { ...process.env };
+
+    afterEach(() => {
+      process.env = { ...originalEnv };
+    });
+
+    it('TDD-H04A-R01-01: debe lanzar error si se intenta usar cliente mock en producción', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.GITHUB_CLIENT_MODE = 'mock';
+      expect(() => createGitHubApiClient()).toThrow(
+        'El cliente mock de GitHub está estrictamente prohibido en entorno de producción'
+      );
+    });
+
+    it('TDD-H04A-R01-02: debe lanzar error si se intenta ALLOW_MOCK_GITHUB en producción', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.ALLOW_MOCK_GITHUB = 'true';
+      expect(() => createGitHubApiClient()).toThrow(
+        'El cliente mock de GitHub está estrictamente prohibido en entorno de producción'
+      );
+    });
+
+    it('TDD-H04A-R01-03: debe lanzar error en modo PostgreSQL operativo sin ALLOW_MOCK_GITHUB', () => {
+      process.env.NODE_ENV = 'development';
+      process.env.DATABASE_MODE = 'postgres';
+      delete process.env.ALLOW_MOCK_GITHUB;
+      delete process.env.GITHUB_CLIENT_MODE;
+      expect(() => createGitHubApiClient()).toThrow('Configuración incompleta de GitHub App');
+    });
+
+    it('TDD-H04A-R01-04: debe lanzar error en modo live si faltan credenciales de GitHub App', () => {
+      process.env.NODE_ENV = 'development';
+      process.env.GITHUB_CLIENT_MODE = 'live';
+      delete process.env.GITHUB_APP_ID;
+      delete process.env.GITHUB_APP_PRIVATE_KEY;
+      expect(() => createGitHubApiClient()).toThrow(
+        'se requieren GITHUB_APP_ID y GITHUB_APP_PRIVATE_KEY'
+      );
+    });
+
+    it('TDD-H04A-R01-05: debe prohibir vinculación con cliente mock en entorno de producción', async () => {
+      const prev = process.env.NODE_ENV;
+      try {
+        process.env.NODE_ENV = 'production';
+        await expect(
+          githubService.linkExistingRepository(
+            testProjectDraftId,
+            {
+              repoOwner: 'JMedina255',
+              repoName: 'TraceFlow',
+              installationId: 12345678,
+            },
+            userJoanGestor
+          )
+        ).rejects.toThrow(ForbiddenException);
+      } finally {
+        process.env.NODE_ENV = prev;
+      }
+    });
+
+    it('TDD-H04A-R01-06: debe prohibir validación de acceso con cliente mock en entorno de producción', async () => {
+      // Primero vincular en entorno normal
+      await githubService.linkExistingRepository(
+        testProjectDraftId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+
+      const prev = process.env.NODE_ENV;
+      try {
+        process.env.NODE_ENV = 'production';
+        await expect(
+          githubService.validateIntegrationAccess(testProjectDraftId, userJoanGestor)
+        ).rejects.toThrow(ForbiddenException);
+      } finally {
+        process.env.NODE_ENV = prev;
+      }
+    });
+  });
+
+  // ==========================================================================
+  // H04A-R02: Aislamiento estricto de instalaciones GitHub por organización
+  // ==========================================================================
+  describe('H04A-R02: Aislamiento de instalaciones GitHub por organización', () => {
+    it('TDD-H04A-R02-01: debe rechazar consulta de repositorios si la instalación pertenece a otra organización', async () => {
+      // 87654321 no está autorizada para ORG-EXODO
+      await expect(
+        githubService.getAvailableRepositories(testProjectDraftId, 87654321, userJoanGestor)
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('TDD-H04A-R02-02: debe rechazar vinculación si la instalación pertenece a otra organización', async () => {
+      await expect(
+        githubService.linkExistingRepository(
+          testProjectDraftId,
+          {
+            repoOwner: 'otra-org',
+            repoName: 'otro-repo',
+            installationId: 87654321,
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('TDD-H04A-R02-03: debe listar repositorios de la instalación activa por defecto si no se pasa installationId', async () => {
+      const repos = await githubService.getAvailableRepositories(
+        testProjectDraftId,
+        undefined,
+        userJoanGestor
+      );
+      expect(Array.isArray(repos)).toBe(true);
+      expect(repos.length).toBeGreaterThan(0);
+    });
+
+    it('TDD-H04A-R02-04: debe rechazar si la cuenta GitHub de la instalación no coincide con la registrada', async () => {
+      // Agregar instalación mock con login adulterado
+      githubRepo.addMockInstallation({
+        id: 'inst-adulterada',
+        organization_id: 'c0000001-0000-0000-0000-000000000001',
+        installation_id: 99887766,
+        account_login: 'cuenta-falsa',
+        account_type: 'Organization',
+        permissions: { contents: 'read' },
+        status: 'ACTIVE',
+        installed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      githubClient.addMockInstallation({
+        id: 99887766,
+        account: { login: 'cuenta-real', type: 'Organization' },
+        app_id: 1111,
+        target_type: 'Organization',
+        permissions: { contents: 'read' },
+      });
+
+      await expect(
+        githubService.linkExistingRepository(
+          testProjectDraftId,
+          {
+            repoOwner: 'cuenta-real',
+            repoName: 'repo-test',
+            installationId: 99887766,
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  // ==========================================================================
+  // H04A-R03: Unicidad canónica de repositorios numérico github_repo_id
+  // ==========================================================================
+  describe('H04A-R03: Unicidad canónica por github_repo_id inmutable', () => {
+    it('TDD-H04A-R03-01: debe prevenir que dos proyectos vinculen el mismo repositorio aun si fue renombrado en GitHub', async () => {
+      // Proyecto 1 vincula JMedina255/TraceFlow (id: 101010101)
+      await githubService.linkExistingRepository(
+        testProjectDraftId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+
+      // Crear segundo proyecto en borrador
+      const secondProjectId = 'b0000001-0000-0000-0000-000000000030';
+      const defaultOrg = (await orgsRepo.findByCode('ORG-EXODO'))!;
+      (projectsRepo as any).projects.push({
+        id: secondProjectId,
+        code: 'PRJ-TEST-03',
+        name: 'Tercer Proyecto de Prueba',
+        organization_id: defaultOrg.id,
+        status: 'BORRADOR',
+        created_by: userJoanGestor.id,
+        manager_id: userJoanGestor.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      (projectsRepo as any).mockAssignments.push({
+        user_id: userJoanGestor.id,
+        project_id: secondProjectId,
+        assigned_at: new Date().toISOString(),
+      });
+
+      // Simular que en GitHub el repo fue renombrado a TraceFlow-Renamed pero conserva el ID 101010101
+      githubClient.addMockRepository({
+        id: 101010101, // Mismo ID numérico
+        name: 'TraceFlow-Renamed',
+        full_name: 'JMedina255/TraceFlow-Renamed',
+        owner: { login: 'JMedina255' },
+        private: false,
+        visibility: 'public',
+        default_branch: 'main',
+        permissions: { push: true, pull: true, admin: true },
+      });
+
+      // Proyecto 2 intenta vincular el repositorio renombrado
+      await expect(
+        githubService.linkExistingRepository(
+          secondProjectId,
+          {
+            repoOwner: 'JMedina255',
+            repoName: 'TraceFlow-Renamed',
+            installationId: 12345678,
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('TDD-H04A-R03-02: debe permitir revincular un repositorio con el mismo ID tras su desvinculación lógica', async () => {
+      // Proyecto 1 vincula y desvincula
+      await githubService.linkExistingRepository(
+        testProjectDraftId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+      await githubService.unlinkRepository(testProjectDraftId, userJoanGestor);
+
+      // Ahora un segundo proyecto puede vincularlo sin conflicto
+      const secondProjectId = 'b0000001-0000-0000-0000-000000000031';
+      const defaultOrg = (await orgsRepo.findByCode('ORG-EXODO'))!;
+      (projectsRepo as any).projects.push({
+        id: secondProjectId,
+        code: 'PRJ-TEST-31',
+        name: 'Proyecto Revinculación',
+        organization_id: defaultOrg.id,
+        status: 'BORRADOR',
+        created_by: userJoanGestor.id,
+        manager_id: userJoanGestor.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      (projectsRepo as any).mockAssignments.push({
+        user_id: userJoanGestor.id,
+        project_id: secondProjectId,
+        assigned_at: new Date().toISOString(),
+      });
+
+      const linked = await githubService.linkExistingRepository(
+        secondProjectId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+      expect(linked.github_repo_id).toBe(101010101);
+      expect(linked.validation_status).toBe('VALIDATED');
+    });
+  });
+
+  // ==========================================================================
+  // H04A-R04: Sincronización atómica de estado, validación de rama y auditoría
+  // ==========================================================================
+  describe('H04A-R04: Sincronización atómica y verificación de rama', () => {
+    it('TDD-H04A-R04-01: debe rechazar vinculación si la rama especificada no existe en GitHub', async () => {
+      await expect(
+        githubService.linkExistingRepository(
+          testProjectDraftId,
+          {
+            repoOwner: 'JMedina255',
+            repoName: 'TraceFlow',
+            installationId: 12345678,
+            defaultBranch: 'rama-inexistente',
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('TDD-H04A-R04-02: debe actualizar atómicamente project_setup.github_completed a false y auditar GITHUB_INTEGRATION_DEGRADED al degradar acceso', async () => {
+      // 1. Vincular
+      await githubService.linkExistingRepository(
+        testProjectDraftId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+
+      const setupBefore = await planningRepo.findSetupByProjectId(testProjectDraftId);
+      expect(setupBefore?.github_completed).toBe(true);
+
+      // 2. Degradar permisos en GitHub
+      githubClient.setRepoPermissions('JMedina255', 'TraceFlow', {
+        push: false,
+        pull: true,
+        admin: false,
+      });
+
+      // 3. Revalidar acceso
+      const degraded = await githubService.validateIntegrationAccess(
+        testProjectDraftId,
+        userJoanGestor
+      );
+      expect(degraded.validation_status).toBe('PERMISSION_DENIED');
+
+      // 4. Verificar sincronización atómica: github_completed debe ser false
+      const setupAfter = await planningRepo.findSetupByProjectId(testProjectDraftId);
+      expect(setupAfter?.github_completed).toBe(false);
+
+      // 5. Verificar auditoría DEGRADED
+      const auditChain = auditService.getAuditChain();
+      const degradedEvent = auditChain.find((e) => e.eventCode === 'GITHUB_INTEGRATION_DEGRADED');
+      expect(degradedEvent).toBeDefined();
+      expect(degradedEvent?.resultStatus).toBe('FAILURE');
+    });
+
+    it('TDD-H04A-R04-03: debe recuperar atómicamente project_setup.github_completed a true y auditar GITHUB_INTEGRATION_VERIFIED tras revalidación exitosa', async () => {
+      // 1. Vincular
+      await githubService.linkExistingRepository(
+        testProjectDraftId,
+        {
+          repoOwner: 'JMedina255',
+          repoName: 'TraceFlow',
+          installationId: 12345678,
+        },
+        userJoanGestor
+      );
+
+      // 2. Degradar
+      githubClient.setRepoPermissions('JMedina255', 'TraceFlow', {
+        push: false,
+        pull: true,
+        admin: false,
+      });
+      await githubService.validateIntegrationAccess(testProjectDraftId, userJoanGestor);
+
+      let setup = await planningRepo.findSetupByProjectId(testProjectDraftId);
+      expect(setup?.github_completed).toBe(false);
+
+      // 3. Restaurar permisos en GitHub
+      githubClient.setRepoPermissions('JMedina255', 'TraceFlow', {
+        push: true,
+        pull: true,
+        admin: true,
+      });
+
+      // 4. Revalidar exitosamente
+      const restored = await githubService.validateIntegrationAccess(
+        testProjectDraftId,
+        userJoanGestor
+      );
+      expect(restored.validation_status).toBe('VALIDATED');
+
+      // 5. Verificar que github_completed volvió a ser true
+      setup = await planningRepo.findSetupByProjectId(testProjectDraftId);
+      expect(setup?.github_completed).toBe(true);
+
+      // 6. Verificar auditoría VERIFIED
+      const auditChain = auditService.getAuditChain();
+      const verifiedEvents = auditChain.filter(
+        (e) => e.eventCode === 'GITHUB_INTEGRATION_VERIFIED'
+      );
+      expect(verifiedEvents.length).toBeGreaterThan(0);
+      const lastVerified = verifiedEvents[verifiedEvents.length - 1];
+      expect(lastVerified.resultStatus).toBe('SUCCESS');
+    });
   });
 });

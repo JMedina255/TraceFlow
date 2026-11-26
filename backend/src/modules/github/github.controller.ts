@@ -37,10 +37,10 @@ export class GitHubController {
   @Get('available-repos')
   async getAvailableRepos(
     @Param('id') projectId: string,
-    @Query('installationId') installationId: string,
+    @Query('installationId') installationId: string | undefined,
     @CurrentUser() user: AuthenticatedUser
   ) {
-    const numericId = parseInt(installationId, 10);
+    const numericId = installationId ? parseInt(installationId, 10) : undefined;
     const data = await this.githubService.getAvailableRepositories(projectId, numericId, user);
     return {
       total: data.length,

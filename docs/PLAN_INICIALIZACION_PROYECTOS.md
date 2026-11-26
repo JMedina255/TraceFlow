@@ -813,14 +813,22 @@ flowchart LR
 #### Hito INIT-H04A — Integración Segura de Repositorios GitHub (Implementado y Certificado)
 - **Alcance Técnico Ejecutado:**
   - Precondición de seguridad: corrección de autorización PU-02 en `ProjectPlanningService` para exigir asignación en BD sin bypass general por rol activo.
-  - Migración incremental `202611260003_init_h04a_github_integration.sql` y tabla `traceflow.github_integration` con índice de unicidad parcial `uq_active_github_repo`.
+  - Migración incremental `202611260003_init_h04a_github_integration.sql` y tabla `traceflow.github_integration`.
   - Mínimo privilegio para `traceflow_app` (SELECT, INSERT, UPDATE concedidos; DELETE estrictamente revocado).
   - Generación de Installation Access Tokens (IAT) bajo demanda en memoria con JWT RS256 firmado por clave RSA privada fuera del repositorio (cero tokens ni claves en BD o archivos).
   - Endpoints REST de vinculación (`/github/link`), revalidación (`/github/validate`), desvinculación lógica (`/github/unlink`), consulta (`/github`, `/github/available-repos`) y contrato de borrador (`/github/create-draft`).
   - Sincronización con el asistente de inicialización (`project_setup.github_completed`).
   - Auditoría inmutable SHA-256 (`GITHUB_REPO_LINKED`, `GITHUB_REPO_UNLINKED`).
-  - Script de reversión `202611260003_init_h04a_github_integration_rollback.sql` con salvaguarda PITR ante integraciones activas validadas.
-  - Certificación completa: 18 pruebas unitarias TDD y 15 pruebas físicas en PostgreSQL 16 real (53/53 pruebas físicas certificadas en el servidor).
+  - Script de reversión `202611260003_init_h04a_github_integration_rollback.sql` con salvaguarda PITR ante registros operativos.
+
+#### Hito INIT-H04A-R — Cierre de Seguridad de GitHub App e Integraciones (Remediado, Blindado y Certificado)
+- **Alcance Técnico Ejecutado (5 Remediaciones Obligatorias):**
+  - **H04A-R01 (Eliminación de modo mock implícito y fail-closed):** Prohibición terminante de clientes simulados en producción; fail-closed ante falta de credenciales de GitHub App en modo operativo; creación de factoría `createGitHubApiClient()` con pruebas negativas unitarias.
+  - **H04A-R02 (Aislamiento de instalaciones GitHub por organización):** Migración incremental `202611260004_init_h04a_r_github_security.sql` creando `traceflow.organization_github_installation` (catálogo físico de 31 tablas); rechazo HTTP 403 a solicitudes con instalaciones no asociadas a la organización del proyecto; validación estricta de cuenta propietaria registrada vs remota en GitHub.
+  - **H04A-R03 (Unicidad canónica de repositorios por ID numérico inmutable):** Índice de unicidad parcial `uq_active_github_repo_id` sobre `github_repo_id` y `uq_active_github_repo_name` sobre `(LOWER(repo_owner), LOWER(repo_name))` para repositorios activos (`validation_status != 'UNLINKED'`), impidiendo duplicidad de enlaces activos aun si el repositorio es renombrado en GitHub.
+  - **H04A-R04 (Sincronización transaccional de estado y validación de referencias Git):** Sincronización atómica en transacción única en `validateIntegrationAccess()`: si se revocan permisos o se pierde acceso, `validation_status` se degrada, `project_setup.github_completed = false` y se emite evento `GITHUB_INTEGRATION_DEGRADED`; recuperación a `true` con `GITHUB_INTEGRATION_VERIFIED`; validación de ramas Git reales vía `getBranch()`.
+  - **H04A-R05 (Salvaguardas de Rollback y Protección de Datos):** Scripts de reversión `202611260004` y `202611260003` blindados para abortar ante registros operativos sin importar estado (`UNLINKED`, etc.); forzado exclusivo con `SET LOCAL traceflow.allow_force_h04_rollback = 'true'` en entornos de prueba descartables.
+  - **Certificación Integral:** 33 pruebas unitarias TDD y 19 pruebas físicas en PostgreSQL 16 real 100% aprobadas (total 57/57 pruebas en la suite de certificación física).
 
 #### Hito INIT-H04B — Webhooks, Procesamiento Asíncrono y Sincronización Git (Siguiente Incremento)
 - **Alcance Técnico:**

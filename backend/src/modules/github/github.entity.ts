@@ -59,3 +59,32 @@ export interface GitHubRepoDetails {
   html_url: string;
   description?: string | null;
 }
+
+export interface OrganizationGitHubInstallationEntity {
+  id: string;
+  organization_id: string;
+  installation_id: number;
+  account_login: string;
+  account_type: 'Organization' | 'User';
+  target_id?: number | null;
+  permissions: Record<string, string>;
+  repository_selection?: 'all' | 'selected';
+  status: 'ACTIVE' | 'SUSPENDED' | 'REVOKED';
+  installed_by?: string | null;
+  installed_at: string;
+  updated_at: string;
+}
+
+export interface GitHubInstallationDetails {
+  id: number;
+  account: {
+    login: string;
+    id?: number;
+    type?: 'Organization' | 'User';
+  };
+  repository_selection?: 'all' | 'selected';
+  permissions?: Record<string, string>;
+  html_url?: string;
+  app_id?: number;
+  target_type?: string;
+}

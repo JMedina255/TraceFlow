@@ -1,18 +1,22 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import { Injectable, Logger } from '@nestjs/common';
-import type { GitHubRepoDetails } from './github.entity.js';
+import type { GitHubRepoDetails, GitHubInstallationDetails } from './github.entity.js';
 
 export interface IGitHubApiClient {
+  readonly isMock: boolean;
   generateAppJwt(): string;
   getInstallationAccessToken(installationId: number): Promise<{ token: string; expiresAt: string }>;
+  getInstallation(installationId: number): Promise<GitHubInstallationDetails>;
   listInstallationRepositories(installationId: number): Promise<GitHubRepoDetails[]>;
   getRepository(owner: string, repo: string, installationId?: number): Promise<GitHubRepoDetails>;
+  getBranch(owner: string, repo: string, branch: string, installationId?: number): Promise<{ name: string; sha: string }>;
   validateRepoDraft(dto: { name: string; owner: string; visibility: string }): { valid: boolean; errors?: string[] };
 }
 
 @Injectable()
 export class HttpGitHubApiClient implements IGitHubApiClient {
+  readonly isMock = false;
   private readonly logger = new Logger(HttpGitHubApiClient.name);
   private readonly tokenCache = new Map<number, { token: string; expiresAt: number }>();
 
@@ -97,6 +101,79 @@ export class HttpGitHubApiClient implements IGitHubApiClient {
     return {
       token: data.token,
       expiresAt: data.expires_at,
+    };
+  }
+
+  async getInstallation(installationId: number): Promise<GitHubInstallationDetails> {
+    const jwt = this.generateAppJwt();
+    const url = `https://api.github.com/app/installations/${installationId}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${jwt}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      this.logger.error(`Error al consultar instalación ${installationId}: ${errText}`);
+      const error: any = new Error(`[GitHubApiError ${response.status}] Instalación ${installationId} no encontrada`);
+      error.status = response.status;
+      error.code = response.status === 404 ? 'INSTALLATION_NOT_FOUND' : 'GITHUB_API_ERROR';
+      throw error;
+    }
+
+    const data: any = await response.json();
+    return {
+      id: data.id,
+      account: {
+        login: data.account?.login || 'unknown',
+        id: data.account?.id || 0,
+        type: data.account?.type === 'User' ? 'User' : 'Organization',
+      },
+      repository_selection: data.repository_selection || 'selected',
+      permissions: data.permissions || {},
+      html_url: data.html_url || '',
+    };
+  }
+
+  async getBranch(
+    owner: string,
+    repo: string,
+    branch: string,
+    installationId?: number
+  ): Promise<{ name: string; sha: string }> {
+    if (!installationId) {
+      throw new Error('[GitHubError] installationId obligatorio para consultar ramas en repositorios.');
+    }
+    const { token } = await this.getInstallationAccessToken(installationId);
+    const url = `https://api.github.com/repos/${owner}/${repo}/branches/${encodeURIComponent(branch)}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `token ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      this.logger.error(`Rama '${branch}' no encontrada en '${owner}/${repo}': ${errText}`);
+      const error: any = new Error(
+        `[GitHubApiError ${response.status}] Rama '${branch}' no encontrada en '${owner}/${repo}'`
+      );
+      error.status = response.status;
+      error.code = response.status === 404 ? 'BRANCH_NOT_FOUND' : 'GITHUB_API_ERROR';
+      throw error;
+    }
+
+    const data: any = await response.json();
+    return {
+      name: data.name,
+      sha: data.commit?.sha || '',
     };
   }
 
@@ -213,6 +290,25 @@ export class HttpGitHubApiClient implements IGitHubApiClient {
 
 @Injectable()
 export class MockGitHubApiClient implements IGitHubApiClient {
+  readonly isMock = true;
+
+  private mockInstallations: GitHubInstallationDetails[] = [
+    {
+      id: 12345678,
+      account: { login: 'exodo-org', id: 501, type: 'Organization' },
+      repository_selection: 'selected',
+      permissions: { issues: 'write', contents: 'write', pull_requests: 'write', metadata: 'read' },
+      html_url: 'https://github.com/organizations/exodo-org/settings/installations/12345678',
+    },
+    {
+      id: 87654321,
+      account: { login: 'otra-org', id: 999, type: 'Organization' },
+      repository_selection: 'selected',
+      permissions: { issues: 'write', contents: 'write', pull_requests: 'write', metadata: 'read' },
+      html_url: 'https://github.com/organizations/otra-org/settings/installations/87654321',
+    },
+  ];
+
   private mockRepositories: GitHubRepoDetails[] = [
     {
       id: 101010101,
@@ -303,6 +399,47 @@ export class MockGitHubApiClient implements IGitHubApiClient {
     };
   }
 
+  async getInstallation(installationId: number): Promise<GitHubInstallationDetails> {
+    if (installationId <= 0) {
+      const error: any = new Error(`Instalación ${installationId} inválida.`);
+      error.status = 400;
+      error.code = 'INVALID_INSTALLATION_ID';
+      throw error;
+    }
+    const found = this.mockInstallations.find((inst) => inst.id === installationId);
+    if (!found) {
+      const error: any = new Error(`[GitHubApiError 404] Instalación GitHub '${installationId}' no encontrada.`);
+      error.code = 'INSTALLATION_NOT_FOUND';
+      error.status = 404;
+      throw error;
+    }
+    return { ...found };
+  }
+
+  async getBranch(
+    owner: string,
+    repo: string,
+    branch: string,
+    _installationId?: number
+  ): Promise<{ name: string; sha: string }> {
+    const repoDetails = await this.getRepository(owner, repo, _installationId);
+    if (
+      branch === repoDetails.default_branch ||
+      ['main', 'develop', 'staging', 'master'].includes(branch)
+    ) {
+      return {
+        name: branch,
+        sha: 'e10adc3949ba59abbe56e057f20f883e12345678',
+      };
+    }
+    const error: any = new Error(
+      `[GitHubApiError 404] Rama '${branch}' no encontrada en el repositorio '${owner}/${repo}'.`
+    );
+    error.code = 'BRANCH_NOT_FOUND';
+    error.status = 404;
+    throw error;
+  }
+
   async listInstallationRepositories(installationId: number): Promise<GitHubRepoDetails[]> {
     if (installationId === 999999) {
       // Simula instalación sin repositorios asignados o permisos revocados
@@ -345,6 +482,10 @@ export class MockGitHubApiClient implements IGitHubApiClient {
   }
 
   // Métodos de apoyo para pruebas TDD
+  addMockInstallation(installation: GitHubInstallationDetails): void {
+    this.mockInstallations.push(installation);
+  }
+
   addMockRepository(repo: GitHubRepoDetails): void {
     this.mockRepositories.push(repo);
   }

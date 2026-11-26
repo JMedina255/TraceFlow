@@ -238,6 +238,13 @@ export async function resetAndMigrateRealPostgres(
       await adminDbClient.query(migH04A);
       appliedMigrations.push('202611260003_init_h04a_github_integration.sql');
     }
+
+    // Paso 8: Migración INIT-H04A-R (asociación de instalaciones, unicidad canónica por github_repo_id)
+    if (opts.targetMigration !== 'H02' && opts.targetMigration !== 'H03' && opts.targetMigration !== 'H04A') {
+      const migH04AR = fs.readFileSync(path.join(migrationsDir, '202611260004_init_h04a_r_github_security.sql'), 'utf8');
+      await adminDbClient.query(migH04AR);
+      appliedMigrations.push('202611260004_init_h04a_r_github_security.sql');
+    }
   } finally {
     await adminDbClient.end();
   }

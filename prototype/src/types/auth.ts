@@ -10,7 +10,9 @@ export type CanonicalRoleId =
   | 'PU-04'
   | 'PU-05'
   | 'PU-06'
-  | 'PU-07';
+  | 'PU-07'
+  | 'PU-08'
+  | 'PU-09';
 
 export type CanonicalRole =
   | 'SOLICITANTE'
@@ -19,7 +21,9 @@ export type CanonicalRole =
   | 'CCB'
   | 'BIBLIOTECARIO'
   | 'DESARROLLADOR'
-  | 'CALIDAD';
+  | 'CALIDAD'
+  | 'ADMIN_SISTEMA'
+  | 'JEFE_PROYECTO';
 
 export interface RoleDefinition {
   id: CanonicalRoleId;
@@ -79,6 +83,20 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
     technicalLevel: 'Medio',
     description: 'Ejecuta pruebas en Biblioteca de Soporte y emite Certificaciones de Conformidad.',
   },
+  'PU-08': {
+    id: 'PU-08',
+    role: 'ADMIN_SISTEMA',
+    label: 'Administrador del Sistema',
+    technicalLevel: 'Experto',
+    description: 'Gestiona usuarios, estados de cuentas, organizaciones, invitaciones y autorizaciones para crear proyectos.',
+  },
+  'PU-09': {
+    id: 'PU-09',
+    role: 'JEFE_PROYECTO',
+    label: 'Jefe de Proyecto',
+    technicalLevel: 'Avanzado',
+    description: 'Crea e inicializa proyectos cuando está autorizado, configura metodología y conforma equipos.',
+  },
 };
 
 /**
@@ -86,6 +104,7 @@ export const CANONICAL_ROLES: Record<CanonicalRoleId, RoleDefinition> = {
  */
 export interface UserAccount {
   id: string; // Ej. "USR-001"
+  code?: string;
   username: string; // Ej. "jmedina"
   fullName: string;
   email: string;
@@ -97,6 +116,9 @@ export interface UserAccount {
   assignedRoleIds: CanonicalRoleId[]; // Lista de roles que tiene autorizados ejercer
   primaryRoleId: CanonicalRoleId; // Rol canónico principal por defecto
   assignedProjectIds: string[]; // Proyectos autorizados para este usuario (multitenant)
+  canCreateProjects?: boolean;
+  githubUsername?: string | null;
+  githubIdentityStatus?: string;
 }
 
 /**

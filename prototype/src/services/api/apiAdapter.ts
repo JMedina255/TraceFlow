@@ -2,7 +2,14 @@
  * Adaptador Unificado de Servicios: Mock Local vs API Backend Real NestJS
  * Controlado mediante la variable VITE_SERVICE_MODE ('mock' | 'api')
  */
-import { SERVICE_MODE, authApi, projectsApi, rfcsApi } from './apiClient';
+import {
+  SERVICE_MODE,
+  authApi,
+  projectsApi,
+  rfcsApi,
+  adminApi,
+  organizationsApi,
+} from './apiClient';
 import { authService } from '../auth.service';
 import { projectService } from '../project.service';
 import { rfcService } from '../rfc.service';
@@ -121,4 +128,8 @@ export const traceFlowAdapter = {
       return rfcService.create(dto, user);
     },
   },
+
+  // Flujo 4: Administración del Sistema (PU-08)
+  admin: adminApi,
+  organizations: organizationsApi,
 };

@@ -5,7 +5,15 @@ export type CanonicalRoleId =
   | 'PU-04' // Comité de Control de Cambios (CCB)
   | 'PU-05' // Bibliotecario / Administrador SCM
   | 'PU-06' // Desarrollador / Ingeniero de Software
-  | 'PU-07'; // Calidad / Testing (QA)
+  | 'PU-07' // Calidad / Testing (QA)
+  | 'PU-08' // Administrador del Sistema
+  | 'PU-09'; // Jefe de Proyecto
+
+export type UserAccountStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+export type GitHubIdentityStatus = 'UNVERIFIED' | 'DECLARED' | 'VERIFIED';
+export type InvitationChannel = 'EMAIL' | 'GITHUB';
+export type InvitationStatus = 'PENDING' | 'CANCELLED' | 'EXPIRED' | 'ACCEPTED';
+export type RoleAssignmentStatus = 'ACTIVE' | 'INACTIVE' | 'REVOKED';
 
 export type RFCStatus =
   | 'REGISTRADA'
@@ -83,4 +91,8 @@ export interface AuthenticatedUser {
   activeRoleId: CanonicalRoleId;
   allowedRoleIds: CanonicalRoleId[];
   assignedProjectIds: string[]; // Códigos de proyecto ej. PRJ-001
+  canCreateProjects?: boolean;
+  githubUsername?: string | null;
+  githubIdentityStatus?: GitHubIdentityStatus;
+  activeProjectId?: string | null;
 }

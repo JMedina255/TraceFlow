@@ -39,20 +39,23 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
   const [showProjectMenu, setShowProjectMenu] = useState(false);
 
   // Filtrar proyectos según los asignados a la cuenta del usuario actual (Aislamiento de acceso)
+  const isSystemAdmin = activeRoleId === 'PU-08';
   const userAssignedProjectIds = currentUser?.assignedProjectIds || [];
-  const authorizedProjects = projects.filter((p) =>
-    userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id)
-  );
+  const authorizedProjects = isSystemAdmin
+    ? []
+    : projects.filter((p) =>
+        userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id) || userAssignedProjectIds.includes(p.code)
+      );
 
   // Asegurar que el proyecto activo pertenezca a los proyectos autorizados del usuario
   useEffect(() => {
-    if (authorizedProjects.length > 0 && !authorizedProjects.some((p) => p.id === activeProject.id)) {
+    if (!isSystemAdmin && authorizedProjects.length > 0 && activeProject && !authorizedProjects.some((p) => p.id === activeProject.id)) {
       setActiveProject(authorizedProjects[0].id);
     }
-  }, [authorizedProjects, activeProject.id, setActiveProject]);
+  }, [isSystemAdmin, authorizedProjects, activeProject, setActiveProject]);
 
   // Derivar notificaciones contextuales del proyecto activo
-  const projectRfcs = getRfcsByProject(activeProject.id);
+  const projectRfcs = !isSystemAdmin && activeProject ? getRfcsByProject(activeProject.id) : [];
   const pendingRfcs = projectRfcs.filter((r) =>
     ['REGISTRADA', 'EN_ANALISIS_TECNICO', 'EN_EVALUACION', 'EN_PRUEBAS'].includes(r.status)
   );
@@ -97,7 +100,13 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Separador */}
         <div className="hidden lg:block h-6 w-px bg-white/20 mx-1" />
 
-        {/* Selector Interactivo de Proyecto Activo (Aislamiento Autorizado) */}
+        {/* Selector Interactivo de Proyecto Activo (o Contexto Global para PU-08) */}
+        {isSystemAdmin ? (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-upt-primary/70 border border-white/15 text-xs text-white">
+            <Shield className="w-3.5 h-3.5 text-upt-yellow shrink-0" />
+            <span className="font-medium">Ámbito Global de Plataforma</span>
+          </div>
+        ) : (
         <div className="relative">
           <button
             onClick={() => setShowProjectMenu(!showProjectMenu)}
@@ -108,11 +117,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
             <div className="hidden sm:block">
               <span className="text-blue-200 text-[11px] mr-1">Proyecto:</span>
               <span className="font-medium text-white truncate max-w-[140px] inline-block align-bottom">
-                {activeProject.name}
+                {activeProject?.name || 'Sin proyecto'}
               </span>
             </div>
             <span className="font-mono text-[10px] text-blue-100 bg-upt-institutional px-1 py-0.5 rounded border border-white/10">
-              {activeProject.code}
+              {activeProject?.code || 'N/A'}
             </span>
             <ChevronDown className="w-3 h-3 text-blue-200" />
           </button>
@@ -128,7 +137,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               </div>
               <div className="space-y-1">
                 {authorizedProjects.map((proj) => {
-                  const isSelected = proj.id === activeProject.id;
+                  const isSelected = proj.id === activeProject?.id;
                   return (
                     <button
                       key={proj.id}
@@ -161,6 +170,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Lado Derecho: Notificaciones + Perfil de Sesión */}

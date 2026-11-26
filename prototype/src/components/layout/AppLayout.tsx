@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Topbar } from './Topbar';
 import { Sidebar } from './Sidebar';
 import { Breadcrumb } from './Breadcrumb';
+import { traceFlowAdapter } from '../../services/api/apiAdapter';
 
 export const AppLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -38,7 +39,7 @@ export const AppLayout: React.FC = () => {
           <div className="border-b border-upt-border bg-upt-surface px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-xs">
             <Breadcrumb />
             <div className="hidden sm:flex items-center gap-2 text-[11px] text-upt-muted font-mono">
-              <span>Modo Demostración</span>
+              <span>{traceFlowAdapter.isApiMode() ? 'API PostgreSQL Activa' : 'Modo Demostración'}</span>
               <span className="w-2 h-2 rounded-full bg-upt-success" />
             </div>
           </div>

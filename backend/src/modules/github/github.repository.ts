@@ -19,6 +19,32 @@ export class GitHubRepository {
   private mockEvents: GitHubEventEntity[] = [];
   private mockPathHistories: ConfigItemPathHistoryEntity[] = [];
   private mockConfigItems: any[] = [];
+  private mockUsers: any[] = [
+    {
+      id: 'a0000001-0000-0000-0000-000000000001',
+      code: 'USR-001',
+      username: 'jmedina',
+      email: 'jmedina@exodo.pe',
+      status: 'ACTIVE',
+      assigned_role_codes: ['PU-02', 'PU-01', 'PU-06'],
+      projectRoles: {
+        'b0000001-0000-0000-0000-000000000001': ['PU-02', 'PU-06'],
+        'PRJ-001': ['PU-02', 'PU-06'],
+      },
+    },
+    {
+      id: 'a0000001-0000-0000-0000-000000000002',
+      code: 'USR-002',
+      username: 'mrodriguez',
+      email: 'mrodriguez@exodo.pe',
+      status: 'ACTIVE',
+      assigned_role_codes: ['PU-06'],
+      projectRoles: {
+        'b0000001-0000-0000-0000-000000000001': ['PU-06'],
+        'PRJ-001': ['PU-06'],
+      },
+    },
+  ];
   private mockRfcs: any[] = [
     {
       id: 'd0000001-0000-0000-0000-000000000001',
@@ -511,6 +537,7 @@ export class GitHubRepository {
       max_attempts: Number(row.max_attempts),
       correlation_status: row.correlation_status || 'NONE',
       locked_by: row.locked_by || null,
+      claim_token: row.claim_token || null,
       locked_at: row.locked_at ? new Date(row.locked_at).toISOString() : null,
       lease_expires_at: row.lease_expires_at ? new Date(row.lease_expires_at).toISOString() : null,
     };
@@ -633,8 +660,8 @@ export class GitHubRepository {
   }
 
   /**
-   * H04B-R04: Reclamo transaccional seguro de eventos utilizando FOR UPDATE SKIP LOCKED
-   * con control de lease / tiempo de expiración y concurrencia garantizada.
+   * H04B-R04 / H04B-C: Reclamo transaccional seguro de eventos utilizando FOR UPDATE SKIP LOCKED
+   * con claim_token criptográfico, control de lease y concurrencia garantizada.
    */
   async claimEvents(
     workerId: string,
@@ -656,6 +683,7 @@ export class GitHubRepository {
         UPDATE traceflow.github_event e
         SET processing_status = 'PROCESSING',
             locked_by = $2,
+            claim_token = gen_random_uuid(),
             locked_at = NOW(),
             lease_expires_at = NOW() + ($3 || ' seconds')::interval,
             attempts = e.attempts + 1,
@@ -687,6 +715,7 @@ export class GitHubRepository {
     for (const e of claimable) {
       e.processing_status = 'PROCESSING';
       e.locked_by = workerId;
+      e.claim_token = crypto.randomUUID();
       e.locked_at = new Date(now).toISOString();
       e.lease_expires_at = leaseExpiry;
       e.attempts += 1;
@@ -696,11 +725,15 @@ export class GitHubRepository {
   }
 
   /**
-   * H04B-R04: Liberación segura del evento tras completarlo o registrar fallo final.
+   * H04B-R04 / H04B-C: Liberación atómica segura del evento con verificación estricta de propiedad
+   * del lease (locked_by + claim_token). Si el lease expiró o fue transferido a otro trabajador,
+   * la operación falla de manera segura retornando null.
    */
   async releaseEvent(
     id: string,
     status: GitHubEventProcessingStatus,
+    workerId?: string | null,
+    claimToken?: string | null,
     errorMessage?: string | null,
     correlationStatus?: GitHubEventCorrelationStatus,
     client?: pg.PoolClient | null
@@ -713,30 +746,75 @@ export class GitHubRepository {
             error_message = $3,
             correlation_status = COALESCE($4, correlation_status),
             locked_by = NULL,
+            claim_token = NULL,
             lease_expires_at = NULL
             ${processedAtClause}
         WHERE id = $1
+          AND ($5::text IS NULL OR locked_by IS NULL OR locked_by = $5)
+          AND ($6::uuid IS NULL OR claim_token IS NULL OR claim_token = $6)
         RETURNING *;
       `;
       const res = client
-        ? await client.query(sql, [id, status, errorMessage || null, correlationStatus || null])
-        : await this.db.query<GitHubEventEntity>(sql, [id, status, errorMessage || null, correlationStatus || null]);
+        ? await client.query(sql, [id, status, errorMessage || null, correlationStatus || null, workerId || null, claimToken || null])
+        : await this.db.query<GitHubEventEntity>(sql, [id, status, errorMessage || null, correlationStatus || null, workerId || null, claimToken || null]);
       return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
     }
 
     const item = this.mockEvents.find((e) => e.id === id);
     if (!item) return null;
+    if (workerId && item.locked_by && item.locked_by !== workerId) {
+      return null;
+    }
+    if (claimToken && item.claim_token && item.claim_token !== claimToken) {
+      return null;
+    }
     item.processing_status = status;
     item.error_message = errorMessage || null;
     if (correlationStatus) {
       item.correlation_status = correlationStatus;
     }
     item.locked_by = null;
+    item.claim_token = null;
     item.lease_expires_at = null;
     if (status === 'PROCESSED') {
       item.processed_at = new Date().toISOString();
     }
     return item;
+  }
+
+  /**
+   * H04B-C: Libera todos los leases retenidos por un trabajador específico (graceful shutdown).
+   */
+  async releaseWorkerLeases(
+    workerId: string,
+    client?: pg.PoolClient | null
+  ): Promise<number> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.github_event
+        SET locked_by = NULL,
+            claim_token = NULL,
+            lease_expires_at = NULL,
+            processing_status = 'PENDING'
+        WHERE locked_by = $1 AND processing_status = 'PROCESSING';
+      `;
+      const res = client
+        ? await client.query(sql, [workerId])
+        : await this.db.query(sql, [workerId]);
+      return res.rowCount || 0;
+    }
+
+    let count = 0;
+    for (const item of this.mockEvents) {
+      if (item.locked_by === workerId && item.processing_status === 'PROCESSING') {
+        item.locked_by = null;
+        item.claim_token = null;
+        item.lease_expires_at = null;
+        item.processing_status = 'PENDING';
+        count++;
+      }
+    }
+    return count;
   }
 
   async findPendingEvents(
@@ -767,7 +845,7 @@ export class GitHubRepository {
     errorMessage?: string | null,
     client?: pg.PoolClient | null
   ): Promise<GitHubEventEntity | null> {
-    return this.releaseEvent(id, status, errorMessage, undefined, client);
+    return this.releaseEvent(id, status, null, null, errorMessage, undefined, client);
   }
 
   async incrementEventAttempts(
@@ -1175,6 +1253,86 @@ export class GitHubRepository {
         };
       }
 
+      // H04B-C: Comprobar bloqueo sync_lock activo coherente con la ECN y el ECS
+      if (!row.sync_lock_id || row.sync_lock_status !== 'ACTIVE') {
+        return {
+          authorized: false,
+          rfcId: row.rfc_id,
+          rfcCode: row.rfc_code,
+          changeOrderId: row.change_order_id,
+          configItemId: row.config_item_id,
+          reason: `La RFC '${row.rfc_code}' y Orden de Cambio '${row.change_order_code || row.change_order_id}' no disponen de un bloqueo sync_lock activo para el ECS.`,
+          status: 'PENDIENTE_DE_CORRELACION',
+        };
+      }
+
+      // H04B-C: Comprobar identidad del ejecutor y rol activo en el proyecto
+      if (authorEmail) {
+        const userSql = `
+          SELECT u.id, u.email, u.username, u.status,
+            (SELECT COUNT(*) FROM traceflow.project_team_role ptr
+             JOIN traceflow.app_role ar ON ar.id = ptr.role_id
+             WHERE ptr.user_id = u.id
+               AND (ptr.project_id::text = $2::text OR ptr.project_id::text = (SELECT id::text FROM traceflow.project WHERE code = $2::text OR id::text = $2::text LIMIT 1))
+               AND ptr.status = 'ACTIVE'
+               AND ar.code IN ('PU-06', 'PU-02', 'PU-03', 'PU-05')) AS team_role_count
+          FROM traceflow.app_user u
+          WHERE (LOWER(u.email) = LOWER($1) OR LOWER(u.username) = LOWER($1))
+            AND u.status = 'ACTIVE'
+          LIMIT 1;
+        `;
+        const userRes = client
+          ? await client.query(userSql, [authorEmail, projectId])
+          : await this.db.query(userSql, [authorEmail, projectId]);
+
+        if (userRes.rows.length === 0) {
+          return {
+            authorized: false,
+            rfcId: row.rfc_id,
+            rfcCode: row.rfc_code,
+            reason: `El autor del commit ('${authorEmail}') no corresponde a ningún usuario activo verificado en TraceFlow.`,
+            status: 'RECHAZADO',
+          };
+        }
+
+        const authorUser = userRes.rows[0];
+        const isAssignedDev = authorUser.id === row.assigned_developer_id;
+        const hasTeamRole = Number(authorUser.team_role_count) > 0;
+        if (!isAssignedDev && !hasTeamRole) {
+          return {
+            authorized: false,
+            rfcId: row.rfc_id,
+            rfcCode: row.rfc_code,
+            reason: `El autor del commit ('${authorEmail}') no cuenta con rol de desarrollo ni asignación técnica activa en el proyecto '${projectId}'.`,
+            status: 'RECHAZADO',
+          };
+        }
+      }
+
+      // H04B-C: Comprobar correspondencia de archivos modificados con el ECS objetivo de la ECN
+      if (row.config_item_id && changedFilePaths && changedFilePaths.length > 0) {
+        const ecsSql = `
+          SELECT id, code, file_path FROM traceflow.config_item
+          WHERE (project_id::text = $1::text OR project_id::text = (SELECT id::text FROM traceflow.project WHERE code = $1::text OR id::text = $1::text LIMIT 1))
+            AND file_path = ANY($2::text[]);
+        `;
+        const ecsRes = client
+          ? await client.query(ecsSql, [projectId, changedFilePaths])
+          : await this.db.query(ecsSql, [projectId, changedFilePaths]);
+
+        if (ecsRes.rows.length > 0 && !ecsRes.rows.some((ci: any) => ci.id === row.config_item_id)) {
+          return {
+            authorized: false,
+            rfcId: row.rfc_id,
+            rfcCode: row.rfc_code,
+            changeOrderId: row.change_order_id,
+            configItemId: row.config_item_id,
+            reason: `Discrepancia de ECS: La Orden de Cambio está emitida para el ECS '${row.config_item_code || row.config_item_id}', pero el commit modifica el ECS '${ecsRes.rows[0].code}'.`,
+            status: 'RECHAZADO',
+          };
+        }
+      }
+
       return {
         authorized: true,
         rfcId: row.rfc_id,
@@ -1252,6 +1410,80 @@ export class GitHubRepository {
         reason: `La RFC '${matchedRfc.code}' no tiene una orden de cambio activa.`,
         status: 'PENDIENTE_DE_CORRELACION',
       };
+    }
+
+    // H04B-C: Comprobar bloqueo sync_lock activo coherente con la ECN y el ECS
+    const activeLock = this.mockSyncLocks.find((l) => l.change_order_id === matchedCo.id && l.status === 'ACTIVE');
+    if (!activeLock) {
+      return {
+        authorized: false,
+        rfcId: matchedRfc.id,
+        rfcCode: matchedRfc.code,
+        changeOrderId: matchedCo.id,
+        configItemId: matchedCo.ecs_id || matchedRfc.target_ecs_id,
+        reason: `La RFC '${matchedRfc.code}' y Orden de Cambio '${matchedCo.code || matchedCo.id}' no disponen de un bloqueo sync_lock activo para el ECS.`,
+        status: 'PENDIENTE_DE_CORRELACION',
+      };
+    }
+
+    // H04B-C: Comprobar identidad del ejecutor y rol activo en el proyecto
+    if (authorEmail) {
+      const authorUser = this.mockUsers.find(
+        (u) =>
+          u.status === 'ACTIVE' &&
+          (u.email.toLowerCase() === authorEmail.toLowerCase() || u.username.toLowerCase() === authorEmail.toLowerCase())
+      );
+      if (!authorUser) {
+        return {
+          authorized: false,
+          rfcId: matchedRfc.id,
+          rfcCode: matchedRfc.code,
+          reason: `El autor del commit ('${authorEmail}') no corresponde a ningún usuario activo verificado en TraceFlow.`,
+          status: 'RECHAZADO',
+        };
+      }
+
+      const isAssignedDev = authorUser.id === matchedCo.assigned_developer_id;
+      const projectRoles = authorUser.projectRoles?.[projectId] || authorUser.projectRoles?.['PRJ-001'] || authorUser.assigned_role_codes || [];
+      const hasTeamRole = projectRoles.some((r: string) => ['PU-06', 'PU-02', 'PU-03', 'PU-05'].includes(r));
+      if (!isAssignedDev && !hasTeamRole) {
+        return {
+          authorized: false,
+          rfcId: matchedRfc.id,
+          rfcCode: matchedRfc.code,
+          reason: `El autor del commit ('${authorEmail}') no cuenta con asignación activa de desarrollo en el proyecto.`,
+          status: 'RECHAZADO',
+        };
+      }
+    }
+
+    // H04B-C: Comprobar correspondencia de archivos modificados con el ECS objetivo de la ECN
+    if (matchedCo.ecs_id && changedFilePaths && changedFilePaths.length > 0) {
+      const matchesAuthEcs = this.mockConfigItems.some(
+        (c) =>
+          (c.project_id === projectId || (projectId === 'b0000001-0000-0000-0000-000000000001' && c.project_id === 'PRJ-001')) &&
+          changedFilePaths.includes(c.file_path) &&
+          c.id === matchedCo.ecs_id
+      );
+      if (!matchesAuthEcs) {
+        const otherEcs = this.mockConfigItems.find(
+          (c) =>
+            (c.project_id === projectId || (projectId === 'b0000001-0000-0000-0000-000000000001' && c.project_id === 'PRJ-001')) &&
+            changedFilePaths.includes(c.file_path) &&
+            c.id !== matchedCo.ecs_id
+        );
+        if (otherEcs) {
+          return {
+            authorized: false,
+            rfcId: matchedRfc.id,
+            rfcCode: matchedRfc.code,
+            changeOrderId: matchedCo.id,
+            configItemId: matchedCo.ecs_id,
+            reason: `Discrepancia de ECS: La Orden de Cambio está emitida para el ECS '${matchedCo.ecs_id}', pero el commit modifica el ECS '${otherEcs.code || otherEcs.id}'.`,
+            status: 'RECHAZADO',
+          };
+        }
+      }
     }
 
     return {

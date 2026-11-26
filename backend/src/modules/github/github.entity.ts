@@ -112,6 +112,7 @@ export interface GitHubEventEntity {
   locked_by?: string | null;
   locked_at?: string | null;
   lease_expires_at?: string | null;
+  claim_token?: string | null;
   last_attempt_at?: string | null;
   processed_at?: string | null;
   error_message?: string | null;

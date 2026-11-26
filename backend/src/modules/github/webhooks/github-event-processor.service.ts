@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto';
-import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { GitHubRepository } from '../github.repository.js';
 import { AuditService } from '../../audit/audit.service.js';
 import { IGitHubApiClient } from '../github-api.client.js';
@@ -10,10 +10,12 @@ import type {
 } from '../github.entity.js';
 
 @Injectable()
-export class GitHubEventProcessorService implements OnModuleInit {
+export class GitHubEventProcessorService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(GitHubEventProcessorService.name);
   readonly workerId: string = `worker-${process.pid}-${crypto.randomUUID().substring(0, 8)}`;
   private isWorking = false;
+  private pollingTimer: NodeJS.Timeout | null = null;
+  private isDestroyed = false;
 
   constructor(
     @Inject(GitHubRepository) private readonly githubRepo: GitHubRepository,
@@ -26,6 +28,44 @@ export class GitHubEventProcessorService implements OnModuleInit {
     this.triggerWorker().catch((err) => {
       this.logger.warn(`Recuperación inicial de eventos: ${err.message}`);
     });
+    // H04B-C: Temporizador continuo de recuperación periódica
+    this.startPolling(5000);
+  }
+
+  async onModuleDestroy() {
+    this.isDestroyed = true;
+    this.stopPolling();
+    try {
+      const released = await this.githubRepo.releaseWorkerLeases(this.workerId);
+      if (released > 0) {
+        this.logger.log(`Trabajador ${this.workerId} liberó ${released} leases retenidos al apagarse.`);
+      }
+    } catch (err: any) {
+      this.logger.warn(`Error liberando leases de trabajador al apagarse: ${err.message}`);
+    }
+  }
+
+  startPolling(intervalMs: number = 5000): void {
+    if (this.pollingTimer) return;
+    this.pollingTimer = setInterval(() => {
+      if (!this.isDestroyed) {
+        this.triggerWorker().catch((err) => {
+          this.logger.warn(`Error en ciclo continuo de recuperación: ${err.message}`);
+        });
+      }
+    }, intervalMs);
+    if (this.pollingTimer.unref) {
+      this.pollingTimer.unref();
+    }
+    this.logger.log(`Ciclo continuo de recuperación iniciado (cada ${intervalMs}ms).`);
+  }
+
+  stopPolling(): void {
+    if (this.pollingTimer) {
+      clearInterval(this.pollingTimer);
+      this.pollingTimer = null;
+      this.logger.log(`Ciclo continuo de recuperación detenido.`);
+    }
   }
 
   /**
@@ -96,6 +136,8 @@ export class GitHubEventProcessorService implements OnModuleInit {
           const updated = await this.githubRepo.releaseEvent(
             event.id,
             'FAILED',
+            this.workerId,
+            event.claim_token,
             authCheck.reason,
             'RECHAZADO'
           );
@@ -129,14 +171,20 @@ export class GitHubEventProcessorService implements OnModuleInit {
           break;
       }
 
-      // Transición exitosa a PROCESSED y liberación del lease
+      // Transición exitosa a PROCESSED y liberación del lease (H04B-C: con verificación de lease)
       const updated = await this.githubRepo.releaseEvent(
         event.id,
         'PROCESSED',
+        this.workerId,
+        event.claim_token,
         null,
         correlationStatus
       );
-      return updated || event;
+      if (!updated) {
+        this.logger.warn(`[LEASE PERDIDO / SPLIT-BRAIN PREVENIDO] Trabajador ${this.workerId} perdió el lease del evento ${event.id} (expiró o fue reclamado concurrentemente).`);
+        return event;
+      }
+      return updated;
     } catch (err: any) {
       this.logger.error(`Fallo procesando evento ${event.id}: ${err.message}`, err.stack);
       const updated = await this.githubRepo.incrementEventAttempts(event.id, err.message);
@@ -397,9 +445,9 @@ export class GitHubEventProcessorService implements OnModuleInit {
     for (const commit of commits) {
       const commitSha = commit.id || commit.sha;
       const message = commit.message || '';
-      const author = commit.author || { name: 'unknown', email: 'unknown' };
+      let author = commit.author;
 
-      // Obtener detalle de archivos
+      // Obtener detalle de archivos y autor verificado
       let files: GitHubCommitFile[] = [];
       try {
         if (commitSha) {
@@ -410,10 +458,15 @@ export class GitHubEventProcessorService implements OnModuleInit {
             event.installation_id
           );
           files = details.files || [];
+          if (!author && details.author) {
+            author = details.author;
+          }
         }
       } catch (err: any) {
         this.logger.warn(`No se pudo obtener detalles remotos de commit ${commitSha}: ${err.message}. Usando payload.`);
       }
+
+      author = author || { name: 'unknown', email: 'unknown' };
 
       if (files.length === 0) {
         const added = (commit.added || []).map((f: string) => ({ filename: f, status: 'added', additions: 0, deletions: 0, changes: 0 }));
@@ -428,8 +481,8 @@ export class GitHubEventProcessorService implements OnModuleInit {
         }
       }
 
-      // H04B-R01: Consulta real a persistencia SCM (RFC, aprobación, change_order, SoD)
-      const filePaths = files.map((f) => f.filename);
+      // H04B-R01 / H04B-C: Consulta real a persistencia SCM (RFC, aprobación, change_order, SoD)
+      const filePaths = files.flatMap((f) => (f.previous_filename ? [f.filename, f.previous_filename] : [f.filename]));
       const scmVerification = await this.githubRepo.verifyScmChangeAuthorization(
         projectId,
         commitSha,
@@ -442,13 +495,19 @@ export class GitHubEventProcessorService implements OnModuleInit {
       const commitCorrelationStatus = scmVerification.status;
       overallCorrelationStatus = commitCorrelationStatus;
 
-      // H04B-R02: Separar evidencia observada de la mutación del inventario canónico
+      // H04B-R02 / H04B-C: Separar evidencia observada de la mutación del inventario canónico
       for (const file of files) {
         if (file.status === 'renamed' && file.previous_filename) {
           const existingEcs = await this.githubRepo.findConfigItemByPath(projectId, file.previous_filename);
           if (existingEcs) {
             const isMove = this.isPathMove(file.previous_filename, file.filename);
             const changeType = isMove ? 'MOVE' : 'RENAME';
+
+            // H04B-C: Correspondencia estricta entre archivo modificado y el alcance del ECS/RFC
+            const isFileInScope = Boolean(
+              isAuthorized &&
+              (!scmVerification.configItemId || existingEcs.id === scmVerification.configItemId)
+            );
 
             // Siempre registrar la evidencia en config_item_path_history
             await this.githubRepo.recordPathChange({
@@ -458,12 +517,16 @@ export class GitHubEventProcessorService implements OnModuleInit {
               newPath: file.filename,
               changeType,
               gitCommitSha: commitSha,
-              appliedToEcs: isAuthorized,
-              status: isAuthorized ? 'APPLIED' : (commitCorrelationStatus === 'PENDIENTE_DE_CORRELACION' ? 'PENDING' : 'REJECTED'),
+              appliedToEcs: isFileInScope,
+              status: isFileInScope
+                ? 'APPLIED'
+                : commitCorrelationStatus === 'PENDIENTE_DE_CORRELACION'
+                ? 'PENDING'
+                : 'REJECTED',
             });
 
-            // Actualizar inventario canónico ÚNICAMENTE si está formalmente autorizado
-            if (isAuthorized) {
+            // Actualizar inventario canónico ÚNICAMENTE si está formalmente autorizado y dentro del alcance del ECS
+            if (isFileInScope) {
               await this.githubRepo.updateConfigItemPath(existingEcs.id, file.filename);
               this.logger.log(`[SCM AUTORIZADO] ECS ${existingEcs.code} ruta actualizada (${changeType}): '${file.previous_filename}' -> '${file.filename}'`);
             } else {
@@ -475,6 +538,12 @@ export class GitHubEventProcessorService implements OnModuleInit {
         if (file.status === 'removed') {
           const existingEcs = await this.githubRepo.findConfigItemByPath(projectId, file.filename);
           if (existingEcs) {
+            // H04B-C: Correspondencia estricta entre archivo modificado y el alcance del ECS/RFC
+            const isFileInScope = Boolean(
+              isAuthorized &&
+              (!scmVerification.configItemId || existingEcs.id === scmVerification.configItemId)
+            );
+
             await this.githubRepo.recordPathChange({
               configItemId: existingEcs.id,
               projectId,
@@ -482,11 +551,15 @@ export class GitHubEventProcessorService implements OnModuleInit {
               newPath: '[DELETED]',
               changeType: 'DELETE',
               gitCommitSha: commitSha,
-              appliedToEcs: isAuthorized,
-              status: isAuthorized ? 'APPLIED' : (commitCorrelationStatus === 'PENDIENTE_DE_CORRELACION' ? 'PENDING' : 'REJECTED'),
+              appliedToEcs: isFileInScope,
+              status: isFileInScope
+                ? 'APPLIED'
+                : commitCorrelationStatus === 'PENDIENTE_DE_CORRELACION'
+                ? 'PENDING'
+                : 'REJECTED',
             });
 
-            if (isAuthorized) {
+            if (isFileInScope) {
               this.logger.log(`[SCM AUTORIZADO] ECS ${existingEcs.code} baja procesada.`);
             } else {
               this.logger.warn(`[SCM BLOQUEO] Eliminación de ECS ${existingEcs.code} registrada como evidencia (${commitCorrelationStatus}). Inventario oficial preservado.`);

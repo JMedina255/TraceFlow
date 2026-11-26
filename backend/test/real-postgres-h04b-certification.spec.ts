@@ -77,10 +77,10 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
     process.env.TEST_DATABASE_URL =
       'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
 
-    // 1. Reiniciar y migrar base de datos real con las 10 migraciones oficiales (hasta H04B-R)
+    // 1. Reiniciar y migrar base de datos real con las 11 migraciones oficiales (hasta H04B-C)
     const setupResult = await resetAndMigrateRealPostgres({
       allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
-      targetMigration: 'H04B-R',
+      targetMigration: 'H04B-C',
     });
     adminPool = setupResult.adminPool;
     appPool = setupResult.appPool;
@@ -113,6 +113,14 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       `SELECT id FROM traceflow.app_user WHERE code = 'USR-001' LIMIT 1`
     );
     realUserId = userRes.rows[0]?.id;
+
+    // Asegurar asignación activa de desarrollo PU-06 en el proyecto
+    await appPool.query(
+      `INSERT INTO traceflow.project_team_role (project_id, user_id, role_id, status)
+       VALUES ($1, $2, 6, 'ACTIVE')
+       ON CONFLICT (project_id, user_id, role_id) DO UPDATE SET status = 'ACTIVE'`,
+      [realProjectId, realUserId]
+    );
 
     // Registrar instalación activa de organización para validar procedencia de webhooks (H04B-R03)
     await githubRepo.saveOrganizationInstallation({
@@ -154,8 +162,8 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
   // BLOQUE 1: MIGRACIONES Y CATÁLOGO FÍSICO (H04B / H04B-R)
   // ==========================================================================
   describe('1. Verificación de Migraciones y Catálogo Físico en PostgreSQL 16 Real', () => {
-    it('CERT-H04B-01: debe haber aplicado exactamente 10 migraciones incrementales en orden estricto', () => {
-      expect(appliedMigrations).toHaveLength(10);
+    it('CERT-H04B-01: debe haber aplicado exactamente 11 migraciones incrementales en orden estricto', () => {
+      expect(appliedMigrations).toHaveLength(11);
       expect(appliedMigrations[0]).toBe('202611250001_initial_traceflow.sql');
       expect(appliedMigrations[1]).toBe('202611250002_structural_seeds.sql');
       expect(appliedMigrations[2]).toBe('202611250003_secure_app_role_least_privilege.sql');
@@ -166,6 +174,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       expect(appliedMigrations[7]).toBe('202611260005_init_h04b_github_installations_remediation.sql');
       expect(appliedMigrations[8]).toBe('202611260006_init_h04b_webhooks_and_git_sync.sql');
       expect(appliedMigrations[9]).toBe('202611260007_init_h04b_r_webhooks_governance_and_worker.sql');
+      expect(appliedMigrations[10]).toBe('202611260008_init_h04b_c_governance_and_leases.sql');
     });
 
     it('CERT-H04B-02: el esquema traceflow debe contener exactamente 33 tablas físicas en PostgreSQL', async () => {
@@ -185,7 +194,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       expect(tables).toContain('config_item');
     });
 
-    it('CERT-H04B-03: la tabla traceflow.github_event debe tener todas sus columnas requeridas (H04B + H04B-R)', async () => {
+    it('CERT-H04B-03: la tabla traceflow.github_event debe tener todas sus columnas requeridas (H04B + H04B-R + H04B-C)', async () => {
       const res = await appPool.query<{ column_name: string; data_type: string }>(`
         SELECT column_name, data_type
         FROM information_schema.columns
@@ -214,6 +223,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
         'locked_at',
         'lease_expires_at',
         'correlation_status',
+        'claim_token',
       ]);
     });
 
@@ -503,7 +513,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
         );
       `, [rfcId, realProjectId, rfcCode, realUserId, ecs.id]);
 
-      // 3. Crear Orden de Cambio activa en traceflow.change_order
+      // 3. Crear Orden de Cambio activa en traceflow.change_order y sync_lock activo (H04B-C)
       const coId = crypto.randomUUID();
       const coCode = `ECN-${Date.now().toString().slice(-4)}`;
       await appPool.query(`
@@ -513,6 +523,15 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
           $1, $2, $3, $4, 'EMITIDA', $5, $5
         );
       `, [coId, rfcId, coCode, ecs.id, realUserId]);
+
+      const lockId = crypto.randomUUID();
+      await appPool.query(`
+        INSERT INTO traceflow.sync_lock (
+          id, ecs_id, change_order_id, locked_by, status, work_library_path
+        ) VALUES (
+          $1, $2, $3, $4, 'ACTIVE', $5
+        );
+      `, [lockId, ecs.id, coId, realUserId, initialPath]);
 
       // 4. Configurar commit mock vinculando la RFC
       const commitSha = `sha-auth-${Date.now()}`;
@@ -651,6 +670,173 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       await githubRepo.updateInstallationStatus(realInstallationId, 'ACTIVE');
       await githubRepo.updateIntegrationsByInstallationId(realInstallationId, 'VALIDATED');
     });
+
+    it('CERT-H04B-C-18: dos trabajadores concurrentes con lease expirado en PostgreSQL 16 real previenen split-brain mediante claim_token', async () => {
+      // Limpiar eventos previos no completados para aislar la prueba de competencia
+      await adminPool.query(`DELETE FROM traceflow.github_event WHERE processing_status != 'PROCESSED'`);
+
+      // 1. Guardar evento de prueba en PostgreSQL real
+      const deliveryId = `lease-cert-${Date.now()}`;
+      const event = await githubRepo.saveEvent({
+        deliveryId,
+        eventType: 'ping',
+        installationId: realInstallationId,
+        payload: { test: 'lease-split-brain' },
+      });
+
+      // 2. Worker 1 reclama el evento
+      const worker1 = 'worker-pg-alpha';
+      const claimedByW1 = await githubRepo.claimEvents(worker1, 1, 1);
+      expect(claimedByW1.length).toBe(1);
+      const token1 = claimedByW1[0].claim_token;
+      expect(token1).toBeDefined();
+
+      // 3. Forzar expiración del lease en PostgreSQL real
+      await adminPool.query(
+        `UPDATE traceflow.github_event SET lease_expires_at = NOW() - interval '2 seconds' WHERE id = $1`,
+        [event.id]
+      );
+
+      // 4. Worker 2 reclama el evento abandonado en PostgreSQL real
+      const worker2 = 'worker-pg-beta';
+      const claimedByW2 = await githubRepo.claimEvents(worker2, 1, 30);
+      expect(claimedByW2.length).toBe(1);
+      expect(claimedByW2[0].id).toBe(event.id);
+      expect(claimedByW2[0].locked_by).toBe(worker2);
+      expect(claimedByW2[0].claim_token).not.toBe(token1);
+
+      // 5. Worker 1 intenta liberar el evento con su token y workerId expirado
+      const failedRelease = await githubRepo.releaseEvent(
+        event.id,
+        'PROCESSED',
+        worker1,
+        token1,
+        null,
+        'AUTORIZADO'
+      );
+      // Debe retornar null porque PostgreSQL actualizó 0 filas (condición locked_by y claim_token no coinciden)
+      expect(failedRelease).toBeNull();
+
+      // 6. Worker 2 finaliza legítimamente la transacción en PostgreSQL
+      const successRelease = await githubRepo.releaseEvent(
+        event.id,
+        'PROCESSED',
+        worker2,
+        claimedByW2[0].claim_token,
+        null,
+        'AUTORIZADO'
+      );
+      expect(successRelease).not.toBeNull();
+      expect(successRelease?.processing_status).toBe('PROCESSED');
+      expect(successRelease?.locked_by).toBeNull();
+    });
+
+    it('CERT-H04B-C-19: recepción de installation.deleted en PostgreSQL 16 actualiza a DELETED e invalida integración sin borrado físico', async () => {
+      const deliveryId = `inst-del-cert-${Date.now()}`;
+      const event = await githubRepo.saveEvent({
+        deliveryId,
+        eventType: 'installation',
+        action: 'deleted',
+        installationId: realInstallationId,
+        payload: { action: 'deleted', installation: { id: realInstallationId } },
+      });
+
+      await eventProcessor.processClaimedEvent(event);
+
+      // 1. Estado en PostgreSQL pasa a DELETED sin borrado físico
+      const instCheck = await appPool.query<{ status: string; count: string }>(
+        `SELECT status, count(*) OVER() as count FROM traceflow.organization_github_installation WHERE installation_id = $1`,
+        [realInstallationId]
+      );
+      expect(instCheck.rows).toHaveLength(1);
+      expect(instCheck.rows[0].status).toBe('DELETED');
+
+      // 2. Integración pasa a UNLINKED
+      const intCheck = await appPool.query<{ validation_status: string }>(
+        `SELECT validation_status FROM traceflow.github_integration WHERE project_id = $1`,
+        [realProjectId]
+      );
+      expect(intCheck.rows[0].validation_status).toBe('UNLINKED');
+
+      // Restaurar para pruebas siguientes
+      await adminPool.query(
+        `UPDATE traceflow.organization_github_installation SET status = 'ACTIVE' WHERE installation_id = $1`,
+        [realInstallationId]
+      );
+      await adminPool.query(
+        `UPDATE traceflow.github_integration SET validation_status = 'VALIDATED' WHERE project_id = $1`,
+        [realProjectId]
+      );
+    });
+
+    it('CERT-H04B-C-20: push con RFC autorizada pero sin sync_lock activo en PostgreSQL 16 queda PENDIENTE_DE_CORRELACION', async () => {
+      // 1. Crear ECS
+      const ecsId = crypto.randomUUID();
+      const code = `ECS-${Date.now().toString().slice(-4)}`;
+      const filePath = `src/services/unlocked-${Date.now()}.ts`;
+      await githubRepo.createConfigItem({
+        id: ecsId,
+        project_id: realProjectId,
+        code,
+        name: 'Módulo sin bloqueo',
+        file_path: filePath,
+      });
+
+      // 2. Crear RFC autorizada y ECN emitida SIN sync_lock activo
+      const rfcId = crypto.randomUUID();
+      const rfcCode = `RFC-${Date.now().toString().slice(-4)}`;
+      await appPool.query(`
+        INSERT INTO traceflow.change_request (
+          id, project_id, code, title, description, justification, priority,
+          classification, status, requested_by, target_ecs_id
+        ) VALUES (
+          $1, $2, $3, 'Aprobación sin lock', 'Desc', 'Just', 'ALTA',
+          'CAMBIO_MENOR', 'AUTORIZADA', $4, $5
+        );
+      `, [rfcId, realProjectId, rfcCode, realUserId, ecsId]);
+
+      const coId = crypto.randomUUID();
+      const coCode = `ECN-${Date.now().toString().slice(-4)}`;
+      await appPool.query(`
+        INSERT INTO traceflow.change_order (
+          id, rfc_id, code, ecs_id, status, issued_by, assigned_developer_id
+        ) VALUES (
+          $1, $2, $3, $4, 'EMITIDA', $5, $5
+        );
+      `, [coId, rfcId, coCode, ecsId, realUserId]);
+
+      // 3. Crear commit y procesar evento push
+      const commitSha = `sha-nolock-${Date.now()}`;
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: `feat(${rfcCode}): intento de cambio sin sync_lock`,
+        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        files: [{ filename: filePath, status: 'modified', additions: 1, deletions: 1, changes: 2 }],
+      });
+
+      const deliveryId = `push-nolock-${Date.now()}`;
+      const event = await githubRepo.saveEvent({
+        deliveryId,
+        eventType: 'push',
+        installationId: realInstallationId,
+        githubRepoId: realRepoId,
+        projectId: realProjectId,
+        payload: {
+          repository: { id: realRepoId, full_name: 'exodo-org/pasarela-core' },
+          commits: [{ id: commitSha, message: `feat(${rfcCode}): intento de cambio sin sync_lock` }],
+        },
+      });
+
+      const processed = await eventProcessor.processClaimedEvent(event);
+      expect(processed.correlation_status).toBe('PENDIENTE_DE_CORRELACION');
+
+      // Inventario no muta
+      const ecsCheck = await appPool.query<{ file_path: string }>(
+        `SELECT file_path FROM traceflow.config_item WHERE id = $1`,
+        [ecsId]
+      );
+      expect(ecsCheck.rows[0].file_path).toBe(filePath);
+    });
   });
 
   // ==========================================================================
@@ -685,7 +871,30 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       await adminPool.query(`DELETE FROM traceflow.github_event WHERE delivery_id = 'block-rb-test'`);
     });
 
-    it('CERT-H04B-16: con allow_force_h04_rollback = true el rollback de H04B-R debe revertir columnas e índices de 202611260007', async () => {
+    it('CERT-H04B-16: con allow_force_h04_rollback = true el rollback de H04B-C (202611260008) y H04B-R (202611260007) debe revertir limpiamente', async () => {
+      // 1. Revertir H04B-C (202611260008)
+      const rollbackH04BCPath = path.resolve(
+        process.cwd(),
+        '..',
+        'supabase',
+        'migrations',
+        '202611260008_init_h04b_c_governance_and_leases_rollback.sql'
+      );
+      const rollbackH04BCSql = fs.readFileSync(rollbackH04BCPath, 'utf8');
+      await adminPool.query(`
+        SET LOCAL traceflow.allow_force_h04_rollback = 'true';
+        ${rollbackH04BCSql}
+      `);
+
+      const colClaimRes = await adminPool.query<{ column_name: string }>(`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'traceflow' AND table_name = 'github_event'
+          AND column_name = 'claim_token';
+      `);
+      expect(colClaimRes.rows).toHaveLength(0);
+
+      // 2. Revertir H04B-R (202611260007)
       const rollbackSqlPath = path.resolve(
         process.cwd(),
         '..',

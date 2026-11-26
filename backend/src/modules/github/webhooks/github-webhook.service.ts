@@ -34,14 +34,31 @@ export class GitHubWebhookService {
 
   /**
    * Obtiene el secreto de webhook configurado respetando fail-closed.
-   * H04B-R06: Prohibido usar secretos HMAC predeterminados en servicios operativos.
+   * H04B-R06 / H04B-C: Prohibido usar secretos HMAC predeterminados en servicios operativos.
+   * TEST_GITHUB_WEBHOOK_SECRET restringido estrictamente a NODE_ENV === 'test'.
    */
   getWebhookSecret(): string {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isTest = process.env.NODE_ENV === 'test';
     const secret = process.env.GITHUB_WEBHOOK_SECRET;
     const testSecret = process.env.TEST_GITHUB_WEBHOOK_SECRET;
 
+    if (isProduction) {
+      if (!secret || secret.trim() === '') {
+        throw new InternalServerErrorException(
+          '[CONFIG_ERROR] Configuración de seguridad incompleta: GITHUB_WEBHOOK_SECRET obligatorio en entorno de producción.'
+        );
+      }
+      if (testSecret && secret.trim() === testSecret.trim()) {
+        throw new InternalServerErrorException(
+          '[CONFIG_ERROR] Prohibición de seguridad: En producción no se permite utilizar el secreto de pruebas TEST_GITHUB_WEBHOOK_SECRET.'
+        );
+      }
+      return secret;
+    }
+
     if (!secret || secret.trim() === '') {
-      if (testSecret && testSecret.trim() !== '') {
+      if (isTest && testSecret && testSecret.trim() !== '') {
         return testSecret;
       }
       throw new InternalServerErrorException(

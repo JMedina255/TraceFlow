@@ -286,6 +286,34 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
   3. **24 pruebas unitarias** en `github-webhooks.spec.ts` certificando todos los requisitos de gobernanza.
   4. **Cobertura Total Consolidada:** 169 pruebas unitarias backend, 74 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**340 pruebas consolidadas en verde**), con 0 errores de compilación `tsc --noEmit`.
 
+## 38. Cierre Final de Aceptación de Gobernanza, Leases y Recuperación Continua (INIT-H04B-C)
+- **Verificación Efectiva de Autorización SCM Multinivel:**
+  1. Comprobación exhaustiva en persistencia PostgreSQL real de la solicitud de cambio (`traceflow.change_request`), verificando que se encuentre formalmente aprobada (`AUTORIZADA`, `ORDEN_EMITIDA`, `EN_EJECUCION`, `EN_IMPLEMENTACION`).
+  2. Existencia de una orden de cambio vigente (`traceflow.change_order`) correspondiente a la misma RFC, con segregación de funciones (SoD) estricta.
+  3. Comprobación de que el ECS asignado a la ECN pertenezca al mismo proyecto del repositorio Git.
+  4. Exigencia de bloqueo activo `traceflow.sync_lock` coherente con la ECN y el ECS. Si el bloqueo está ausente, el evento permanece como `PENDIENTE_DE_CORRELACION`.
+  5. Verificación de identidad del ejecutor Git: debe corresponder a un usuario activo en `traceflow.app_user` con rol técnico activo en `traceflow.project_team_role` (`DEVELOPER`, `LEAD_DEVELOPER` o `SCM_ADMIN`).
+  6. Correspondencia estricta de alcance de archivos modificados (`files` / `previous_filename`): archivos ajenos al ECS objetivo de la ECN no mutan la ruta canónica en `traceflow.config_item`, registrándose en `traceflow.config_item_path_history` con `applied_to_ecs = false` y `status = 'REJECTED'`.
+- **Recuperación Continua y Ciclo de Vida del Trabajador:**
+  1. Temporizador continuo y periódico (`startPolling(5000)` / `stopPolling()`) acoplado al ciclo de vida NestJS (`OnModuleDestroy`), operando de forma autónoma sin depender de nuevos webhooks entrantes.
+  2. Recuperación proactiva de eventos pendientes o con lease expirado tras reinicios del servicio en lotes acotados (`LIMIT $2`).
+  3. Liberación ordenada y graceful de leases transaccionales (`releaseWorkerLeases()`) durante el apagado del módulo.
+- **Propiedad del Lease Atómica y Prevención de Split-Brain con `claim_token`:**
+  1. Migración DDL `202611260008_init_h04b_c_governance_and_leases.sql`: adición de la columna `claim_token UUID` a `traceflow.github_event`.
+  2. Al adquirir un lote con `claimEvents()`, se genera un identificador unívoco efímero (`gen_random_uuid()`).
+  3. Modificación atómica de `releaseEvent()` exigiendo coincidencia simultánea de `workerId` y `claim_token` (`WHERE id = $1 AND ($5::text IS NULL OR locked_by IS NULL OR locked_by = $5) AND ($6::uuid IS NULL OR claim_token IS NULL OR claim_token = $6)`).
+  4. Si el lease expiró y el evento fue reclamado concurrentemente por otro trabajador, la liberación retorna `null`, se descartan mutaciones canónicas en el ECS y se previenen colisiones de split-brain.
+- **Coherencia del Ciclo de Vida de Instalaciones de GitHub:**
+  1. Actualización de la restricción `CHECK` sobre `traceflow.organization_github_installation` para admitir formalmente el estado `DELETED`.
+  2. Procesamiento transaccional de eventos `installation.deleted`: actualización del registro de instalación a `DELETED` e invalidación sincronizada de las integraciones activas del proyecto a `UNLINKED` (`project_setup.github_completed = false`) sin eliminación física ni pérdida de historial.
+- **Protección de Rollback y Seguridad HMAC Fail-Closed:**
+  1. Scripts de reversión `202611260008` y `202611260007` blindados contra la eliminación de estructuras si existen registros con `claim_token` asignado, instalaciones en `DELETED`, eventos correlacionados o rutas aplicadas a ECS, requiriendo `SET LOCAL traceflow.allow_force_h04_rollback = 'true'` en pruebas.
+  2. Validación estricta de secretos de webhooks en `getWebhookSecret()`: rechazo absoluto de `TEST_GITHUB_WEBHOOK_SECRET` en entornos de producción con excepción `InternalServerErrorException`.
+- **Cobertura Física y Certificación Consolidada:**
+  1. **9 escenarios de aceptación certificados** (`TDD-H04B-C-01`..`09`) en `backend/test/github-webhooks.spec.ts` (32 pruebas unitarias totales en la suite).
+  2. **20 pruebas físicas certificadas** en `backend/test/real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real, validando competencia de leases concurrentes (`CERT-H04B-C-18`), ciclo de vida de instalación `DELETED` (`CERT-H04B-C-19`), control de `sync_lock` (`CERT-H04B-C-20`) y reversión completa de migraciones 11, 10 y 9.
+  3. **Cobertura Total Consolidada:** 177 pruebas unitarias backend, 77 pruebas físicas en PostgreSQL 16 real (18 H02, 20 H03, 19 H04A-R, 20 H04B-C), y 97 pruebas en prototipo frontend (**351 pruebas consolidadas en verde**), con 0 errores `tsc --noEmit`.
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B / INIT-H04B-R — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B / INIT-H04B-R / INIT-H04B-C — C-SharkTeam / ÉXODO S.A.C.*

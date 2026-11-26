@@ -367,6 +367,7 @@ describe('TraceFlow SCM — INIT-H04B-R: Cierre de Gobernanza, Idempotencia y Re
 
     it('TDD-H04B-R01-05: commit que cumple RFC aprobada y Orden de Cambio activa debe ser clasificado AUTORIZADO y mutar inventario', async () => {
       const ecs = await githubRepo.createConfigItem({
+        id: 'c0000001-0000-0000-0000-000000000001',
         project_id: testProjectId,
         code: 'ECS-001',
         name: 'Módulo de Pagos',
@@ -424,6 +425,7 @@ describe('TraceFlow SCM — INIT-H04B-R: Cierre de Gobernanza, Idempotencia y Re
   describe('H04B-R02 & H04B-R05: Preservación de inventario e idempotencia ante reintentos', () => {
     it('TDD-H04B-R02-01: reintentar el procesamiento del mismo commit NO debe duplicar transiciones en path history', async () => {
       const ecs = await githubRepo.createConfigItem({
+        id: 'c0000001-0000-0000-0000-000000000001',
         project_id: testProjectId,
         code: 'ECS-001',
         name: 'Controlador Auth',
@@ -712,6 +714,340 @@ describe('TraceFlow SCM — INIT-H04B-R: Cierre de Gobernanza, Idempotencia y Re
       const auditTrail = auditService.getAuditChain();
       const repoRevokedAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_REPO_ACCESS_REVOKED');
       expect(repoRevokedAudit).toBeDefined();
+    });
+  });
+
+  // ==========================================================================
+  // BLOQUE 7: CIERRE FINAL DE GOBERNANZA, LEASES Y RECUPERACIÓN CONTINUA (INIT-H04B-C)
+  // ==========================================================================
+  describe('INIT-H04B-C: Cierre Final de Aceptación de Gobernanza, Leases y Recuperación Continua', () => {
+    afterEach(() => {
+      eventProcessor.stopPolling();
+    });
+
+    it('TDD-H04B-C-01: push asociado a RFC aprobada pero sin sync_lock activo queda en PENDIENTE_DE_CORRELACION', async () => {
+      githubRepo.resetMockScmData();
+      // Remover todos los bloqueos activos
+      githubRepo['mockSyncLocks'] = [];
+
+      const commitSha = 'sha-no-lock-01';
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: 'fix(RFC-2026-0001): cambio sin sync_lock',
+        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        files: [{ filename: 'src/services/billing.ts', status: 'modified', additions: 1, deletions: 1, changes: 2 }],
+      });
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-no-lock-01',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): cambio sin sync_lock' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('PENDIENTE_DE_CORRELACION');
+
+      const auditTrail = auditService.getAuditChain();
+      const pendingAudit = auditTrail.find(
+        (a) => a.eventCode === 'GITHUB_CORRELATION_PENDING' && a.entityId === commitSha
+      );
+      expect(pendingAudit).toBeDefined();
+      expect(pendingAudit?.payloadDiff?.reason).toMatch(/sync_lock/i);
+    });
+
+    it('TDD-H04B-C-02: push con ECN emitida pero asociada a un ECS diferente es rechazado sin mutar inventario', async () => {
+      githubRepo.resetMockScmData();
+      // ECN-2026-0001 está emitida para c0000001-0000-0000-0000-000000000001 (ECS-001)
+      const ecsOther = await githubRepo.createConfigItem({
+        id: 'c0000001-0000-0000-0000-000000000009',
+        project_id: testProjectId,
+        code: 'ECS-OTHER',
+        name: 'Módulo Secundario',
+        file_path: 'src/modules/other.ts',
+      });
+
+      const commitSha = 'sha-diff-ecs-02';
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: 'fix(RFC-2026-0001): intentando mover ECS ajeno a la ECN',
+        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        files: [
+          {
+            filename: 'src/modules/new-other.ts',
+            status: 'renamed',
+            previous_filename: 'src/modules/other.ts',
+            additions: 1,
+            deletions: 1,
+            changes: 2,
+          },
+        ],
+      });
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-diff-ecs-02',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): intentando mover ECS ajeno a la ECN' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('RECHAZADO');
+
+      // Comprobar que el archivo original no fue mutado
+      const untouchedEcs = await githubRepo.findConfigItemByPath(testProjectId, 'src/modules/other.ts');
+      expect(untouchedEcs).not.toBeNull();
+      expect(untouchedEcs?.id).toBe(ecsOther.id);
+    });
+
+    it('TDD-H04B-C-03: push de commit cuyo autor no corresponde a ningún desarrollador activo es rechazado', async () => {
+      githubRepo.resetMockScmData();
+
+      const commitSha = 'sha-unauthorized-author-03';
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: 'fix(RFC-2026-0001): push desde atacante o usuario no registrado',
+        author: { name: 'Atacante Externo', email: 'attacker@externo.org', date: new Date().toISOString() },
+        files: [{ filename: 'src/services/billing.ts', status: 'modified', additions: 1, deletions: 1, changes: 2 }],
+      });
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-unauthorized-author-03',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): push desde atacante o usuario no registrado' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('RECHAZADO');
+
+      const auditTrail = auditService.getAuditChain();
+      const outOfBandAudit = auditTrail.find(
+        (a) => a.eventCode === 'GITHUB_OUT_OF_BAND_DETECTED' && a.entityId === commitSha
+      );
+      expect(outOfBandAudit).toBeDefined();
+      expect(outOfBandAudit?.payloadDiff?.reason).toMatch(/autor del commit/i);
+    });
+
+    it('TDD-H04B-C-04: push con archivos modificados fuera del alcance de la ECN no muta rutas ajenas', async () => {
+      githubRepo.resetMockScmData();
+
+      // ECS autorizado por ECN
+      const authorizedEcs = await githubRepo.createConfigItem({
+        id: 'c0000001-0000-0000-0000-000000000001',
+        project_id: testProjectId,
+        code: 'ECS-001',
+        name: 'Módulo Facturación',
+        file_path: 'src/services/billing.ts',
+      });
+
+      // ECS ajeno fuera del alcance de la ECN
+      const outOfScopeEcs = await githubRepo.createConfigItem({
+        id: 'c0000001-0000-0000-0000-000000000077',
+        project_id: testProjectId,
+        code: 'ECS-077',
+        name: 'Módulo Seguridad',
+        file_path: 'src/security/crypto.ts',
+      });
+
+      const commitSha = 'sha-partial-scope-04';
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: 'fix(RFC-2026-0001): cambio con archivo en scope y archivo fuera de scope',
+        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        files: [
+          {
+            filename: 'src/modules/billing/billing.service.ts',
+            status: 'renamed',
+            previous_filename: 'src/services/billing.ts',
+            additions: 10,
+            deletions: 0,
+            changes: 10,
+          },
+          {
+            filename: 'src/security/hacked.ts',
+            status: 'renamed',
+            previous_filename: 'src/security/crypto.ts',
+            additions: 5,
+            deletions: 0,
+            changes: 5,
+          },
+        ],
+      });
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-partial-scope-04',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): cambio con archivo en scope y archivo fuera de scope' }],
+        },
+      });
+
+      await eventProcessor.processEvent(event);
+
+      // ECS autorizado SÍ se muta
+      const updatedAuthEcs = await githubRepo.findConfigItemByPath(testProjectId, 'src/modules/billing/billing.service.ts');
+      expect(updatedAuthEcs).not.toBeNull();
+      expect(updatedAuthEcs?.id).toBe(authorizedEcs.id);
+
+      // ECS fuera del alcance NO se muta
+      const untouchedSecEcs = await githubRepo.findConfigItemByPath(testProjectId, 'src/security/crypto.ts');
+      expect(untouchedSecEcs).not.toBeNull();
+      expect(untouchedSecEcs?.id).toBe(outOfScopeEcs.id);
+
+      // Historial para ECS fuera de scope queda REJECTED y applied_to_ecs = false
+      const secHistory = await githubRepo.findPathHistoryByConfigItemId(outOfScopeEcs.id);
+      expect(secHistory.length).toBe(1);
+      expect(secHistory[0].applied_to_ecs).toBe(false);
+      expect(secHistory[0].status).toBe('REJECTED');
+    });
+
+    it('TDD-H04B-C-05: recuperación periódica continua procesa eventos pendientes sin webhooks entrantes', async () => {
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-continuous-recovery-05',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: { zen: 'Non-blocking continuous processing' },
+      });
+
+      expect(event.processing_status).toBe('PENDING');
+
+      // Ejecutar triggerWorker directamente simulando el timer continuo
+      const result = await eventProcessor.triggerWorker();
+      expect(result.processed).toBeGreaterThanOrEqual(1);
+
+      const recoveredEvent = await githubRepo.findEventById(event.id);
+      expect(recoveredEvent?.processing_status).toBe('PROCESSED');
+      expect(recoveredEvent?.locked_by).toBeNull();
+    });
+
+    it('TDD-H04B-C-06: intento de finalizar evento por trabajador con lease perdido/expirado es rechazado (split-brain prevention)', async () => {
+      // 1. Crear evento
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-lease-split-brain-06',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: { zen: 'Concurrency Lease Shield' },
+      });
+
+      // 2. Worker 1 reclama el evento
+      const worker1 = 'worker-alpha';
+      const claimedByW1 = await githubRepo.claimEvents(worker1, 1, 1);
+      expect(claimedByW1.length).toBe(1);
+      const token1 = claimedByW1[0].claim_token;
+      expect(token1).toBeDefined();
+
+      // 3. Simular expiración del lease en el mock
+      const mockEvent = githubRepo['mockEvents'].find((e) => e.id === event.id);
+      expect(mockEvent).toBeDefined();
+      mockEvent!.lease_expires_at = new Date(Date.now() - 1000).toISOString();
+
+      // 4. Worker 2 reclama el evento abandonado
+      const worker2 = 'worker-beta';
+      const claimedByW2 = await githubRepo.claimEvents(worker2, 1, 30);
+      expect(claimedByW2.length).toBe(1);
+      expect(claimedByW2[0].id).toBe(event.id);
+      expect(claimedByW2[0].locked_by).toBe(worker2);
+      expect(claimedByW2[0].claim_token).not.toBe(token1);
+
+      // 5. Worker 1 intenta liberar el evento con su token y workerId expirado
+      const failedRelease = await githubRepo.releaseEvent(
+        event.id,
+        'PROCESSED',
+        worker1,
+        token1,
+        null,
+        'AUTORIZADO'
+      );
+      // Debe retornar null (rechazo seguro para evitar split-brain)
+      expect(failedRelease).toBeNull();
+
+      // El evento sigue en poder de Worker 2
+      const currentEvent = await githubRepo.findEventById(event.id);
+      expect(currentEvent?.locked_by).toBe(worker2);
+      expect(currentEvent?.processing_status).toBe('PROCESSING');
+
+      // 6. Worker 2 finaliza legítimamente el evento
+      const successRelease = await githubRepo.releaseEvent(
+        event.id,
+        'PROCESSED',
+        worker2,
+        claimedByW2[0].claim_token,
+        null,
+        'AUTORIZADO'
+      );
+      expect(successRelease).not.toBeNull();
+      expect(successRelease?.processing_status).toBe('PROCESSED');
+      expect(successRelease?.locked_by).toBeNull();
+    });
+
+    it('TDD-H04B-C-07: evento installation.deleted actualiza estado a DELETED e invalida integraciones preservando auditoría histórica', async () => {
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-h04b-c-deleted-07',
+        eventType: 'installation',
+        action: 'deleted',
+        installationId: testInstallationId,
+        payload: { action: 'deleted', installation: { id: testInstallationId } },
+      });
+
+      await eventProcessor.processEvent(event);
+
+      // 1. Estado en DELETED (sin borrado físico)
+      const inst = await githubRepo.findInstallationByInstallationId(testInstallationId);
+      expect(inst).not.toBeNull();
+      expect(inst?.status).toBe('DELETED');
+
+      // 2. Integración vinculada degradada a UNLINKED
+      const integ = await githubRepo.findByProjectId(testProjectId);
+      expect(integ?.validation_status).toBe('UNLINKED');
+
+      // 3. Registro de auditoría emitido
+      const auditTrail = auditService.getAuditChain();
+      const deletedAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_INSTALLATION_DELETED');
+      expect(deletedAudit).toBeDefined();
+    });
+
+    it('TDD-H04B-C-09: verificación de secreto HMAC en NODE_ENV=production sin secreto configurado falla de inmediato sin fallback a test', () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      const originalSecret = process.env.GITHUB_WEBHOOK_SECRET;
+      const originalTestSecret = process.env.TEST_GITHUB_WEBHOOK_SECRET;
+
+      try {
+        process.env.NODE_ENV = 'production';
+        delete process.env.GITHUB_WEBHOOK_SECRET;
+        process.env.TEST_GITHUB_WEBHOOK_SECRET = 'insecure_test_secret_that_must_be_blocked';
+
+        expect(() => {
+          webhookService['getWebhookSecret']();
+        }).toThrow(InternalServerErrorException);
+
+        expect(() => {
+          webhookService['getWebhookSecret']();
+        }).toThrow(/TEST_GITHUB_WEBHOOK_SECRET|producción/i);
+      } finally {
+        process.env.NODE_ENV = originalNodeEnv;
+        if (originalSecret) process.env.GITHUB_WEBHOOK_SECRET = originalSecret;
+        if (originalTestSecret) process.env.TEST_GITHUB_WEBHOOK_SECRET = originalTestSecret;
+      }
     });
   });
 });

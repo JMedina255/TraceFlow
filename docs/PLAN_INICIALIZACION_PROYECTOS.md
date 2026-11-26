@@ -759,7 +759,7 @@ La implementación del bloque de inicialización de proyectos se reestructura en
 
 ```mermaid
 flowchart LR
-    H01["INIT-H01-R\n(Auditoría y Diseño)\n[COMPLETADO]"] --> H02["INIT-H02\n(Organizaciones y\nPersistencia)"]
+    H01["INIT-H01-R\n(Auditoría y Diseño)\n[COMPLETADO]"] --> H02["INIT-H02\n(Organizaciones y\nPersistencia)\n[IMPLEMENTADO]"]
     H02 --> H03["INIT-H03\n(Equipo, Metodología\ny Planificación)"]
     H03 --> H04["INIT-H04\n(Integración\nGitHub)"]
     H04 --> H05["INIT-H05\n(Interfaz, Asistente\ny Activación SCM)"]
@@ -768,14 +768,17 @@ flowchart LR
 
 ### 10.1 Desglose de Hitos de Implementación
 
-#### Hito INIT-H02 — Organizaciones, Proyectos y Persistencia
-- **Alcance Técnico:**
-  - Migración incremental PostgreSQL: entidades `traceflow.organization` y `traceflow.organization_member`.
-  - Ampliación de `traceflow.project` con clave foránea `organization_id` y restricción de estados canónicos en español.
+#### Hito INIT-H02 — Organizaciones, Proyectos y Persistencia [IMPLEMENTADO EN CÓDIGO Y CERTIFICADO EN AISLADO]
+- **Alcance Técnico Ejecutado:**
+  - Migración incremental PostgreSQL preparada: script `supabase/migrations/202611260001_init_h02_organizations_and_projects.sql` con entidades `traceflow.organization` y `traceflow.organization_member`.
+  - Ampliación de `traceflow.project` con clave foránea `organization_id` y restricción de estados canónicos en español (`chk_project_status`).
+  - Script de rollback controlado: `supabase/migrations/202611260001_init_h02_organizations_and_projects_rollback.sql`.
   - Reajuste estricto de privilegios para `traceflow_app` (`SELECT, INSERT, UPDATE` exclusivamente, sin `DELETE`).
-  - Creación de `OrganizationsModule` en NestJS (controladores, servicios, repositorios).
-  - Normalización bidireccional de estados legacy en capa DTO.
-  - Transición controlada de proyectos históricos (`PRJ-001`..`003`) a `HISTORICO_PENDIENTE_GITHUB` vinculados a `ORG-001`.
+  - Creación de `OrganizationsModule` en NestJS (controladores, servicios, repositorios, DTOs con class-validator).
+  - Extensión de `ProjectsModule` en NestJS (`POST /api/v1/projects` en estado strictly `BORRADOR`, filtros y aislamiento multitenant estricto por organización).
+  - Normalización canónica de estados legados (`ACTIVE` $\rightarrow$ `HISTORICO_PENDIENTE_GITHUB`, `CLOSED` $\rightarrow$ `ARCHIVADO`, `ACTIVO` $\rightarrow$ `ACTIVO`).
+  - Suite de pruebas TDD ejecutada con éxito (72/72 pruebas de backend NestJS + 97/97 pruebas de prototipo = 169 pruebas en verde).
+  - **Estado de Despliegue:** Certificado en entorno aislado; pendiente de ejecución sobre Supabase productivo por política de Governance Gate.
 
 #### Hito INIT-H03 — Equipo, Metodología y Planificación
 - **Alcance Técnico:**
@@ -843,6 +846,53 @@ flowchart LR
 | **`TDD-INIT-28`** | `INIT-H04` | Integración | `GitHubOutOfBandDetectionService` | RF-25, RN-03 | Detecta push directo sin RFC/ECN y genera automáticamente `incident_ticket` y alerta en auditoría. |
 | **`TDD-INIT-29`** | `INIT-H05` | Integración | `BaselineLifecycleService.freezeWithGitTag` | RF-13, RNF-03 | Congela Línea Base creando Git Tag inmutable en GitHub y persistiendo `git_commit_sha`. |
 | **`TDD-INIT-30`** | `INIT-H04` | Unitaria | `ConfigItemPathHistoryService.trackRename` | RF-24, RN-17 | Registra renombres/movimientos en `config_item_path_history` preservando la identidad inmutable del ECS. |
+
+---
+
+### 10.3 Seguridad y Gestión de Datos (Hito INIT-H02)
+
+Para garantizar la seguridad de los datos productivos y cumplir estrictamente el Governance Gate antes del despliegue en Supabase:
+
+#### 1. Respaldo y Verificación de Restauración
+- **Snapshot previo:** Antes de cualquier aplicación de DDL, se debe generar un volcado transaccional completo:
+  ```bash
+  pg_dump -h [host] -U postgres -d postgres -F c -b -v -f traceflow_backup_pre_h02_$(date +%Y%m%d_%H%M%S).dump
+  ```
+- **Prueba de integridad:** Validar la restaurabilidad en una base de datos de staging aislada:
+  ```bash
+  pg_restore --schema-only --dry-run traceflow_backup_pre_h02_*.dump
+  ```
+
+#### 2. Migración Incremental Preparada
+- **Script oficial:** [`supabase/migrations/202611260001_init_h02_organizations_and_projects.sql`](../supabase/migrations/202611260001_init_h02_organizations_and_projects.sql).
+- **Características:** Transaccional (`BEGIN ... COMMIT`), idempotente (`IF NOT EXISTS`, `ON CONFLICT DO UPDATE/NOTHING`), preserva intactos los proyectos existentes (`PRJ-001`..`003`) vinculándolos a `ORG-EXODO`, y migra el CHECK constraint de estados de proyecto sin pérdida de datos.
+
+#### 3. Validación Previa (Pre-Checks de Seguridad)
+- Verificar conectividad con usuario operativo `traceflow_app`.
+- Comprobar que `traceflow.project` y `traceflow.app_user` conservan sus claves primarias e integridad referencial.
+- Confirmar que el rol `traceflow_app` no posee privilegios `DELETE` ni `DROP`.
+
+#### 4. Plan de Rollback Controlado
+- **Script oficial de reversión:** [`supabase/migrations/202611260001_init_h02_organizations_and_projects_rollback.sql`](../supabase/migrations/202611260001_init_h02_organizations_and_projects_rollback.sql).
+- Reversión atómica de disparadores, funciones, restricciones de estado, columnas foráneas y tablas auxiliares sin corromper tablas preexistentes.
+
+#### 5. Pruebas de Compatibilidad Certificadas
+- Suite completa de backend NestJS: **72/72 pruebas aprobadas (100%)**, cubriendo creación de organizaciones, unicidad, incorporación DA-06, aislamiento multitenant y compatibilidad de migraciones.
+- Suite completa de prototipo frontend: **97/97 pruebas aprobadas (100%)**.
+
+#### 6. Procedimiento de Despliegue Controlado
+- Se ejecutará en una ventana de mantenimiento programada únicamente tras recibir la **autorización explícita y formal del CCB / Usuario Líder**.
+- No se utilizan credenciales de administrador en la operativa ordinaria del backend (uso estricto de `traceflow_app`).
+- Prohibida la creación de organizaciones o usuarios ficticios en el entorno productivo.
+
+#### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
+Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:
+- Asociación automática de commits y Pull Requests con RFC y ECS (`RN-16`).
+- Validación de las 5 puertas SCM mediante GitHub Checks API (`TraceFlow SCM / Policy Gate`, `RF-25`).
+- Configuración y verificación remota de Branch Protection y Rulesets en GitHub.
+- Protección y creación de Git Tags inmutables para líneas base (`refs/tags/vX.Y.Z`).
+- Detección de cambios directos no autorizados ("out-of-band") y emisión automática de tickets de incidencia SCM.
+- Custodia de renombres y traslados en `config_item_path_history` (`RN-17`).
 
 ---
 

@@ -203,6 +203,14 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Rollback Seguro sin CASCADE:** Eliminación de borrado en cascada en `202611260001_init_h02_organizations_and_projects_rollback.sql` y parametrización con marcas de tiempo dinámicas en UTC y LSN para restauración Point-In-Time-Recovery (PITR).
 - **Cobertura de Certificación:** 15 pruebas físicas en `real-postgres-certification.spec.ts` (100% aprobadas), 77 pruebas backend (`npm test`) y 97 pruebas en prototipo frontend (189 pruebas en verde).
 
+## 32. Cierre Final de Seguridad y Blindaje de Persistencia (INIT-H02-VF)
+- **Protección contra Borrado Destructivo:** Establecimiento de lista blanca estricta de bases de datos descartables (`ALLOWED_DISPOSABLE_DATABASES`), prohibición de eliminación de bases no identificadas, remotas o de sistema, y formateo seguro mediante `quoteSqlIdentifier()` y `format(%I, %L)` en creación de roles.
+- **Desacoplamiento Estricto de Permisos de Prueba:** La autorización de DML remoto (`ALLOW_REMOTE_TEST_DML`) no autoriza la eliminación destructiva de bases de datos (`DROP DATABASE`). Se exige la variable explícita `ALLOW_DESTRUCTIVE_DATABASE_RESET=true`.
+- **Aislamiento No Destructivo de `npm test`:** Exclusión automática de las suites de recreación física de base de datos de la ejecución estándar de `npm test`. La certificación física se ejecuta exclusivamente vía comando explícito (`npm run test:real-postgres`).
+- **Autorización SCM Obligatoria Fail-Closed:** Modificación de `RfcsService` para exigir validación obligatoria de membresía organizacional (error 503 ante falta de dependencia), rechazar proyectos sin organización (error 403), impedir que sesiones antiguas permitan el acceso a usuarios suspendidos, y preservar la lectura de expedientes históricos conforme a los estados del proyecto.
+- **Salvaguarda Exhaustiva de Rollback:** Bloqueo de reversión en `202611260001_init_h02_organizations_and_projects_rollback.sql` ante cualquier adición o alteración de miembros en la organización semilla o cambios estructurales post-migración.
+- **Cobertura Final Consolidada:** 15 pruebas físicas reales en `test:real-postgres`, 76 pruebas backend seguras en `npm test` (incluyendo 8 pruebas de salvaguardas destructivas y 10 pruebas SCM) y 97 pruebas en prototipo frontend (188 pruebas en verde).
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF — C-SharkTeam / ÉXODO S.A.C.*

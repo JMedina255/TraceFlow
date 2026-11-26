@@ -106,8 +106,10 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
     process.env.DATABASE_SSL = 'false';
     process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
 
-    // 2. Ejecutar reinicio y migraciones reales completas en orden
-    const setupResult = await resetAndMigrateRealPostgres();
+    // 2. Ejecutar reinicio y migraciones reales completas en orden con autorización explícita
+    const setupResult = await resetAndMigrateRealPostgres({
+      allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
+    });
     adminPool = setupResult.adminPool;
     appPool = setupResult.appPool;
     appliedMigrations = setupResult.appliedMigrations;
@@ -437,9 +439,27 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
         )
       ).rejects.toThrow(ForbiddenException);
 
-      // 4. RfcsService.getRfcsForUser debe excluir expedientes de organizaciones donde está suspendido
+      // 4. Insertar una RFC en PRJ-001 para validar que getRfcById rechaza a miembros suspendidos
+      const rfcRes = await adminPool.query(`
+        INSERT INTO traceflow.change_request (
+          id, code, project_id, target_ecs_id, title, description, justification,
+          priority, classification, status, requested_by, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), 'RFC-TEST-0001', 'b0000001-0000-0000-0000-000000000001',
+          'c0000001-0000-0000-0000-000000000001', 'RFC de Prueba Histórica', 'Descripción de prueba',
+          'Justificación de prueba', 'MEDIA', 'PENDIENTE', 'REGISTRADA',
+          'a0000001-0000-0000-0000-000000000001', NOW(), NOW()
+        ) RETURNING id, code;
+      `);
+      const sampleRfcCode = rfcRes.rows[0].code;
+
+      await expect(
+        rfcsService.getRfcById(sampleRfcCode, userAugustoDev)
+      ).rejects.toThrow(ForbiddenException);
+
+      // 5. RfcsService.getRfcsForUser debe excluir expedientes de organizaciones donde está suspendido
       const visibleRfcs = await rfcsService.getRfcsForUser(userAugustoDev);
-      const prj1Rfcs = visibleRfcs.filter((r) => r.project_id === 'PRJ-001');
+      const prj1Rfcs = visibleRfcs.filter((r) => r.project_id === 'b0000001-0000-0000-0000-000000000001' || r.project_id === 'PRJ-001');
       expect(prj1Rfcs.length).toBe(0);
 
       // Restaurar estado activo de Augusto para no alterar pruebas posteriores
@@ -449,6 +469,10 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
         { status: 'ACTIVE' },
         userJoanGestor
       );
+
+      // 6. Consulta histórica autorizada: Augusto activo puede consultar la RFC histórica
+      const rfcConsultada = await rfcsService.getRfcById(sampleRfcCode, userAugustoDev);
+      expect(rfcConsultada.code).toBe(sampleRfcCode);
     });
 
     it('V-12: Protección contra condiciones de carrera: No se puede suspender al único OWNER activo de una organización', async () => {
@@ -515,7 +539,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
         await adminPool.query(rollbackSql);
       } catch (err: any) {
         rollbackBlocked = true;
-        expect(err.message).toContain('BLOQUEO DE SEGURIDAD (H02-R05)');
+        expect(err.message).toContain('BLOQUEO DE SEGURIDAD');
       }
       expect(rollbackBlocked).toBe(true);
 

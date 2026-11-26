@@ -958,6 +958,32 @@ Para dar cumplimiento formal al estándar de calidad y seguridad, se completó l
    - 15 escenarios físicos superados al 100% cubriendo DDL, FKs, CHECKs, permisos de `traceflow_app`, transacciones atómicas, concurrencia, disparadores DA-06, auditoría SHA-256 y salvaguarda de rollback.
    - Total backend: **77/77 pruebas en verde** (`npm test`) y **97/97 en prototipo frontend** (189 pruebas consolidadas). Persistencia en Supabase real en pausa bajo Governance Gate.
 
+### 10.6 Cierre Final de Seguridad y Preparación para INIT-H03 (Hito INIT-H02-VF)
+
+Tras la certificación física inicial, se ejecutaron las remediaciones de seguridad definitivas **INIT-H02-VF** blindando la persistencia contra destrucción accidental y reforzando la autorización en los procesos SCM:
+
+1. **Protección contra Borrado Accidental de Bases de Datos:**
+   - Se estableció la lista blanca explícita de bases descartables permitidas en `test-isolation.guard.ts`: `ALLOWED_DISPOSABLE_DATABASES = ['traceflow_cert', 'traceflow_test_disposable', 'traceflow_isolated_test']`.
+   - Se validan estrictamente los destinos descartables rechazando bases de sistema (`postgres`, `template1`), bases de producción (`traceflow`) y cualquier host remoto o no local.
+   - Se desacopló de forma estricta la autorización de DML remoto (`ALLOW_REMOTE_TEST_DML`) de la autorización de eliminación de bases de datos (`ALLOW_DESTRUCTIVE_DATABASE_RESET=true`). La autorización de pruebas remotas bajo ninguna circunstancia autoriza el borrado de bases de datos.
+   - Se eliminó la interpolación directa de credenciales e identificadores SQL en `real-db-helper.ts`, utilizando `quoteSqlIdentifier()` y las funciones C nativas de PostgreSQL `format('%I', ...)` y `format('%L', ...)`.
+   - Se incorporó la suite de pruebas negativas `test/destructive-safeguards.spec.ts` (8 pruebas en verde) certificando el bloqueo ante configuraciones incorrectas o maliciosas.
+
+2. **Aislamiento Total del Comando `npm test`:**
+   - Se configuró `vitest.config.ts` para que `npm test` ejecute **exclusivamente pruebas no destructivas** en memoria o unitarias.
+   - La suite de certificación física destructiva (`test/real-postgres-certification.spec.ts`) fue aislada y requiere invocación deliberada mediante el comando explícito `npm run test:real-postgres` asistido por script tipado con verificación de variables de entorno.
+   - Las pruebas remotas hacia Supabase permanecen excluidas por defecto y `test:all` no omite las salvaguardas de seguridad.
+
+3. **Autorización Obligatoria Fail-Closed en Procesos SCM (`RfcsService`):**
+   - En modo PostgreSQL, la validación de membresía organizacional es estrictamente obligatoria; ante la ausencia del repositorio de organizaciones se produce un fallo controlado `ServiceUnavailableException` (503) impidiendo bypasses silenciosos.
+   - Se rechaza formalmente cualquier intento de operar o consultar RFCs en proyectos sin organización válida asignada (DA-02).
+   - Se impide que sesiones antiguas o asignaciones previamente cacheadas otorguen acceso si el usuario ha sido suspendido en la organización (`status = 'SUSPENDED'`), arrojando `ForbiddenException` (403).
+   - Se conserva la consulta histórica de RFCs para miembros activos en proyectos con estados no activos (`HISTORICO_PENDIENTE_GITHUB`, `ARCHIVADO`, `CERRADO`), restringiendo la creación de RFCs exclusivamente a proyectos en estado `ACTIVO` (RN-12 / RN-13).
+
+4. **Salvaguarda Exhaustiva de Rollback contra Pérdida Irreversible de Datos:**
+   - Se blindó el script `202611260001_init_h02_organizations_and_projects_rollback.sql` para cancelar la reversión si se detectan adiciones de miembros posteriores a la migración, modificaciones sobre el rol o estado del miembro inicial (`USR-001` como `OWNER`), o alteraciones en la organización institucional semilla.
+   - Se documentó la política de recuperación y respaldo PITR (Point-in-Time Recovery) con objetivos `RTO <= 2h` y `RPO <= 24h` / WAL continuo.
+
 #### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
 Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:
 - Asociación automática de commits y Pull Requests con RFC y ECS (`RN-16`).

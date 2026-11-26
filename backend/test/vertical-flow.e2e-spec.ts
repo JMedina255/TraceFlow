@@ -39,7 +39,7 @@ describe('Flujo Vertical Completo E2E (Login -> Proyectos -> Crear RFC -> Consul
     projectsService = new ProjectsService(db, projectsRepo, orgRepo, auditService);
 
     const rfcsRepo = new RfcsRepository(db);
-    rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);
+    rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService, orgRepo, db);
   });
 
   it('debe ejecutar exitosamente el flujo de extremo a extremo sin datos ficticios', async () => {

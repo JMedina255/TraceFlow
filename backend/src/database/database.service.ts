@@ -39,10 +39,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       let sslConfig: pg.ConnectionConfig['ssl'] = undefined;
 
       // Configuración TLS segura (H-06: Sin rejectUnauthorized: false no justificado)
+      const isLocal = config.databaseUrl.includes('127.0.0.1') || config.databaseUrl.includes('localhost');
       if (
-        config.databaseUrl.includes('supabase.co') ||
-        config.databaseUrl.includes('pooler.supabase.com') ||
-        process.env.DATABASE_SSL === 'true'
+        !isLocal && (
+          config.databaseUrl.includes('supabase.co') ||
+          config.databaseUrl.includes('pooler.supabase.com') ||
+          process.env.DATABASE_SSL === 'true'
+        )
       ) {
         sslConfig = {
           rejectUnauthorized: config.databaseSslRejectUnauthorized,

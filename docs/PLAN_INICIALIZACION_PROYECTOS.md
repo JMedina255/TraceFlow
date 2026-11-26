@@ -925,9 +925,38 @@ Tras la auditoría del hito INIT-H02, se ejecutó la remediación exhaustiva **I
    - Se captura el `previousStatus` del miembro antes de aplicar la mutación de estado en BD, registrando diferencias fidedignas en `payload_diff` de `audit_log`.
    - Se reconcilió `normalizeProjectStatus()` para mapear los 8 estados canónicos: `BORRADOR`, `CONFIGURACION_INICIAL`, `ACTIVO`, `SUSPENDIDO`, `ARCHIVADO`, `HISTORICO_PENDIENTE_GITHUB`, `PENDIENTE_VALIDACION` y `CERRADO`.
 
-8. **H02-R08 — Certificación Física Aislada en PostgreSQL (10 Escenarios):**
-   - Se implementó la suite completa `backend/test/isolated-postgres-certification.spec.ts` ejecutada sobre un motor relacional PostgreSQL 14+ aislado (`pg-mem`).
-   - Certificación exitosa de los 10 escenarios: migraciones base, migración H02, datos iniciales, creación de proyecto en borrador, asignación con mínimo privilegio, bloqueo de acceso no autorizado, concurrencia, trigger de integridad DA-06, rollback atómico en fallo transaccional y validación de seguridad de rollback/recuperación.
+8. **H02-R08 — Certificación Rápida de Regresión en Memoria (8 Escenarios):**
+   - Se mantiene la suite `backend/test/isolated-pgmem-tests.spec.ts` como herramienta de pruebas unitarias y de regresión rápida en memoria (`pg-mem`), clarificando que no constituye la certificación del motor PostgreSQL real.
+
+### 10.5 Certificación Real de PostgreSQL y Cierre de Persistencia (Hito INIT-H02-V)
+
+Para dar cumplimiento formal al estándar de calidad y seguridad, se completó la certificación exhaustiva **INIT-H02-V** sobre un motor relacional físico PostgreSQL 16.14:
+
+1. **Ejecución Física de la Cadena Completa de Migraciones:**
+   - Se ejecutaron las migraciones históricas reales (`202611250001`, `202611250002`, seeds, `202611250003` y `202611260001`) sobre una instancia PostgreSQL 16 física sin DDL simplificado.
+   - Se verificó la función física `append_audit_log` con encadenamiento SHA-256 fidedigno utilizando la extensión `pgcrypto` aprovisionada bajo el esquema `extensions`.
+
+2. **Expansión de Columna para Estados Canónicos (`VARCHAR(40)`):**
+   - Se corrigió la restricción de longitud en `traceflow.project.status` elevándola de `VARCHAR(20)` a `VARCHAR(40)`, solventando el error de desbordamiento detectado en PostgreSQL físico con el estado `HISTORICO_PENDIENTE_GITHUB` (26 caracteres).
+
+3. **Aislamiento Obligatorio de Pruebas y Bloqueo de Conexiones Remotas:**
+   - Se diseñó e implementó el guardián `assertSafeTestDatabase()` en `backend/src/common/guards/test-isolation.guard.ts`.
+   - Se bloquean de forma terminante escrituras accidentales contra hosts remotos de Supabase (`supabase.co`, `pooler.supabase.com`, `amazonaws.com`) durante `npm test`.
+   - Se configuró `vitest.config.ts` para excluir automáticamente pruebas con DML remoto salvo que se active explícitamente `ALLOW_REMOTE_TEST_DML=true`.
+
+4. **Bloqueo Pesimista (`FOR UPDATE`) en Protección del Último OWNER:**
+   - Se eliminó la condición de carrera en `countActiveOwners` aplicando bloqueo a nivel de fila (`SELECT id FROM traceflow.organization_member ... FOR UPDATE`) dentro de transacciones atómicas `DatabaseService.transaction()`.
+
+5. **Revocación Efectiva de Acceso SCM a Miembros Suspendidos:**
+   - Se integró la validación de membresía en `RfcsService` (`getRfcsForUser`, `getRfcById`, `createRfc`), bloqueando con HTTP 403 Forbidden a usuarios con estado `SUSPENDED` en la organización propietaria del proyecto.
+
+6. **Rollback Seguro sin `CASCADE` y con PITR Dinámico:**
+   - Se eliminaron las cláusulas `CASCADE` en el script de reversión `202611260001_init_h02_organizations_and_projects_rollback.sql` para prevenir borrados colaterales inadvertidos.
+   - Se reemplazaron fechas estáticas por parámetros dinámicos UTC y LSN para procedimientos formales de Point-In-Time-Recovery (PITR).
+
+7. **Batería de 15 Pruebas en PostgreSQL 16 Real (`test/real-postgres-certification.spec.ts`):**
+   - 15 escenarios físicos superados al 100% cubriendo DDL, FKs, CHECKs, permisos de `traceflow_app`, transacciones atómicas, concurrencia, disparadores DA-06, auditoría SHA-256 y salvaguarda de rollback.
+   - Total backend: **77/77 pruebas en verde** (`npm test`) y **97/97 en prototipo frontend** (189 pruebas consolidadas). Persistencia en Supabase real en pausa bajo Governance Gate.
 
 #### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
 Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:

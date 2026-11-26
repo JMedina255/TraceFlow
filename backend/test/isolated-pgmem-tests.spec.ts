@@ -1,21 +1,10 @@
 /**
  * ============================================================================
- * TRACEFLOW SCM — CERTIFICACIÓN POSTGRESQL AISLADA (HITO INIT-H02-R / H02-R08)
- * Archivo: backend/test/isolated-postgres-certification.spec.ts
- * Motor: PostgreSQL Aislado (pg-mem relational SQL engine compatible con pg driver)
- * Marco Normativo: DA-01 a DA-06, ADR-011, Plan Maestro, IEEE 828, RNF-01, RNF-03
- *
- * 10 ESCENARIOS CERTIFICADOS OBLIGATORIOS:
- *  1. Aplicación de migraciones históricas previas (202611250001, 202611250002, 202611250003).
- *  2. Aplicación de migración INIT-H02 (202611260001_init_h02_organizations_and_projects.sql).
- *  3. Inserción de semillas y verificación de estructura institucional.
- *  4. Creación de proyecto en estado BORRADOR con transacción atómica.
- *  5. Asignación del creador al proyecto con rol operativo traceflow_app.
- *  6. Intentos de acceso y creación no autorizados (no miembro, suspendido, rol inactivo).
- *  7. Concurrencia y aislamiento multitenant institucional (DA-01, DA-02).
- *  8. Disparador de integridad referencial institucional (trg_check_user_project_assignment_org).
- *  9. Rollback de transacción atómica ante error intermedio (cero registros huérfanos).
- * 10. Ejecución del script de recuperación y rollback seguro (H02-R05).
+ * TRACEFLOW SCM — SUITE DE REGRESIÓN RÁPIDA EN MEMORIA CON PG-MEM (INIT-H02 / INIT-H02-V)
+ * Archivo: backend/test/isolated-pgmem-tests.spec.ts
+ * Motor: pg-mem (Simulador relacional en memoria para desarrollo desconectado y CI ligero)
+ * NOTA DE GOBERNANZA (INIT-H02-V): Esta suite sirve como herramienta de pruebas rápidas,
+ * pero NO constituye la certificación oficial de PostgreSQL real (atendida en real-postgres-certification.spec.ts).
  * ============================================================================
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';

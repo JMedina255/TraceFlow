@@ -194,6 +194,15 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Estrategia Segura de Recuperación y Rollback (PITR):** Procedimiento de reversión condicional que aborta si existen datos dependientes post-migración, preservando la información y redirigiendo a copias de seguridad Point-In-Time-Recovery (PITR).
 - **Certificación Aislada en PostgreSQL:** Batería de 10 escenarios ejecutados en motor PostgreSQL 14+ aislado (`pg-mem`) certificando transaccionalidad, disparadores de integridad `DA-06`, concurrencia y seguridad.
 
+## 31. Certificación Real de PostgreSQL y Cierre de Persistencia (INIT-H02-V)
+- **Certificación Física sobre PostgreSQL 16.14 Real:** Ejecución secuencial y limpia de la cadena completa de migraciones históricas (`202611250001`, `202611250002`, seeds, `202611250003` y `202611260001`) sobre una instancia relacional física en `127.0.0.1:5432`, verificando tablas, FKs, restricciones CHECK, triggers y permisos reales de `traceflow_app`.
+- **Auditoría Física Real SHA-256:** Verificación de la función `append_audit_log` con encadenamiento de hash fidedigno utilizando la extensión `pgcrypto` bajo el esquema `extensions` (sin simulaciones ni mocks).
+- **Aislamiento Obligatorio de Pruebas:** Implementación del guardián `assertSafeTestDatabase()` que detecta hosts remotos (`supabase.co`, `pooler.supabase.com`, `amazonaws.com`) y bloquea escrituras no autorizadas durante `npm test`. Exclusión automática de suites remotas en `vitest.config.ts`.
+- **Eliminación de Condiciones de Carrera:** Serialización pesimista con bloqueo por fila (`SELECT id ... FOR UPDATE`) en `countActiveOwners` dentro de `DatabaseService.transaction()`, impidiendo la suspensión concurrente del último propietario institucional.
+- **Revocación Efectiva de Acceso a Suspendidos:** Modificación de `RfcsService` para revocar consultas y creación de RFCs (HTTP 403 Forbidden) para usuarios suspendidos en la organización del proyecto.
+- **Rollback Seguro sin CASCADE:** Eliminación de borrado en cascada en `202611260001_init_h02_organizations_and_projects_rollback.sql` y parametrización con marcas de tiempo dinámicas en UTC y LSN para restauración Point-In-Time-Recovery (PITR).
+- **Cobertura de Certificación:** 15 pruebas físicas en `real-postgres-certification.spec.ts` (100% aprobadas), 77 pruebas backend (`npm test`) y 97 pruebas en prototipo frontend (189 pruebas en verde).
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V — C-SharkTeam / ÉXODO S.A.C.*

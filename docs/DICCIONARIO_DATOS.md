@@ -666,7 +666,7 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 
 ## 20. Entidades Candidatas para la Etapa de Inicialización y Gobierno GitHub (INIT-H01-R / INIT-H02..05)
 
-*(Diseño propuesto en `PLAN_INICIALIZACION_PROYECTOS.md` y `ADR-011`; **no ejecutado** en PostgreSQL durante H01-R. Privilegios auditados bajo mínimo privilegio sin `DELETE` para preservar inmutabilidad probatoria).*
+*(Diseño propuesto en `PLAN_INICIALIZACION_PROYECTOS.md` y `ADR-011`; certificado físicamente en PostgreSQL 16.14 aislado durante `INIT-H02-V` para las tablas 22 y 23. Despliegue productivo en Supabase en pausa bajo Governance Gate. Privilegios auditados bajo mínimo privilegio sin `DELETE` para preservar inmutabilidad probatoria. Columna `traceflow.project.status` expandida a `VARCHAR(40)` para compatibilidad canónica).*
 
 | ID | Tabla Actual Propuesta | Equivalente Objetivo Español | Propósito y Cardinalidad | Claves y Restricciones | Privilegios `traceflow_app` |
 |---|---|---|---|---|---|

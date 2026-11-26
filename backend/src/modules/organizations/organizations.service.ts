@@ -298,24 +298,21 @@ export class OrganizationsService {
       );
     }
 
-    // Prohibición de dejar a la organización sin propietarios
-    if (targetMember.role_in_org === 'OWNER' && dto.status === 'SUSPENDED') {
-      const allMembers = await this.orgRepo.findMembersByOrgId(org.id);
-      const activeOwners = allMembers.filter(
-        (m) => m.role_in_org === 'OWNER' && m.status === 'ACTIVE'
-      );
-      if (activeOwners.length <= 1) {
-        throw new BadRequestException(
-          'Acción bloqueada: No se puede suspender al único propietario activo de la organización.'
-        );
-      }
-    }
-
     // H02-R07: Capturar el estado anterior antes de la mutación para preservar la fidelidad de auditoría
     const previousStatus = targetMember.status;
 
-    // H02-R03: Ejecutar la actualización y la auditoría de forma atómica en transacción
+    // H02-R03 / INIT-H02-V: Ejecutar la actualización, verificación de concurrencia y auditoría de forma atómica en transacción
     await this.db.transaction(async (client) => {
+      // Protección contra condiciones de carrera: verificar que no se suspenda al último OWNER activo bajo bloqueo
+      if (targetMember.role_in_org === 'OWNER' && dto.status === 'SUSPENDED') {
+        const activeOwnersCount = await this.orgRepo.countActiveOwners(org.id, client, true);
+        if (activeOwnersCount <= 1) {
+          throw new BadRequestException(
+            'Acción bloqueada: No se puede suspender al único propietario activo de la organización.'
+          );
+        }
+      }
+
       await this.orgRepo.updateMemberStatus(org.id, targetUserId, dto.status, client);
 
       await this.auditService.logEvent(

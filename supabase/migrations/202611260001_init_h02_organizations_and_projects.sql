@@ -9,6 +9,24 @@
 
 BEGIN;
 
+-- 0. COMPROBACIONES DE INTEGRIDAD PRE-MIGRACIÓN (INIT-H02-V §4)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'traceflow' AND table_name = 'project'
+    ) THEN
+        RAISE EXCEPTION '[PRE-CHECK ERROR] Tabla traceflow.project no encontrada. Migraciones base ausentes.';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM traceflow.app_user
+        WHERE id = 'a0000001-0000-0000-0000-000000000001' AND status = 'ACTIVE'
+    ) THEN
+        RAISE EXCEPTION '[PRE-CHECK ERROR] Usuario fundador USR-001 no existe en traceflow.app_user o no está activo.';
+    END IF;
+END $$;
+
 -- 1. TABLA DE ORGANIZACIONES (TENANT RAÍZ - DA-02)
 CREATE TABLE IF NOT EXISTS traceflow.organization (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -81,14 +99,18 @@ WHERE EXISTS (
 )
 ON CONFLICT (organization_id, user_id) DO NOTHING;
 
--- 4.3 Vinculación de los proyectos históricos existentes a ORG-EXODO
+-- 4.3 Regularización acotada: Vinculación exclusiva de los proyectos históricos verificados de ÉXODO S.A.C.
+-- (PRJ-001, PRJ-002, PRJ-003) únicamente cuando no posean organización previamente asignada (INIT-H02-V §4).
+-- Prohibido vincular proyectos desconocidos o sobrescribir organizaciones existentes.
 UPDATE traceflow.project
 SET organization_id = 'c0000001-0000-0000-0000-000000000001'
-WHERE organization_id IS NULL;
+WHERE code IN ('PRJ-001', 'PRJ-002', 'PRJ-003')
+  AND organization_id IS NULL;
 
 -- 5. ACTUALIZACIÓN DE RESTRICCIÓN DE ESTADOS CANÓNICOS DE PROYECTO (INIT-H01-R)
 -- Permitir estados canónicos ('BORRADOR', 'CONFIGURACION_INICIAL', 'ACTIVO', 'SUSPENDIDO', 'ARCHIVADO', 'HISTORICO_PENDIENTE_GITHUB')
 -- y preservar compatibilidad con estados legados ('ACTIVE', 'CLOSED') durante la migración progresiva.
+ALTER TABLE traceflow.project ALTER COLUMN status TYPE VARCHAR(40);
 ALTER TABLE traceflow.project DROP CONSTRAINT IF EXISTS project_status_check;
 ALTER TABLE traceflow.project DROP CONSTRAINT IF EXISTS chk_project_status;
 
@@ -165,5 +187,29 @@ REVOKE DELETE ON TABLE
     traceflow.project,
     traceflow.user_project_assignment
 FROM traceflow_app;
+
+-- 8. COMPROBACIONES DE INTEGRIDAD POST-MIGRACIÓN (INIT-H02-V §4)
+DO $$
+DECLARE
+    v_unassigned_historical INT;
+    v_invalid_members INT;
+BEGIN
+    SELECT COUNT(*) INTO v_unassigned_historical
+    FROM traceflow.project
+    WHERE code IN ('PRJ-001', 'PRJ-002', 'PRJ-003') AND organization_id IS NULL;
+
+    IF v_unassigned_historical > 0 THEN
+        RAISE EXCEPTION '[POST-CHECK ERROR] Existen proyectos históricos sin organización asignada tras la migración.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_invalid_members
+    FROM traceflow.organization_member m
+    LEFT JOIN traceflow.app_user u ON m.user_id = u.id
+    WHERE u.id IS NULL;
+
+    IF v_invalid_members > 0 THEN
+        RAISE EXCEPTION '[POST-CHECK ERROR] Se detectaron membresías huérfanas sin usuario asociado en app_user.';
+    END IF;
+END $$;
 
 COMMIT;

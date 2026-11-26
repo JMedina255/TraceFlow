@@ -327,6 +327,23 @@ export class OrganizationsRepository {
     return this.members.filter((m) => m.organization_id === orgId);
   }
 
+  async countActiveOwners(orgId: string, client?: any, forUpdate = false): Promise<number> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const lockClause = forUpdate ? 'FOR UPDATE' : '';
+      const res = await this.runQuery<{ id: string }>(
+        `SELECT id FROM traceflow.organization_member
+         WHERE organization_id = $1 AND role_in_org = 'OWNER' AND status = 'ACTIVE'
+         ${lockClause}`,
+        [orgId],
+        client
+      );
+      return res.rows.length;
+    }
+    return this.members.filter(
+      (m) => m.organization_id === orgId && m.role_in_org === 'OWNER' && m.status === 'ACTIVE'
+    ).length;
+  }
+
   async updateMemberStatus(
     orgId: string,
     userId: string,

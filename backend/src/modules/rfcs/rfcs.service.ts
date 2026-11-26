@@ -1,7 +1,8 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException, Inject, Optional } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { RfcsRepository, RfcEntity } from './rfcs.repository.js';
 import { ProjectsRepository } from '../projects/projects.repository.js';
+import { OrganizationsRepository } from '../organizations/organizations.repository.js';
 import { AuditService } from '../audit/audit.service.js';
 import { CreateRfcDto } from './dtos/create-rfc.dto.js';
 import type { AuthenticatedUser } from '../../common/types/index.js';
@@ -12,27 +13,46 @@ export class RfcsService {
     @Inject(RfcsRepository) private readonly rfcsRepo: RfcsRepository,
     @Inject(ProjectsRepository) private readonly projectsRepo: ProjectsRepository,
     @Inject(AuditService) private readonly auditService: AuditService,
+    @Optional() @Inject(OrganizationsRepository) private readonly orgRepo?: OrganizationsRepository,
   ) {}
 
   async getRfcsForUser(user: AuthenticatedUser, projectId?: string): Promise<RfcEntity[]> {
     const all = await this.rfcsRepo.findAll();
 
-    return all.filter((rfc) => {
+    // H02-V / DA-06: Recuperar organizaciones activas del usuario para revocar acceso si está suspendido
+    let activeOrgIds: string[] | null = null;
+    if (this.orgRepo) {
+      const activeOrgs = await this.orgRepo.findOrganizationsForUser(user.id);
+      activeOrgIds = activeOrgs.map((o) => o.id);
+    }
+
+    const filtered: RfcEntity[] = [];
+    for (const rfc of all) {
       // 1. Filtrado multitenant por proyecto asignado
       const projectMatches = user.assignedProjectIds.includes(rfc.project_id);
-      if (!projectMatches) return false;
+      if (!projectMatches) continue;
 
-      // Si se especificó un proyecto de filtro
-      if (projectId && rfc.project_id !== projectId) return false;
+      if (projectId && rfc.project_id !== projectId) continue;
+
+      // H02-V / DA-06: Validar que el usuario sea miembro activo de la organización del proyecto
+      if (this.orgRepo && activeOrgIds) {
+        const prj = await this.projectsRepo.findByIdOrCode(rfc.project_id);
+        if (prj && prj.organization_id && !activeOrgIds.includes(prj.organization_id)) {
+          continue; // Suspendido o no miembro en la organización
+        }
+      }
 
       // 2. Regla de Ownership para Solicitante (PU-01): Solo ve sus propios expedientes
       if (user.activeRoleId === 'PU-01') {
-        return rfc.requested_by === user.id || rfc.requested_by === user.code;
+        if (rfc.requested_by !== user.id && rfc.requested_by !== user.code) {
+          continue;
+        }
       }
 
-      // Los demás roles de gestión, arquitectura, CCB, calidad ven todas las RFCs del proyecto asignado
-      return true;
-    });
+      filtered.push(rfc);
+    }
+
+    return filtered;
   }
 
   async getRfcById(idOrCode: string, user: AuthenticatedUser): Promise<RfcEntity> {
@@ -47,6 +67,19 @@ export class RfcsService {
       (Boolean((rfc as any).project_code) && user.assignedProjectIds.includes((rfc as any).project_code));
     if (!hasProjectAccess) {
       throw new ForbiddenException(`Acceso no autorizado al proyecto de la RFC '${rfc.code}'.`);
+    }
+
+    // H02-V / DA-06: Validar membresía activa en la organización del proyecto
+    if (this.orgRepo) {
+      const prj = await this.projectsRepo.findByIdOrCode(rfc.project_id);
+      if (prj && prj.organization_id) {
+        const member = await this.orgRepo.findMember(prj.organization_id, user.id);
+        if (!member || member.status !== 'ACTIVE') {
+          throw new ForbiddenException(
+            `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización propietaria del proyecto (DA-06).`
+          );
+        }
+      }
     }
 
     // Regla de Ownership estricta para PU-01
@@ -77,6 +110,16 @@ export class RfcsService {
     const project = await this.projectsRepo.findByIdOrCode(dto.projectId);
     if (!project) {
       throw new NotFoundException(`El proyecto '${dto.projectId}' no existe.`);
+    }
+
+    // H02-V / DA-06: Validar membresía activa en la organización propietaria del proyecto
+    if (this.orgRepo && project.organization_id) {
+      const member = await this.orgRepo.findMember(project.organization_id, user.id);
+      if (!member || member.status !== 'ACTIVE') {
+        throw new ForbiddenException(
+          `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización propietaria del proyecto (DA-06).`
+        );
+      }
     }
 
     const hasProjectAccess =

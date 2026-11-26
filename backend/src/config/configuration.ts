@@ -40,7 +40,7 @@ export function loadConfig(): AppConfig {
     nodeEnv,
     port: parseInt(process.env.PORT || '3001', 10),
     corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    databaseUrl: process.env.DATABASE_URL || '',
+    databaseUrl: (nodeEnv === 'test' && process.env.TEST_DATABASE_URL) ? process.env.TEST_DATABASE_URL : (process.env.DATABASE_URL || ''),
     databaseMode,
     databaseSslRejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false',
     databaseCaCert: caCert,

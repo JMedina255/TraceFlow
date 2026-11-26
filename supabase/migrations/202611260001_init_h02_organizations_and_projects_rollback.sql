@@ -16,8 +16,8 @@
 --       i. Detener el tráfico hacia traceflow_app.
 --       ii. Determinar el LSN o timestamp exacto previo al incidente:
 --           SELECT pg_current_wal_lsn(), NOW();
---       iii. Restaurar el backup base inmediatamente anterior y configurar target:
---           recovery_target_time = '2026-11-26 00:00:00-05'
+--       iii. Restaurar el backup base inmediatamente anterior y configurar target dinámico:
+--           recovery_target_time = '<TIMESTAMP_UTC_PREVIO_AL_INCIDENTE>' -- O recovery_target_lsn = '<LSN_PREVIO>'
 --           recovery_target_action = 'promote'
 --    c) Procedimiento Restauración Selectiva con pg_restore:
 --       pg_restore --host=$DB_HOST --username=$DB_USER --dbname=$DB_NAME \
@@ -82,8 +82,8 @@ WHERE organization_id = 'c0000001-0000-0000-0000-000000000001';
 DELETE FROM traceflow.organization
 WHERE id = 'c0000001-0000-0000-0000-000000000001';
 
--- 7. ELIMINAR TABLAS DDL DE MANERA SEGURA (SOLO CUANDO NO HAY DEPENDENCIAS ACTIVAS)
-DROP TABLE IF EXISTS traceflow.organization_member CASCADE;
-DROP TABLE IF EXISTS traceflow.organization CASCADE;
+-- 7. ELIMINAR TABLAS DDL DE MANERA SEGURA (RESTRICTIVO, SIN CASCADE PARA PREVENIR BORRADOS COLATERALES)
+DROP TABLE IF EXISTS traceflow.organization_member;
+DROP TABLE IF EXISTS traceflow.organization;
 
 COMMIT;

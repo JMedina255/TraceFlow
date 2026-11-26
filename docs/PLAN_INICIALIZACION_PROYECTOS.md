@@ -984,6 +984,27 @@ Tras la certificación física inicial, se ejecutaron las remediaciones de segur
    - Se blindó el script `202611260001_init_h02_organizations_and_projects_rollback.sql` para cancelar la reversión si se detectan adiciones de miembros posteriores a la migración, modificaciones sobre el rol o estado del miembro inicial (`USR-001` como `OWNER`), o alteraciones en la organización institucional semilla.
    - Se documentó la política de recuperación y respaldo PITR (Point-in-Time Recovery) con objetivos `RTO <= 2h` y `RPO <= 24h` / WAL continuo.
 
+### 10.7 Cierre Definitivo de Observaciones Residuales (INIT-H02 Residuales)
+
+Para culminar formalmente el hito `INIT-H02` previo a la autorización de `INIT-H03`, se remediaron y certificaron las 3 observaciones residuales detectadas durante la auditoría final:
+
+1. **Coherencia del Script de Rollback con el Conjunto Completo de Fundadores:**
+   - La migración `202611260001` genera 4 membresías institucionales (`USR-001` como `OWNER`, `USR-002`..`USR-004` como `MEMBER`). El script de rollback fue corregido para contrastar contra los cuatro registros fundadores legítimos.
+   - Si existen exactamente los 4 fundadores sin alteraciones de rol o estado, y no hay proyectos u organizaciones post-migración, la reversión procede de forma limpia y controlada, eliminando las tablas `organization` y `organization_member`, desvinculando la columna `organization_id` y restaurando el estado canónico de los proyectos históricos.
+   - Si cualquiera de los 4 fundadores es alterado en su rol o estado, o si se detectan miembros adicionales, el script aborta inmediatamente arrojando `BLOQUEO DE SEGURIDAD` para proteger la custodia de datos institucionales.
+
+2. **Salvaguarda de Gobernanza SCM Fail-Closed (`RfcsService.createRfc`):**
+   - Un estado `ACTIVE` heredado o `ACTIVO` no constituye evidencia suficiente de que el proyecto dispone de una integración GitHub validada (DA-04, RN-12).
+   - En modo PostgreSQL real (`DATABASE_MODE=postgres`), `RfcsService.createRfc()` aplica una salvaguarda fail-closed que rechaza la creación de RFCs con HTTP 403 Forbidden hasta que el hito `INIT-H04` suministre el canal de verificación física de GitHub.
+   - El modo `mock` (`DATABASE_MODE=mock`) preserva compatibilidad abierta para pruebas de prototipo y desarrollo sin requerir infraestructura remota.
+
+3. **Introspección Física en Runtime y Protección de Pruebas Externas:**
+   - En `real-db-helper.ts`, antes de invocar cualquier instrucción `DROP DATABASE`, se realiza una introspección nativa del socket PostgreSQL consultando `inet_server_addr()`, `current_database()` y `datistemplate`, garantizando en tiempo de ejecución que la conexión esté atada estrictamente a la interfaz loopback (`127.0.0.1` / `::1`) y que la base no sea una plantilla del sistema.
+   - En `run-supabase-tests.ts`, se eliminó la asignación automática de `ALLOW_REMOTE_TEST_DML=true`. La ejecución de pruebas contra Supabase exige que la autorización sea suministrada de forma deliberada y previa por el operador, y valida rigurosamente que el host sea remoto vía `isRemoteDatabaseHost()`.
+
+4. **Certificación Oficial en PostgreSQL 16 Real (`test/real-postgres-certification.spec.ts`):**
+   - Se ampliaron los escenarios físicos reales a **18 pruebas (100% aprobadas)**: `V-13` (rechazo fail-closed en SCM), `V-16` (bloqueo de rollback por proyectos/organizaciones post-migración), `V-17` (bloqueo de rollback por alteración de cualquiera de los 4 fundadores) y `V-18` (reversión limpia y restauración del esquema relacional pre-H02).
+
 #### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
 Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:
 - Asociación automática de commits y Pull Requests con RFC y ECS (`RN-16`).

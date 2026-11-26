@@ -64,6 +64,32 @@ export async function resetAndMigrateRealPostgres(
   await adminClient.connect();
 
   try {
+    // 0.1 Comprobación verificable del entorno descartable mediante introspección directa de PostgreSQL
+    const srvCheck = await adminClient.query(
+      'SELECT inet_server_addr()::text AS srv_addr, inet_server_port() AS srv_port, current_database() AS curr_db;'
+    );
+    const { srv_addr, curr_db } = srvCheck.rows[0];
+    if (srv_addr && srv_addr !== '127.0.0.1' && srv_addr !== '::1' && !srv_addr.startsWith('127.')) {
+      throw new Error(
+        `[BLOQUEO DESTRUCCTIVO] Introspección de servidor fallida: La conexión activa se estableció hacia la dirección no local '${srv_addr}'. Operación de borrado cancelada.`
+      );
+    }
+    if (curr_db === opts.database) {
+      throw new Error(
+        `[BLOQUEO DESTRUCCTIVO] Introspección fallida: La base de datos conectada '${curr_db}' coincide con la base que se intenta eliminar.`
+      );
+    }
+
+    const tplCheck = await adminClient.query(
+      'SELECT datistemplate FROM pg_database WHERE datname = $1;',
+      [opts.database]
+    );
+    if (tplCheck.rows.length > 0 && tplCheck.rows[0].datistemplate) {
+      throw new Error(
+        `[BLOQUEO DESTRUCCTIVO] La base de datos '${opts.database}' es una plantilla de sistema (template). Prohibido eliminar.`
+      );
+    }
+
     // Terminar conexiones activas hacia la base de datos de pruebas si existe (usando parámetros bind)
     await adminClient.query(
       `

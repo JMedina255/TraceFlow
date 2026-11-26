@@ -43,6 +43,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
   let adminPool: pg.Pool;
   let appPool: pg.Pool;
   let appliedMigrations: string[];
+  let poolsClosed = false;
 
   let dbService: DatabaseService;
   let orgsRepo: OrganizationsRepository;
@@ -132,9 +133,11 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
   });
 
   afterAll(async () => {
-    if (dbService) await dbService.onModuleDestroy();
-    if (adminPool) await adminPool.end();
-    if (appPool) await appPool.end();
+    if (!poolsClosed) {
+      if (dbService) await dbService.onModuleDestroy();
+      if (adminPool) await adminPool.end();
+      if (appPool) await appPool.end();
+    }
   });
 
   // ==========================================================================
@@ -486,13 +489,66 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
         )
       ).rejects.toThrow(BadRequestException);
     });
+
+    it('V-13: Salvaguarda de Gobernanza SCM (DA-04): En modo PostgreSQL, un integrante activo en un proyecto ACTIVE no puede emitir RFC sin integración GitHub validada (fail-closed)', async () => {
+      // Joan es OWNER activo en ORG-EXODO y tiene membresía y asignación al proyecto PRJ-001
+      const userJoanSolicitante: AuthenticatedUser = {
+        ...userJoanGestor,
+        activeRoleId: 'PU-01',
+      };
+
+      // Simular que el proyecto se encuentra en estado 'ACTIVE' (ej. migración o regularización previa)
+      await adminPool.query("UPDATE traceflow.project SET status = 'ACTIVE' WHERE code = 'PRJ-001';");
+
+      try {
+        // Sin la variable ALLOW_MOCK_GITHUB_ACTIVATION, debe fallar con ForbiddenException (fail-closed)
+        delete process.env.ALLOW_MOCK_GITHUB_ACTIVATION;
+
+        await expect(
+          rfcsService.createRfc(
+            {
+              projectId: 'PRJ-001',
+              targetEcsId: 'c0000001-0000-0000-0000-000000000001',
+              title: 'Intento de RFC en proyecto sin GitHub validado',
+              description: 'Prueba de salvaguarda fail-closed DA-04',
+              justification: 'Validar gobernanza SCM obligatoria',
+              priority: 'MEDIA',
+            },
+            userJoanSolicitante
+          )
+        ).rejects.toThrow(
+          /Operación rechazada \(DA-04 \/ RN-12\): El proyecto 'PRJ-001' no dispone de una integración GitHub validada/i
+        );
+
+        // Si explícitamente se habilita ALLOW_MOCK_GITHUB_ACTIVATION=true (simulación autorizada en pruebas),
+        // la salvaguarda permite la emisión controlada de la RFC
+        process.env.ALLOW_MOCK_GITHUB_ACTIVATION = 'true';
+        const rfc = await rfcsService.createRfc(
+          {
+            projectId: 'PRJ-001',
+            targetEcsId: 'c0000001-0000-0000-0000-000000000001',
+            title: 'RFC autorizada con bypass simulado de prueba',
+            description: 'Prueba controlada de bypass en testing',
+            justification: 'Verificación de canal de pruebas controladas',
+            priority: 'MEDIA',
+          },
+          userJoanSolicitante
+        );
+        expect(rfc).toBeDefined();
+        expect(rfc.title).toBe('RFC autorizada con bypass simulado de prueba');
+        expect(rfc.status).toBe('REGISTRADA');
+      } finally {
+        delete process.env.ALLOW_MOCK_GITHUB_ACTIVATION;
+        await adminPool.query("UPDATE traceflow.project SET status = 'HISTORICO_PENDIENTE_GITHUB' WHERE code = 'PRJ-001';");
+      }
+    });
   });
 
   // ==========================================================================
   // BLOQUE 6: AUDITORÍA REAL CON CRIPTOGRAFÍA SHA-256 E INMUTABILIDAD
   // ==========================================================================
   describe('Bloque 6: Auditoría Inmutable con Cadena Criptográfica SHA-256 (ADR-008)', () => {
-    it('V-13: append_audit_log en PostgreSQL real debe generar hashes SHA-256 válidos y serializados', async () => {
+    it('V-14: append_audit_log en PostgreSQL real debe generar hashes SHA-256 válidos y serializados', async () => {
       const logsRes = await appPool.query(`
         SELECT sequence_number, prev_log_hash, curr_log_hash, payload_diff
         FROM traceflow.audit_log
@@ -509,7 +565,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
       }
     });
 
-    it('V-14: UPDATE y DELETE sobre traceflow.audit_log deben ser estrictamente rechazados por el trigger', async () => {
+    it('V-15: UPDATE y DELETE sobre traceflow.audit_log deben ser estrictamente rechazados por el trigger', async () => {
       // Intentar alterar un registro de auditoría en PostgreSQL real
       await expect(
         adminPool.query("UPDATE traceflow.audit_log SET event_code = 'ALTERED';")
@@ -526,13 +582,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
   // BLOQUE 7: RECUPERACIÓN Y ROLLBACK SEGURO SIN PÉRDIDA DE INFORMACIÓN (H02-R05)
   // ==========================================================================
   describe('Bloque 7: Salvaguardas del Script de Recuperación y Rollback (H02-R05)', () => {
-    it('V-15: Si existen datos creados post-migración, el script de rollback debe ABORTAR protegiendo los datos', async () => {
-      const rollbackSqlPath = path.resolve(
-        process.cwd(),
-        '../supabase/migrations/202611260001_init_h02_organizations_and_projects_rollback.sql'
-      );
-      const rollbackSql = fs.readFileSync(rollbackSqlPath, 'utf8');
+    const rollbackSqlPath = path.resolve(
+      process.cwd(),
+      '../supabase/migrations/202611260001_init_h02_organizations_and_projects_rollback.sql'
+    );
+    const rollbackSql = fs.readFileSync(rollbackSqlPath, 'utf8');
 
+    it('V-16: Si existen proyectos u organizaciones creadas post-migración, el script de rollback debe ABORTAR', async () => {
       // Intentar ejecutar el rollback cuando existen proyectos u organizaciones creadas (PRJ-SUR-01, ORG-BANCOSUR)
       let rollbackBlocked = false;
       try {
@@ -540,12 +596,91 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
       } catch (err: any) {
         rollbackBlocked = true;
         expect(err.message).toContain('BLOQUEO DE SEGURIDAD');
+        expect(err.message).toContain('Orgs nuevas: 1');
       }
       expect(rollbackBlocked).toBe(true);
 
       // Verificar que los datos siguen existiendo intactos
       const orgCheck = await adminPool.query("SELECT 1 FROM traceflow.organization WHERE code = 'ORG-BANCOSUR';");
       expect(orgCheck.rows.length).toBe(1);
+    });
+
+    it('V-17: Si uno de los cuatro fundadores es alterado en rol o estado, el rollback debe ABORTAR', async () => {
+      // Modificar temporalmente el rol de USR-002 de MEMBER a OWNER
+      await adminPool.query(`
+        UPDATE traceflow.organization_member
+        SET role_in_org = 'OWNER'
+        WHERE user_id = 'a0000001-0000-0000-0000-000000000002';
+      `);
+
+      let rollbackBlocked = false;
+      try {
+        await adminPool.query(rollbackSql);
+      } catch (err: any) {
+        rollbackBlocked = true;
+        expect(err.message).toContain('BLOQUEO DE SEGURIDAD');
+        expect(err.message).toMatch(/Fundadores alterados:\s*(true|t)/);
+      } finally {
+        // Restaurar estado original del fundador para no dejar datos corruptos
+        await adminPool.query(`
+          UPDATE traceflow.organization_member
+          SET role_in_org = 'MEMBER'
+          WHERE user_id = 'a0000001-0000-0000-0000-000000000002';
+        `);
+      }
+      expect(rollbackBlocked).toBe(true);
+    });
+
+    it('V-18: Reversión limpia: Con solo los 4 fundadores y proyectos históricos recién migrados, el rollback revierte el esquema limpiamente', async () => {
+      // 0. Cerrar limpiamente conexiones de aplicación previas para evitar desconexiones abruptas por pg_terminate_backend
+      if (dbService) await dbService.onModuleDestroy();
+      if (appPool) await appPool.end();
+      if (adminPool) await adminPool.end();
+
+      // 1. Reestablecer el estado exacto post-migración H02 (con las 4 migraciones aplicadas y seeds intactos)
+      const setupResult = await resetAndMigrateRealPostgres({
+        allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
+      });
+      adminPool = setupResult.adminPool;
+      appPool = setupResult.appPool;
+
+      // 2. Ejecutar el script exacto de rollback en la base PostgreSQL real
+      await adminPool.query(rollbackSql);
+
+      // 3. Verificar que las tablas organizacionales fueron removidas
+      const orgTableRes = await adminPool.query("SELECT to_regclass('traceflow.organization') as tbl;");
+      expect(orgTableRes.rows[0].tbl).toBeNull();
+
+      const memberTableRes = await adminPool.query("SELECT to_regclass('traceflow.organization_member') as tbl;");
+      expect(memberTableRes.rows[0].tbl).toBeNull();
+
+      // 4. Verificar que la columna organization_id en project fue eliminada
+      const colRes = await adminPool.query(`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'traceflow' AND table_name = 'project' AND column_name = 'organization_id';
+      `);
+      expect(colRes.rows.length).toBe(0);
+
+      // 5. Verificar que los proyectos históricos siguen existiendo intactos con status ACTIVE
+      const prjsRes = await adminPool.query(`
+        SELECT code, status FROM traceflow.project ORDER BY code ASC;
+      `);
+      expect(prjsRes.rows.length).toBe(3);
+      expect(prjsRes.rows.map(r => r.code)).toEqual(['PRJ-001', 'PRJ-002', 'PRJ-003']);
+      expect(prjsRes.rows.every(r => r.status === 'ACTIVE')).toBe(true);
+
+      // 6. Verificar que los 4 usuarios del sistema continúan existiendo en app_user
+      const usersRes = await adminPool.query(`
+        SELECT code FROM traceflow.app_user ORDER BY code ASC;
+      `);
+      expect(usersRes.rows.length).toBe(4);
+      expect(usersRes.rows.map(r => r.code)).toEqual(['USR-001', 'USR-002', 'USR-003', 'USR-004']);
+
+      // 7. Cerrar pools de la reversión limpia y marcar bandera
+      await adminPool.end();
+      await appPool.end();
+      poolsClosed = true;
     });
   });
 });

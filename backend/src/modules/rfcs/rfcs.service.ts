@@ -197,7 +197,22 @@ export class RfcsService {
       }
     }
 
-    // 3. Reglas SCM de Ciclo de Vida (RN-12 / RN-13): Escritura restringida exclusivamente a proyectos ACTIVO
+    // 3. Salvaguarda de Gobernanza SCM (DA-04 / RN-12):
+    // Un estado 'ACTIVE' heredado o 'ACTIVO' no constituye evidencia suficiente de que el proyecto
+    // disponga de una integración GitHub validada. En modo PostgreSQL, se aplica una salvaguarda
+    // temporal fail-closed que bloquea la emisión de RFCs hasta que INIT-H04 suministre el mecanismo real.
+    // El modo mock (DATABASE_MODE=mock) preserva compatibilidad para desarrollo y prototipo.
+    if (isPostgres) {
+      const allowMockActivation = process.env.ALLOW_MOCK_GITHUB_ACTIVATION === 'true';
+      if (!allowMockActivation) {
+        throw new ForbiddenException(
+          `Operación rechazada (DA-04 / RN-12): El proyecto '${project.code}' no dispone de una integración GitHub validada. ` +
+            `El estado '${project.status}' heredado no autoriza operaciones SCM hasta que el mecanismo de verificación de GitHub sea activado en INIT-H04.`
+        );
+      }
+    }
+
+    // 4. Reglas SCM de Ciclo de Vida (RN-12 / RN-13): Escritura restringida exclusivamente a proyectos ACTIVO
     const statusUpper = (project.status || '').toUpperCase();
     if (statusUpper !== 'ACTIVE' && statusUpper !== 'ACTIVO') {
       throw new ForbiddenException(
@@ -205,7 +220,7 @@ export class RfcsService {
       );
     }
 
-    // 4. Validación de asignación del proyecto
+    // 5. Validación de asignación del proyecto
     const hasProjectAccess =
       user.assignedProjectIds.includes(project.code) || user.assignedProjectIds.includes(project.id);
     if (!hasProjectAccess) {

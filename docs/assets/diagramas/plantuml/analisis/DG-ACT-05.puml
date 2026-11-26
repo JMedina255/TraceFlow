@@ -22,58 +22,84 @@ skinparam activity {
     FontColor #2C3E50
 }
 
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
 |#EBF5FB|Analista de Requerimientos / Gestor|
 |#EAEDED|TraceFlow SCM|
 
 |Analista de Requerimientos / Gestor|
 start
-:<color:white><b>FASE 1: Recepción y Revisión Formal</b></color>; <<#34495E>>
-:Abrir expediente RFC en estado REGISTRADA;
+#34495E:<color:white><b>FASE 1: Identificación y Recepción en Bandeja General</b></color>;
+:Acceder a Bandeja General de Solicitudes (/rfcs);\nfiltrar por Estado "REGISTRADA" y pulsar "Ver";
 
 |TraceFlow SCM|
-if (¿Rol activo es Gestor [PU-02] con proyecto asignado?) then (No)
-    :[E001] Mostrar restricción de revisión\nreservada al Analista de Requerimientos / Gestor;
-    stop
-elseif (¿Estado de la RFC es REGISTRADA?) then (No)
-    :[E002] Informar que la solicitud no está\nen etapa de revisión inicial;
+if (¿Expediente pertenece al proyecto activo de la sesión?) then (No)
+    :[E001] Mostrar bloqueo multitenant de proyecto\ny ofrecer conmutar al proyecto propietario;
     stop
 else (Sí)
-    :Presentar Expediente 360° y panel de decisiones\n(Admitir, Observar o Desestimar);
+endif
+
+if (¿Rol activo es Gestor [PU-02]?) then (No)
+    :[E001] Mostrar Expediente 360° en solo lectura\ncon aviso SoD "Revisión Inicial Reservada al Gestor";
+    stop
+else (Sí)
+endif
+
+if (¿Estado oficial de la RFC es REGISTRADA?) then (No)
+    :[E002] Informar estado incompatible y restringir acciones;\nexpediente no admite triaje inicial;
+    stop
+else (Sí)
+    :Desplegar Expediente 360° con banner WF-06A\ny consola activa de "Revisión Inicial y Dictamen de Admisión";
 endif
 
 |Analista de Requerimientos / Gestor|
-:Inspeccionar descripción, justificación, prioridad,\nECS asociado, anexos y eventual duplicidad;
+#34495E:<color:white><b>FASE 2: Inspección Integral del Expediente 360°</b></color>;
+:Examinar metadatos clave, pestañas "Resumen y justificación",\n"Elementos afectados" y evidencias probatorias;
 
-if (¿Anexos legibles y consistentes?) then (No [E004])
-    :Alertar falla o ilegibilidad de anexos\ny derivar a formulación de observaciones;
+if (¿Evidencias adjuntas legibles y consistentes?) then (No [E004])
+    :Identificar vacíos probatorios o fallas de formato;\ncanalizar hacia emisión de pliego de observaciones;
 else (Sí)
 endif
 
-:<color:white><b>FASE 2: Emisión de Dictamen Inicial</b></color>; <<#34495E>>
-if (¿Decisión de admisibilidad?) then (Opción A: Admitir)
-    :Registrar observaciones o confirmación de admisión\ny pulsar "Admitir Solicitud";
+#34495E:<color:white><b>FASE 3: Emisión de Dictamen Formal y Notificación</b></color>;
+if (¿Ruta de resolución seleccionada?) then (Opción A: Admitir RFC [Flujo Normal])
+    :Seleccionar "Opción A: Admitir RFC",\ningresar "Dictamen Preliminar / Observaciones de Admisión"\ny pulsar "Admitir Solicitud (REGISTRADA -> CLASIFICADA)";
     |TraceFlow SCM|
-    :Actualizar estado a <b>CLASIFICADA</b>,\nregistrar auditoría y notificar al Arquitecto (PU-03);
-    stop
-elseif (Opción B: Observar [A001]) then
-    repeat
-        |Analista de Requerimientos / Gestor|
-        :Redactar pliego de observaciones\ny pulsar "Emitir Pliego de Observaciones";
-        |TraceFlow SCM|
-        :Validar extensión mínima del pliego (10 car.);
-    repeat while (¿Pliego válido?) is (No [E003]: Exigir detalle suficiente)
-    -> Sí;
-    :Transicionar estado a <b>EN_SUBSANACION</b>,\nregistrar auditoría y notificar al Solicitante (CU-04.1);
-    stop
-else (Opción C: Desestimar [A002])
-    repeat
-        |Analista de Requerimientos / Gestor|
-        :Ingresar justificación obligatoria, marcar confirmación\ny pulsar "Desestimar Definitivamente";
-        |TraceFlow SCM|
-        :Validar justificación (>= 10 car.) y casilla de confirmación;
-    repeat while (¿Justificación y confirmación válidas?) is (No [E003]: Exigir fundamentación)
-    -> Sí;
-    :Transicionar estado terminal a <b>DESESTIMADA</b> (RN-07),\nregistrar auditoría y notificar cierre al Solicitante;
-    stop
+    :Validar transición normativa DG-11;
+    :Actualizar estado oficial a <b>CLASIFICADA</b>;
+    :Registrar bitácora inmutable de auditoría (SHA-256);
+    :Desplegar aviso de éxito en pantalla, actualizar banner\ny habilitar botón "Realizar Análisis de Impacto Técnico" para PU-03 (CU-06);
+|Analista de Requerimientos / Gestor|
+elseif (¿Ruta de resolución seleccionada?) then (Opción B: Observar RFC [A001])
+    :Seleccionar "Opción B: Observar RFC",\nredactar "Pliego Formal de Observaciones para Subsanación"\ny pulsar "Emitir Pliego de Observaciones";
+    |TraceFlow SCM|
+    :Validar longitud del pliego (mínimo 10 caracteres);
+    note right
+      <b>[E003]</b> Si longitud < 10 car.,
+      muestra error y conserva texto
+    end note
+    :Transicionar estado oficial a <b>EN_SUBSANACION</b>;
+    :Registrar autoría y pliego en auditoría inmutable (SHA-256);
+    :Desplegar aviso de éxito en pantalla, presentar pliego\ny habilitar botón "Subsanar Solicitud" para el Solicitante (CU-04.1);
+|Analista de Requerimientos / Gestor|
+else (Opción C: Desestimar RFC [A002])
+    :Seleccionar "Opción C: Desestimar RFC",\ningresar "Fundamentación Mandatoria de Desestimación",\nmarcar confirmación de irreversibilidad\ny pulsar "Desestimar Definitivamente";
+    |TraceFlow SCM|
+    :Validar justificación (>= 10 car.) y casilla de confirmación;
+    note right
+      <b>[E003]</b> Si faltan datos o confirmación,
+      cancela cierre y señala requisito
+    end note
+    :Transicionar a estado terminal <b>DESESTIMADA</b> (RN-07);\nbloquear de forma irreversible modificaciones futuras;
+    :Registrar motivo de cierre en auditoría inmutable (SHA-256);
+    :Desplegar aviso de cierre definitivo en pantalla\ny actualizar ficha de archivo en el expediente;
+|Analista de Requerimientos / Gestor|
 endif
+
+|TraceFlow SCM|
+stop
 @enduml

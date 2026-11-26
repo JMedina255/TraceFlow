@@ -20,7 +20,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import pg from 'pg';
-import { ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConflictException, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { resetAndMigrateRealPostgres } from './helpers/real-db-helper.js';
 import { DatabaseService } from '../src/database/database.service.js';
@@ -92,7 +92,21 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
 
   let testOrgId: string;
   let testProjectId: string;
+  let secondProjectId: string;
   let externalUserId: string;
+
+  const userLoyolaQA: AuthenticatedUser = {
+    id: 'a0000001-0000-0000-0000-000000000004',
+    code: 'USR-004',
+    username: 'rloyola',
+    fullName: 'Renzo Fernando Loyola Vilca Choque',
+    email: 'rloyola@exodo.pe',
+    organization: 'ÉXODO S.A.C.',
+    position: 'Ingeniero QA',
+    activeRoleId: 'PU-05',
+    allowedRoleIds: ['PU-05'],
+    assignedProjectIds: ['PRJ-WALLET-01'],
+  };
 
   beforeAll(async () => {
     // 1. Configurar entorno
@@ -385,7 +399,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
       await orgsService.addMember(testOrgId, { userCodeOrEmailOrId: userRenzoArqui.id, roleInOrg: 'MEMBER' }, userJoanGestor);
       await orgsService.addMember(testOrgId, { userCodeOrEmailOrId: userAugustoDev.id, roleInOrg: 'MEMBER' }, userJoanGestor);
 
-      // Crear proyecto borrador
+      // Crear proyecto borrador principal
       const prj = await projectsService.createProject(
         {
           code: 'PRJ-WALLET-01',
@@ -398,6 +412,23 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
         userJoanGestor
       );
       testProjectId = prj.id;
+
+      // Crear segundo proyecto borrador para pruebas de aislamiento entre proyectos (H03-R01, H03-R04)
+      const prj2 = await projectsService.createProject(
+        {
+          code: 'PRJ-WALLET-02',
+          projectKey: 'WALLE2',
+          name: 'Billetera Digital Fintech Secundaria',
+          description: 'Proyecto secundario para pruebas de aislamiento',
+          clientName: 'Banco Fintech S.A.',
+          organizationId: testOrgId,
+        },
+        userJoanGestor
+      );
+      secondProjectId = prj2.id;
+
+      // Agregar a USR-004 (Renzo Loyola) como miembro activo de la organización (rol PU-05 QA)
+      await orgsService.addMember(testOrgId, { userCodeOrEmailOrId: userLoyolaQA.id, roleInOrg: 'MEMBER' }, userJoanGestor);
     });
 
     it('H03-V09: Asignación de roles de equipo con ProjectPlanningService en PostgreSQL', async () => {
@@ -637,6 +668,116 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
       expect(draft.wizard_step).toBe(4);
       expect((draft.draft_payload as any).notes).toBe('Alineado con el cliente');
     });
+
+    it('H03-V13-R1: Aislamiento estricto de roles entre proyectos en PostgreSQL Real (H03-R01)', async () => {
+      // 1. Obtener rol de Renzo en testProjectId
+      const rolesPrj1 = await planningService.getTeamRoles(testProjectId, userJoanGestor);
+      const renzoRole = rolesPrj1.find((r) => r.user_id === userRenzoArqui.id);
+      expect(renzoRole).toBeDefined();
+
+      // 2. Intentar actualizar la asignación de testProjectId enviando la ruta de secondProjectId
+      await expect(
+        planningService.updateTeamRoleStatus(
+          secondProjectId,
+          renzoRole!.id,
+          'INACTIVE',
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // 3. Validar rechazo de estado inválido
+      await expect(
+        planningService.updateTeamRoleStatus(
+          testProjectId,
+          renzoRole!.id,
+          'INVALID_STATE' as any,
+          userJoanGestor
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('H03-V13-R2: Preservación acumulada y fusión de draft_payload en el asistente (H03-R02)', async () => {
+      // 1. Guardar borrador parcial clave 1
+      await planningService.saveDraftProgress(
+        testProjectId,
+        {
+          wizardStep: 4,
+          draftPayload: { archDecision: 'PostgreSQL 16 partitioned' },
+        },
+        userJoanGestor
+      );
+
+      // 2. Guardar borrador parcial clave 2 (debe combinarse vía JSONB merge sin sobreescribir clave 1)
+      await planningService.saveDraftProgress(
+        testProjectId,
+        {
+          wizardStep: 3, // Intentar retroceder wizard_step no debe disminuir el wizard_step almacenado
+          draftPayload: { cicdProvider: 'GitHub Actions Enterprise' },
+        },
+        userJoanGestor
+      );
+
+      const setupRes = await planningService.getProjectSetup(testProjectId, userJoanGestor);
+      expect(setupRes.setup?.team_completed).toBe(true);
+      expect(setupRes.setup?.methodology_completed).toBe(true);
+      expect(setupRes.setup?.wizard_step).toBeGreaterThanOrEqual(4);
+      expect(setupRes.setup?.draft_payload).toMatchObject({
+        notes: 'Alineado con el cliente',
+        archDecision: 'PostgreSQL 16 partitioned',
+        cicdProvider: 'GitHub Actions Enterprise',
+      });
+    });
+
+    it('H03-V13-R3: Atomicidad transaccional del lote de equipo en PostgreSQL Real (H03-R03)', async () => {
+      // Crear proyecto temporal para prueba atómica
+      const prjBatch = await projectsService.createProject(
+        {
+          code: 'PRJ-ATOMIC-01',
+          projectKey: 'ATOMIC',
+          name: 'Proyecto Prueba Atomicidad',
+          description: 'Validación de rollback de lote',
+          clientName: 'Auditoría TraceFlow',
+          organizationId: testOrgId,
+        },
+        userJoanGestor
+      );
+
+      // Intentar guardar lote con 1 integrante válido y 1 inválido (usuario externo no miembro de la org)
+      await expect(
+        planningService.saveStep2Team(
+          prjBatch.id,
+          {
+            members: [
+              { userId: userRenzoArqui.id, roleIdOrCode: 'PU-03' },
+              { userId: externalUserId, roleIdOrCode: 'PU-06' }, // Inválido DA-06
+            ],
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // Verificar en base de datos real que NINGÚN registro fue insertado en project_team_role
+      const checkRows = await adminPool.query(
+        'SELECT COUNT(*) as c FROM traceflow.project_team_role WHERE project_id = $1',
+        [prjBatch.id]
+      );
+      expect(parseInt(checkRows.rows[0].c, 10)).toBe(0);
+
+      // Verificar que el setup no fue creado ni marcado como team_completed debido al rollback total
+      const setupCheck = await planningService.getProjectSetup(prjBatch.id, userJoanGestor);
+      expect(setupCheck.setup).toBeNull();
+    });
+
+    it('H03-V13-R4: Control de acceso estricto por proyecto para miembros de la misma organización (H03-R04)', async () => {
+      // USR-004 (Loyola) es miembro activo de testOrgId con rol PU-05, pero no está asignado a secondProjectId
+      await expect(
+        planningService.getProjectSetup(secondProjectId, userLoyolaQA)
+      ).rejects.toThrow(ForbiddenException);
+
+      await expect(
+        planningService.getTeamRoles(secondProjectId, userLoyolaQA)
+      ).rejects.toThrow(ForbiddenException);
+    });
   });
 
   // ==========================================================================
@@ -675,9 +816,34 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
     );
     const rollbackSql = fs.readFileSync(rollbackSqlPath, 'utf8');
 
-    it('H03-V15: Reversión limpia: el script de rollback de H03 remueve exactamente las 6 tablas y devuelve el esquema al estado H02', async () => {
-      // 1. Ejecutar el script exacto de rollback de H03 como admin
-      await adminPool.query(rollbackSql);
+    it('H03-V15-A: Salvaguarda de integridad en PostgreSQL Real: intento de rollback cuando existen datos operativos de planificación es abortado con excepción (H03-R05)', async () => {
+      // 1. El intento de rollback directo sin flag deliberado debe fallar con error de seguridad
+      await expect(adminPool.query(rollbackSql)).rejects.toThrow(/BLOQUEO DE SEGURIDAD \(INIT-H03\)/);
+
+      // 2. Verificar que las 6 tablas continúan existiendo e intactas
+      const h03Tables = [
+        'project_setup',
+        'project_team_role',
+        'project_methodology',
+        'project_phase',
+        'project_milestone',
+        'project_deliverable',
+      ];
+      for (const tbl of h03Tables) {
+        const check = await adminPool.query(`SELECT to_regclass('traceflow.${tbl}') as tbl;`);
+        expect(check.rows[0].tbl).not.toBeNull();
+      }
+    });
+
+    it('H03-V15-B: Reversión limpia con autorización deliberada: con traceflow.allow_force_h03_rollback activa, remueve las 6 tablas y retorna el esquema a 23 tablas', async () => {
+      // 1. Ejecutar el script de rollback con sobreescritura deliberada en la sesión
+      const client = await adminPool.connect();
+      try {
+        await client.query("SET traceflow.allow_force_h03_rollback = 'true';");
+        await client.query(rollbackSql);
+      } finally {
+        client.release();
+      }
 
       // 2. Verificar que las 6 tablas fueron eliminadas
       const h03Tables = [

@@ -285,7 +285,12 @@ export class ProjectPlanningRepository {
     return this.mockTeamRoles.filter((tr) => tr.project_id === projectId);
   }
 
-  async findTeamRole(projectId: string, userId: string, roleId: number): Promise<ProjectTeamRoleEntity | null> {
+  async findTeamRole(
+    projectId: string,
+    userId: string,
+    roleId: number,
+    client?: pg.PoolClient | null
+  ): Promise<ProjectTeamRoleEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
       const sql = `
         SELECT ptr.*,
@@ -296,12 +301,36 @@ export class ProjectPlanningRepository {
         JOIN traceflow.app_user u ON u.id = ptr.user_id
         WHERE ptr.project_id = $1 AND ptr.user_id = $2 AND ptr.role_id = $3;
       `;
-      const res = await this.db.query<ProjectTeamRoleEntity>(sql, [projectId, userId, roleId]);
+      const res = client
+        ? await client.query(sql, [projectId, userId, roleId])
+        : await this.db.query<ProjectTeamRoleEntity>(sql, [projectId, userId, roleId]);
       return res.rows[0] || null;
     }
     return this.mockTeamRoles.find(
       (tr) => tr.project_id === projectId && tr.user_id === userId && tr.role_id === roleId
     ) || null;
+  }
+
+  async findTeamRoleById(
+    id: string,
+    client?: pg.PoolClient | null
+  ): Promise<ProjectTeamRoleEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT ptr.*,
+               ar.code as role_code, ar.name as role_name,
+               u.code as user_code, u.full_name as user_full_name, u.email as user_email
+        FROM traceflow.project_team_role ptr
+        JOIN traceflow.app_role ar ON ar.id = ptr.role_id
+        JOIN traceflow.app_user u ON u.id = ptr.user_id
+        WHERE ptr.id = $1;
+      `;
+      const res = client
+        ? await client.query(sql, [id])
+        : await this.db.query<ProjectTeamRoleEntity>(sql, [id]);
+      return res.rows[0] || null;
+    }
+    return this.mockTeamRoles.find((tr) => tr.id === id) || null;
   }
 
   async addTeamRole(
@@ -748,19 +777,19 @@ export class ProjectPlanningRepository {
           COALESCE($6, false),
           COALESCE($7, false),
           COALESCE($8, false),
-          COALESCE($9, '{}'::jsonb),
+          COALESCE($9::jsonb, '{}'::jsonb),
           $10
         )
         ON CONFLICT (project_id) DO UPDATE SET
-          wizard_step = COALESCE(EXCLUDED.wizard_step, traceflow.project_setup.wizard_step),
-          wizard_completed = COALESCE(EXCLUDED.wizard_completed, traceflow.project_setup.wizard_completed),
-          identity_completed = COALESCE(EXCLUDED.identity_completed, traceflow.project_setup.identity_completed),
-          team_completed = COALESCE(EXCLUDED.team_completed, traceflow.project_setup.team_completed),
-          methodology_completed = COALESCE(EXCLUDED.methodology_completed, traceflow.project_setup.methodology_completed),
-          github_completed = COALESCE(EXCLUDED.github_completed, traceflow.project_setup.github_completed),
-          validation_completed = COALESCE(EXCLUDED.validation_completed, traceflow.project_setup.validation_completed),
-          draft_payload = COALESCE(EXCLUDED.draft_payload, traceflow.project_setup.draft_payload),
-          last_saved_by = COALESCE(EXCLUDED.last_saved_by, traceflow.project_setup.last_saved_by),
+          wizard_step = CASE WHEN $2 IS NOT NULL THEN GREATEST($2::integer, traceflow.project_setup.wizard_step) ELSE traceflow.project_setup.wizard_step END,
+          wizard_completed = COALESCE($3, traceflow.project_setup.wizard_completed),
+          identity_completed = COALESCE($4, traceflow.project_setup.identity_completed),
+          team_completed = COALESCE($5, traceflow.project_setup.team_completed),
+          methodology_completed = COALESCE($6, traceflow.project_setup.methodology_completed),
+          github_completed = COALESCE($7, traceflow.project_setup.github_completed),
+          validation_completed = COALESCE($8, traceflow.project_setup.validation_completed),
+          draft_payload = CASE WHEN $9 IS NOT NULL THEN traceflow.project_setup.draft_payload || $9::jsonb ELSE traceflow.project_setup.draft_payload END,
+          last_saved_by = COALESCE($10, traceflow.project_setup.last_saved_by),
           updated_at = NOW()
         RETURNING *;
       `;
@@ -784,15 +813,33 @@ export class ProjectPlanningRepository {
 
     let existing = this.mockSetups.find((s) => s.project_id === projectId);
     if (existing) {
-      if (data.wizard_step !== undefined) existing.wizard_step = data.wizard_step;
-      if (data.wizard_completed !== undefined) existing.wizard_completed = data.wizard_completed;
-      if (data.identity_completed !== undefined) existing.identity_completed = data.identity_completed;
-      if (data.team_completed !== undefined) existing.team_completed = data.team_completed;
-      if (data.methodology_completed !== undefined) existing.methodology_completed = data.methodology_completed;
-      if (data.github_completed !== undefined) existing.github_completed = data.github_completed;
-      if (data.validation_completed !== undefined) existing.validation_completed = data.validation_completed;
-      if (data.draft_payload !== undefined) existing.draft_payload = { ...existing.draft_payload, ...data.draft_payload };
-      if (data.last_saved_by !== undefined) existing.last_saved_by = data.last_saved_by;
+      if (data.wizard_step !== undefined && data.wizard_step !== null) {
+        existing.wizard_step = Math.max(existing.wizard_step, data.wizard_step);
+      }
+      if (data.wizard_completed !== undefined && data.wizard_completed !== null) {
+        existing.wizard_completed = data.wizard_completed;
+      }
+      if (data.identity_completed !== undefined && data.identity_completed !== null) {
+        existing.identity_completed = data.identity_completed;
+      }
+      if (data.team_completed !== undefined && data.team_completed !== null) {
+        existing.team_completed = data.team_completed;
+      }
+      if (data.methodology_completed !== undefined && data.methodology_completed !== null) {
+        existing.methodology_completed = data.methodology_completed;
+      }
+      if (data.github_completed !== undefined && data.github_completed !== null) {
+        existing.github_completed = data.github_completed;
+      }
+      if (data.validation_completed !== undefined && data.validation_completed !== null) {
+        existing.validation_completed = data.validation_completed;
+      }
+      if (data.draft_payload !== undefined && data.draft_payload !== null) {
+        existing.draft_payload = { ...existing.draft_payload, ...data.draft_payload };
+      }
+      if (data.last_saved_by !== undefined && data.last_saved_by !== null) {
+        existing.last_saved_by = data.last_saved_by;
+      }
       existing.updated_at = new Date().toISOString();
       return existing;
     }
@@ -814,5 +861,39 @@ export class ProjectPlanningRepository {
     };
     this.mockSetups.push(created);
     return created;
+  }
+
+  snapshotMockState(): {
+    roles: ProjectTeamRoleEntity[];
+    setups: ProjectSetupEntity[];
+    methodologies: ProjectMethodologyEntity[];
+    phases: ProjectPhaseEntity[];
+    milestones: ProjectMilestoneEntity[];
+    deliverables: ProjectDeliverableEntity[];
+  } {
+    return {
+      roles: JSON.parse(JSON.stringify(this.mockTeamRoles)),
+      setups: JSON.parse(JSON.stringify(this.mockSetups)),
+      methodologies: JSON.parse(JSON.stringify(this.mockMethodologies)),
+      phases: JSON.parse(JSON.stringify(this.mockPhases)),
+      milestones: JSON.parse(JSON.stringify(this.mockMilestones)),
+      deliverables: JSON.parse(JSON.stringify(this.mockDeliverables)),
+    };
+  }
+
+  restoreMockState(snapshot: {
+    roles: ProjectTeamRoleEntity[];
+    setups: ProjectSetupEntity[];
+    methodologies: ProjectMethodologyEntity[];
+    phases: ProjectPhaseEntity[];
+    milestones: ProjectMilestoneEntity[];
+    deliverables: ProjectDeliverableEntity[];
+  }): void {
+    this.mockTeamRoles = snapshot.roles;
+    this.mockSetups = snapshot.setups;
+    this.mockMethodologies = snapshot.methodologies;
+    this.mockPhases = snapshot.phases;
+    this.mockMilestones = snapshot.milestones;
+    this.mockDeliverables = snapshot.deliverables;
   }
 }

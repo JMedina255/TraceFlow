@@ -726,12 +726,35 @@ En Git los archivos carecen de identificador persistente; Git infiere movimiento
 - **`POST /api/v1/organizations`**: Registra nueva organización (exclusivo Administrador del Sistema).
 - **`GET /api/v1/organizations/:orgId/members`**: Obtiene lista de miembros registrados para asignación a proyectos (DA-06).
 
-### 9.2 Grupo 2: Asistente y Ciclo de Vida de Proyectos (`MOD-02`)
-- **`POST /api/v1/projects/initiate`**:
+### 9.2 Grupo 2: Asistente, Planificación y Ciclo de Vida de Proyectos (`MOD-02`)
+
+#### 9.2.1 Asistente Progresivo de Inicialización (DA-05)
+- **`GET /api/v1/projects/:id/setup`**:
+  - *Descripción:* Consulta el estado general del asistente, banderas de completitud (`identity_completed`, `team_completed`, etc.), y colecciones configuradas.
+- **`PUT /api/v1/projects/:id/setup/step-2`**:
+  - *Descripción:* Guardado atómico del Paso 2 (Equipo). Asigna en lote los integrantes y roles del equipo (valida DA-06 bajo una única transacción relacional).
+- **`PUT /api/v1/projects/:id/setup/step-3`**:
+  - *Descripción:* Guardado atómico del Paso 3 (Metodología y Planificación). Configura metodología, fases, hitos y entregables.
+- **`PATCH /api/v1/projects/:id/setup/progress`**:
+  - *Descripción:* Guardado parcial de borrador. Actualiza `wizard_step` con no regresión (`GREATEST`) y fusiona el objeto JSONB `draft_payload` sin pérdida de claves.
+
+#### 9.2.2 Endpoints Granulares de Planificación (INIT-H03 / H03-R)
+- **`POST /api/v1/projects/:id/team-members`**: Asigna un rol funcional canónico (`PU-01`..`PU-07`) a un miembro activo de la organización (`DA-06`).
+- **`GET /api/v1/projects/:id/team-members`**: Lista los roles e integrantes del proyecto (aislamiento estricto por proyecto `DA-01`).
+- **`PATCH /api/v1/projects/:id/team-members/:roleAssignmentId/status`**: Actualiza el estado (`ACTIVE` o `INACTIVE`) con validación estricta de pertenencia de la asignación al proyecto de la ruta (`H03-R01`).
+- **`PUT /api/v1/projects/:id/methodology`**: Configura o actualiza la metodología (Scrum 1..8 sem, Kanban, Cascada, Híbrida, UPT Académica).
+- **`GET /api/v1/projects/:id/methodology`**: Consulta los parámetros metodológicos configurados.
+- **`POST /api/v1/projects/:id/phases`**: Registra una fase con validación cronológica (`end_date >= start_date`) y orden de secuencia.
+- **`GET /api/v1/projects/:id/phases`**: Lista las fases ordenadas por `sequence_order`.
+- **`POST /api/v1/projects/:id/milestones`**: Crea un hito asociado a una fase del mismo proyecto (disparador anti-contaminación).
+- **`GET /api/v1/projects/:id/milestones`**: Lista los hitos del proyecto.
+- **`POST /api/v1/projects/:id/deliverables`**: Crea un entregable vinculado a un hito y fase, con responsable activo en el equipo del proyecto.
+- **`GET /api/v1/projects/:id/deliverables`**: Lista los entregables del proyecto.
+
+#### 9.2.3 Ciclo de Vida y Transición
+- **`POST /api/v1/projects`**:
   - *Descripción:* Crea proyecto en estado `BORRADOR` con datos del Paso 1.
   - *Respuesta (HTTP 201):* `{ "id": "b0000001-...", "status": "BORRADOR", "step": 1 }`
-- **`PUT /api/v1/projects/:id/setup/step-2`**: Asigna integrantes y roles del equipo (valida DA-06).
-- **`PUT /api/v1/projects/:id/setup/step-3`**: Configura metodología (Scrum/Cascada), fases y cronograma.
 - **`POST /api/v1/projects/:id/activate`**:
   - *Descripción:* Valida condiciones obligatorias (DA-04) y activa el proyecto.
   - *Respuesta Éxito (HTTP 200):* `{ "status": "ACTIVO", "message": "Proyecto activado formalmente." }`

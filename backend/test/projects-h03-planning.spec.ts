@@ -606,12 +606,167 @@ describe('TraceFlow SCM — INIT-H03: Equipo, Metodología y Planificación (TDD
         userJoanGestor
       );
 
-      expect(setup.wizard_step).toBe(3);
+      expect(setup.wizard_step).toBeGreaterThanOrEqual(3);
       expect(setup.draft_payload).toMatchObject(partialPayload);
 
       // Recuperar configuración para validar que persiste el payload
       const retrieved = await planningService.getProjectSetup('PRJ-001', userJoanGestor);
       expect(retrieved.setup?.draft_payload).toMatchObject(partialPayload);
+    });
+  });
+
+  // ==========================================================================
+  // BLOQUE 6: SUBSANACIÓN H03-R (AISLAMIENTO, ATOMICIDAD Y PRESERVACIÓN)
+  // ==========================================================================
+  describe('Bloque 6: Subsanación H03-R (Aislamiento, Atomicidad y Persistencia)', () => {
+    const userMemberUnassigned: AuthenticatedUser = {
+      id: 'a0000001-0000-0000-0000-000000000004',
+      code: 'USR-004',
+      username: 'rloyola',
+      email: 'rloyola@exodo.pe',
+      fullName: 'Renzo Fernando Loyola Vilca Choque',
+      organization: 'ÉXODO S.A.C.',
+      position: 'Ingeniero QA',
+      activeRoleId: 'PU-05',
+      allowedRoleIds: ['PU-05'],
+      assignedProjectIds: ['PRJ-001'], // No asignado a PRJ-003
+    };
+
+    it('TDD-H03-R01: Aislamiento estricto de asignaciones entre proyectos (403 Forbidden al cruzar proyectos)', async () => {
+      // 1. Asignar rol a Augusto en PRJ-001
+      const rolePrj1 = await planningService.assignTeamRole(
+        'PRJ-001',
+        {
+          userId: userAugustoDev.id,
+          roleIdOrCode: 'PU-06',
+          functionalTitle: 'Desarrollador Backend',
+        },
+        userJoanGestor
+      );
+      expect(rolePrj1.id).toBeDefined();
+
+      // 2. Intentar actualizar el rol de PRJ-001 pero especificando la ruta de PRJ-002
+      await expect(
+        planningService.updateTeamRoleStatus('PRJ-002', rolePrj1.id, 'INACTIVE', userJoanGestor)
+      ).rejects.toThrow(ForbiddenException);
+
+      // 3. Verificar rechazo de estado inválido
+      await expect(
+        planningService.updateTeamRoleStatus('PRJ-001', rolePrj1.id, 'SUSPENDED' as any, userJoanGestor)
+      ).rejects.toThrow(BadRequestException);
+
+      // 4. Actualización válida en su propio proyecto
+      const updated = await planningService.updateTeamRoleStatus('PRJ-001', rolePrj1.id, 'INACTIVE', userJoanGestor);
+      expect(updated.status).toBe('INACTIVE');
+    });
+
+    it('TDD-H03-R02: Preservación de datos acumulados del asistente entre pasos y fusión de draft_payload', async () => {
+      // 1. Guardar Paso 2 (Equipo) en PRJ-002 (inicia limpio)
+      const step2 = await planningService.saveStep2Team(
+        'PRJ-002',
+        {
+          members: [
+            {
+              userId: userAugustoDev.id,
+              roleIdOrCode: 'PU-06',
+              functionalTitle: 'Dev Principal',
+            },
+          ],
+        },
+        userJoanGestor
+      );
+      expect(step2.setup.team_completed).toBe(true);
+      expect(step2.setup.wizard_step).toBe(3);
+
+      // 2. Guardar Metodología
+      await planningService.configureMethodology(
+        'PRJ-002',
+        {
+          methodologyType: 'SCRUM',
+          iterationDurationWeeks: 2,
+        },
+        userJoanGestor
+      );
+
+      // Verificar que team_completed no se sobreescribió
+      let currentSetup = (await planningService.getProjectSetup('PRJ-002', userJoanGestor)).setup;
+      expect(currentSetup?.team_completed).toBe(true);
+      expect(currentSetup?.methodology_completed).toBe(true);
+      expect(currentSetup?.wizard_step).toBe(3);
+
+      // 3. Guardar borrador parcial 1
+      await planningService.saveDraftProgress(
+        'PRJ-002',
+        {
+          wizardStep: 3,
+          draftPayload: { section1: 'datos_paso_1', counter: 10 },
+        },
+        userJoanGestor
+      );
+
+      // 4. Guardar borrador parcial 2 con intento de retroceder wizard_step a 2: no debe disminuir el wizard_step almacenado
+      await planningService.saveDraftProgress(
+        'PRJ-002',
+        {
+          wizardStep: 2,
+          draftPayload: { section2: 'datos_paso_2', counter: 20 },
+        },
+        userJoanGestor
+      );
+
+      currentSetup = (await planningService.getProjectSetup('PRJ-002', userJoanGestor)).setup;
+      expect(currentSetup?.team_completed).toBe(true);
+      expect(currentSetup?.methodology_completed).toBe(true);
+      expect(currentSetup?.wizard_step).toBe(3); // NO retrocedió a 2
+      expect(currentSetup?.draft_payload).toMatchObject({
+        section1: 'datos_paso_1',
+        section2: 'datos_paso_2',
+        counter: 20,
+      });
+    });
+
+    it('TDD-H03-R03: Atomicidad de guardado por lote (reversión total si falla algún integrante)', async () => {
+      const initialRoles = await planningService.getTeamRoles('PRJ-001', userJoanGestor);
+      const initialCount = initialRoles.length;
+
+      // Intentar lote con 2 válidos y 1 inválido (externo a la organización DA-06)
+      await expect(
+        planningService.saveStep2Team(
+          'PRJ-001',
+          {
+            members: [
+              {
+                userId: userAugustoDev.id,
+                roleIdOrCode: 'PU-06',
+              },
+              {
+                userId: userRenzoArqui.id,
+                roleIdOrCode: 'PU-03',
+              },
+              {
+                userId: userRenzoExterno.id, // Inválido DA-06
+                roleIdOrCode: 'PU-01',
+              },
+            ],
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // Comprobar que NINGUNO de los integrantes fue persistido
+      const rolesAfterRollback = await planningService.getTeamRoles('PRJ-001', userJoanGestor);
+      expect(rolesAfterRollback.length).toBe(initialCount);
+    });
+
+    it('TDD-H03-R04: Autorización estricta por proyecto (miembro de la misma org sin asignación es rechazado con 403)', async () => {
+      // USR-004 es miembro activo de ÉXODO S.A.C. pero no está asignado ni es gestor de PRJ-003
+      await expect(
+        planningService.getProjectSetup('PRJ-003', userMemberUnassigned)
+      ).rejects.toThrow(ForbiddenException);
+
+      await expect(
+        planningService.getTeamRoles('PRJ-003', userMemberUnassigned)
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });

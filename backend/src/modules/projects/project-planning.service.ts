@@ -6,6 +6,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import pg from 'pg';
 import { DatabaseService } from '../../database/database.service.js';
 import { ProjectsRepository, ProjectEntity } from './projects.repository.js';
 import { OrganizationsRepository } from '../organizations/organizations.repository.js';
@@ -67,14 +68,58 @@ export class ProjectPlanningService {
       );
     }
 
-    // Validar pertenencia del usuario a la organización propietaria
+    // 1. Validar pertenencia del usuario a la organización propietaria
+    let member: any = null;
     if (project.organization_id) {
-      const member = await this.orgRepo.findMember(project.organization_id, callerUser.id);
+      member = await this.orgRepo.findMember(project.organization_id, callerUser.id);
       if (!member || member.status !== 'ACTIVE') {
         throw new ForbiddenException(
           `Acceso denegado (DA-06): El usuario '${callerUser.code}' no es miembro activo de la organización propietaria.`
         );
       }
+    }
+
+    // 2. Validar autorización específica sobre el proyecto (H03-R04)
+    let isAuthorizedForProject = false;
+
+    // Roles institucionales globales de la organización (OWNER, ADMIN, AUDITOR)
+    if (member && ['OWNER', 'ADMIN', 'AUDITOR'].includes(member.role_in_org)) {
+      isAuthorizedForProject = true;
+    }
+
+    // Creador o Gestor del proyecto o usuario con rol activo PU-02
+    if (
+      project.created_by === callerUser.id ||
+      project.manager_id === callerUser.id ||
+      (callerUser.activeRoleId === 'PU-02' && (!member || ['OWNER', 'ADMIN', 'MEMBER'].includes(member.role_in_org)))
+    ) {
+      isAuthorizedForProject = true;
+    }
+
+    // Integrante explícitamente asignado al proyecto (en token, user_project_assignment o project_team_role)
+    if (!isAuthorizedForProject) {
+      if (
+        callerUser.assignedProjectIds?.includes(project.id) ||
+        callerUser.assignedProjectIds?.includes(project.code)
+      ) {
+        isAuthorizedForProject = true;
+      } else {
+        const assignments = await this.projectsRepo.findUserProjectAssignments(callerUser.id);
+        if (assignments.includes(project.id) || assignments.includes(project.code)) {
+          isAuthorizedForProject = true;
+        } else {
+          const teamRoles = await this.planningRepo.findTeamRolesByProjectId(project.id);
+          if (teamRoles.some((tr) => tr.user_id === callerUser.id && tr.status === 'ACTIVE')) {
+            isAuthorizedForProject = true;
+          }
+        }
+      }
+    }
+
+    if (!isAuthorizedForProject) {
+      throw new ForbiddenException(
+        `Acceso denegado: El usuario '${callerUser.code}' no está asignado al proyecto '${project.code}' ni cuenta con permisos de gestión.`
+      );
     }
 
     return project;
@@ -106,11 +151,27 @@ export class ProjectPlanningService {
   async assignTeamRole(
     projectIdOrCode: string,
     dto: AssignTeamRoleDto,
-    callerUser: AuthenticatedUser
+    callerUser: AuthenticatedUser,
+    client?: pg.PoolClient | null
   ): Promise<ProjectTeamRoleEntity> {
     const project = await this.getAuthorizedProject(projectIdOrCode, callerUser);
     await this.assertAdminOrManager(project, callerUser);
 
+    if (client) {
+      return this.executeAssignTeamRole(project, dto, callerUser, client);
+    }
+
+    return await this.db.transaction(async (trxClient) => {
+      return this.executeAssignTeamRole(project, dto, callerUser, trxClient);
+    });
+  }
+
+  private async executeAssignTeamRole(
+    project: ProjectEntity,
+    dto: AssignTeamRoleDto,
+    callerUser: AuthenticatedUser,
+    client?: pg.PoolClient | null
+  ): Promise<ProjectTeamRoleEntity> {
     // 1. Resolver usuario objetivo y validar estado activo
     const targetUser = await this.authRepo.findById(dto.userId);
     if (!targetUser) {
@@ -149,79 +210,77 @@ export class ProjectPlanningService {
     }
 
     // 5. Persistencia atómica con compatibilidad en user_project_assignment y auditoría SHA-256
-    return await this.db.transaction(async (client) => {
-      let teamRole: ProjectTeamRoleEntity;
-      if (existing) {
-        teamRole = (await this.planningRepo.updateTeamRole(
-          existing.id,
-          {
-            status: 'ACTIVE',
-            functional_title: dto.functionalTitle,
-            is_lead: dto.isLead,
-          },
-          client
-        ))!;
-      } else {
-        teamRole = await this.planningRepo.addTeamRole(
-          {
-            projectId: project.id,
-            userId: targetUser.id,
-            roleId: role.id,
-            functionalTitle: dto.functionalTitle,
-            isLead: dto.isLead,
-            assignedBy: callerUser.id,
-          },
-          client
-        );
-      }
-
-      // Compatibilidad garantizada con user_project_assignment
-      await this.projectsRepo.assignUserToProject(targetUser.id, project.id, callerUser.id, client);
-
-      // Actualizar estado del asistente de configuración
-      await this.planningRepo.saveSetup(
-        project.id,
+    let teamRole: ProjectTeamRoleEntity;
+    if (existing) {
+      teamRole = (await this.planningRepo.updateTeamRole(
+        existing.id,
         {
-          team_completed: true,
-          last_saved_by: callerUser.id,
+          status: 'ACTIVE',
+          functional_title: dto.functionalTitle,
+          is_lead: dto.isLead,
         },
         client
-      );
-
-      // Auditoría inmutable SHA-256
-      await this.auditService.logEvent(
+      ))!;
+    } else {
+      teamRole = await this.planningRepo.addTeamRole(
         {
-          eventCode: 'PROJECT_TEAM_ROLE_ASSIGNED',
-          actorUserId: callerUser.id,
-          actorRole: callerUser.activeRoleId,
-          operation: 'ASSIGN_TEAM_ROLE',
-          entityName: 'project_team_role',
-          entityId: teamRole.id,
           projectId: project.id,
-          resultStatus: 'SUCCESS',
-          payloadDiff: {
-            projectId: project.id,
-            projectCode: project.code,
-            userId: targetUser.id,
-            userCode: targetUser.code,
-            roleId: role.id,
-            roleCode: role.code,
-            functionalTitle: dto.functionalTitle,
-            isLead: dto.isLead ?? false,
-          },
+          userId: targetUser.id,
+          roleId: role.id,
+          functionalTitle: dto.functionalTitle,
+          isLead: dto.isLead,
+          assignedBy: callerUser.id,
         },
         client
       );
+    }
 
-      return {
-        ...teamRole,
-        role_code: role.code,
-        role_name: role.name,
-        user_code: targetUser.code,
-        user_full_name: targetUser.full_name,
-        user_email: targetUser.email,
-      };
-    });
+    // Compatibilidad garantizada con user_project_assignment
+    await this.projectsRepo.assignUserToProject(targetUser.id, project.id, callerUser.id, client);
+
+    // Actualizar estado del asistente de configuración
+    await this.planningRepo.saveSetup(
+      project.id,
+      {
+        team_completed: true,
+        last_saved_by: callerUser.id,
+      },
+      client
+    );
+
+    // Auditoría inmutable SHA-256
+    await this.auditService.logEvent(
+      {
+        eventCode: 'PROJECT_TEAM_ROLE_ASSIGNED',
+        actorUserId: callerUser.id,
+        actorRole: callerUser.activeRoleId,
+        operation: 'ASSIGN_TEAM_ROLE',
+        entityName: 'project_team_role',
+        entityId: teamRole.id,
+        projectId: project.id,
+        resultStatus: 'SUCCESS',
+        payloadDiff: {
+          projectId: project.id,
+          projectCode: project.code,
+          userId: targetUser.id,
+          userCode: targetUser.code,
+          roleId: role.id,
+          roleCode: role.code,
+          functionalTitle: dto.functionalTitle,
+          isLead: dto.isLead ?? false,
+        },
+      },
+      client
+    );
+
+    return {
+      ...teamRole,
+      role_code: role.code,
+      role_name: role.name,
+      user_code: targetUser.code,
+      user_full_name: targetUser.full_name,
+      user_email: targetUser.email,
+    };
   }
 
   async getTeamRoles(
@@ -238,30 +297,53 @@ export class ProjectPlanningService {
     status: 'ACTIVE' | 'INACTIVE',
     callerUser: AuthenticatedUser
   ): Promise<ProjectTeamRoleEntity> {
+    if (!['ACTIVE', 'INACTIVE'].includes(status)) {
+      throw new BadRequestException(
+        `Estado '${status}' inválido para asignación de rol. Debe ser 'ACTIVE' o 'INACTIVE'.`
+      );
+    }
+
     const project = await this.getAuthorizedProject(projectIdOrCode, callerUser);
     await this.assertAdminOrManager(project, callerUser);
 
-    const updated = await this.planningRepo.updateTeamRole(roleAssignmentId, { status });
-    if (!updated) {
-      throw new NotFoundException(`Asignación de rol '${roleAssignmentId}' no encontrada.`);
-    }
+    return await this.db.transaction(async (client) => {
+      const assignment = await this.planningRepo.findTeamRoleById(roleAssignmentId, client);
+      if (!assignment) {
+        throw new NotFoundException(`Asignación de rol '${roleAssignmentId}' no encontrada.`);
+      }
 
-    await this.auditService.logEvent({
-      eventCode: 'TEAM_ROLE_STATUS_UPDATED',
-      actorUserId: callerUser.id,
-      actorRole: callerUser.activeRoleId,
-      operation: 'UPDATE_TEAM_ROLE_STATUS',
-      entityName: 'project_team_role',
-      entityId: updated.id,
-      projectId: project.id,
-      resultStatus: 'SUCCESS',
-      payloadDiff: {
-        roleAssignmentId: updated.id,
-        newStatus: status,
-      },
+      if (assignment.project_id !== project.id) {
+        throw new ForbiddenException(
+          `Violación de aislamiento por proyecto: La asignación '${roleAssignmentId}' no pertenece al proyecto '${project.code}'.`
+        );
+      }
+
+      const updated = await this.planningRepo.updateTeamRole(roleAssignmentId, { status }, client);
+      if (!updated) {
+        throw new NotFoundException(`Asignación de rol '${roleAssignmentId}' no encontrada al actualizar.`);
+      }
+
+      await this.auditService.logEvent(
+        {
+          eventCode: 'TEAM_ROLE_STATUS_UPDATED',
+          actorUserId: callerUser.id,
+          actorRole: callerUser.activeRoleId,
+          operation: 'UPDATE_TEAM_ROLE_STATUS',
+          entityName: 'project_team_role',
+          entityId: updated.id,
+          projectId: project.id,
+          resultStatus: 'SUCCESS',
+          payloadDiff: {
+            roleAssignmentId: updated.id,
+            previousStatus: assignment.status,
+            newStatus: status,
+          },
+        },
+        client
+      );
+
+      return updated;
     });
-
-    return updated;
   }
 
   // ==========================================================================
@@ -631,36 +713,53 @@ export class ProjectPlanningService {
       throw new BadRequestException('Se debe especificar al menos un integrante del equipo.');
     }
 
-    const assignedRoles: ProjectTeamRoleEntity[] = [];
-    for (const memberDto of dto.members) {
+    const planningSnapshot = this.planningRepo.snapshotMockState();
+    const assignmentSnapshot = this.projectsRepo.snapshotMockAssignments();
+
+    return await this.db.transaction(async (client) => {
       try {
-        const assigned = await this.assignTeamRole(project.id, memberDto, callerUser);
-        assignedRoles.push(assigned);
-      } catch (err) {
-        if (err instanceof ConflictException) {
-          const role = await this.planningRepo.resolveRole(memberDto.roleIdOrCode);
-          if (role) {
-            const existing = await this.planningRepo.findTeamRole(project.id, memberDto.userId, role.id);
-            if (existing) {
-              assignedRoles.push(existing);
-              continue;
+        const assignedRoles: ProjectTeamRoleEntity[] = [];
+        for (const memberDto of dto.members) {
+          try {
+            const assigned = await this.executeAssignTeamRole(project, memberDto, callerUser, client);
+            assignedRoles.push(assigned);
+          } catch (err) {
+            if (err instanceof ConflictException) {
+              const role = await this.planningRepo.resolveRole(memberDto.roleIdOrCode);
+              if (role) {
+                const existing = await this.planningRepo.findTeamRole(project.id, memberDto.userId, role.id);
+                if (existing) {
+                  assignedRoles.push(existing);
+                  continue;
+                }
+              }
             }
+            throw err;
           }
         }
-        throw err;
+
+        const setup = await this.planningRepo.saveSetup(
+          project.id,
+          {
+            wizard_step: 3,
+            team_completed: true,
+            last_saved_by: callerUser.id,
+          },
+          client
+        );
+
+        return {
+          team: assignedRoles,
+          setup,
+        };
+      } catch (error) {
+        if (this.db.getDatabaseMode() === 'mock') {
+          this.planningRepo.restoreMockState(planningSnapshot);
+          this.projectsRepo.restoreMockAssignments(assignmentSnapshot);
+        }
+        throw error;
       }
-    }
-
-    const setup = await this.planningRepo.saveSetup(project.id, {
-      wizard_step: 3,
-      team_completed: true,
-      last_saved_by: callerUser.id,
     });
-
-    return {
-      team: assignedRoles,
-      setup,
-    };
   }
 
   async saveStep3MethodologyPlanning(

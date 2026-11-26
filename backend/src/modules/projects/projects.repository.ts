@@ -261,7 +261,15 @@ export class ProjectsRepository {
       { user_id: 'a0000001-0000-0000-0000-000000000001', project_id: 'b0000001-0000-0000-0000-000000000002', assigned_at: '2026-08-15T09:00:00Z' },
       { user_id: 'a0000001-0000-0000-0000-000000000001', project_id: 'b0000001-0000-0000-0000-000000000003', assigned_at: '2026-09-01T10:00:00Z' },
       { user_id: 'a0000001-0000-0000-0000-000000000004', project_id: 'b0000001-0000-0000-0000-000000000001', assigned_at: '2026-08-01T08:00:00Z' },
-      { user_id: 'a0000001-0000-0000-0000-000000000004', project_id: 'b0000001-0000-0000-0000-000000000002', assigned_at: '2026-08-15T09:00:00Z' },
+      { user_id: 'a0000001-0000-0000-0000-000000000002', project_id: 'b0000001-0000-0000-0000-000000000002', assigned_at: '2026-08-15T09:00:00Z' },
     ];
+  }
+
+  snapshotMockAssignments(): any[] {
+    return JSON.parse(JSON.stringify(this.mockAssignments));
+  }
+
+  restoreMockAssignments(snapshot: any[]): void {
+    this.mockAssignments = snapshot;
   }
 }

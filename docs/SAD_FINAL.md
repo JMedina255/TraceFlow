@@ -90,7 +90,7 @@ Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base
 
 ## 13. Contratos de Comunicación (`/api/v1`) y Navegación UI
 - **Protocolo (`ADR-009`):** RESTful JSON bajo prefijo global `/api/v1` con `ValidationPipe` estricto (`whitelist`, `forbidNonWhitelisted`).
-- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/projects{,/:id}`, `/api/v1/rfcs{,/:id}`.
+- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/rfcs{,/:id}`.
 - **Contratos diseñados para próximos hitos:** `/api/v1/rfcs/:id/{classify,rectification,impact-assessment,minor-approval,ccb-votes}`, `/api/v1/change-orders/*`, `/api/v1/scm/*` (ver `contracts.ts` y `ESTANDAR_PROGRAMACION.md` §6).
 - **Navegación SPA (`DG-UWE-NAV-01`):**
 ![Modelo General de Navegación UWE](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)

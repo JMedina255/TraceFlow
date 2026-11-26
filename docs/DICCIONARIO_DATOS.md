@@ -78,7 +78,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | 16 | `qa_certification` | `certificacion_qa` | 7 | MOD-06 Calidad y Pruebas | CU-16..CU-19 | `INSERT, SELECT, UPDATE` |
 | 17 | `sync_lock` | `bloqueo_sincronizacion` | 9 | MOD-05 Administración SCM | CU-10, CU-11, CU-12, CU-21, CU-22 | `INSERT, SELECT, UPDATE` |
 | 18 | `uat_acceptance` | `aceptacion_uat` | 7 | MOD-06 Calidad y Pruebas | CU-29, RN-09 | `INSERT, SELECT, UPDATE` |
-| 19 | `user_project_assignment` | `asignacion_proyecto_usuario` | 4 | MOD-02 Gestión de Proyectos | CU-01, CU-02, CU-03 | `SELECT` |
+| 19 | `user_project_assignment` | `asignacion_proyecto_usuario` | 4 | MOD-02 Gestión de Proyectos | CU-01, CU-02, CU-03 | `SELECT, INSERT, UPDATE` (H02-R01) |
 | 20 | `user_role_assignment` | `asignacion_rol_usuario` | 5 | MOD-01 Autenticación y RBAC | CU-01 | `SELECT` |
 | 21 | `user_session` | `sesion_usuario` | 10 | MOD-01 Autenticación y RBAC | CU-01, RNF-01 | `INSERT, SELECT, UPDATE` |
 

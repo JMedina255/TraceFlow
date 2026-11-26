@@ -29,7 +29,7 @@ describe('Backend Multitenant Projects Isolation (ADR-006, RBAC Matrix)', () => 
     const orgRepo = new OrganizationsRepository(db, authRepo);
     const auditService = new AuditService(db);
     const repo = new ProjectsRepository(db);
-    projectsService = new ProjectsService(repo, orgRepo, auditService);
+    projectsService = new ProjectsService(db, repo, orgRepo, auditService);
   });
 
   it('USR-001 con acceso a PRJ-001, PRJ-002 y PRJ-003 debe recibir los 3 proyectos', async () => {

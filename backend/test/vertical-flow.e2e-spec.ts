@@ -36,7 +36,7 @@ describe('Flujo Vertical Completo E2E (Login -> Proyectos -> Crear RFC -> Consul
 
     const projectsRepo = new ProjectsRepository(db);
     const orgRepo = new OrganizationsRepository(db, authRepo);
-    projectsService = new ProjectsService(projectsRepo, orgRepo, auditService);
+    projectsService = new ProjectsService(db, projectsRepo, orgRepo, auditService);
 
     const rfcsRepo = new RfcsRepository(db);
     rfcsService = new RfcsService(rfcsRepo, projectsRepo, auditService);

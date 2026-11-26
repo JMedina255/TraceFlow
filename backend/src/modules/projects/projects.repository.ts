@@ -149,7 +149,7 @@ export class ProjectsRepository {
     return this.projects.filter((p) => p.organization_id === orgId);
   }
 
-  async create(data: Partial<ProjectEntity>): Promise<ProjectEntity> {
+  async create(data: Partial<ProjectEntity>, client?: any): Promise<ProjectEntity> {
     const id = data.id || crypto.randomUUID();
     const now = new Date().toISOString();
     const entity: ProjectEntity = {
@@ -171,7 +171,8 @@ export class ProjectsRepository {
     };
 
     if (this.db.getDatabaseMode() === 'postgres') {
-      await this.db.query(
+      const runner = client || this.db;
+      await runner.query(
         `INSERT INTO traceflow.project
           (id, code, project_key, name, description, client_name, status, active_baseline_version, organization_id, manager_id, architect_id, librarian_id, created_by, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
@@ -200,9 +201,10 @@ export class ProjectsRepository {
     return entity;
   }
 
-  async assignUserToProject(userId: string, projectId: string, assignedBy?: string): Promise<void> {
+  async assignUserToProject(userId: string, projectId: string, assignedBy?: string, client?: any): Promise<void> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      await this.db.query(
+      const runner = client || this.db;
+      await runner.query(
         `INSERT INTO traceflow.user_project_assignment (user_id, project_id, assigned_by)
          VALUES ($1, $2, $3)
          ON CONFLICT (user_id, project_id) DO NOTHING`,

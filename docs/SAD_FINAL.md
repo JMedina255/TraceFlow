@@ -186,6 +186,14 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
 - **Hoja de Ruta en 5 Hitos (`INIT-H02` a `INIT-H06`):** Desglose secuencial con 30 pruebas TDD mapeadas exhaustivamente.
 - **Compendio Gráfico Canónico:** 11 modelos canónicos compilados `DG-INIT-01` a `DG-INIT-11` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
 
+## 30. Remediaciones de Persistencia, Aislamiento y Transaccionalidad (INIT-H02-R)
+- **Transaccionalidad Atómica (`DatabaseService.transaction`):** Operaciones compuestas (creación de organización/miembro, creación de proyecto/asignación, actualización de estado de miembro) se ejecutan dentro de transacciones atómicas `BEGIN ... COMMIT / ROLLBACK` compartiendo un `PoolClient` para garantizar consistencia ACID.
+- **Fail-Fast Sin Fallbacks Silenciosos:** En modo PostgreSQL, cualquier ausencia de tabla (error `42P01`) o fallo relacional produce una excepción HTTP controlada (`ServiceUnavailableException` 503 / `ForbiddenException` 403), eliminando sustituciones silenciosas por datos en memoria. Mocks restringidos a `DATABASE_MODE=mock`.
+- **Mínimo Privilegio de Asignaciones (`H02-R01`):** Otorgamiento explícito de `SELECT, INSERT, UPDATE` sobre `traceflow.user_project_assignment` al rol `traceflow_app`, reteniendo la revocación total de `DELETE`.
+- **Segregación Estricta SoD (`H02-R06`):** Validación en backend del rol activo `activeRoleId === 'PU-02'` para la inicialización institucional y de proyectos, bloqueando intentos de adopción pasiva desde `allowedRoleIds`. La suspensión de membresías revoca automáticamente el acceso operacional a los proyectos.
+- **Estrategia Segura de Recuperación y Rollback (PITR):** Procedimiento de reversión condicional que aborta si existen datos dependientes post-migración, preservando la información y redirigiendo a copias de seguridad Point-In-Time-Recovery (PITR).
+- **Certificación Aislada en PostgreSQL:** Batería de 10 escenarios ejecutados en motor PostgreSQL 14+ aislado (`pg-mem`) certificando transaccionalidad, disparadores de integridad `DA-06`, concurrencia y seguridad.
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R — C-SharkTeam / ÉXODO S.A.C.*

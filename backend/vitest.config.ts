@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     include: ['test/**/*.{spec,e2e-spec,test}.ts'],
     globals: true,
+    fileParallelism: false,
   },
 });

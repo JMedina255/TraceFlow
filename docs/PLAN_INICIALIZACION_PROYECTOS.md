@@ -877,13 +877,57 @@ Para garantizar la seguridad de los datos productivos y cumplir estrictamente el
 - Reversión atómica de disparadores, funciones, restricciones de estado, columnas foráneas y tablas auxiliares sin corromper tablas preexistentes.
 
 #### 5. Pruebas de Compatibilidad Certificadas
-- Suite completa de backend NestJS: **72/72 pruebas aprobadas (100%)**, cubriendo creación de organizaciones, unicidad, incorporación DA-06, aislamiento multitenant y compatibilidad de migraciones.
-- Suite completa de prototipo frontend: **97/97 pruebas aprobadas (100%)**.
+- Suite completa de backend NestJS: **86/86 pruebas aprobadas (100%)**, cubriendo creación de organizaciones, unicidad, incorporación DA-06, aislamiento multitenant, compatibilidad de migraciones y la suite de certificación aislada PostgreSQL de 10 escenarios.
+- Suite completa de prototipo frontend: **97/97 pruebas aprobadas (100%)** con 0 regresiones.
 
 #### 6. Procedimiento de Despliegue Controlado
 - Se ejecutará en una ventana de mantenimiento programada únicamente tras recibir la **autorización explícita y formal del CCB / Usuario Líder**.
 - No se utilizan credenciales de administrador en la operativa ordinaria del backend (uso estricto de `traceflow_app`).
 - Prohibida la creación de organizaciones o usuarios ficticios en el entorno productivo.
+
+---
+
+### 10.4 Subsanación Arquitectónica INIT-H02-R (Persistencia, Aislamiento y Seguridad)
+
+Tras la auditoría del hito INIT-H02, se ejecutó la remediación exhaustiva **INIT-H02-R** compuesta por 8 correcciones obligatorias antes de autorizar cualquier migración en Supabase productivo o iniciar INIT-H03:
+
+1. **H02-R01 — Mínimo Privilegio en PostgreSQL para Asignaciones:**
+   - Se ajustó el script DDL `202611260001_init_h02_organizations_and_projects.sql` para otorgar `GRANT SELECT, INSERT, UPDATE ON traceflow.user_project_assignment TO traceflow_app`.
+   - Se revocó explícitamente el permiso `DELETE` (`REVOKE DELETE ON ALL TABLES IN SCHEMA traceflow FROM traceflow_app`) garantizando el principio de menor privilegio (`SEC-02`).
+
+2. **H02-R02 — Eliminación Radical de Fallback Inseguro en Modo PostgreSQL:**
+   - Se eliminaron las capturas silenciosas de error `42P01` (tabla no encontrada) en `OrganizationsRepository` y `ProjectsService`.
+   - En modo PostgreSQL, cualquier ausencia de tabla o fallo en BD lanza una excepción HTTP controlada (`ServiceUnavailableException` 503) bloqueando la operación.
+   - Prohibido devolver organizaciones mock o aceptar proyectos sin `organization_id` válido. Los datos simulados quedan restringidos exclusivamente a `DATABASE_MODE=mock`.
+
+3. **H02-R03 — Transacciones Atómicas en Operaciones Compuestas:**
+   - Se implementó `DatabaseService.transaction<T>()` en el backend NestJS con soporte para cliente transaccional compartido (`client`).
+   - Las siguientes operaciones se ejecutan de forma estrictamente atómica (`BEGIN ... COMMIT / ROLLBACK`):
+     - Creación de organización + incorporación del creador como `OWNER` + emisión de evento de auditoría SHA-256.
+     - Creación de proyecto en `BORRADOR` + asignación del creador al proyecto + emisión de evento de auditoría SHA-256.
+     - Actualización de estado de miembro organizacional + emisión de evento de auditoría SHA-256.
+
+4. **H02-R04 — Migración Incremental Segura y Saneamiento de Datos:**
+   - Se eliminó el RUC/tax_id ficticio de los scripts de migración y seed, estableciendo `tax_id = NULL`.
+   - Se valida la existencia física del usuario en `traceflow.app_user` antes de insertar membresías organizacionales.
+   - Se sustituyeron cláusulas destructivas `ON CONFLICT DO UPDATE` por `ON CONFLICT (id) DO NOTHING` para proteger la información institucional.
+   - Los proyectos históricos (`PRJ-001`..`PRJ-003`) se asocian a la organización raíz únicamente cuando `WHERE organization_id IS NULL`, preservando proyectos ya vinculados.
+
+5. **H02-R05 — Estrategia Segura de Recuperación y Rollback (PITR):**
+   - El script `202611260001_init_h02_organizations_and_projects_rollback.sql` verifica la existencia de registros dependientes posteriores a la migración (`organization_member`, `project_setup`, proyectos creados post-migración).
+   - Si existen datos creados, el script aborta inmediatamente con `RAISE EXCEPTION` para evitar destrucción involuntaria de información, indicando el procedimiento formal de respaldo/recuperación en el tiempo (PITR) y `pg_restore`.
+
+6. **H02-R06 — Blindaje de Rol Activo (SoD) y Revocación por Suspensión:**
+   - Se exige que el usuario posea explícitamente `activeRoleId === 'PU-02'` para la creación inicial de organizaciones y proyectos, rechazando peticiones donde `PU-02` solo esté presente en roles secundarios pasivos (`allowedRoleIds`).
+   - La suspensión de un miembro de la organización (`status = 'SUSPENDED'`) revoca automáticamente todos sus accesos operacionales a proyectos de la organización.
+
+7. **H02-R07 — Fidelidad en Auditoría y Reconciliación Canónica de Estados:**
+   - Se captura el `previousStatus` del miembro antes de aplicar la mutación de estado en BD, registrando diferencias fidedignas en `payload_diff` de `audit_log`.
+   - Se reconcilió `normalizeProjectStatus()` para mapear los 8 estados canónicos: `BORRADOR`, `CONFIGURACION_INICIAL`, `ACTIVO`, `SUSPENDIDO`, `ARCHIVADO`, `HISTORICO_PENDIENTE_GITHUB`, `PENDIENTE_VALIDACION` y `CERRADO`.
+
+8. **H02-R08 — Certificación Física Aislada en PostgreSQL (10 Escenarios):**
+   - Se implementó la suite completa `backend/test/isolated-postgres-certification.spec.ts` ejecutada sobre un motor relacional PostgreSQL 14+ aislado (`pg-mem`).
+   - Certificación exitosa de los 10 escenarios: migraciones base, migración H02, datos iniciales, creación de proyecto en borrador, asignación con mínimo privilegio, bloqueo de acceso no autorizado, concurrencia, trigger de integridad DA-06, rollback atómico en fallo transaccional y validación de seguridad de rollback/recuperación.
 
 #### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
 Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:

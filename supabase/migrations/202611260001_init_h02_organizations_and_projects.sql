@@ -49,6 +49,7 @@ COMMENT ON COLUMN traceflow.project.organization_id IS 'Organización propietari
 
 -- 4. POBLACIÓN SEGURA Y REGULARIZACIÓN HISTÓRICA (PRESERVACIÓN DE DATOS PREVIOS)
 -- 4.1 Inserción de la organización institucional inicial (ÉXODO S.A.C.)
+-- H02-R04: Se omite tax_id ficticio (NULL) y se usa ON CONFLICT DO NOTHING para preservar datos previos sin sobrescribir.
 INSERT INTO traceflow.organization (id, code, name, slug, legal_name, tax_id, status, created_by, created_at, updated_at)
 VALUES (
     'c0000001-0000-0000-0000-000000000001',
@@ -56,24 +57,28 @@ VALUES (
     'ÉXODO S.A.C.',
     'exodo-sac',
     'Éxodo Soluciones Informáticas S.A.C.',
-    '20601234567',
+    NULL,
     'ACTIVE',
     'a0000001-0000-0000-0000-000000000001',
     '2026-08-01 00:00:00+00',
     '2026-08-01 00:00:00+00'
 )
-ON CONFLICT (id) DO UPDATE SET
-    code = EXCLUDED.code,
-    name = EXCLUDED.name,
-    slug = EXCLUDED.slug;
+ON CONFLICT (id) DO NOTHING;
 
--- 4.2 Incorporación de miembros fundadores registrados (DA-06)
+-- 4.2 Incorporación de miembros fundadores registrados (DA-06, H02-R04)
+-- Valida explícitamente la existencia de cada usuario en traceflow.app_user antes de insertar membresías
 INSERT INTO traceflow.organization_member (id, organization_id, user_id, role_in_org, status, joined_at, added_by)
-VALUES
-    ('d0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000001', 'OWNER', 'ACTIVE', '2026-08-01 00:00:00+00', 'a0000001-0000-0000-0000-000000000001'),
-    ('d0000001-0000-0000-0000-000000000002', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000002', 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00', 'a0000001-0000-0000-0000-000000000001'),
-    ('d0000001-0000-0000-0000-000000000003', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000003', 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00', 'a0000001-0000-0000-0000-000000000001'),
-    ('d0000001-0000-0000-0000-000000000004', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000004', 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00', 'a0000001-0000-0000-0000-000000000001')
+SELECT v.id, v.organization_id, v.user_id, v.role_in_org, v.status, v.joined_at, v.added_by
+FROM (
+    VALUES
+    ('d0000001-0000-0000-0000-000000000001'::uuid, 'c0000001-0000-0000-0000-000000000001'::uuid, 'a0000001-0000-0000-0000-000000000001'::uuid, 'OWNER', 'ACTIVE', '2026-08-01 00:00:00+00'::timestamptz, 'a0000001-0000-0000-0000-000000000001'::uuid),
+    ('d0000001-0000-0000-0000-000000000002'::uuid, 'c0000001-0000-0000-0000-000000000001'::uuid, 'a0000001-0000-0000-0000-000000000002'::uuid, 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00'::timestamptz, 'a0000001-0000-0000-0000-000000000001'::uuid),
+    ('d0000001-0000-0000-0000-000000000003'::uuid, 'c0000001-0000-0000-0000-000000000001'::uuid, 'a0000001-0000-0000-0000-000000000003'::uuid, 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00'::timestamptz, 'a0000001-0000-0000-0000-000000000001'::uuid),
+    ('d0000001-0000-0000-0000-000000000004'::uuid, 'c0000001-0000-0000-0000-000000000001'::uuid, 'a0000001-0000-0000-0000-000000000004'::uuid, 'MEMBER', 'ACTIVE', '2026-08-01 00:00:00+00'::timestamptz, 'a0000001-0000-0000-0000-000000000001'::uuid)
+) AS v(id, organization_id, user_id, role_in_org, status, joined_at, added_by)
+WHERE EXISTS (
+    SELECT 1 FROM traceflow.app_user u WHERE u.id = v.user_id AND u.status = 'ACTIVE'
+)
 ON CONFLICT (organization_id, user_id) DO NOTHING;
 
 -- 4.3 Vinculación de los proyectos históricos existentes a ORG-EXODO
@@ -95,6 +100,8 @@ ALTER TABLE traceflow.project ADD CONSTRAINT chk_project_status
         'SUSPENDIDO',
         'ARCHIVADO',
         'HISTORICO_PENDIENTE_GITHUB',
+        'PENDIENTE_VALIDACION',
+        'CERRADO',
         'ACTIVE',
         'CLOSED'
     ));
@@ -142,18 +149,21 @@ CREATE TRIGGER trg_check_user_project_assignment_org
     BEFORE INSERT OR UPDATE ON traceflow.user_project_assignment
     FOR EACH ROW EXECUTE FUNCTION traceflow.enforce_project_member_organization_integrity();
 
--- 7. REAJUSTE DE PRIVILEGIOS MÍNIMOS (LEAST PRIVILEGE AUDITADO)
+-- 7. REAJUSTE DE PRIVILEGIOS MÍNIMOS (LEAST PRIVILEGE AUDITADO - H02-R01)
+-- Se otorga a traceflow_app el permiso necesario para insertar asignaciones en user_project_assignment
 -- Conforme a trazabilidad SCM (IEEE 828, RNF-01, RNF-03), queda revocado el privilegio DELETE para traceflow_app.
 GRANT SELECT, INSERT, UPDATE ON TABLE
     traceflow.organization,
     traceflow.organization_member,
-    traceflow.project
+    traceflow.project,
+    traceflow.user_project_assignment
 TO traceflow_app;
 
 REVOKE DELETE ON TABLE
     traceflow.organization,
     traceflow.organization_member,
-    traceflow.project
+    traceflow.project,
+    traceflow.user_project_assignment
 FROM traceflow_app;
 
 COMMIT;

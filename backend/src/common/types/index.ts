@@ -33,8 +33,10 @@ export type MemberStatus = 'ACTIVE' | 'SUSPENDED';
 export type CanonicalProjectStatus =
   | 'BORRADOR'
   | 'CONFIGURACION_INICIAL'
+  | 'PENDIENTE_VALIDACION'
   | 'ACTIVO'
   | 'SUSPENDIDO'
+  | 'CERRADO'
   | 'ARCHIVADO'
   | 'HISTORICO_PENDIENTE_GITHUB';
 
@@ -45,6 +47,8 @@ export function normalizeProjectStatus(rawStatus: string): CanonicalProjectStatu
     case 'ACTIVE':
       return 'HISTORICO_PENDIENTE_GITHUB';
     case 'CLOSED':
+      return 'CERRADO';
+    case 'ARCHIVED':
       return 'ARCHIVADO';
     case 'ACTIVO':
       return 'ACTIVO';
@@ -53,8 +57,12 @@ export function normalizeProjectStatus(rawStatus: string): CanonicalProjectStatu
     case 'CONFIGURACION_INICIAL':
     case 'EN_CONFIGURACION':
       return 'CONFIGURACION_INICIAL';
+    case 'PENDIENTE_VALIDACION':
+      return 'PENDIENTE_VALIDACION';
     case 'SUSPENDIDO':
       return 'SUSPENDIDO';
+    case 'CERRADO':
+      return 'CERRADO';
     case 'ARCHIVADO':
       return 'ARCHIVADO';
     case 'HISTORICO_PENDIENTE_GITHUB':

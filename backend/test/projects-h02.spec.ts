@@ -76,7 +76,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
     orgRepo = new OrganizationsRepository(db, authRepo);
     projectsRepo = new ProjectsRepository(db);
     auditService = new AuditService(db);
-    projectsService = new ProjectsService(projectsRepo, orgRepo, auditService);
+    projectsService = new ProjectsService(db, projectsRepo, orgRepo, auditService);
   });
 
   describe('TDD-INIT-07: Creación de proyecto en estado BORRADOR (DA-01, DA-02)', () => {
@@ -104,6 +104,54 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
       expect(auditService.verifyChainIntegrity()).toBe(true);
       const auditChain = auditService.getAuditChain();
       expect(auditChain.some((l) => l.eventCode === 'PRJ_CREATED_DRAFT')).toBe(true);
+    });
+
+    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el usuario opera con activeRoleId no autorizado aunque tenga PU-02 en roles pasivos', async () => {
+      // Usuario que es MEMBER ordinario en la org, y tiene PU-02 en allowed pero activo PU-06
+      const userMemberRolInactivo: AuthenticatedUser = {
+        ...userDevExodo, // rol en org: MEMBER
+        activeRoleId: 'PU-06',
+        allowedRoleIds: ['PU-06', 'PU-02'],
+      };
+
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-UNAUTH-ACTIVE',
+            projectKey: 'UNAUTH-KEY',
+            name: 'Proyecto Invalido Activo',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          userMemberRolInactivo
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el miembro se encuentra suspendido', async () => {
+      // Suspender temporalmente a un miembro
+      await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'SUSPENDED');
+
+      const userSuspendido: AuthenticatedUser = {
+        ...userDevExodo,
+        activeRoleId: 'PU-02',
+      };
+
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-SUSPENDED',
+            projectKey: 'SUSP-KEY',
+            name: 'Proyecto Suspendido',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          userSuspendido
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // Restaurar estado activo
+      await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'ACTIVE');
     });
 
     it('PRUEBA NEGATIVA: debe rechazar la creación si la organización no existe (404)', async () => {
@@ -235,13 +283,51 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
         projectsService.getProjectById('PRJ-001', userOrgB)
       ).rejects.toThrow(ForbiddenException);
     });
+
+    it('PRUEBA NEGATIVA (H02-R06): un miembro suspendido en la organización no puede consultar sus proyectos con filtro', async () => {
+      // Suspender temporalmente a USR-002 en ORG-EXODO
+      await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'SUSPENDED');
+
+      await expect(
+        projectsService.getProjectsForUser(userDevExodo, 'ORG-EXODO')
+      ).rejects.toThrow(ForbiddenException);
+
+      // Restaurar estado activo
+      await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'ACTIVE');
+    });
+
+    it('PRUEBA NEGATIVA (H02-R02): en modo PostgreSQL, un proyecto sin organización válida no debe ser devuelto ni accesible', async () => {
+      const dbPgMode = new DatabaseService('postgres');
+      const pRepo = new ProjectsRepository(dbPgMode);
+      const oRepo = new OrganizationsRepository(dbPgMode, authRepo);
+      const audService = new AuditService(dbPgMode);
+      const pService = new ProjectsService(dbPgMode, pRepo, oRepo, audService);
+
+      // Simular que findByIdOrCode retorna un proyecto sin organization_id
+      pRepo.findByIdOrCode = async () => ({
+        id: 'b0000001-0000-0000-0000-000000000999',
+        code: 'PRJ-NO-ORG',
+        project_key: 'NO-ORG',
+        name: 'Sin Org',
+        description: '',
+        client_name: 'Test',
+        status: 'ACTIVO',
+        organization_id: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      await expect(
+        pService.getProjectById('PRJ-NO-ORG', userOwnerExodo)
+      ).rejects.toThrow(ForbiddenException);
+    });
   });
 
   describe('Compatibilidad de estados y normalización canónica', () => {
     it('debe normalizar estados legados sin romper compatibilidad', () => {
       expect(normalizeProjectStatus('ACTIVE')).toBe('HISTORICO_PENDIENTE_GITHUB');
       expect(normalizeProjectStatus('ACTIVO')).toBe('ACTIVO');
-      expect(normalizeProjectStatus('CLOSED')).toBe('ARCHIVADO');
+      expect(normalizeProjectStatus('CLOSED')).toBe('CERRADO');
       expect(normalizeProjectStatus('BORRADOR')).toBe('BORRADOR');
       expect(normalizeProjectStatus('CONFIGURACION_INICIAL')).toBe('CONFIGURACION_INICIAL');
       expect(normalizeProjectStatus('SUSPENDIDO')).toBe('SUSPENDIDO');

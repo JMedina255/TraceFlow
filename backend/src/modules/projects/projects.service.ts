@@ -7,6 +7,7 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
+import { DatabaseService } from '../../database/database.service.js';
 import { ProjectsRepository, ProjectEntity } from './projects.repository.js';
 import { OrganizationsRepository } from '../organizations/organizations.repository.js';
 import { AuditService } from '../audit/audit.service.js';
@@ -17,6 +18,8 @@ import type { CreateProjectDto } from './dtos/create-project.dto.js';
 @Injectable()
 export class ProjectsService {
   constructor(
+    @Inject(DatabaseService)
+    private readonly db: DatabaseService,
     @Inject(ProjectsRepository)
     private readonly projectsRepo: ProjectsRepository,
     @Inject(forwardRef(() => OrganizationsRepository))
@@ -43,7 +46,7 @@ export class ProjectsService {
       );
     }
 
-    // 2. Validar membresía y permisos del usuario en la organización (DA-06)
+    // 2. Validar membresía y permisos del usuario en la organización (DA-06, H02-R06)
     const member = await this.orgRepo.findMember(org.id, user.id);
     if (!member || member.status !== 'ACTIVE') {
       throw new ForbiddenException(
@@ -51,14 +54,14 @@ export class ProjectsService {
       );
     }
 
+    // H02-R06: SoD estricta — Solo OWNER/ADMIN de la org o usuario con rol activo PU-02 (no permitido vía allowedRoleIds pasivos)
     const hasCreationPermission =
       ['OWNER', 'ADMIN'].includes(member.role_in_org) ||
-      user.activeRoleId === 'PU-02' ||
-      user.allowedRoleIds.includes('PU-02');
+      user.activeRoleId === 'PU-02';
 
     if (!hasCreationPermission) {
       throw new ForbiddenException(
-        `Acceso denegado: Se requiere rol de Propietario (OWNER), Administrador de la organización o Gestor PU-02 para registrar proyectos.`
+        `Acceso denegado: Se requiere rol de Propietario (OWNER), Administrador de la organización o rol activo Gestor PU-02 para registrar proyectos.`
       );
     }
 
@@ -77,48 +80,59 @@ export class ProjectsService {
       );
     }
 
-    // 4. Crear proyecto en estado estrictamente BORRADOR (no activo en este hito)
-    const project = await this.projectsRepo.create({
-      code: dto.code.toUpperCase(),
-      project_key: dto.projectKey.toUpperCase(),
-      name: dto.name,
-      description: dto.description || '',
-      client_name: dto.clientName,
-      status: 'BORRADOR',
-      organization_id: org.id,
-      created_by: user.id,
-      manager_id: user.id,
+    // 4. H02-R03: Crear proyecto, asignar creador y registrar auditoría atómicamente en una única transacción
+    const project = await this.db.transaction(async (client) => {
+      const prj = await this.projectsRepo.create(
+        {
+          code: dto.code.toUpperCase(),
+          project_key: dto.projectKey.toUpperCase(),
+          name: dto.name,
+          description: dto.description || '',
+          client_name: dto.clientName,
+          status: 'BORRADOR',
+          organization_id: org.id,
+          created_by: user.id,
+          manager_id: user.id,
+        },
+        client
+      );
+
+      // Asignar al creador como integrante del proyecto
+      await this.projectsRepo.assignUserToProject(user.id, prj.id, user.id, client);
+
+      // Auditoría inmutable SHA-256
+      await this.auditService.logEvent(
+        {
+          eventCode: 'PRJ_CREATED_DRAFT',
+          actorUserId: user.id,
+          actorRole: user.activeRoleId,
+          operation: 'CREATE',
+          entityName: 'project',
+          entityId: prj.id,
+          projectId: prj.id,
+          resultStatus: 'SUCCESS',
+          payloadDiff: {
+            code: prj.code,
+            projectKey: prj.project_key,
+            name: prj.name,
+            organizationId: org.id,
+            organizationCode: org.code,
+            status: 'BORRADOR',
+            createdBy: user.code,
+          },
+        },
+        client
+      );
+
+      return prj;
     });
 
-    // 5. Asignar al creador como integrante del proyecto
-    await this.projectsRepo.assignUserToProject(user.id, project.id, user.id);
     if (!user.assignedProjectIds.includes(project.code)) {
       user.assignedProjectIds.push(project.code);
     }
     if (!user.assignedProjectIds.includes(project.id)) {
       user.assignedProjectIds.push(project.id);
     }
-
-    // 6. Auditoría inmutable SHA-256
-    await this.auditService.logEvent({
-      eventCode: 'PRJ_CREATED_DRAFT',
-      actorUserId: user.id,
-      actorRole: user.activeRoleId,
-      operation: 'CREATE',
-      entityName: 'project',
-      entityId: project.id,
-      projectId: project.id,
-      resultStatus: 'SUCCESS',
-      payloadDiff: {
-        code: project.code,
-        projectKey: project.project_key,
-        name: project.name,
-        organizationId: org.id,
-        organizationCode: org.code,
-        status: 'BORRADOR',
-        createdBy: user.code,
-      },
-    });
 
     return {
       ...project,
@@ -142,6 +156,13 @@ export class ProjectsService {
           `Acceso denegado: El usuario no tiene autorización sobre la organización solicitada.`
         );
       }
+      // H02-R06: Comprobar que el usuario sea miembro activo (si está suspendido, acceso denegado)
+      const callerMember = await this.orgRepo.findMember(org.id, user.id);
+      if (!callerMember || callerMember.status !== 'ACTIVE') {
+        throw new ForbiddenException(
+          `Acceso denegado: La membresía del usuario '${user.code}' en la organización '${org.code}' está inactiva o suspendida.`
+        );
+      }
       targetOrgId = org.id;
     }
 
@@ -149,12 +170,16 @@ export class ProjectsService {
     const dynamicAssignments = await this.projectsRepo.findUserProjectAssignments(user.id);
 
     // Aislamiento multitenant estricto (ADR-006 / DA-01, DA-02):
-    // 1. El proyecto debe pertenecer a una organización donde el usuario es miembro activo
-    // 2. El usuario debe estar asignado al proyecto O ser OWNER/ADMIN de la organización propietaria
+    // 1. En PostgreSQL, el proyecto debe tener obligatoriamente organización institucional asignada (H02-R02)
+    // 2. El usuario debe ser miembro activo de dicha organización (DA-06)
+    // 3. El usuario debe estar asignado al proyecto O ser su creador
     return allProjects
       .filter((p) => {
-        // Validación de pertenencia a organización del usuario
-        // Si el proyecto histórico no tiene organization_id aún, se asocia por defecto a la org institucional
+        // H02-R02: En modo postgres, nunca considerar autorizado un proyecto sin organización
+        if (this.db.getDatabaseMode() === 'postgres' && !p.organization_id) {
+          return false;
+        }
+
         const orgMatch = p.organization_id
           ? userOrgIds.includes(p.organization_id)
           : true;
@@ -189,12 +214,19 @@ export class ProjectsService {
       throw new NotFoundException(`Proyecto '${idOrCode}' no encontrado.`);
     }
 
-    // Verificación de aislamiento organizacional (DA-02)
+    // H02-R02: En modo PostgreSQL, rechazar proyectos sin organización institucional válida
+    if (this.db.getDatabaseMode() === 'postgres' && !project.organization_id) {
+      throw new ForbiddenException(
+        `Acceso denegado: El proyecto '${project.code}' carece de organización institucional válida.`
+      );
+    }
+
+    // Verificación de aislamiento organizacional (DA-02, DA-06)
     if (project.organization_id) {
       const member = await this.orgRepo.findMember(project.organization_id, user.id);
       if (!member || member.status !== 'ACTIVE') {
         throw new ForbiddenException(
-          `Acceso denegado: El usuario '${user.code}' no es miembro de la organización propietaria del proyecto.`
+          `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización propietaria del proyecto.`
         );
       }
     }

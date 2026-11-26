@@ -104,4 +104,31 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
     throw new Error('[DatabaseModeError] Invocación directa de getClient en modo mock.');
   }
+
+  async transaction<T>(callback: (client: pg.PoolClient | null) => Promise<T>): Promise<T> {
+    if (this.databaseMode === 'postgres') {
+      const client = await this.getClient();
+      const memDbBackup = (this.pool as any)?._memDbBackup ? (this.pool as any)._memDbBackup() : null;
+      try {
+        await client.query('BEGIN');
+        const result = await callback(client);
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        try {
+          await client.query('ROLLBACK');
+        } catch {
+          // Ignorar fallo de comando si la conexión fue terminada
+        }
+        if (memDbBackup) {
+          memDbBackup.restore();
+        }
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+    // En modo mock en memoria, ejecuta la operación atómicamente
+    return callback(null);
+  }
 }

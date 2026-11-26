@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, ServiceUnavailableException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import { AuthRepository } from '../auth/auth.repository.js';
 import type { OrganizationRole, OrganizationStatus, MemberStatus } from '../../common/types/index.js';
@@ -31,6 +31,20 @@ export interface OrganizationMemberEntity {
 
 @Injectable()
 export class OrganizationsRepository {
+  private async runQuery<T>(queryText: string, params?: any[], client?: any): Promise<{ rows: T[] }> {
+    try {
+      const runner = client || this.db;
+      return await runner.query(queryText, params);
+    } catch (err: any) {
+      if (err.code === '42P01') {
+        // H02-R02: Error controlado que bloquea la operación sin fallback a datos simulados
+        throw new ServiceUnavailableException(
+          'Esquema organizacional no inicializado en PostgreSQL (tabla no encontrada). Operación bloqueada (H02-R02).'
+        );
+      }
+      throw err;
+    }
+  }
   private organizations: OrganizationEntity[] = [
     {
       id: 'c0000001-0000-0000-0000-000000000001',
@@ -38,7 +52,7 @@ export class OrganizationsRepository {
       name: 'ÉXODO S.A.C.',
       slug: 'exodo-sac',
       legal_name: 'Éxodo Soluciones Informáticas S.A.C.',
-      tax_id: '20601234567',
+      tax_id: null,
       status: 'ACTIVE',
       created_by: 'a0000001-0000-0000-0000-000000000001',
       created_at: '2026-08-01T00:00:00Z',
@@ -104,18 +118,13 @@ export class OrganizationsRepository {
 
   async count(): Promise<number> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<{ count: string }>('SELECT COUNT(*)::text as count FROM traceflow.organization');
-        return parseInt(res.rows[0].count, 10);
-      } catch (err: any) {
-        if (err.code === '42P01') return this.organizations.length;
-        throw err;
-      }
+      const res = await this.runQuery<{ count: string }>('SELECT COUNT(*)::text as count FROM traceflow.organization');
+      return parseInt(res.rows[0].count, 10);
     }
     return this.organizations.length;
   }
 
-  async create(data: Partial<OrganizationEntity>): Promise<OrganizationEntity> {
+  async create(data: Partial<OrganizationEntity>, client?: any): Promise<OrganizationEntity> {
     const id = data.id || crypto.randomUUID();
     const now = new Date().toISOString();
     const entity: OrganizationEntity = {
@@ -132,32 +141,25 @@ export class OrganizationsRepository {
     };
 
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        await this.db.query(
-          `INSERT INTO traceflow.organization 
-            (id, code, name, slug, legal_name, tax_id, status, created_by, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [
-            entity.id,
-            entity.code,
-            entity.name,
-            entity.slug,
-            entity.legal_name,
-            entity.tax_id,
-            entity.status,
-            entity.created_by,
-            entity.created_at,
-            entity.updated_at,
-          ]
-        );
-        return entity;
-      } catch (err: any) {
-        if (err.code === '42P01') {
-          this.organizations.push(entity);
-          return entity;
-        }
-        throw err;
-      }
+      await this.runQuery(
+        `INSERT INTO traceflow.organization
+          (id, code, name, slug, legal_name, tax_id, status, created_by, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          entity.id,
+          entity.code,
+          entity.name,
+          entity.slug,
+          entity.legal_name,
+          entity.tax_id,
+          entity.status,
+          entity.created_by,
+          entity.created_at,
+          entity.updated_at,
+        ],
+        client
+      );
+      return entity;
     }
 
     this.organizations.push(entity);
@@ -166,16 +168,11 @@ export class OrganizationsRepository {
 
   async findById(id: string): Promise<OrganizationEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          'SELECT * FROM traceflow.organization WHERE id = $1 LIMIT 1',
-          [id]
-        );
-        return res.rows.length > 0 ? res.rows[0] : null;
-      } catch (err: any) {
-        if (err.code === '42P01') return this.organizations.find((o) => o.id === id) || null;
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationEntity>(
+        'SELECT * FROM traceflow.organization WHERE id = $1 LIMIT 1',
+        [id]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.organizations.find((o) => o.id === id) || null;
   }
@@ -183,16 +180,11 @@ export class OrganizationsRepository {
   async findByCode(code: string): Promise<OrganizationEntity | null> {
     const normalized = code.trim().toUpperCase();
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          'SELECT * FROM traceflow.organization WHERE UPPER(code) = $1 LIMIT 1',
-          [normalized]
-        );
-        return res.rows.length > 0 ? res.rows[0] : null;
-      } catch (err: any) {
-        if (err.code === '42P01') return this.organizations.find((o) => o.code.toUpperCase() === normalized) || null;
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationEntity>(
+        'SELECT * FROM traceflow.organization WHERE UPPER(code) = $1 LIMIT 1',
+        [normalized]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.organizations.find((o) => o.code.toUpperCase() === normalized) || null;
   }
@@ -200,42 +192,24 @@ export class OrganizationsRepository {
   async findBySlug(slug: string): Promise<OrganizationEntity | null> {
     const normalized = slug.trim().toLowerCase();
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          'SELECT * FROM traceflow.organization WHERE LOWER(slug) = $1 LIMIT 1',
-          [normalized]
-        );
-        return res.rows.length > 0 ? res.rows[0] : null;
-      } catch (err: any) {
-        if (err.code === '42P01') return this.organizations.find((o) => o.slug.toLowerCase() === normalized) || null;
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationEntity>(
+        'SELECT * FROM traceflow.organization WHERE LOWER(slug) = $1 LIMIT 1',
+        [normalized]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     return this.organizations.find((o) => o.slug.toLowerCase() === normalized) || null;
   }
 
   async findByIdOrSlugOrCode(val: string): Promise<OrganizationEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          `SELECT * FROM traceflow.organization 
-           WHERE id::text = $1 OR LOWER(slug) = LOWER($1) OR UPPER(code) = UPPER($1) 
-           LIMIT 1`,
-          [val]
-        );
-        return res.rows.length > 0 ? res.rows[0] : null;
-      } catch (err: any) {
-        if (err.code === '42P01') {
-          const lower = val.toLowerCase();
-          const upper = val.toUpperCase();
-          return (
-            this.organizations.find(
-              (o) => o.id === val || o.slug.toLowerCase() === lower || o.code.toUpperCase() === upper
-            ) || null
-          );
-        }
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationEntity>(
+        `SELECT * FROM traceflow.organization
+         WHERE id::text = $1 OR LOWER(slug) = LOWER($1) OR UPPER(code) = UPPER($1)
+         LIMIT 1`,
+        [val]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
     const lower = val.toLowerCase();
     const upper = val.toUpperCase();
@@ -248,43 +222,26 @@ export class OrganizationsRepository {
 
   async findAll(): Promise<OrganizationEntity[]> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          'SELECT * FROM traceflow.organization ORDER BY code ASC'
-        );
-        return res.rows;
-      } catch (err: any) {
-        if (err.code === '42P01') return [...this.organizations];
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationEntity>(
+        'SELECT * FROM traceflow.organization ORDER BY code ASC'
+      );
+      return res.rows;
     }
     return [...this.organizations];
   }
 
   async findOrganizationsForUser(userId: string): Promise<OrganizationEntity[]> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationEntity>(
-          `SELECT o.* 
-           FROM traceflow.organization o
-           JOIN traceflow.organization_member m ON o.id = m.organization_id
-           WHERE m.user_id = $1 AND m.status = 'ACTIVE' AND o.status = 'ACTIVE'
-           ORDER BY o.code ASC`,
-          [userId]
-        );
-        return res.rows;
-      } catch (err: any) {
-        // Fallback institucional transparente si la migración H02 aún no ha sido aplicada a Supabase (42P01)
-        if (err.code === '42P01') {
-          const memberOrgIds = this.members
-            .filter((m) => m.user_id === userId && m.status === 'ACTIVE')
-            .map((m) => m.organization_id);
-          return this.organizations.filter(
-            (o) => (memberOrgIds.length === 0 || memberOrgIds.includes(o.id)) && o.status === 'ACTIVE'
-          );
-        }
-        throw err;
-      }
+      // Sin fallback inseguro (H02-R02): el error debe propagarse si falla la consulta
+      const res = await this.runQuery<OrganizationEntity>(
+        `SELECT o.*
+         FROM traceflow.organization o
+         JOIN traceflow.organization_member m ON o.id = m.organization_id
+         WHERE m.user_id = $1 AND m.status = 'ACTIVE' AND o.status = 'ACTIVE'
+         ORDER BY o.code ASC`,
+        [userId]
+      );
+      return res.rows;
     }
 
     const memberOrgIds = this.members
@@ -295,7 +252,7 @@ export class OrganizationsRepository {
     );
   }
 
-  async addMember(data: Partial<OrganizationMemberEntity>): Promise<OrganizationMemberEntity> {
+  async addMember(data: Partial<OrganizationMemberEntity>, client?: any): Promise<OrganizationMemberEntity> {
     const id = data.id || crypto.randomUUID();
     const now = new Date().toISOString();
     const entity: OrganizationMemberEntity = {
@@ -312,29 +269,22 @@ export class OrganizationsRepository {
     };
 
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        await this.db.query(
-          `INSERT INTO traceflow.organization_member 
-            (id, organization_id, user_id, role_in_org, status, joined_at, added_by)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            entity.id,
-            entity.organization_id,
-            entity.user_id,
-            entity.role_in_org,
-            entity.status,
-            entity.joined_at,
-            entity.added_by,
-          ]
-        );
-        return entity;
-      } catch (err: any) {
-        if (err.code === '42P01') {
-          this.members.push(entity);
-          return entity;
-        }
-        throw err;
-      }
+      await this.runQuery(
+        `INSERT INTO traceflow.organization_member
+          (id, organization_id, user_id, role_in_org, status, joined_at, added_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          entity.id,
+          entity.organization_id,
+          entity.user_id,
+          entity.role_in_org,
+          entity.status,
+          entity.joined_at,
+          entity.added_by,
+        ],
+        client
+      );
+      return entity;
     }
 
     this.members.push(entity);
@@ -343,26 +293,15 @@ export class OrganizationsRepository {
 
   async findMember(orgId: string, userId: string): Promise<OrganizationMemberEntity | null> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationMemberEntity>(
-          `SELECT m.*, u.code as user_code, u.full_name as user_full_name, u.email as user_email
-           FROM traceflow.organization_member m
-           JOIN traceflow.app_user u ON m.user_id = u.id
-           WHERE m.organization_id = $1 AND m.user_id = $2
-           LIMIT 1`,
-          [orgId, userId]
-        );
-        return res.rows.length > 0 ? res.rows[0] : null;
-      } catch (err: any) {
-        if (err.code === '42P01') {
-          return (
-            this.members.find(
-              (m) => m.organization_id === orgId && m.user_id === userId
-            ) || null
-          );
-        }
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationMemberEntity>(
+        `SELECT m.*, u.code as user_code, u.full_name as user_full_name, u.email as user_email
+         FROM traceflow.organization_member m
+         JOIN traceflow.app_user u ON m.user_id = u.id
+         WHERE m.organization_id = $1 AND m.user_id = $2
+         LIMIT 1`,
+        [orgId, userId]
+      );
+      return res.rows.length > 0 ? res.rows[0] : null;
     }
 
     return (
@@ -374,20 +313,15 @@ export class OrganizationsRepository {
 
   async findMembersByOrgId(orgId: string): Promise<OrganizationMemberEntity[]> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        const res = await this.db.query<OrganizationMemberEntity>(
-          `SELECT m.*, u.code as user_code, u.full_name as user_full_name, u.email as user_email
-           FROM traceflow.organization_member m
-           JOIN traceflow.app_user u ON m.user_id = u.id
-           WHERE m.organization_id = $1
-           ORDER BY m.joined_at ASC`,
-          [orgId]
-        );
-        return res.rows;
-      } catch (err: any) {
-        if (err.code === '42P01') return this.members.filter((m) => m.organization_id === orgId);
-        throw err;
-      }
+      const res = await this.runQuery<OrganizationMemberEntity>(
+        `SELECT m.*, u.code as user_code, u.full_name as user_full_name, u.email as user_email
+         FROM traceflow.organization_member m
+         JOIN traceflow.app_user u ON m.user_id = u.id
+         WHERE m.organization_id = $1
+         ORDER BY m.joined_at ASC`,
+        [orgId]
+      );
+      return res.rows;
     }
 
     return this.members.filter((m) => m.organization_id === orgId);
@@ -396,27 +330,18 @@ export class OrganizationsRepository {
   async updateMemberStatus(
     orgId: string,
     userId: string,
-    status: MemberStatus
+    status: MemberStatus,
+    client?: any
   ): Promise<void> {
     if (this.db.getDatabaseMode() === 'postgres') {
-      try {
-        await this.db.query(
-          `UPDATE traceflow.organization_member 
-           SET status = $1 
-           WHERE organization_id = $2 AND user_id = $3`,
-          [status, orgId, userId]
-        );
-        return;
-      } catch (err: any) {
-        if (err.code === '42P01') {
-          const member = this.members.find(
-            (m) => m.organization_id === orgId && m.user_id === userId
-          );
-          if (member) member.status = status;
-          return;
-        }
-        throw err;
-      }
+      await this.runQuery(
+        `UPDATE traceflow.organization_member
+         SET status = $1
+         WHERE organization_id = $2 AND user_id = $3`,
+        [status, orgId, userId],
+        client
+      );
+      return;
     }
 
     const member = this.members.find(
@@ -435,7 +360,7 @@ export class OrganizationsRepository {
         name: 'ÉXODO S.A.C.',
         slug: 'exodo-sac',
         legal_name: 'Éxodo Soluciones Informáticas S.A.C.',
-        tax_id: '20601234567',
+        tax_id: null,
         status: 'ACTIVE',
         created_by: 'a0000001-0000-0000-0000-000000000001',
         created_at: '2026-08-01T00:00:00Z',

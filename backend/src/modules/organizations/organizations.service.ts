@@ -7,6 +7,7 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
+import { DatabaseService } from '../../database/database.service.js';
 import {
   OrganizationsRepository,
   OrganizationEntity,
@@ -22,6 +23,8 @@ import type { UpdateMemberStatusDto } from './dtos/update-member-status.dto.js';
 @Injectable()
 export class OrganizationsService {
   constructor(
+    @Inject(DatabaseService)
+    private readonly db: DatabaseService,
     @Inject(OrganizationsRepository)
     private readonly orgRepo: OrganizationsRepository,
     @Inject(forwardRef(() => AuthRepository))
@@ -37,13 +40,11 @@ export class OrganizationsService {
     const totalCount = await this.orgRepo.count();
 
     if (totalCount === 0) {
-      // Regla Bootstrap: La primera organización puede ser inicializada por el rol PU-02 Gestor
-      const isPU02 =
-        user.activeRoleId === 'PU-02' ||
-        user.allowedRoleIds.includes('PU-02');
+      // Regla Bootstrap (H02-R06): La primera organización requiere explícitamente el rol ACTIVO PU-02 Gestor
+      const isPU02 = user.activeRoleId === 'PU-02';
       if (!isPU02) {
         throw new ForbiddenException(
-          'Acceso denegado: La inicialización de la primera organización del sistema requiere el rol PU-02 (Gestor de Configuración).'
+          'Acceso denegado: La inicialización de la primera organización del sistema requiere el rol activo PU-02 (Gestor de Configuración).'
         );
       }
     } else {
@@ -81,43 +82,57 @@ export class OrganizationsService {
       );
     }
 
-    const org = await this.orgRepo.create({
-      code: dto.code,
-      name: dto.name,
-      slug: dto.slug,
-      legal_name: dto.legalName,
-      tax_id: dto.taxId,
-      status: 'ACTIVE',
-      created_by: user.id,
-    });
+    // H02-R03: Creación atómica en una única transacción de PostgreSQL
+    const org = await this.db.transaction(async (client) => {
+      const createdOrg = await this.orgRepo.create(
+        {
+          code: dto.code,
+          name: dto.name,
+          slug: dto.slug,
+          legal_name: dto.legalName,
+          tax_id: dto.taxId,
+          status: 'ACTIVE',
+          created_by: user.id,
+        },
+        client
+      );
 
-    // DA-06: El creador se incorpora automáticamente como OWNER activo
-    await this.orgRepo.addMember({
-      organization_id: org.id,
-      user_id: user.id,
-      role_in_org: 'OWNER',
-      status: 'ACTIVE',
-      added_by: user.id,
-      user_code: user.code,
-      user_full_name: user.fullName,
-      user_email: user.email,
-    });
+      // DA-06: El creador se incorpora automáticamente como OWNER activo
+      await this.orgRepo.addMember(
+        {
+          organization_id: createdOrg.id,
+          user_id: user.id,
+          role_in_org: 'OWNER',
+          status: 'ACTIVE',
+          added_by: user.id,
+          user_code: user.code,
+          user_full_name: user.fullName,
+          user_email: user.email,
+        },
+        client
+      );
 
-    // Auditoría inmutable SHA-256
-    await this.auditService.logEvent({
-      eventCode: 'ORG_CREATED',
-      actorUserId: user.id,
-      actorRole: user.activeRoleId,
-      operation: 'CREATE',
-      entityName: 'organization',
-      entityId: org.id,
-      resultStatus: 'SUCCESS',
-      payloadDiff: {
-        code: org.code,
-        name: org.name,
-        slug: org.slug,
-        createdBy: user.code,
-      },
+      // Auditoría inmutable SHA-256 dentro de la misma transacción
+      await this.auditService.logEvent(
+        {
+          eventCode: 'ORG_CREATED',
+          actorUserId: user.id,
+          actorRole: user.activeRoleId,
+          operation: 'CREATE',
+          entityName: 'organization',
+          entityId: createdOrg.id,
+          resultStatus: 'SUCCESS',
+          payloadDiff: {
+            code: createdOrg.code,
+            name: createdOrg.name,
+            slug: createdOrg.slug,
+            createdBy: user.code,
+          },
+        },
+        client
+      );
+
+      return createdOrg;
     });
 
     return org;
@@ -296,25 +311,34 @@ export class OrganizationsService {
       }
     }
 
-    await this.orgRepo.updateMemberStatus(org.id, targetUserId, dto.status);
-    targetMember.status = dto.status;
+    // H02-R07: Capturar el estado anterior antes de la mutación para preservar la fidelidad de auditoría
+    const previousStatus = targetMember.status;
 
-    await this.auditService.logEvent({
-      eventCode: 'ORG_MEMBER_STATUS_CHANGED',
-      actorUserId: user.id,
-      actorRole: user.activeRoleId,
-      operation: 'UPDATE',
-      entityName: 'organization_member',
-      entityId: targetMember.id,
-      resultStatus: 'SUCCESS',
-      payloadDiff: {
-        organizationId: org.id,
-        targetUserId,
-        previousStatus: targetMember.status,
-        newStatus: dto.status,
-      },
+    // H02-R03: Ejecutar la actualización y la auditoría de forma atómica en transacción
+    await this.db.transaction(async (client) => {
+      await this.orgRepo.updateMemberStatus(org.id, targetUserId, dto.status, client);
+
+      await this.auditService.logEvent(
+        {
+          eventCode: 'ORG_MEMBER_STATUS_CHANGED',
+          actorUserId: user.id,
+          actorRole: user.activeRoleId,
+          operation: 'UPDATE',
+          entityName: 'organization_member',
+          entityId: targetMember.id,
+          resultStatus: 'SUCCESS',
+          payloadDiff: {
+            organizationId: org.id,
+            targetUserId,
+            previousStatus,
+            newStatus: dto.status,
+          },
+        },
+        client
+      );
     });
 
+    targetMember.status = dto.status;
     return targetMember;
   }
 }

@@ -68,7 +68,7 @@ describe('INIT-H02: Gestión de Organizaciones y Membresías (DA-02, DA-06)', ()
     authRepo = new AuthRepository(db);
     orgRepo = new OrganizationsRepository(db, authRepo);
     auditService = new AuditService(db);
-    orgService = new OrganizationsService(orgRepo, authRepo, auditService);
+    orgService = new OrganizationsService(db, orgRepo, authRepo, auditService);
   });
 
   describe('TDD-INIT-01: Creación de la primera organización (Regla de Bootstrap)', () => {
@@ -101,6 +101,27 @@ describe('INIT-H02: Gestión de Organizaciones y Membresías (DA-02, DA-06)', ()
       expect(auditService.verifyChainIntegrity()).toBe(true);
       const auditLogs = auditService.getAuditChain();
       expect(auditLogs.some((l) => l.eventCode === 'ORG_CREATED')).toBe(true);
+    });
+
+    it('PRUEBA NEGATIVA (H02-R06): debe rechazar a un usuario que tiene PU-02 en allowedRoleIds pero opera con otro activeRoleId', async () => {
+      orgRepo.clearAllMockForBootstrap();
+
+      const userConPU02Inactivo: AuthenticatedUser = {
+        ...userPU02Gestor,
+        activeRoleId: 'PU-01', // Rol activo Solicitante, no Gestor
+        allowedRoleIds: ['PU-01', 'PU-02'],
+      };
+
+      await expect(
+        orgService.createOrganization(
+          {
+            code: 'ORG-INIT',
+            name: 'Organización Inicial',
+            slug: 'org-init',
+          },
+          userConPU02Inactivo
+        )
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('PRUEBA NEGATIVA: debe rechazar a un usuario sin rol PU-02 al intentar inicializar el sistema', async () => {
@@ -218,7 +239,7 @@ describe('INIT-H02: Gestión de Organizaciones y Membresías (DA-02, DA-06)', ()
   });
 
   describe('TDD-INIT-05: Modificación de estados de membresía y protección de gobernanza', () => {
-    it('debe permitir al OWNER suspender la membresía de un integrante ordinario', async () => {
+    it('debe permitir al OWNER suspender la membresía de un integrante ordinario y registrar previousStatus fielmente (H02-R07)', async () => {
       const updated = await orgService.updateMemberStatus(
         'ORG-EXODO',
         'USR-003',
@@ -229,7 +250,11 @@ describe('INIT-H02: Gestión de Organizaciones y Membresías (DA-02, DA-06)', ()
       expect(updated.status).toBe('SUSPENDED');
       expect(auditService.verifyChainIntegrity()).toBe(true);
       const logs = auditService.getAuditChain();
-      expect(logs.some((l) => l.eventCode === 'ORG_MEMBER_STATUS_CHANGED')).toBe(true);
+      const statusLog = logs.find((l) => l.eventCode === 'ORG_MEMBER_STATUS_CHANGED');
+      expect(statusLog).toBeDefined();
+      // H02-R07: Verificar que previousStatus capture fielmente el estado previo
+      expect(statusLog?.payloadDiff.previousStatus).toBe('ACTIVE');
+      expect(statusLog?.payloadDiff.newStatus).toBe('SUSPENDED');
     });
 
     it('PRUEBA NEGATIVA: debe bloquear la suspensión del único OWNER de la organización', async () => {
@@ -252,6 +277,21 @@ describe('INIT-H02: Gestión de Organizaciones y Membresías (DA-02, DA-06)', ()
 
       const orgsExterno = await orgService.getOrganizationsForUser(userExternoSinOrg);
       expect(orgsExterno.length).toBe(0);
+    });
+
+    it('PRUEBA NEGATIVA (H02-R06): un usuario suspendido debe tener revocado el acceso a la organización', async () => {
+      // Suspender a USR-002
+      await orgService.updateMemberStatus(
+        'ORG-EXODO',
+        'USR-002',
+        { status: 'SUSPENDED' },
+        userPU02Gestor
+      );
+
+      // Al intentar consultar la organización, debe ser rechazado
+      await expect(
+        orgService.getOrganizationByIdOrSlug('ORG-EXODO', userPU06Dev)
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('PRUEBA NEGATIVA: un usuario no perteneciente a una organización debe recibir 403 Forbidden al consultarla', async () => {

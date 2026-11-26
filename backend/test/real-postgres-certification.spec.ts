@@ -107,9 +107,10 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
     process.env.DATABASE_SSL = 'false';
     process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
 
-    // 2. Ejecutar reinicio y migraciones reales completas en orden con autorización explícita
+    // 2. Ejecutar reinicio y migraciones reales completas en orden con autorización explícita (H02)
     const setupResult = await resetAndMigrateRealPostgres({
       allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
+      targetMigration: 'H02',
     });
     adminPool = setupResult.adminPool;
     appPool = setupResult.appPool;
@@ -640,6 +641,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
       // 1. Reestablecer el estado exacto post-migración H02 (con las 4 migraciones aplicadas y seeds intactos)
       const setupResult = await resetAndMigrateRealPostgres({
         allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
+        targetMigration: 'H02',
       });
       adminPool = setupResult.adminPool;
       appPool = setupResult.appPool;

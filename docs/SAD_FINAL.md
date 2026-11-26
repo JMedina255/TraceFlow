@@ -65,7 +65,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | Módulo | Responsabilidad principal | Casos de uso | Estado actual en código |
 |---|---|---|---|
 | **MOD-01** Autenticación, Usuarios y RBAC | Login Argon2id, sesiones opacas, roles `PU-01..07` | `CU-01` | **Operativo** (`AuthModule`, falta CRUD UI de usuarios) |
-| **MOD-02** Gestión de Proyectos | Catálogo de proyectos y aislamiento multitenant | `CU-02`, `CU-03` | **Operativo lectura** (`ProjectsModule`, falta CRUD UI) |
+| **MOD-02** Gestión de Proyectos | Catálogo de proyectos, aislamiento multitenant, planificación metodológica, equipos y asistente progresivo | `CU-02`, `CU-03`, `CU-32`, `CU-34` | **Operativo lectura y planificación** (`ProjectsModule`, `ProjectPlanningService`, entidades `project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`; UI React en INIT-H05) |
 | **MOD-03** Catálogo de ECS | Registro y clasificación de Elementos de Configuración | `CU-09` | Lectura parcial vía `Projects`/`Rfcs` + `ecsService` mock |
 | **MOD-04** Control de Cambios (RFC/CCB/ECN) | Registro, admisión, subsanación, impacto, Doble Llave, CCB, ECN | `CU-04`, `04.1`, `05..08`, `30` | `CU-04` real (`RfcsModule`); `CU-05/04.1/06/30/07` simulados en UI |
 | **MOD-05** Administración SCM Core | Check-Out, Check-In, `sync_lock`, `StoragePort`, Líneas Base, Rollback | `CU-10..14`, `20..22`, `26` | Tablas y triggers desplegados; lógica backend/UI pendiente |
@@ -73,8 +73,8 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-07** Auditoría e Integridad | Bitácora SHA-256 append-only e inspección de cadena | `CU-27` | **Operativo base** (`AuditModule` + `append_audit_log()`); falta visor UI |
 | **MOD-08** Incidencias y Soporte | Tickets de falla y derivación a RFC | `CU-23..25` | Tabla `incident_ticket` desplegada; endpoints/UI pendientes |
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
-| **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | Diseñado en `INIT-H01` (`ADR-011`) |
-| **MOD-11 (Nuevo)** Integración GitHub | Vinculación/Creación de repositorios, webhooks HMAC-SHA256, tokens AES-256 (DA-03, DA-04) | `CU-33` | Diseñado en `INIT-H01` (`ADR-011`) |
+| **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | **Operativo Backend** (`OrganizationsModule`, certificado en H02/H03) |
+| **MOD-11 (Nuevo)** Integración GitHub | Vinculación/Creación de repositorios, webhooks HMAC-SHA256, tokens AES-256 (DA-03, DA-04) | `CU-33` | Diseñado en `INIT-H01` (`ADR-011`, objetivo INIT-H04) |
 
 ## 11. Modelo de Dominio (`DG-12`)
 *(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
@@ -82,7 +82,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 ![Modelo Conceptual del Dominio (DG-12 Canónico)](assets/diagramas/render/analisis/DG-12.svg)
 
 ## 12. Modelo de Datos (`DICCIONARIO_DATOS.md`)
-Consta de **21 tablas** en el esquema privado `traceflow`, verificadas en PostgreSQL 17.12.
+Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`) y a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`), certificadas en PostgreSQL 16 real.
 - **Modelo Físico Vigente (`DG-ER-ACTUAL`):**
 ![Modelo ER Físico Vigente](assets/diagramas/render/diseno/DG-ER-ACTUAL.svg)
 - **Modelo Objetivo en Español (`DG-ER-OBJETIVO`):** *(Propuesta para `REF-01.5`, aún NO desplegada en Supabase)*

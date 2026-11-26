@@ -18,6 +18,7 @@ export interface RealDbSetupOptions {
   appPassword?: string;
   database?: string;
   allowDestructiveReset?: boolean;
+  targetMigration?: 'H02' | 'H03';
 }
 
 export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
@@ -29,6 +30,7 @@ export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
   appPassword: process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!',
   database: process.env.TEST_DB_NAME || 'traceflow_cert',
   allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
+  targetMigration: 'H03',
 };
 
 export async function resetAndMigrateRealPostgres(
@@ -222,6 +224,13 @@ export async function resetAndMigrateRealPostgres(
     const migH02 = fs.readFileSync(path.join(migrationsDir, '202611260001_init_h02_organizations_and_projects.sql'), 'utf8');
     await adminDbClient.query(migH02);
     appliedMigrations.push('202611260001_init_h02_organizations_and_projects.sql');
+
+    // Paso 6: Migración INIT-H03 (equipos, metodologías, fases, hitos, entregables, setup progresivo)
+    if (opts.targetMigration !== 'H02') {
+      const migH03 = fs.readFileSync(path.join(migrationsDir, '202611260002_init_h03_team_methodology_planning.sql'), 'utf8');
+      await adminDbClient.query(migH03);
+      appliedMigrations.push('202611260002_init_h03_team_methodology_planning.sql');
+    }
   } finally {
     await adminDbClient.end();
   }

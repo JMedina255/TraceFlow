@@ -1006,13 +1006,71 @@ Para culminar formalmente el hito `INIT-H02` previo a la autorización de `INIT-
    - Se ampliaron los escenarios físicos reales a **18 pruebas (100% aprobadas)**: `V-13` (rechazo fail-closed en SCM), `V-16` (bloqueo de rollback por proyectos/organizaciones post-migración), `V-17` (bloqueo de rollback por alteración de cualquiera de los 4 fundadores) y `V-18` (reversión limpia y restauración del esquema relacional pre-H02).
 
 #### 7. Dependencias Diferidas hacia INIT-H04 (GitHub como Fundamento SCM)
-Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02**:
+Las siguientes capacidades quedan explícitamente registradas como dependencias técnicas de `INIT-H04` y **no se implementan en H02 ni en H03**:
 - Asociación automática de commits y Pull Requests con RFC y ECS (`RN-16`).
 - Validación de las 5 puertas SCM mediante GitHub Checks API (`TraceFlow SCM / Policy Gate`, `RF-25`).
 - Configuración y verificación remota de Branch Protection y Rulesets en GitHub.
 - Protección y creación de Git Tags inmutables para líneas base (`refs/tags/vX.Y.Z`).
 - Detección de cambios directos no autorizados ("out-of-band") y emisión automática de tickets de incidencia SCM.
 - Custodia de renombres y traslados en `config_item_path_history` (`RN-17`).
+
+---
+
+### 10.8 Implementación y Certificación de INIT-H03 (Equipos, Metodologías y Planificación de Proyectos)
+
+En cumplimiento de la hoja de ruta del Plan Maestro (`INIT-H01-R`), se ejecutó y certificó íntegramente el hito **INIT-H03** sobre la rama `feat/init-h03-team-methodology-planning` a partir del commit certificado `16afb2d63afe657d603baeab79b0eeb6f7f5d8f2`:
+
+#### 1. Alcance Funcional y Arquitectónico Implementado (H03.1 a H03.5):
+1. **H03.1 — Roles y Miembros del Proyecto (`traceflow.project_team_role`):**
+   - Asignación de colaboradores con los 7 roles canónicos (`PU-01` a `PU-07`).
+   - Cumplimiento estricto de la regla `DA-06`: rechazo en base de datos y backend de usuarios no registrados o suspendidos, o que no pertenezcan a la organización del proyecto.
+   - Control de segregación SoD: asignación restringida a Gestores (`PU-02`) o Administradores de la organización (`OWNER`/`ADMIN`).
+   - Prevención de asignaciones duplicadas (`uq_project_user_role`).
+   - Compatibilidad bidireccional automática con la tabla histórica `traceflow.user_project_assignment`.
+   - Registro de auditoría append-only con hash SHA-256 (`PROJECT_TEAM_ROLE_ASSIGNED`, `TEAM_ROLE_STATUS_UPDATED`).
+
+2. **H03.2 — Configuración de Metodología de Desarrollo (`traceflow.project_methodology`):**
+   - Soporte para marcos metodológicos: `SCRUM`, `KANBAN`, `CASCADA`, `HIBRIDA`, `UPT_ACADEMICA` (restricción CHECK `chk_methodology_type`).
+   - Reglas de negocio: para `SCRUM`, duración de iteración estrictamente obligatoria entre 1 y 8 semanas.
+   - Parámetros flexibles de configuración almacenados en `JSONB configuration_params`.
+   - Registro de auditoría SHA-256 (`PROJECT_METHODOLOGY_CONFIGURED`).
+
+3. **H03.3 — Fases y Cronograma de Proyecto (`traceflow.project_phase`):**
+   - Secuenciación ordenada de fases con unicidad compuesta (`uq_project_phase_order`, `uq_project_phase_code`).
+   - Integridad cronológica estricta en PostgreSQL (`chk_phase_dates`: `end_date >= start_date`).
+   - Estados de fase: `PLANNED`, `IN_PROGRESS`, `COMPLETED`, `BLOCKED`.
+   - Registro de auditoría SHA-256 (`PROJECT_PHASE_CREATED`).
+
+4. **H03.4 — Hitos y Entregables Planificados (`traceflow.project_milestone`, `traceflow.project_deliverable`):**
+   - Definición de hitos verificables vinculados opcionalmente a fases del mismo proyecto.
+   - Entregables tipificados: `SOFTWARE_RELEASE`, `TECHNICAL_DOCUMENT`, `SOURCE_BRANCH`, `TEST_REPORT`, `DB_MIGRATION`.
+   - Asignación obligatoria de responsable a miembros activos del equipo del proyecto.
+   - Enlace opcional a ECS (`associated_ecs_id`), sin inserción de ECS ficticios.
+   - Disparadores físicos de aislamiento (`trg_check_milestone_project` y `trg_check_deliverable_project`) impidiendo contaminación cruzada entre proyectos distintos.
+
+5. **H03.5 — Configuración Progresiva y Asistente (`traceflow.project_setup`, DA-05):**
+   - Persistencia de progreso en asistente de 5 pasos (`wizard_step`, `identity_completed`, `team_completed`, `methodology_completed`, `github_completed`).
+   - Guardado en lote atómico para Paso 2 (`PUT /setup/step-2`) y Paso 3 (`PUT /setup/step-3`).
+   - Guardado y recuperación de borradores arbitrarios (`PATCH /setup/progress` con `draft_payload JSONB`).
+
+#### 2. Persistencia y Mínimo Privilegio en PostgreSQL:
+- **Migración incremental oficial:** [`supabase/migrations/202611260002_init_h03_team_methodology_planning.sql`](../supabase/migrations/202611260002_init_h03_team_methodology_planning.sql).
+- **Esquema relacional físico:** Catálogo ampliado de 23 a **29 tablas** en el esquema `traceflow`.
+- **Privilegios de aplicación (`traceflow_app`):** Concesión de `SELECT, INSERT, UPDATE` sobre las 6 nuevas tablas; `DELETE` estrictamente revocado (`SEC-02`).
+- **Disparadores PL/pgSQL:**
+  - `traceflow.trg_check_project_team_role_org` sobre `project_team_role`.
+  - `traceflow.trg_check_milestone_project` sobre `project_milestone`.
+  - `traceflow.trg_check_deliverable_project` sobre `project_deliverable`.
+- **Script de reversión segura y salvaguardas:** [`supabase/migrations/202611260002_init_h03_team_methodology_planning_rollback.sql`](../supabase/migrations/202611260002_init_h03_team_methodology_planning_rollback.sql), con comprobación de no existencia de entregables vinculados a ECS antes de revertir.
+
+#### 3. Resultados de Certificación y Métricas de Calidad:
+- **Suite TDD Unitaria (`backend/test/projects-h03-planning.spec.ts`):** **22/22 pruebas aprobadas (100%)**.
+- **Suite de Certificación Física Real (`backend/test/real-postgres-h03-certification.spec.ts`):** **15/15 pruebas aprobadas (100%)** en PostgreSQL 16.
+- **Suite de Regresión H02 en PostgreSQL Real (`backend/test/real-postgres-certification.spec.ts`):** **18/18 pruebas aprobadas (100%)**.
+- **Suite Unitaria/Integración Backend (`npm test`):** **98/98 pruebas aprobadas (100%)** en 11 archivos de prueba.
+- **Suite Prototipo Frontend (`prototype/`):** **97/97 pruebas aprobadas (100%)** en 9 suites sin regresiones.
+- **Total de pruebas en verde consolidadas:** **228 pruebas aprobadas**.
+- **Governance Gate:** Cero migraciones ejecutadas en Supabase productivo (`xmyfqxlvveiawnxgydtz`). Todo validado en entorno local aislado a la espera de autorización formal antes de INIT-H04.
 
 ---
 

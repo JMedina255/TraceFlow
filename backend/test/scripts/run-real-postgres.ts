@@ -12,7 +12,7 @@ const env = {
   ALLOW_DESTRUCTIVE_DATABASE_RESET: 'true',
 };
 
-const result = spawnSync('npx', ['vitest', 'run', 'test/real-postgres-certification.spec.ts'], {
+const result = spawnSync('npx', ['vitest', 'run', 'test/real-postgres-certification.spec.ts', 'test/real-postgres-h03-certification.spec.ts'], {
   stdio: 'inherit',
   shell: true,
   env,

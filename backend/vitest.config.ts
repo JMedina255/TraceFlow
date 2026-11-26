@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 const isExplicitRealPostgres =
   process.env.RUN_REAL_POSTGRES_CERT === 'true' ||
-  process.argv.some((arg) => arg.includes('real-postgres-certification'));
+  process.argv.some((arg) => arg.includes('real-postgres'));
 
 const isExplicitRemote =
   process.env.ALLOW_REMOTE_TEST_DML === 'true' ||
@@ -18,8 +18,10 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      // Aislamiento de pruebas destructivas (INIT-H02-VF): Excluidas de `npm test` estándar
-      ...(!isExplicitRealPostgres ? ['test/real-postgres-certification.spec.ts'] : []),
+      // Aislamiento de pruebas destructivas (INIT-H02-VF / INIT-H03): Excluidas de `npm test` estándar
+      ...(!isExplicitRealPostgres
+        ? ['test/real-postgres-certification.spec.ts', 'test/real-postgres-h03-certification.spec.ts']
+        : []),
       // Aislamiento de pruebas remotas de Supabase: Excluidas por defecto de npm test
       ...(!isExplicitRemote
         ? ['test/real-postgres-integration.spec.ts', 'test/real-postgres-vertical-flow.spec.ts']

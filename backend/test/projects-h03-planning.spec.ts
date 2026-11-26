@@ -768,5 +768,78 @@ describe('TraceFlow SCM — INIT-H03: Equipo, Metodología y Planificación (TDD
         planningService.getTeamRoles('PRJ-003', userMemberUnassigned)
       ).rejects.toThrow(ForbiddenException);
     });
+
+    it('TDD-H04A-PRE-01: Precondición H04A: Usuario con rol activo PU-02 no asignado al proyecto es RECHAZADO con 403 (no acceso transversal)', async () => {
+      // Usuario con rol activo PU-02 y miembro de ÉXODO S.A.C., pero sin asignación en PRJ-003 ni creador
+      const userGestorAjeno: AuthenticatedUser = {
+        id: 'a0000001-0000-0000-0000-000000000088',
+        code: 'USR-088',
+        username: 'mgestor',
+        email: 'mgestor@exodo.pe',
+        fullName: 'Manuel Gestor Alterno',
+        organization: 'ÉXODO S.A.C.',
+        position: 'Gestor de Configuración',
+        activeRoleId: 'PU-02',
+        allowedRoleIds: ['PU-02'],
+        assignedProjectIds: ['PRJ-002'], // Asignado a PRJ-002, NO a PRJ-003
+      };
+
+      // Registrar en authRepo y orgsRepo como MEMBER de ÉXODO S.A.C.
+      (authRepo as any).mockUsers.push({
+        id: userGestorAjeno.id,
+        code: userGestorAjeno.code,
+        username: userGestorAjeno.username,
+        email: userGestorAjeno.email,
+        password_hash: 'mock_hash',
+        full_name: userGestorAjeno.fullName,
+        organization: userGestorAjeno.organization,
+        position: userGestorAjeno.position,
+        status: 'ACTIVE',
+        primary_role_code: 'PU-02',
+        assigned_role_codes: ['PU-02'],
+        assigned_project_codes: ['PRJ-002'],
+      });
+
+      (orgsRepo as any).members.push({
+        id: 'd0000001-0000-0000-0000-000000000088',
+        organization_id: 'c0000001-0000-0000-0000-000000000001',
+        user_id: userGestorAjeno.id,
+        role_in_org: 'MEMBER',
+        status: 'ACTIVE',
+        joined_at: '2026-08-01T00:00:00Z',
+        added_by: 'a0000001-0000-0000-0000-000000000001',
+        user_code: userGestorAjeno.code,
+        user_full_name: userGestorAjeno.fullName,
+        user_email: userGestorAjeno.email,
+      });
+
+      // 1. Intento de consulta de setup de PRJ-003 debe ser rechazado con 403 Forbidden
+      await expect(
+        planningService.getProjectSetup('PRJ-003', userGestorAjeno)
+      ).rejects.toThrow(ForbiddenException);
+
+      // 2. Intento de consulta de miembros del equipo de PRJ-003 debe ser rechazado con 403 Forbidden
+      await expect(
+        planningService.getTeamRoles('PRJ-003', userGestorAjeno)
+      ).rejects.toThrow(ForbiddenException);
+
+      // 3. Intento de asignación de rol en PRJ-003 debe ser rechazado con 403 Forbidden
+      await expect(
+        planningService.assignTeamRole(
+          'PRJ-003',
+          { userId: userAugustoDev.id, roleIdOrCode: 'PU-06' },
+          userGestorAjeno
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // 4. Intento de guardar lote de equipo en PRJ-003 debe ser rechazado con 403 Forbidden
+      await expect(
+        planningService.saveStep2Team(
+          'PRJ-003',
+          { members: [{ userId: userAugustoDev.id, roleIdOrCode: 'PU-06' }] },
+          userGestorAjeno
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
   });
 });

@@ -231,6 +231,13 @@ export async function resetAndMigrateRealPostgres(
       await adminDbClient.query(migH03);
       appliedMigrations.push('202611260002_init_h03_team_methodology_planning.sql');
     }
+
+    // Paso 7: Migración INIT-H04A (integración segura de repositorios GitHub, permisos, no DELETE)
+    if (opts.targetMigration !== 'H02' && opts.targetMigration !== 'H03') {
+      const migH04A = fs.readFileSync(path.join(migrationsDir, '202611260003_init_h04a_github_integration.sql'), 'utf8');
+      await adminDbClient.query(migH04A);
+      appliedMigrations.push('202611260003_init_h04a_github_integration.sql');
+    }
   } finally {
     await adminDbClient.end();
   }

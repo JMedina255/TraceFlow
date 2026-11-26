@@ -18,9 +18,13 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      // Aislamiento de pruebas destructivas (INIT-H02-VF / INIT-H03): Excluidas de `npm test` estándar
+      // Aislamiento de pruebas destructivas (INIT-H02-VF / INIT-H03 / INIT-H04A): Excluidas de `npm test` estándar
       ...(!isExplicitRealPostgres
-        ? ['test/real-postgres-certification.spec.ts', 'test/real-postgres-h03-certification.spec.ts']
+        ? [
+            'test/real-postgres-certification.spec.ts',
+            'test/real-postgres-h03-certification.spec.ts',
+            'test/real-postgres-h04a-certification.spec.ts',
+          ]
         : []),
       // Aislamiento de pruebas remotas de Supabase: Excluidas por defecto de npm test
       ...(!isExplicitRemote

@@ -79,7 +79,7 @@ export class ProjectPlanningService {
       }
     }
 
-    // 2. Validar autorización específica sobre el proyecto (H03-R04)
+    // 2. Validar autorización específica sobre el proyecto (H03-R04 / H04A Precondición de Seguridad)
     let isAuthorizedForProject = false;
 
     // Roles institucionales globales de la organización (OWNER, ADMIN, AUDITOR)
@@ -87,32 +87,32 @@ export class ProjectPlanningService {
       isAuthorizedForProject = true;
     }
 
-    // Creador o Gestor del proyecto o usuario con rol activo PU-02
-    if (
-      project.created_by === callerUser.id ||
-      project.manager_id === callerUser.id ||
-      (callerUser.activeRoleId === 'PU-02' && (!member || ['OWNER', 'ADMIN', 'MEMBER'].includes(member.role_in_org)))
-    ) {
+    // Creador o Gestor designado del proyecto
+    if (project.created_by === callerUser.id || project.manager_id === callerUser.id) {
       isAuthorizedForProject = true;
     }
 
-    // Integrante explícitamente asignado al proyecto (en token, user_project_assignment o project_team_role)
+    // Integrante explícitamente asignado al proyecto en base de datos PostgreSQL
+    // (H04A: Se valida asignación real persistida en BD; tener activeRoleId PU-02 no otorga acceso transversal)
     if (!isAuthorizedForProject) {
+      const assignments = await this.projectsRepo.findUserProjectAssignments(callerUser.id);
+      if (assignments.includes(project.id) || assignments.includes(project.code)) {
+        isAuthorizedForProject = true;
+      } else {
+        const teamRoles = await this.planningRepo.findTeamRolesByProjectId(project.id);
+        if (teamRoles.some((tr) => tr.user_id === callerUser.id && tr.status === 'ACTIVE')) {
+          isAuthorizedForProject = true;
+        }
+      }
+    }
+
+    // En modo mock desacoplado, permitir asignaciones declaradas en sesión si no hay BD relacional
+    if (!isAuthorizedForProject && this.db.getDatabaseMode() === 'mock') {
       if (
         callerUser.assignedProjectIds?.includes(project.id) ||
         callerUser.assignedProjectIds?.includes(project.code)
       ) {
         isAuthorizedForProject = true;
-      } else {
-        const assignments = await this.projectsRepo.findUserProjectAssignments(callerUser.id);
-        if (assignments.includes(project.id) || assignments.includes(project.code)) {
-          isAuthorizedForProject = true;
-        } else {
-          const teamRoles = await this.planningRepo.findTeamRolesByProjectId(project.id);
-          if (teamRoles.some((tr) => tr.user_id === callerUser.id && tr.status === 'ACTIVE')) {
-            isAuthorizedForProject = true;
-          }
-        }
       }
     }
 
@@ -133,14 +133,26 @@ export class ProjectPlanningService {
 
     const member = await this.orgRepo.findMember(project.organization_id, callerUser.id);
     const isOrgAdmin = member && ['OWNER', 'ADMIN'].includes(member.role_in_org);
-    const isProjectManager =
-      project.created_by === callerUser.id ||
-      project.manager_id === callerUser.id ||
-      callerUser.activeRoleId === 'PU-02';
+
+    // H04A Precondición de Seguridad: Un usuario con rol activo PU-02 NO es gestor automático
+    // de todos los proyectos de su organización. Debe ser el creador, el manager_id designado,
+    // o contar con una asignación activa específica como PU-02 en project_team_role para este proyecto.
+    let isProjectManager =
+      project.created_by === callerUser.id || project.manager_id === callerUser.id;
+
+    if (!isProjectManager && callerUser.activeRoleId === 'PU-02') {
+      const teamRoles = await this.planningRepo.findTeamRolesByProjectId(project.id);
+      isProjectManager = teamRoles.some(
+        (tr) =>
+          tr.user_id === callerUser.id &&
+          (tr.role_code === 'PU-02' || tr.role_id === 2) &&
+          tr.status === 'ACTIVE'
+      );
+    }
 
     if (!isOrgAdmin && !isProjectManager) {
       throw new ForbiddenException(
-        `Acceso denegado: Se requiere rol de Propietario/Administrador de la organización o Gestor del proyecto (PU-02) para modificar la configuración.`
+        `Acceso denegado: Se requiere rol de Propietario/Administrador de la organización o Gestor asignado del proyecto (PU-02) para modificar la configuración.`
       );
     }
   }

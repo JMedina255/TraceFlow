@@ -810,13 +810,24 @@ flowchart LR
   - Endpoints de backend para asignación de roles de proyecto (`PUT /api/v1/projects/:id/setup/step-2`) y configuración metodológica (`step-3`).
   - Validación de compatibilidad entre entregables planificados e ítems de configuración (`associated_ecs_id`).
 
-#### Hito INIT-H04 — Integración GitHub
+#### Hito INIT-H04A — Integración Segura de Repositorios GitHub (Implementado y Certificado)
+- **Alcance Técnico Ejecutado:**
+  - Precondición de seguridad: corrección de autorización PU-02 en `ProjectPlanningService` para exigir asignación en BD sin bypass general por rol activo.
+  - Migración incremental `202611260003_init_h04a_github_integration.sql` y tabla `traceflow.github_integration` con índice de unicidad parcial `uq_active_github_repo`.
+  - Mínimo privilegio para `traceflow_app` (SELECT, INSERT, UPDATE concedidos; DELETE estrictamente revocado).
+  - Generación de Installation Access Tokens (IAT) bajo demanda en memoria con JWT RS256 firmado por clave RSA privada fuera del repositorio (cero tokens ni claves en BD o archivos).
+  - Endpoints REST de vinculación (`/github/link`), revalidación (`/github/validate`), desvinculación lógica (`/github/unlink`), consulta (`/github`, `/github/available-repos`) y contrato de borrador (`/github/create-draft`).
+  - Sincronización con el asistente de inicialización (`project_setup.github_completed`).
+  - Auditoría inmutable SHA-256 (`GITHUB_REPO_LINKED`, `GITHUB_REPO_UNLINKED`).
+  - Script de reversión `202611260003_init_h04a_github_integration_rollback.sql` con salvaguarda PITR ante integraciones activas validadas.
+  - Certificación completa: 18 pruebas unitarias TDD y 15 pruebas físicas en PostgreSQL 16 real (53/53 pruebas físicas certificadas en el servidor).
+
+#### Hito INIT-H04B — Webhooks, Procesamiento Asíncrono y Sincronización Git (Siguiente Incremento)
 - **Alcance Técnico:**
-  - Migración incremental: tablas `github_integration` y `github_event`.
-  - Implementación del módulo `GitHubIntegrationModule` con `GitHubCryptoService` (cifrado AES-256-GCM).
-  - Implementación de `GitHubAppClientService` con autenticación JWT RS256 y tokens de instalación bajo demanda en memoria.
-  - Implementación de endpoints de vinculación (`/github/link`) y creación (`/github/create`).
-  - Controlador de webhook con verificación HMAC-SHA256 e idempotencia garantizada por `X-GitHub-Delivery`.
+  - Migración incremental: tabla `traceflow.github_event`.
+  - Controlador de webhook con verificación de firma HMAC-SHA256 e idempotencia estricta vía cabecera `X-GitHub-Delivery`.
+  - Detección de modificaciones no autorizadas (out-of-band) y políticas de protección de ramas en GitHub.
+  - Mapeo bidireccional entre commits/pull requests y Elementos de Configuración de Software (ECS) / Solicitudes de Cambio (RFC).
 
 #### Hito INIT-H05 — Interfaz y Activación (Asistente, Panel y Salvaguarda SCM)
 - **Alcance Técnico:**

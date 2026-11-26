@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { OrganizationsModule } from './modules/organizations/organizations.module.js';
 import { ProjectsModule } from './modules/projects/projects.module.js';
+import { GitHubModule } from './modules/github/github.module.js';
 import { RfcsModule } from './modules/rfcs/rfcs.module.js';
 
 @Module({
@@ -15,6 +16,7 @@ import { RfcsModule } from './modules/rfcs/rfcs.module.js';
     AuthModule,
     OrganizationsModule,
     ProjectsModule,
+    GitHubModule,
     RfcsModule,
   ],
 })

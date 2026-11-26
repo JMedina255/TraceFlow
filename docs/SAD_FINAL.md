@@ -74,7 +74,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-08** Incidencias y Soporte | Tickets de falla y derivación a RFC | `CU-23..25` | Tabla `incident_ticket` desplegada; endpoints/UI pendientes |
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
 | **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | **Operativo Backend** (`OrganizationsModule`, certificado en H02/H03) |
-| **MOD-11 (Nuevo)** Integración GitHub | Vinculación/Creación de repositorios, webhooks HMAC-SHA256, tokens AES-256 (DA-03, DA-04) | `CU-33` | Diseñado en `INIT-H01` (`ADR-011`, objetivo INIT-H04) |
+| **MOD-11 (Nuevo)** Integración GitHub | Vinculación y validación de repositorios, Installation Access Tokens en memoria bajo demanda, índice uq_active_github_repo (DA-03, DA-04) | `CU-33` | **Operativo Backend** (`GitHubModule`, certificado en INIT-H04A; webhooks en INIT-H04B) |
 
 ## 11. Modelo de Dominio (`DG-12`)
 *(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
@@ -82,7 +82,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 ![Modelo Conceptual del Dominio (DG-12 Canónico)](assets/diagramas/render/analisis/DG-12.svg)
 
 ## 12. Modelo de Datos (`DICCIONARIO_DATOS.md`)
-Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`) y a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`), certificadas en PostgreSQL 16 real.
+Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`), a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`) y a **30 tablas en INIT-H04A** (`github_integration` con índice de unicidad parcial `uq_active_github_repo` y revocación estricta de DELETE para `traceflow_app`), certificadas en PostgreSQL 16 real.
 - **Modelo Físico Vigente (`DG-ER-ACTUAL`):**
 ![Modelo ER Físico Vigente](assets/diagramas/render/diseno/DG-ER-ACTUAL.svg)
 - **Modelo Objetivo en Español (`DG-ER-OBJETIVO`):** *(Propuesta para `REF-01.5`, aún NO desplegada en Supabase)*
@@ -90,7 +90,7 @@ Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base
 
 ## 13. Contratos de Comunicación (`/api/v1`) y Navegación UI
 - **Protocolo (`ADR-009`):** RESTful JSON bajo prefijo global `/api/v1` con `ValidationPipe` estricto (`whitelist`, `forbidNonWhitelisted`).
-- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/rfcs{,/:id}`.
+- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/projects/:id/github{,/available-repos,/link,/validate,/unlink,/create-draft}`, `/api/v1/rfcs{,/:id}`.
 - **Contratos diseñados para próximos hitos:** `/api/v1/rfcs/:id/{classify,rectification,impact-assessment,minor-approval,ccb-votes}`, `/api/v1/change-orders/*`, `/api/v1/scm/*` (ver `contracts.ts` y `ESTANDAR_PROGRAMACION.md` §6).
 - **Navegación SPA (`DG-UWE-NAV-01`):**
 ![Modelo General de Navegación UWE](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)

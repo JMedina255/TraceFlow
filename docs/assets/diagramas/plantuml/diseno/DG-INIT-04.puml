@@ -45,7 +45,7 @@ state HISTORICO_PENDIENTE_GITHUB {
     ProyectoMigrado : Proyectos preexistentes (PRJ-001..003)\nOperaciones de consulta permitidas\nOperaciones de mutación bloqueadas
 }
 
-HISTORICO_PENDIENTE_GITHUB --> PENDIENTE_VALIDACION : Regularización de enlace GitHub (DA-04)
+HISTORICO_PENDIENTE_GITHUB --> PENDIENTE_VALIDACION : Regularización explícita repositorio dedicado (PU-02, DA-04)
 
 ARCHIVADO --> [*]
 

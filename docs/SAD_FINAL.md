@@ -173,14 +173,18 @@ Para mantener [`FD03-EPIS-Informe_SRS.md`](FD03-EPIS-Informe_SRS.md) estrictamen
 - **Diseñado pendiente de implementación (`SCM-02+`):** `CU-08`..`CU-26`, `CU-28`, `CU-29`, adaptador `StoragePort` físico y UI de las 12 pantallas en placeholder.
 - **Propuesta de normalización (`REF-01`):** La traducción al español de código, rutas y tablas (`DG-ER-OBJETIVO`) es una **arquitectura objetivo documental pendiente de aprobación** conforme a [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md); **no ha sido desplegada aún en Supabase ni en código fuente**.
 
-## 29. Inicialización de Proyectos, Gobernanza GitHub y Salvaguardas SCM (INIT-H01)
-Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) y [`docs/adr/ADR-011.md`](adr/ADR-011.md):
-- **Gobernanza Multitenant (`DA-01`, `DA-02`, `DA-06`):** Entidades `organization` y `organization_member`, membresía activa obligatoria para incorporación a proyectos (`RN-10`, `RN-11`).
-- **Asistente Híbrido 5 Pasos (`DA-05`, `RN-14`):** Entidad `project_setup` con `draft_payload JSONB` para autosave sin alterar restricciones relacionales (`DG-INIT-05`).
-- **Integración GitHub Segura (`DA-03`, `DA-04`):** Soporte de vinculación y creación de repositorios (`DG-INIT-07`, `DG-INIT-08`), credenciales cifradas con AES-256-GCM, webhooks HMAC-SHA256 y tabla idempotente `github_event`.
+## 29. Inicialización de Proyectos, Gobernanza GitHub y Salvaguardas SCM (INIT-H01-R)
+Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) y [`docs/adr/ADR-011.md`](adr/ADR-011.md) (subsanación arquitectónica `INIT-H01-R`):
+- **Gobernanza Multitenant e Integridad (`DA-01`, `DA-02`, `DA-06`):** Entidades `organization` y `organization_member`, membresía activa obligatoria para incorporación a proyectos (`RN-10`, `RN-11`) blindada mediante disparador PL/pgSQL `enforce_project_member_organization_integrity`. Se suprime el estado no admitido `INVITED`.
+- **Modelo Canónico de Estados:** Máquina de 8 estados en español (`BORRADOR`, `EN_CONFIGURACION`, `PENDIENTE_VALIDACION`, `ACTIVO`, `SUSPENDIDO`, `CERRADO`, `ARCHIVADO`, `HISTORICO_PENDIENTE_GITHUB`) con matriz de transiciones permitidas y capa de normalización retroactiva para compatibilidad DTO.
+- **Asistente Híbrido 5 Pasos (`DA-05`, `RN-14`):** Entidad `project_setup` con `draft_payload JSONB` para autosave sin alterar restricciones relacionales (`DG-INIT-05`) y Panel de Configuración Posterior.
+- **Integración GitHub Segura (`DA-03`, `DA-04`):** Soporte de vinculación y creación de repositorios (`DG-INIT-07`, `DG-INIT-08`), tokens de instalación generados bajo demanda en memoria vía JWT RS256 (sin almacenamiento en BD), webhooks HMAC-SHA256 con tiempo constante (`crypto.timingSafeEqual`) y tabla idempotente `github_event` (`X-GitHub-Delivery`).
 - **Salvaguarda Operacional SCM (`DA-04`, `RN-12`, `RN-13`):** El guardián `ProjectActiveGuard` bloquea formalmente (HTTP 412) todo registro de RFC u operación en bibliotecas en proyectos que no cuenten con GitHub validado y estado `ACTIVO` (`DG-INIT-09`).
-- **Compendio Gráfico Canónico:** 10 modelos compilados `DG-INIT-01` a `DG-INIT-10` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
+- **Regularización Estricta de Proyectos Históricos:** Vinculación individual y explícita por el Gestor (`PU-02`) de cada proyecto cliente (`PRJ-001`..`003`) a su propio repositorio dedicado en GitHub, prohibiendo cualquier asociación a `TraceFlow.git` y sin alteración masiva de datos.
+- **Mínimo Privilegio e Integridad Referencial:** Revocación del privilegio `DELETE` a `traceflow_app` (solo `SELECT, INSERT, UPDATE`), y uso de `ON DELETE RESTRICT` sobre entidades hijas para garantizar custodia e inmutabilidad probatoria.
+- **Hoja de Ruta en 5 Hitos (`INIT-H02` a `INIT-H06`):** Desglose secuencial con 25 pruebas TDD mapeadas exhaustivamente.
+- **Compendio Gráfico Canónico:** 10 modelos canónicos compilados `DG-INIT-01` a `DG-INIT-10` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
 
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01 — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R — C-SharkTeam / ÉXODO S.A.C.*

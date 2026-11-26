@@ -354,7 +354,7 @@ Nota: Elaboración Propia
 | RN-12 | Integración GitHub Obligatoria para Activación (DA-04) | Ningún proyecto puede activarse operacionalmente si no cuenta con un repositorio GitHub vinculado, con permisos verificados y webhook validado. | Gestor (`PU-02`) / Arquitecto (`PU-03`) | Los proyectos operaban sin respaldo físico en Git. |
 | RN-13 | Bloqueo Estricto de Operaciones SCM en Proyectos Inactivos | Se prohíbe registrar RFCs, emitir órdenes o modificar bibliotecas en proyectos en estado `BORRADOR`, `EN_CONFIGURACION`, `SUSPENDIDO` o `ARCHIVADO`. | Guardián del Sistema (`ProjectActiveGuard`) | Se admitían RFCs sobre proyectos incompletos o cerrados. |
 | RN-14 | Persistencia Parcial de Estado Borrador (DA-05) | El progreso del asistente de inicialización se almacena de forma incremental en borrador (`JSONB`) sin forzar restricciones relacionales duras. | Sistema TraceFlow | La creación requería un solo envío síncrono sin posibilidad de pausa. |
-| RN-15 | Inmutabilidad de Transición de Estados de Proyecto | Toda activación, suspensión o archivado de proyecto debe registrarse en la bitácora inmutable de auditoría con firma SHA-256. | Sistema TraceFlow / Módulo de Auditoría | Los cambios de estado no contaban con encadenamiento criptográfico. |
+| RN-15 | Inmutabilidad de Transición de Estados de Proyecto | Toda activación, suspensión o archivado de proyecto debe registrarse en la bitácora inmutable de auditoría mediante encadenamiento criptográfico de integridad SHA-256 (hash-chaining inmutable). | Sistema TraceFlow / Módulo de Auditoría | Los cambios de estado no contaban con encadenamiento criptográfico. |
 
 Nota: Elaboración Propia
 

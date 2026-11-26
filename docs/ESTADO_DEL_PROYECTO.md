@@ -64,7 +64,7 @@ Este documento consolida el estado real de implementación del sistema **TraceFl
 | **DB-01 / DB-01.1 (Reconexión y Seguridad)** | `ea21db7`, `f047b94` | Migración a Supabase `TraceFlow-UPT`, eliminación de credenciales expuestas, aprovisionamiento seguro Argon2id (`provision-users.ts`) y rechazo de fallback silencioso (`H-03`). |
 | **DB-02 / DB-02.1 / INT-01 (PR #14)** | `5ad2380`, `c9e3f75`, `84c832f` | Mínimo privilegio `traceflow_app`, 10 triggers físicos en PostgreSQL, certificación física `DB-T01`..`DB-T14` (`14/14`), certificación E2E Playwright `INT-T01`..`INT-T18` (`18/18`), regresión histórica backend `44/44` y frontend `71/71` (`97/97` casos actuales). |
 | **DOC-02 (Normalización y Consolidación)** | *Rama actual* | Formalización de `GLOSARIO.md`, `MATRIZ_NOMENCLATURA.md`, `DICCIONARIO_DATOS.md`, `ESTANDAR_PROGRAMACION.md`, consolidación de `FD03`, `SAD_FINAL.md`, `MATRIZ_TRAZABILIDAD.md` y `PLAN_REFACTORIZACION.md`. |
-| **INIT-H01 (Inicialización y GitHub)** | `docs/init-h01-project-architecture` | Auditoría AS-IS de proyectos, modelo multitenant Organización (DA-02), Asistente híbrido 5 pasos (DA-05), membresía previa (DA-06), integración GitHub App (DA-03), salvaguarda ProjectActiveGuard (DA-04), 10 diagramas `DG-INIT-01..10`, ADR-011 y Plan Maestro `PLAN_INICIALIZACION_PROYECTOS.md`. |
+| **INIT-H01-R (Inicialización y GitHub - Subsanación)** | `docs/init-h01-project-architecture` | Subsanación arquitectónica: modelo canónico de 8 estados en español, regularización explícita de proyectos históricos sin TraceFlow.git, matriz oficial de permisos GitHub con tokens en memoria bajo demanda, integridad referencial DA-06 sin INVITED ni DELETE para traceflow_app, y plan reorganizado en 5 hitos (INIT-H02..H06) con 25 pruebas TDD. |
 
 ---
 

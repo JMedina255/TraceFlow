@@ -22,7 +22,7 @@ entity "organization_member\n(Membresía Org)" as ORG_MEM {
     * organization_id : UUID [FK]
     * user_id : UUID [FK]
     * role_in_org : VARCHAR(30)
-    * status : VARCHAR(20)
+    * status : VARCHAR(20) [ACTIVE, SUSPENDED]
 }
 
 entity "app_user\n(Usuario)" as USR {
@@ -116,7 +116,9 @@ entity "github_integration\n(Integración GitHub)" as GH {
     * repo_full_name : VARCHAR(200)
     * github_repo_id : BIGINT
     * default_branch : VARCHAR(50)
-    encrypted_access_token : BYTEA
+    installation_id : BIGINT [GitHub App]
+    encrypted_oauth_token : BYTEA [OAuth Fallback]
+    encrypted_webhook_secret : BYTEA [HMAC-SHA256]
     * validation_status : VARCHAR(30)
     last_validated_at : TIMESTAMPTZ
 }

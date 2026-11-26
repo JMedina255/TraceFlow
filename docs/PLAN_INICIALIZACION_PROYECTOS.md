@@ -1,13 +1,13 @@
-# Plan Maestro de Inicialización, Organización y Configuración de Proyectos — TraceFlow SCM (INIT-H01)
+# Plan Maestro de Inicialización, Organización y Configuración de Proyectos — TraceFlow SCM (INIT-H01-R)
 
-> **Documento Oficial de Línea Base:** `docs/PLAN_INICIALIZACION_PROYECTOS.md`  
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
-> **Autoría:** Arquitecto de Software Sénior, Especialista PostgreSQL, Seguridad de Aplicaciones e Ingeniero GCSW  
-> **Rama de Trabajo:** `docs/init-h01-project-architecture` | **Línea Base Git:** `master @ 99cf70f`  
-> **Hito:** INIT-H01 (Auditoría, Consolidación Arquitectónica y Diseño Técnico)  
-> **Fecha:** 25 de noviembre de 2026  
-> **Estado:** PROPUESTO — Pendiente de Aprobación por el Responsable / CCB  
+> **Documento Oficial de Línea Base:** `docs/PLAN_INICIALIZACION_PROYECTOS.md`
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam
+> **Autoría:** Arquitecto de Software Sénior, Especialista PostgreSQL, Seguridad de Aplicaciones e Ingeniero GCSW
+> **Rama de Trabajo:** `docs/init-h01-project-architecture` | **Línea Base Git:** `master @ 99cf70f`
+> **Hito:** INIT-H01-R (Subsanación de Observaciones Arquitectónicas y Consolidación de Diseño Técnico)
+> **Fecha:** 25 de noviembre de 2026
+> **Estado:** PROPUESTO — Pendiente de Aprobación Formal por el Responsable / CCB
 
 ---
 
@@ -17,7 +17,13 @@ TraceFlow SCM ha alcanzado la certificación funcional y de persistencia de su n
 
 No obstante, la auditoría exhaustiva del sistema detectó una brecha arquitectónica crítica en la fase previa a la operación SCM: **el sistema carece de un marco formal de inicialización, organización y configuración de proyectos**. Hasta el momento, los proyectos se encontraban precargados estáticamente en la base de datos sin pertenecer a una entidad formal de organización, sin soporte para estados borradores y sin integración activa con un sistema de control de versiones real como GitHub.
 
-El presente Plan Maestro consolida los resultados de la auditoría AS-IS, formaliza la ingeniería de requisitos (RF-19 a RF-23, RN-10 a RN-15, CU-31 a CU-35), establece el diseño arquitectónico TO-BE con 10 nuevos diagramas canónicos (`DG-INIT-01` a `DG-INIT-10`), define el modelo relacional objetivo y su migración incremental no destructiva, diseña la seguridad y la integración criptográfica con GitHub, y estructura la estrategia de pruebas y el orden de desarrollo mediante TDD para el hito ejecutable `INIT-H02`.
+El presente Plan Maestro consolida los resultados de la auditoría AS-IS y subsana de forma exhaustiva las observaciones formuladas en la revisión de arquitectura (`INIT-H01-R`):
+1. **Compatibilidad Canónica de Estados:** Establece una única representación canónica en español para `traceflow.project.status` (`BORRADOR`, `EN_CONFIGURACION`, `PENDIENTE_VALIDACION`, `ACTIVO`, `SUSPENDIDO`, `CERRADO`, `ARCHIVADO`, `HISTORICO_PENDIENTE_GITHUB`), con matriz de transiciones permitidas y capa de normalización bidireccional para compatibilidad retroactiva.
+2. **Política de Regularización Histórica Estricta:** Suprime cualquier intento de vinculación errónea de los proyectos cliente históricos (`PRJ-001`..`PRJ-003`) con el repositorio de la plataforma TraceFlow. Cada proyecto debe asociarse exclusivamente a su propio repositorio remoto mediante autorización explícita individual del Gestor (`PU-02`), sin automatismos no supervisados ni alteración destructiva de datos.
+3. **Matriz Oficial de Permisos GitHub:** Define los alcances y permisos técnicos vigentes para GitHub App y OAuth según la documentación oficial de GitHub, priorizando la generación de Installation Access Tokens bajo demanda en memoria (duración 1 hora) y eliminando el almacenamiento innecesario de tokens temporales en base de datos.
+4. **Integridad de Datos y Mínimo Privilegio:** Incorpora salvaguardas DDL (disparadores de integridad de membresía `DA-06`), suprime el estado no admitido `INVITED` para cumplir estrictamente con la incorporación exclusiva de usuarios ya registrados, restringe el uso de `ON DELETE CASCADE` en favor de `ON DELETE RESTRICT` sobre entidades auditables, y revoca privilegios innecesarios de `DELETE` otorgados a `traceflow_app`.
+5. **Reorganización Estructurada en 5 Hitos Ejecutables:** Descompone la hoja de ruta de implementación en cinco hitos secuenciales (`INIT-H02` a `INIT-H06`) y asigna el catálogo completo de 25 pruebas TDD al hito que le corresponde.
+6. **Coherencia Documental y Terminológica:** Distingue rigurosamente el encadenamiento criptográfico de integridad SHA-256 (hash-chain inmutable de auditoría) frente a una firma digital asimétrica, y mantiene el estado documental en `PROPUESTO` sin declarar aprobaciones colegiadas anticipadas.
 
 ---
 
@@ -119,7 +125,7 @@ La inspección detallada del código fuente, esquema de base de datos, pruebas y
 - **`RN-12` (Condición Sine Qua Non de Integración GitHub - DA-04):** Es mandatorio que el repositorio remoto en GitHub esté verificado y con webhook operativo para que el proyecto pueda ser activado.
 - **`RN-13` (Bloqueo Estricto de Operaciones SCM en Proyectos Inactivos):** Las solicitudes de cambio (RFC), órdenes de cambio (ECN), bloqueos de sincronización y check-in/out solo pueden ejecutarse en proyectos con estado `ACTIVO`. Proyectos en `BORRADOR`, `EN_CONFIGURACION`, `PENDIENTE_VALIDACION`, `SUSPENDIDO` o `ARCHIVADO` bloquean estas operaciones con error HTTP 412 / 403.
 - **`RN-14` (Persistencia y Recuperación de Estado Borrador):** El asistente de inicialización debe persistir automáticamente el avance de cada paso en `project_setup.draft_payload` sin alterar las restricciones relacionales duras hasta la activación final.
-- **`RN-15` (Inmutabilidad de Transición de Estados):** Todo cambio en el estado del proyecto (`BORRADOR` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `ARCHIVADO`) debe registrarse en la bitácora inmutable de auditoría con firma SHA-256 del usuario actor.
+- **`RN-15` (Inmutabilidad de Transición de Estados):** Todo cambio en el estado del proyecto (`BORRADOR` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `ARCHIVADO`) debe registrarse en la bitácora inmutable de auditoría mediante encadenamiento criptográfico de integridad SHA-256 (`append_audit_log` con `prev_log_hash` y `curr_log_hash`), diferenciado técnicamente de firmas digitales asimétricas (PKI/RSA/ECDSA).
 
 ### 5.3 Nuevos Casos de Uso del Bloque de Inicialización
 
@@ -139,48 +145,103 @@ La inspección detallada del código fuente, esquema de base de datos, pruebas y
 
 Se han formalizado y compilado 10 diagramas canónicos en formato PlantUML (`docs/assets/diagramas/plantuml/diseno/`) y sus versiones renderizadas SVG y PNG (`docs/assets/diagramas/render/diseno/`):
 
-1. **Contexto del Sistema (`DG-INIT-01`):**  
-   Fuente: [`DG-INIT-01.puml`](assets/diagramas/plantuml/diseno/DG-INIT-01.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-01.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-01.png)  
+1. **Contexto del Sistema (`DG-INIT-01`):**
+   Fuente: [`DG-INIT-01.puml`](assets/diagramas/plantuml/diseno/DG-INIT-01.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-01.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-01.png)
    *Delimita las interacciones entre los actores por rol, la SPA React, el backend NestJS, PostgreSQL 17 y la API/Webhooks de GitHub.*
-2. **Arquitectura por Componentes (`DG-INIT-02`):**  
-   Fuente: [`DG-INIT-02.puml`](assets/diagramas/plantuml/diseno/DG-INIT-02.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-02.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-02.png)  
+2. **Arquitectura por Componentes (`DG-INIT-02`):**
+   Fuente: [`DG-INIT-02.puml`](assets/diagramas/plantuml/diseno/DG-INIT-02.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-02.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-02.png)
    *Muestra la evolución modular con `OrganizationsModule`, `ProjectsModule` evolucionado, `GitHubIntegrationModule` y el guardián `ProjectActiveGuard`.*
-3. **Organización y Multiproyecto (`DG-INIT-03`):**  
-   Fuente: [`DG-INIT-03.puml`](assets/diagramas/plantuml/diseno/DG-INIT-03.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-03.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-03.png)  
+3. **Organización y Multiproyecto (`DG-INIT-03`):**
+   Fuente: [`DG-INIT-03.puml`](assets/diagramas/plantuml/diseno/DG-INIT-03.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-03.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-03.png)
    *Ilustra la jerarquía de gobierno: Organización $\rightarrow$ Miembros de Organización $\rightarrow$ Proyectos $\rightarrow$ Roles por Proyecto.*
-4. **Ciclo de Vida del Proyecto (`DG-INIT-04`):**  
-   Fuente: [`DG-INIT-04.puml`](assets/diagramas/plantuml/diseno/DG-INIT-04.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-04.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-04.png)  
+4. **Ciclo de Vida del Proyecto (`DG-INIT-04`):**
+   Fuente: [`DG-INIT-04.puml`](assets/diagramas/plantuml/diseno/DG-INIT-04.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-04.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-04.png)
    *Máquina de estados: `BORRADOR` $\rightarrow$ `EN_CONFIGURACION` $\rightarrow$ `PENDIENTE_VALIDACION` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `CERRADO` $\rightarrow$ `ARCHIVADO`.*
-5. **Asistente de Inicialización (`DG-INIT-05`):**  
-   Fuente: [`DG-INIT-05.puml`](assets/diagramas/plantuml/diseno/DG-INIT-05.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-05.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-05.png)  
+5. **Asistente de Inicialización (`DG-INIT-05`):**
+   Fuente: [`DG-INIT-05.puml`](assets/diagramas/plantuml/diseno/DG-INIT-05.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-05.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-05.png)
    *Diagrama de actividades detallando el flujo de 5 pasos, autosave y bifurcación según resultado de validación.*
-6. **Modelo Entidad-Relación Conceptual TO-BE (`DG-INIT-06`):**  
-   Fuente: [`DG-INIT-06.puml`](assets/diagramas/plantuml/diseno/DG-INIT-06.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-06.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-06.png)  
+6. **Modelo Entidad-Relación Conceptual TO-BE (`DG-INIT-06`):**
+   Fuente: [`DG-INIT-06.puml`](assets/diagramas/plantuml/diseno/DG-INIT-06.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-06.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-06.png)
    *Especifica las entidades relacionales nuevas y su acoplamiento con `project`, `app_user`, `config_item` y `change_request`.*
-7. **Secuencia de Vinculación GitHub (`DG-INIT-07`):**  
-   Fuente: [`DG-INIT-07.puml`](assets/diagramas/plantuml/diseno/DG-INIT-07.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-07.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-07.png)  
+7. **Secuencia de Vinculación GitHub (`DG-INIT-07`):**
+   Fuente: [`DG-INIT-07.puml`](assets/diagramas/plantuml/diseno/DG-INIT-07.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-07.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-07.png)
    *Secuencia de verificación de repositorio existente, prueba de permisos, configuración de webhook y cifrado AES-256.*
-8. **Secuencia de Creación de Repositorio GitHub (`DG-INIT-08`):**  
-   Fuente: [`DG-INIT-08.puml`](assets/diagramas/plantuml/diseno/DG-INIT-08.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-08.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-08.png)  
+8. **Secuencia de Creación de Repositorio GitHub (`DG-INIT-08`):**
+   Fuente: [`DG-INIT-08.puml`](assets/diagramas/plantuml/diseno/DG-INIT-08.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-08.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-08.png)
    *Secuencia de aprovisionamiento de repositorio nuevo, commit de plantilla, ramas canónicas y webhook.*
-9. **Secuencia de Activación del Proyecto (`DG-INIT-09`):**  
-   Fuente: [`DG-INIT-09.puml`](assets/diagramas/plantuml/diseno/DG-INIT-09.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-09.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-09.png)  
+9. **Secuencia de Activación del Proyecto (`DG-INIT-09`):**
+   Fuente: [`DG-INIT-09.puml`](assets/diagramas/plantuml/diseno/DG-INIT-09.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-09.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-09.png)
    *Verificación de salvaguarda DA-04, transición a `ACTIVO`, inicialización de bibliotecas y rechazo de RFCs en proyectos inactivos.*
-10. **Navegación del Frontend (`DG-INIT-10`):**  
-    Fuente: [`DG-INIT-10.puml`](assets/diagramas/plantuml/diseno/DG-INIT-10.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-10.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-10.png)  
+10. **Navegación del Frontend (`DG-INIT-10`):**
+    Fuente: [`DG-INIT-10.puml`](assets/diagramas/plantuml/diseno/DG-INIT-10.puml) | [SVG](assets/diagramas/render/diseno/DG-INIT-10.svg) | [PNG](assets/diagramas/render/diseno/DG-INIT-10.png)
     *Estructura de enrutamiento React Router: `/projects/new/*`, `/projects/:id/settings/*` y guardianes de ruta.*
 
 ---
 
-## 7. Diseño de Persistencia y Migración Incremental (Propuesta DDL No Ejecutable)
+## 7. Modelo Canónico de Estados, Persistencia y Migración Incremental
+
+### 7.1 Modelo Canónico de Estados de `traceflow.project`
+
+La auditoría arquitectónica identificó divergencias en la representación del ciclo de vida del proyecto entre PostgreSQL (`ACTIVE`, `CLOSED`, `ARCHIVED`), el backend (`'ACTIVO'`) y el frontend (`'ACTIVO'`, `'PLANIFICADO'`, `'CONGELADO'`, `'FINALIZADO'`).
+
+Se establece como **única representación canónica del sistema** la siguiente máquina de estados en español, alineada con las entidades SCM del sistema (`change_request.status`, `change_order.status`, `baseline.status`):
+
+| Estado Canónico | Propósito y Semántica Operacional | Operaciones SCM Permitidas | Transiciones Válidas de Salida |
+| :--- | :--- | :---: | :--- |
+| **`BORRADOR`** | Proyecto en creación guiada dentro del Asistente de Inicialización (Pasos 1 a 4). | Ninguna (Bloqueo HTTP 412) | $\rightarrow$ `EN_CONFIGURACION`, $\rightarrow$ `PENDIENTE_VALIDACION` |
+| **`EN_CONFIGURACION`** | Proyecto guardado parcialmente fuera del asistente para su posterior reanudación (DA-05). | Ninguna (Bloqueo HTTP 412) | $\rightarrow$ `BORRADOR`, $\rightarrow$ `PENDIENTE_VALIDACION` |
+| **`PENDIENTE_VALIDACION`** | Configuración completada (roles mínimos e integración GitHub asignados); verificación en curso. | Ninguna (Bloqueo HTTP 412) | $\rightarrow$ `ACTIVO` (Éxito), $\rightarrow$ `EN_CONFIGURACION` (Fallo) |
+| **`ACTIVO`** | Proyecto formalmente certificado y habilitado operacionalmente con repositorio GitHub validado (DA-04). | Total (RFC, ECN, Check-In/Out, Líneas Base) | $\rightarrow$ `SUSPENDIDO`, $\rightarrow$ `CERRADO` |
+| **`SUSPENDIDO`** | Operaciones congeladas temporalmente por decisión del Gestor (`PU-02`) por auditoría o incidente. | Solo Consulta / Lectura (Bloqueo HTTP 412) | $\rightarrow$ `ACTIVO` (Reactivación formal auditada) |
+| **`CERRADO`** | Proyecto culminado contractualmente; no admite nuevos cambios pero preserva trazabilidad. | Solo Consulta / Lectura (Bloqueo HTTP 412) | $\rightarrow$ `ARCHIVADO` |
+| **`ARCHIVADO`** | Expediente congelado de forma permanente para custodia histórica (solo lectura inmutable). | Solo Consulta / Lectura (Bloqueo HTTP 412) | Estado terminal final |
+| **`HISTORICO_PENDIENTE_GITHUB`** | Estado de transición para proyectos preexistentes (`PRJ-001`..`PRJ-003`) previo a su regularización. | Solo Consulta / Lectura (Bloqueo HTTP 412) | $\rightarrow$ `PENDIENTE_VALIDACION` (tras configurar repo propio) |
+
+#### Matriz de Transiciones Permitidas y Reglas de Negocio
+
+```mermaid
+stateDiagram-v2
+    [*] --> BORRADOR : initiateProject (PU-02)
+    BORRADOR --> EN_CONFIGURACION : saveDraft (Autosave DA-05)
+    EN_CONFIGURACION --> BORRADOR : resumeWizard
+    BORRADOR --> PENDIENTE_VALIDACION : completeSetup (Paso 4)
+    EN_CONFIGURACION --> PENDIENTE_VALIDACION : requestValidation
+    PENDIENTE_VALIDACION --> EN_CONFIGURACION : validationFailed (Credencial/Permiso/Error)
+    PENDIENTE_VALIDACION --> ACTIVO : activateProject [GitHub VALIDATED + DA-06 OK]
+    ACTIVO --> SUSPENDIDO : suspendProject (PU-02 con justificación)
+    SUSPENDIDO --> ACTIVO : reactivateProject (PU-02 con auditoría)
+    ACTIVO --> CERRADO : closeProject (PU-02 / CCB)
+    CERRADO --> ARCHIVADO : archiveProject (PU-05 Custodio)
+
+    HISTORICO_PENDIENTE_GITHUB --> PENDIENTE_VALIDACION : linkDedicatedRepo (PU-02 explícito)
+    ARCHIVADO --> [*]
+```
+
+#### Capa de Normalización Bidireccional (Backward Compatibility Layer)
+
+Para evitar incompatibilidades con clientes externos o scripts que envíen denominaciones legacy en inglés o estados preliminares del prototipo, los adaptadores DTO del backend implementan la siguiente normalización determinista:
+
+| Entrada Legacy Recibida | Estado Canónico Normalizado | Comportamiento |
+| :--- | :--- | :--- |
+| `'ACTIVE'` | `'ACTIVO'` | Mapeo directo retroactivo para proyectos existentes en BD. |
+| `'CLOSED'` | `'CERRADO'` | Mapeo directo retroactivo. |
+| `'ARCHIVED'` | `'ARCHIVADO'` | Mapeo directo retroactivo. |
+| `'PLANIFICADO'` | `'BORRADOR'` | Normalización de prototipo frontend a estado canónico. |
+| `'CONGELADO'` | `'SUSPENDIDO'` | Normalización de prototipo frontend a estado canónico. |
+| `'FINALIZADO'` | `'CERRADO'` | Normalización de prototipo frontend a estado canónico. |
+
+---
+
+### 7.2 Diseño de Persistencia (Propuesta DDL No Ejecutable para INIT-H02)
 
 > [!WARNING]
-> **RESTRICCIÓN FORMAL:** Este código SQL es una propuesta técnica de diseño y análisis para la futura etapa `INIT-H02`. **NO DEBE EJECUTARSE** durante el hito `INIT-H01`.
+> **RESTRICCIÓN FORMAL:** Este código SQL es una propuesta técnica de diseño y análisis arquitectónico. **QUEDA PROHIBIDO SU EJECUCIÓN** en PostgreSQL o Supabase durante el hito `INIT-H01-R`. Su despliegue se realizará de forma incremental y certificada en `INIT-H02`.
 
 ```sql
 -- ============================================================================
--- TRACEFLOW SCM — PROPUESTA DDL INCREMENTAL (INIT-H02 CANDIDATE)
+-- TRACEFLOW SCM — PROPUESTA DDL INCREMENTAL (CANDIDATO INIT-H02)
 -- Esquema: traceflow | Motor: PostgreSQL 17
+-- Restricciones: Mínimo privilegio, preservación histórica e integridad DA-06
 -- ============================================================================
 
 -- 1. TABLA DE ORGANIZACIONES (TENANT RAÍZ - DA-02)
@@ -197,27 +258,32 @@ CREATE TABLE IF NOT EXISTS traceflow.organization (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. TABLA DE MEMBRESÍA ORGANIZACIONAL (DA-06)
+-- 2. TABLA DE MEMBRESÍA ORGANIZACIONAL (DA-06 - EXCLUSIVO USUARIOS REGISTRADOS)
+-- Nota de remediación INIT-H01-R: Se elimina el estado 'INVITED' para respetar estrictamente DA-06.
+-- Solo pueden incorporarse usuarios previamente registrados (app_user.status = 'ACTIVE').
 CREATE TABLE IF NOT EXISTS traceflow.organization_member (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     organization_id UUID NOT NULL REFERENCES traceflow.organization(id) ON DELETE RESTRICT,
     user_id UUID NOT NULL REFERENCES traceflow.app_user(id) ON DELETE RESTRICT,
     role_in_org VARCHAR(30) NOT NULL DEFAULT 'MEMBER' CHECK (role_in_org IN ('OWNER', 'ADMIN', 'MEMBER', 'AUDITOR')),
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INVITED', 'SUSPENDED')),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'SUSPENDED')),
     joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    invited_by UUID REFERENCES traceflow.app_user(id) ON DELETE SET NULL,
+    added_by UUID REFERENCES traceflow.app_user(id) ON DELETE RESTRICT,
     CONSTRAINT uq_org_member UNIQUE (organization_id, user_id)
 );
 
 -- 3. EVOLUCIÓN DE TABLA PROJECT (AGREGAR FK Y ESTADOS AMPLIADOS)
--- Nota: En migración incremental se agregará organization_id y se migrarán PRJ-001..003
-ALTER TABLE traceflow.project 
+ALTER TABLE traceflow.project
     ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES traceflow.organization(id) ON DELETE RESTRICT;
 
--- Ampliación de restricción de estados para admitir borrador y transición controlada
--- CHECK (status IN ('BORRADOR', 'EN_CONFIGURACION', 'PENDIENTE_VALIDACION', 'ACTIVO', 'SUSPENDIDO', 'CERRADO', 'ARCHIVADO', 'HISTORICO_PENDIENTE_GITHUB'))
+-- Actualización controlada de la restricción de estados canónicos
+-- ALTER TABLE traceflow.project DROP CONSTRAINT IF EXISTS project_status_check;
+-- ALTER TABLE traceflow.project ADD CONSTRAINT chk_project_status
+--     CHECK (status IN ('BORRADOR', 'EN_CONFIGURACION', 'PENDIENTE_VALIDACION', 'ACTIVO', 'SUSPENDIDO', 'CERRADO', 'ARCHIVADO', 'HISTORICO_PENDIENTE_GITHUB'));
 
 -- 4. TABLA DE CONFIGURACIÓN DEL ASISTENTE Y AUTOSAVE (DA-05)
+-- Nota de justificación de integridad: project_setup es una tabla auxiliar 1:1 estrictamente dependiente
+-- del ciclo de configuración; su eliminación en borrador no afecta la trazabilidad SCM.
 CREATE TABLE IF NOT EXISTS traceflow.project_setup (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id UUID UNIQUE NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
@@ -234,22 +300,23 @@ CREATE TABLE IF NOT EXISTS traceflow.project_setup (
 );
 
 -- 5. TABLA DE ROLES FUNCIONALES DEL EQUIPO EN EL PROYECTO
+-- Nota de remediación: ON DELETE RESTRICT previene la eliminación accidental de proyectos con asignaciones.
 CREATE TABLE IF NOT EXISTS traceflow.project_team_role (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
     user_id UUID NOT NULL REFERENCES traceflow.app_user(id) ON DELETE RESTRICT,
     role_id INT NOT NULL REFERENCES traceflow.app_role(id) ON DELETE RESTRICT,
     functional_title VARCHAR(100),
     is_lead BOOLEAN NOT NULL DEFAULT FALSE,
     assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    assigned_by UUID REFERENCES traceflow.app_user(id) ON DELETE SET NULL,
+    assigned_by UUID REFERENCES traceflow.app_user(id) ON DELETE RESTRICT,
     CONSTRAINT uq_project_user_role UNIQUE (project_id, user_id, role_id)
 );
 
 -- 6. TABLA DE METODOLOGÍA DEL PROYECTO
 CREATE TABLE IF NOT EXISTS traceflow.project_methodology (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID UNIQUE NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
+    project_id UUID UNIQUE NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
     methodology_type VARCHAR(30) NOT NULL CHECK (methodology_type IN ('SCRUM', 'KANBAN', 'CASCADA', 'HIBRIDA', 'UPT_ACADEMICA')),
     iteration_duration_weeks INT DEFAULT 2,
     active_phase_code VARCHAR(30),
@@ -261,7 +328,7 @@ CREATE TABLE IF NOT EXISTS traceflow.project_methodology (
 -- 7. TABLAS DE CRONOGRAMA, FASES, HITOS Y ENTREGABLES
 CREATE TABLE IF NOT EXISTS traceflow.project_phase (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
     phase_code VARCHAR(30) NOT NULL,
     name VARCHAR(100) NOT NULL,
     sequence_order INT NOT NULL,
@@ -275,8 +342,8 @@ CREATE TABLE IF NOT EXISTS traceflow.project_phase (
 
 CREATE TABLE IF NOT EXISTS traceflow.project_milestone (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
-    phase_id UUID REFERENCES traceflow.project_phase(id) ON DELETE SET NULL,
+    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
+    phase_id UUID REFERENCES traceflow.project_phase(id) ON DELETE RESTRICT,
     code VARCHAR(30) NOT NULL,
     title VARCHAR(150) NOT NULL,
     target_date DATE NOT NULL,
@@ -287,36 +354,39 @@ CREATE TABLE IF NOT EXISTS traceflow.project_milestone (
 
 CREATE TABLE IF NOT EXISTS traceflow.project_deliverable (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
-    milestone_id UUID REFERENCES traceflow.project_milestone(id) ON DELETE SET NULL,
+    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
+    milestone_id UUID REFERENCES traceflow.project_milestone(id) ON DELETE RESTRICT,
     code VARCHAR(30) NOT NULL,
     name VARCHAR(150) NOT NULL,
     expected_type VARCHAR(50) NOT NULL CHECK (expected_type IN ('SOFTWARE_RELEASE', 'TECHNICAL_DOCUMENT', 'SOURCE_BRANCH', 'TEST_REPORT', 'DB_MIGRATION')),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'SUBMITTED', 'ACCEPTED', 'REJECTED')),
-    associated_ecs_id UUID REFERENCES traceflow.config_item(id) ON DELETE SET NULL,
+    associated_ecs_id UUID REFERENCES traceflow.config_item(id) ON DELETE RESTRICT,
     CONSTRAINT uq_project_deliverable_code UNIQUE (project_id, code)
 );
 
 -- 8. TABLA DE INTEGRACIÓN GITHUB (DA-03, DA-04)
+-- Nota de arquitectura de seguridad: Los tokens de instalación de GitHub App duran 1 hora y
+-- se generan BAJO DEMANDA en memoria a partir de la llave privada de la App. NO se almacenan tokens temporales en BD.
+-- Se almacena únicamente el installation_id público, y de forma opcional encrypted_oauth_token para cuentas personales.
 CREATE TABLE IF NOT EXISTS traceflow.github_integration (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID UNIQUE NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
+    project_id UUID UNIQUE NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
     integration_mode VARCHAR(20) NOT NULL CHECK (integration_mode IN ('LINK_EXISTING', 'CREATE_NEW')),
     repo_owner VARCHAR(100) NOT NULL,
     repo_name VARCHAR(100) NOT NULL,
     repo_full_name VARCHAR(200) NOT NULL,
     github_repo_id BIGINT NOT NULL,
     default_branch VARCHAR(50) NOT NULL DEFAULT 'main',
-    installation_id BIGINT,
-    encrypted_access_token BYTEA,
-    token_iv BYTEA,
-    token_auth_tag BYTEA,
-    token_expires_at TIMESTAMPTZ,
+    installation_id BIGINT,                          -- Identificador de GitHub App Installation
+    encrypted_oauth_token BYTEA,                     -- Solo OAuth personal fallback (cifrado AES-256-GCM)
+    oauth_token_iv BYTEA,
+    oauth_token_auth_tag BYTEA,
     webhook_id BIGINT,
-    encrypted_webhook_secret BYTEA,
-    webhook_iv BYTEA,
-    webhook_auth_tag BYTEA,
-    validation_status VARCHAR(30) NOT NULL DEFAULT 'UNVALIDATED' CHECK (validation_status IN ('UNVALIDATED', 'VALIDATED', 'INVALID_CREDENTIALS', 'REPO_NOT_FOUND', 'PERMISSION_DENIED', 'REVOKED')),
+    encrypted_webhook_secret BYTEA NOT NULL,         -- Secreto para HMAC-SHA256 (cifrado AES-256-GCM)
+    webhook_iv BYTEA NOT NULL,
+    webhook_auth_tag BYTEA NOT NULL,
+    validation_status VARCHAR(30) NOT NULL DEFAULT 'UNVALIDATED'
+        CHECK (validation_status IN ('UNVALIDATED', 'VALIDATED', 'INVALID_CREDENTIALS', 'REPO_NOT_FOUND', 'PERMISSION_DENIED', 'REVOKED')),
     last_validated_at TIMESTAMPTZ,
     validation_error_message TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -327,7 +397,7 @@ CREATE TABLE IF NOT EXISTS traceflow.github_integration (
 -- 9. TABLA DE EVENTOS DE WEBHOOK GITHUB
 CREATE TABLE IF NOT EXISTS traceflow.github_event (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES traceflow.project(id) ON DELETE RESTRICT,
     github_delivery_id VARCHAR(64) UNIQUE NOT NULL,  -- Idempotencia garantizada por X-GitHub-Delivery
     event_type VARCHAR(50) NOT NULL,
     action VARCHAR(50),
@@ -340,37 +410,138 @@ CREATE TABLE IF NOT EXISTS traceflow.github_event (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 10. REAJUSTE DE PRIVILEGIOS MÍNIMOS (LEAST PRIVILEGE)
-GRANT SELECT, INSERT, UPDATE ON TABLE 
+-- 10. DISPARADOR DE INTEGRIDAD ORGANIZACIONAL (DA-06 EN BASE DE DATOS)
+-- Garantiza que ningún usuario ajeno a la organización propietaria pueda ser asignado a un proyecto.
+CREATE OR REPLACE FUNCTION traceflow.enforce_project_member_organization_integrity()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_project_org_id UUID;
+    v_is_member BOOLEAN;
+BEGIN
+    SELECT organization_id INTO v_project_org_id
+    FROM traceflow.project
+    WHERE id = NEW.project_id;
+
+    IF v_project_org_id IS NULL THEN
+        RAISE EXCEPTION 'Violación de integridad (DA-02): El proyecto % no tiene organización asignada.', NEW.project_id;
+    END IF;
+
+    SELECT EXISTS (
+        SELECT 1 FROM traceflow.organization_member
+        WHERE organization_id = v_project_org_id
+          AND user_id = NEW.user_id
+          AND status = 'ACTIVE'
+    ) INTO v_is_member;
+
+    IF NOT v_is_member THEN
+        RAISE EXCEPTION 'Violación de segregación institucional (DA-06): El usuario % no es miembro activo de la organización propietaria del proyecto %.',
+            NEW.user_id, NEW.project_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Asociación del disparador a asignaciones de proyecto y roles
+-- DROP TRIGGER IF EXISTS trg_check_user_project_assignment_org ON traceflow.user_project_assignment;
+-- CREATE TRIGGER trg_check_user_project_assignment_org
+--     BEFORE INSERT OR UPDATE ON traceflow.user_project_assignment
+--     FOR EACH ROW EXECUTE FUNCTION traceflow.enforce_project_member_organization_integrity();
+
+-- DROP TRIGGER IF EXISTS trg_check_project_team_role_org ON traceflow.project_team_role;
+-- CREATE TRIGGER trg_check_project_team_role_org
+--     BEFORE INSERT OR UPDATE ON traceflow.project_team_role
+--     FOR EACH ROW EXECUTE FUNCTION traceflow.enforce_project_member_organization_integrity();
+
+-- 11. REAJUSTE DE PRIVILEGIOS MÍNIMOS (LEAST PRIVILEGE AUDITADO)
+-- Justificación de exclusión de DELETE:
+-- Por principios de trazabilidad SCM (IEEE 828, RNF-01, RNF-03), queda revocado el privilegio DELETE para traceflow_app.
+-- Ninguna entidad histórica (miembros, fases, hitos, entregables, roles) puede eliminarse físicamente;
+-- las bajas se realizan mediante transiciones de estado lógico (SUSPENDIDO, CANCELLED).
+GRANT SELECT, INSERT, UPDATE ON TABLE
     traceflow.organization,
+    traceflow.organization_member,
     traceflow.project,
     traceflow.project_setup,
+    traceflow.project_team_role,
     traceflow.project_methodology,
+    traceflow.project_phase,
+    traceflow.project_milestone,
+    traceflow.project_deliverable,
     traceflow.github_integration,
     traceflow.github_event
 TO traceflow_app;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE 
-    traceflow.organization_member,
-    traceflow.project_team_role,
-    traceflow.project_phase,
-    traceflow.project_milestone,
-    traceflow.project_deliverable
-TO traceflow_app;
 ```
 
-### Estrategia de Migración de Proyectos Preexistentes (Zero Data Loss)
-1. **Paso 1 (Creación de Organización Institucional):** Insertar automáticamente la organización inicial `ÉXODO S.A.C.` (`code = 'ORG-001'`, `slug = 'exodo-sac'`).
-2. **Paso 2 (Membresía Inicial):** Asociar todos los usuarios preexistentes (`USR-001` a `USR-004`) como miembros activos (`organization_member`) de `ORG-001`.
-3. **Paso 3 (Vinculación de Proyectos):** Asignar los proyectos existentes `PRJ-001`, `PRJ-002` y `PRJ-003` a `ORG-001`.
-4. **Paso 4 (Estado Histórico sin Infracción de DA-04):** Para cumplir estrictamente con DA-04 sin corromper el historial, **no se asignará automáticamente el estado `ACTIVO`**; en su lugar, se asignará el estado canónico `HISTORICO_PENDIENTE_GITHUB`.
-5. **Paso 5 (Compatibilidad Temporal SCM):** Las consultas, reportes y lecturas de expedientes y líneas base históricas permanecerán 100% disponibles. Cualquier nueva solicitud de cambio (`POST /api/v1/rfcs`) solicitará al Gestor la regularización de la vinculación con el repositorio oficial `https://github.com/JMedina255/TraceFlow.git` antes de admitir mutaciones.
+---
+
+### 7.3 Política Estricta de Regularización de Proyectos Históricos
+
+> [!CAUTION]
+> **CORRECCIÓN ARQUITECTÓNICA VINCULANTE (INIT-H01-R):**
+> Queda **terminantemente prohibido** vincular de forma automática, genérica o masiva los proyectos históricos (`PRJ-001`, `PRJ-002`, `PRJ-003`) al repositorio oficial del motor TraceFlow (`https://github.com/JMedina255/TraceFlow.git`).
+> `TraceFlow` es la plataforma de gestión de cambios; los proyectos históricos representan sistemas cliente autónomos e independientes, con su propia naturaleza técnica, base de código y gobernanza.
+
+#### Lineamientos de Regularización:
+1. **Preservación Inmutable de Datos Históricos:**
+   - Toda la información previa de `PRJ-001` (Pasarela de Pagos Core), `PRJ-002` (Portal Autoservicio Clientes) y `PRJ-003` (Módulo de Facturación Electrónica), incluyendo RFCs, dictámenes técnicos, actas CCB, órdenes ECN, ítems de configuración (`ECS`) y líneas base históricas, permanece intacta, consistente y disponible para consulta en modo solo lectura (`GET`).
+2. **Asignación de Estado Transitorio `HISTORICO_PENDIENTE_GITHUB`:**
+   - Durante la migración incremental en `INIT-H02`, los proyectos históricos se vincularán a la organización institucional por defecto `ÉXODO S.A.C.` (`ORG-001`) y se les asignará el estado canónico `HISTORICO_PENDIENTE_GITHUB`.
+   - Este estado formaliza que el proyecto cuenta con expediente histórico pero carece de integración activa con su repositorio Git dedicado, cumpliendo estrictamente con la decisión `DA-04` sin falsear validaciones inexistentes.
+3. **Vinculación Individual con Autorización Explícita:**
+   - Cada proyecto histórico deberá ser vinculado **de forma individual, explícita y manual** por el Gestor del Proyecto (`PU-02`) o el Administrador de la Organización.
+   - La vinculación requerirá invocar el endpoint de vinculación (`POST /api/v1/projects/:id/github/link`) o utilizar el panel de configuración (`/projects/:id/settings`), indicando el repositorio remoto propio y exclusivo que le corresponde a dicho sistema cliente en GitHub (ej. `exodo-org/pasarela-core`, `exodo-org/portal-autoservicio`, `exodo-org/facturacion-electronica`).
+4. **Validación Remota y Promoción a `ACTIVO`:**
+   - Al recibir la solicitud de vinculación explícita, el backend verificará los permisos de la GitHub App sobre el repositorio indicado, aprovisionará el webhook seguro con secreto HMAC-SHA256 y registrará `validation_status = 'VALIDATED'`.
+   - Únicamente tras superar dicha validación, el proyecto transicionará de `HISTORICO_PENDIENTE_GITHUB` a `PENDIENTE_VALIDACION` y finalmente a `ACTIVO`.
+5. **Cero Modificación Automatizada de Datos:**
+   - No se ejecutará ningún script de actualización masiva ni se insertarán registros simulados de integración GitHub para los proyectos históricos. La regularización se llevará a cabo como un proceso operacional gobernado y auditable.
 
 ---
 
 ## 8. Seguridad e Integración GitHub
 
-### 8.1 Matriz de Autorización para los Siete Perfiles Canónicos
+### 8.1 Matriz Oficial de Permisos y Requisitos Técnicos GitHub por Operación
+
+Conforme a la documentación oficial de GitHub (*GitHub Apps Documentation*, *REST API Permissions*, *Webhook Security*), se establecen los requisitos técnicos, alcances (*scopes*) y permisos granulares requeridos para cada operación del módulo:
+
+| Operación | Mecanismo de Identidad | Endpoint Oficial GitHub API | Permisos Mínimos Requeridos | Gestión y Almacenamiento de Credenciales |
+| :--- | :--- | :--- | :--- | :--- |
+| **Vincular Repositorio Existente (Org o Personal)** | GitHub App Installation | `GET /repos/{owner}/{repo}`<br>`GET /repos/{owner}/{repo}/branches` | • `Metadata: Read-only` (Obligatorio)<br>• `Contents: Read-only` (Inspección)<br>• `Administration: Read-only` | **Bajo Demanda:** Installation Access Token generado en memoria (1 h) vía JWT (RS256). Solo se almacena `installation_id`. Cero persistencia en BD. |
+| **Crear Repositorio Organizacional** | GitHub App Installation | `POST /orgs/{org}/repos` | • `Administration: Read & Write` (Org)<br>• `Contents: Read & Write` (Templates) | **Bajo Demanda:** Installation Access Token generado en memoria a partir de la llave privada institucional (`APP_PRIVATE_KEY_PEM`). |
+| **Crear Repositorio Personal** | User Access Token (OAuth Flow) | `POST /user/repos` | • OAuth Scope `repo` (Completo)<br>• Scope `user:email` | **Cifrado en Reposo:** Token OAuth de usuario cifrado con **AES-256-GCM** (`encrypted_oauth_token`, `oauth_token_iv`, `oauth_token_auth_tag`). |
+| **Autorizar Instalación GitHub App** | Web Setup Flow | Callback URL con `installation_id` y `setup_action` | • Autorización explícita del Owner de la Organización o Usuario en GitHub | Se asocia `installation_id` con `organization.id`. No se requieren credenciales permanentes del usuario. |
+| **Aprovisionar y Gestionar Webhooks** | GitHub App o REST API Hook | `POST /repos/{owner}/{repo}/hooks` (si es por API) | • Webhooks a nivel de App (Automático), o<br>• `Administration: Read & Write` | Se genera secreto criptográfico aleatorio de 32 bytes (256 bits). Cifrado con **AES-256-GCM** en `encrypted_webhook_secret`. |
+| **Validar Firmas de Webhooks** | Interceptor Backend | Recepción en `/api/v1/projects/:id/github/webhook` | Cabecera `X-Hub-Signature-256` | Cómputo de `HMAC-SHA256(raw_body, secret)`. Comparación en tiempo constante con `crypto.timingSafeEqual` (anti-timing attack). |
+| **Renovación y Revocación de Credenciales** | Event-driven / On-demand | `POST /app/installations/{id}/access_tokens`<br>Webhook `installation` (`deleted/suspend`) | • Generación JWT RS256 con llave privada `.pem` | Los tokens expiran automáticamente en 60 minutos. La desinstalación remota emite evento que transiciona `validation_status = 'REVOKED'`. |
+
+### 8.2 Principio de Generación de Tokens Bajo Demanda (Cero Persistencia de Tokens Temporales)
+
+Un pilar de seguridad fundamental de este diseño arquitectónico es la **eliminación de persistencia de tokens de instalación temporales**:
+- Los *GitHub App Installation Access Tokens* emitidos por GitHub tienen una vida útil fija de exactamente **60 minutos**.
+- **Regla de Arquitectura:** TraceFlow **NO almacena estos tokens temporales en la base de datos**.
+- **Flujo de Ejecución en Memoria:**
+  1. El servidor mantiene la llave privada asimétrica de la GitHub App (`.pem`) inyectada exclusivamente por variable de entorno (`GITHUB_APP_PRIVATE_KEY`).
+  2. Cuando el backend necesita interactuar con GitHub para un proyecto, `GitHubAppClientService` consulta el `installation_id` (identificador público numérico en `github_integration`).
+  3. Firma un JSON Web Token (JWT) con algoritmo **RS256** (vigencia de 10 minutos).
+  4. Invoca `POST https://api.github.com/app/installations/{installation_id}/access_tokens`.
+  5. GitHub retorna el token de instalación temporal.
+  6. El servicio mantiene el token en un **caché en memoria con TTL de 50 minutos** (para amortizar llamadas sin agotar la cuota de generación).
+  7. El token se descarta automáticamente al expirar o ante un reinicio del proceso.
+
+### 8.3 Distinción Criptográfica: Encadenamiento SHA-256 vs Firmas Digitales Asimétricas
+
+Para garantizar la exactitud terminológica y metodológica del sistema:
+- **Encadenamiento Criptográfico de Integridad SHA-256 (Bitácora de Auditoría):**
+  - Implementado en `traceflow.append_audit_log` mediante la función de dispersión unidireccional SHA-256 (`encode(digest(coalesce(prev_log_hash, '') || ... || payload::text, 'sha256'), 'hex')`) protegido por cerrojo transaccional `pg_advisory_xact_lock(74291)`.
+  - Proporciona **detección de manipulación e inmutabilidad secuencial (hash-chain)**, garantizando que ninguna fila de auditoría pueda insertarse, alterarse o eliminarse retroactivamente sin romper la cadena de dispersión.
+  - **No constituye una firma digital asimétrica**, ya que no utiliza infraestructura de clave pública/privada (PKI) ni certificados X.509.
+- **Autenticación HMAC-SHA256 (Integridad de Webhooks):**
+  - Utiliza un secreto criptográfico compartido de 256 bits para verificar el origen y la integridad de las entregas HTTP de GitHub (`X-Hub-Signature-256`).
+- **Firmas Asimétricas RS256 (Autenticación GitHub App):**
+  - Utilizadas exclusivamente para la generación de JWT con la llave privada `.pem` institucional hacia la API de GitHub.
+
+### 8.4 Matriz de Autorización para los Siete Perfiles Canónicos
 
 | Perfil Canónico | Rol en Organización | Rol en Proyecto | Permisos en Inicialización | Permisos en Integración GitHub | Permisos SCM (Activo) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -381,33 +552,6 @@ TO traceflow_app;
 | **PU-05 (Bibliotecario)** | Miembro de Custodia | Custodio SCM | Consulta de estructura de bibliotecas | Inspección de ramas protegidas | Check-In a Maestra, congelamiento de líneas base (`CU-12`, `CU-20`) |
 | **PU-06 (Desarrollador)** | Miembro Operativo | Ingeniero de Software | Consulta de ficha de proyecto y metodología | Lectura/escritura de código en Git según ramas autorizadas | Check-Out a Trabajo, implementación técnica de cambios (`CU-10`) |
 | **PU-07 (Calidad / QA)** | Miembro de Control | Evaluador QA | Consulta de fases y entregables planificados | Verificación de releases y tags en Git | Pruebas de conformidad, certificación y no conformidades (`CU-16..19`) |
-
-### 8.2 Diferenciación Estricta de Identidades y Facultades
-- **Rol del Sistema:** Cuenta de autenticación física en `app_user` (credenciales Argon2id, UUID de usuario).
-- **Membresía Organizacional:** Privilegio administrativo dentro del tenant (`OWNER`, `ADMIN`, `MEMBER`, `AUDITOR`).
-- **Membresía del Proyecto:** Asignación contextual de acceso a un proyecto específico (`user_project_assignment`).
-- **Responsabilidad Funcional:** Especialidad operativa asignada dentro del equipo (`project_team_role`, ej. "Líder de Integración").
-- **Permiso Efectivo:** Intersección resultante entre el rol activo canónico (`activeRoleId` en sesión), la membresía del proyecto y el estado del proyecto (`ACTIVO`).
-- **Restricción SoD:** Invariantes de segregación física evaluadas en disparadores de PostgreSQL (anti-autoevaluación, doble llave física independiente, incompatibilidad Solicitante vs Votante CCB).
-
-### 8.3 Evaluación Técnica: GitHub App vs OAuth App
-
-| Criterio | GitHub App (Modelo Seleccionado) | OAuth App (Alternativa Secundaria) | Justificación de Elección |
-| :--- | :--- | :--- | :--- |
-| **Identidad** | Actúa como aplicación institucional propia | Actúa en nombre de un usuario individual | Garantiza que la integración no dependa de la cuenta personal de un empleado que pueda rotar. |
-| **Permisos** | Granulares por recurso (ej. `Contents: Read/Write`, `Webhooks: Read/Write`) | Todo o nada en alcances amplios (`repo`, `admin:repo_hook`) | Cumplimiento del principio de mínimo privilegio (`RNF-01`). |
-| **Tokens** | Installation Access Tokens temporales (1 hora de vigencia) | Tokens estáticos de larga duración sin expiración automática | Reduce drásticamente la ventana de impacto ante filtraciones. |
-| **Webhooks** | Integrados de forma centralizada con secreto compartido | Requiere creación manual por repositorio | Automatización completa desde el Asistente de Inicialización. |
-| **Límites de API** | 5,000 peticiones/hora por instalación (escala por organización) | 5,000 peticiones/hora compartidas por usuario | Mayor escalabilidad para despliegues multiproyecto empresariales. |
-
-### 8.4 Almacenamiento Seguro de Credenciales (Criptografía AES-256-GCM)
-- Los secretos compartidos de webhooks y tokens de larga duración se cifran a nivel de aplicación mediante el servicio `GitHubCryptoService` antes de guardarse en la base de datos.
-- Se utiliza el algoritmo **AES-256-GCM** (Galois/Counter Mode), el cual provee confidencialidad y autenticación de integridad (Authenticated Encryption).
-- Cada secreto cifrado almacena tres campos binarios independientes en PostgreSQL:
-  - `encrypted_access_token BYTEA` / `encrypted_webhook_secret BYTEA`: Texto cifrado.
-  - `token_iv BYTEA` / `webhook_iv BYTEA`: Vector de inicialización criptográficamente aleatorio de 12 bytes (96 bits) generado por `crypto.randomBytes(12)`.
-  - `token_auth_tag BYTEA` / `webhook_auth_tag BYTEA`: Etiqueta de autenticación de 16 bytes (128 bits) generada por el cifrador GCM.
-- La clave maestra de cifrado (`APP_SECRET_KEY`) se inyecta exclusivamente mediante variable de entorno protegida en el servidor; **nunca se expone al frontend, nunca se incluye en respuestas JSON de la API, nunca se registra en `audit_log` y nunca se almacena en el repositorio Git**.
 
 ---
 
@@ -421,18 +565,6 @@ TO traceflow_app;
 ### 9.2 Grupo 2: Asistente y Ciclo de Vida de Proyectos (`MOD-02`)
 - **`POST /api/v1/projects/initiate`**:
   - *Descripción:* Crea proyecto en estado `BORRADOR` con datos del Paso 1.
-  - *Body:*
-    ```json
-    {
-      "organizationId": "c0000001-0000-0000-0000-000000000001",
-      "code": "PRJ-004",
-      "projectKey": "EXO-PAY",
-      "name": "Billetera Digital Móvil",
-      "description": "Aplicación móvil y backend transaccional.",
-      "clientName": "Banco Financiero",
-      "targetDeliveryDate": "2027-06-30"
-    }
-    ```
   - *Respuesta (HTTP 201):* `{ "id": "b0000001-...", "status": "BORRADOR", "step": 1 }`
 - **`PUT /api/v1/projects/:id/setup/step-2`**: Asigna integrantes y roles del equipo (valida DA-06).
 - **`PUT /api/v1/projects/:id/setup/step-3`**: Configura metodología (Scrum/Cascada), fases y cronograma.
@@ -440,56 +572,108 @@ TO traceflow_app;
   - *Descripción:* Valida condiciones obligatorias (DA-04) y activa el proyecto.
   - *Respuesta Éxito (HTTP 200):* `{ "status": "ACTIVO", "message": "Proyecto activado formalmente." }`
   - *Respuesta Rechazo (HTTP 412):* `{ "statusCode": 412, "error": "Precondition Failed", "message": "DA-04: La integración GitHub debe estar validada para activar el proyecto." }`
+- **`POST /api/v1/projects/:id/suspend`**: Suspende temporalmente el proyecto (solo lectura para SCM).
+- **`POST /api/v1/projects/:id/reactivate`**: Reactiva el proyecto tras subsanación.
 
 ### 9.3 Grupo 3: Integración GitHub (`MOD-11`)
 - **`POST /api/v1/projects/:id/github/link`**:
   - *Descripción:* Vincula un repositorio existente validando permisos remotos (DA-03).
-  - *Body:* `{ "repoOwner": "ÉXODO-ORG", "repoName": "traceflow-mobile", "installationId": 123456 }`
+  - *Body:* `{ "repoOwner": "exodo-org", "repoName": "pasarela-core", "installationId": 123456 }`
   - *Respuesta (HTTP 200):* `{ "validationStatus": "VALIDATED", "defaultBranch": "main" }`
 - **`POST /api/v1/projects/:id/github/create`**:
   - *Descripción:* Aprovisiona un nuevo repositorio en GitHub y lo vincula al proyecto (DA-03).
-  - *Body:* `{ "orgName": "ÉXODO-ORG", "repoName": "traceflow-mobile", "isPrivate": true, "initBranches": ["develop", "staging"] }`
+  - *Body:* `{ "orgName": "exodo-org", "repoName": "traceflow-mobile", "isPrivate": true, "initBranches": ["develop", "staging"] }`
   - *Respuesta (HTTP 201):* `{ "validationStatus": "VALIDATED", "repoUrl": "https://github.com/..." }`
 - **`POST /api/v1/projects/:id/github/webhook`**:
-  - *Descripción:* Endpoint de recepción de webhooks de GitHub validado con HMAC-SHA256 (`X-Hub-Signature-256`).
+  - *Descripción:* Endpoint de recepción de webhooks de GitHub validado con HMAC-SHA256 (`X-Hub-Signature-256`) e idempotente por `X-GitHub-Delivery`.
 
 ---
 
-## 10. Estrategia de Pruebas y Catálogo TDD (Línea Base para INIT-H02)
+## 10. Hoja de Ruta de Implementación Reorganizada (H02 a H06) y Catálogo TDD
 
-### 10.1 Línea Base de Pruebas Existentes (Verificada)
-- `backend/test/auth.spec.ts`: Unitarias de login, hash Argon2id y sesiones opacas (Pasa).
-- `backend/test/projects.spec.ts`: Unitarias de aislamiento multitenant en servicio (Pasa).
-- `backend/test/governance-negative.spec.ts`: Pruebas de violación SoD y anti-autoevaluación (Pasa).
-- `prototype/src/services/*.spec.mjs`: 9 suites unitarias de frontend con Node test runner (Pasa).
+La implementación del bloque de inicialización de proyectos se reestructura en **cinco hitos secuenciales bien delimitados**, eliminando la sobrecarga monólitica y permitiendo verificación rigurosa paso a paso:
 
-### 10.2 Catálogo de Pruebas Obligatorias para INIT-H02
+```mermaid
+flowchart LR
+    H01["INIT-H01-R\n(Auditoría y Diseño)\n[COMPLETADO]"] --> H02["INIT-H02\n(Organizaciones y\nPersistencia)"]
+    H02 --> H03["INIT-H03\n(Equipo, Metodología\ny Planificación)"]
+    H03 --> H04["INIT-H04\n(Integración\nGitHub)"]
+    H04 --> H05["INIT-H05\n(Interfaz, Asistente\ny Activación SCM)"]
+    H05 --> H06["INIT-H06\n(Certificación\nIntegral E2E)"]
+```
 
-| ID Prueba | Tipo | Componente Evaluado | Requisito / Regla | Condición de Aprobación |
-| :--- | :--- | :--- | :--- | :--- |
-| **`TDD-INIT-01`** | Unitaria | `ProjectsService.initiateProject` | RF-20, RN-10 | Crea proyecto en estado `BORRADOR` con `organization_id` válido. |
-| **`TDD-INIT-02`** | Negativa | `ProjectsService.initiateProject` | RN-10 | Rechaza con HTTP 400 si `organization_id` es inexistente. |
-| **`TDD-INIT-03`** | Unitaria | `ProjectsService.assignTeamMember` | RF-19, RN-11 (DA-06) | Acepta usuario si pertenece activamente a `organization_member`. |
-| **`TDD-INIT-04`** | Negativa | `ProjectsService.assignTeamMember` | RN-11 (DA-06) | Rechaza con HTTP 403 / 400 si el usuario no es miembro de la organización. |
-| **`TDD-INIT-05`** | Unitaria | `GitHubAppClientService.linkRepo` | RF-21, DA-03 | Valida repositorio existente y registra estado `VALIDATED`. |
-| **`TDD-INIT-06`** | Negativa | `GitHubAppClientService.linkRepo` | RF-21 | Emite error controlado si el repositorio no existe o faltan permisos. |
-| **`TDD-INIT-07`** | Unitaria | `GitHubAppClientService.createRepo` | RF-21, DA-03 | Crea repositorio remoto, inicializa ramas y retorna estado `VALIDATED`. |
-| **`TDD-INIT-08`** | Integración | `GitHubWebhookController` | RNF-01 | Valida firma HMAC-SHA256 (`X-Hub-Signature-256`) y procesa entrega. |
-| **`TDD-INIT-09`** | Negativa | `GitHubWebhookController` | RNF-01 | Rechaza entrega con HTTP 401 si la firma HMAC es inválida o ausente. |
-| **`TDD-INIT-10`** | Unitaria | `GitHubCryptoService` | RNF-01 | Cifra y descifra secretos con AES-256-GCM verificando autenticidad (tag). |
-| **`TDD-INIT-11`** | Integración | `ProjectLifecycleService.activate` | RF-23, RN-12 (DA-04) | Activa proyecto si GitHub está `VALIDATED` y roles mínimos cubiertos. |
-| **`TDD-INIT-12`** | Negativa | `ProjectLifecycleService.activate` | RN-12 (DA-04) | Rechaza activación con HTTP 412 si GitHub no está validado. |
-| **`TDD-INIT-13`** | Integración | `ProjectActiveGuard` + `RfcsController` | RN-13 (DA-04) | Bloquea creación de RFC (HTTP 412) si el proyecto está en `BORRADOR` o `SUSPENDIDO`. |
-| **`TDD-INIT-14`** | Integración | `ProjectActiveGuard` + `RfcsController` | RN-13 (DA-04) | Permite creación de RFC si el proyecto se encuentra en estado `ACTIVO`. |
-| **`TDD-INIT-15`** | Regresión | `AuditService.logEvent` | RF-17, RNF-03 | Registra eventos de activación e integración en cadena SHA-256 inmutable. |
+### 10.1 Desglose de Hitos de Implementación
 
-### 10.3 Orden de Implementación TDD para INIT-H02
-1. **Fase 1 (Criptografía y Servicios Base):** Escribir `github-crypto.spec.ts` $\rightarrow$ Implementar `GitHubCryptoService`.
-2. **Fase 2 (Modelo de Organización y DA-06):** Escribir `organizations.spec.ts` $\rightarrow$ Implementar `OrganizationsModule` y validación de membresía.
-3. **Fase 3 (Asistente y Estado Borrador):** Escribir `project-setup.spec.ts` $\rightarrow$ Implementar `ProjectSetupWizardService` y autosave JSONB.
-4. **Fase 4 (Cliente GitHub y Webhooks):** Escribir `github-client.spec.ts` y `github-webhook.spec.ts` $\rightarrow$ Implementar `GitHubAppClientService` con mocks de API.
-5. **Fase 5 (Activación y Salvaguardas SCM - DA-04):** Escribir `project-activation.spec.ts` y `project-active-guard.spec.ts` $\rightarrow$ Implementar `ProjectLifecycleService` y `@UseGuards(ProjectActiveGuard)` en `RfcsController`.
-6. **Fase 6 (Integración E2E y Frontend):** Conectar endpoints en `prototype/src/services/api/` y construir vistas del Asistente y Panel de Configuración.
+#### Hito INIT-H02 — Organizaciones, Proyectos y Persistencia
+- **Alcance Técnico:**
+  - Migración incremental PostgreSQL: entidades `traceflow.organization` y `traceflow.organization_member`.
+  - Ampliación de `traceflow.project` con clave foránea `organization_id` y restricción de estados canónicos en español.
+  - Reajuste estricto de privilegios para `traceflow_app` (`SELECT, INSERT, UPDATE` exclusivamente, sin `DELETE`).
+  - Creación de `OrganizationsModule` en NestJS (controladores, servicios, repositorios).
+  - Normalización bidireccional de estados legacy en capa DTO.
+  - Transición controlada de proyectos históricos (`PRJ-001`..`003`) a `HISTORICO_PENDIENTE_GITHUB` vinculados a `ORG-001`.
+
+#### Hito INIT-H03 — Equipo, Metodología y Planificación
+- **Alcance Técnico:**
+  - Migración incremental: tablas `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`.
+  - Implementación del disparador PL/pgSQL `enforce_project_member_organization_integrity` para blindar `DA-06`.
+  - Endpoints de backend para asignación de roles de proyecto (`PUT /api/v1/projects/:id/setup/step-2`) y configuración metodológica (`step-3`).
+  - Validación de compatibilidad entre entregables planificados e ítems de configuración (`associated_ecs_id`).
+
+#### Hito INIT-H04 — Integración GitHub
+- **Alcance Técnico:**
+  - Migración incremental: tablas `github_integration` y `github_event`.
+  - Implementación del módulo `GitHubIntegrationModule` con `GitHubCryptoService` (cifrado AES-256-GCM).
+  - Implementación de `GitHubAppClientService` con autenticación JWT RS256 y tokens de instalación bajo demanda en memoria.
+  - Implementación de endpoints de vinculación (`/github/link`) y creación (`/github/create`).
+  - Controlador de webhook con verificación HMAC-SHA256 e idempotencia garantizada por `X-GitHub-Delivery`.
+
+#### Hito INIT-H05 — Interfaz y Activación (Asistente, Panel y Salvaguarda SCM)
+- **Alcance Técnico:**
+  - Desarrollo de la interfaz React 19: Asistente guiado de 5 pasos (`/projects/new`) con autosave JSONB (`project_setup.draft_payload`).
+  - Panel de Configuración Posterior (`/projects/:id/settings`).
+  - Implementación de `ProjectLifecycleService` y endpoint de activación formal (`POST /api/v1/projects/:id/activate`).
+  - Implementación de la salvaguarda de backend `ProjectActiveGuard` sobre todos los controladores SCM (`RfcsController`, `ChangeOrdersController`, `BaselinesController`), bloqueando con HTTP 412 proyectos no activos (DA-04).
+  - Flujo de regularización explícita individual para proyectos históricos.
+
+#### Hito INIT-H06 — Certificación Integral
+- **Alcance Técnico:**
+  - Batería de pruebas integrales E2E cruzando organizaciones, asistente, GitHub y operaciones SCM.
+  - Validación de auditoría inmutable con encadenamiento SHA-256 (`append_audit_log`).
+  - Pruebas de penetración y regresión (verificación SoD, anti-autoevaluación, intentos de tampering HMAC).
+  - Congelamiento formal de línea base y preparación para entrega a producción.
+
+---
+
+### 10.2 Catálogo Completo de Pruebas TDD Asignadas por Hito
+
+| ID Prueba | Hito Asignado | Tipo | Componente Evaluado | Requisito / Regla | Condición de Aprobación |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| **`TDD-INIT-01`** | `INIT-H02` | Unitaria | `OrganizationsService.createOrganization` | RF-19, DA-02 | Registra organización con `code` y `slug` únicos y estado `ACTIVE`. |
+| **`TDD-INIT-02`** | `INIT-H02` | Negativa | `OrganizationsService.createOrganization` | RF-19 | Rechaza con HTTP 409 duplicados de `code` o `slug`. |
+| **`TDD-INIT-03`** | `INIT-H02` | Unitaria | `ProjectsService.initiateProject` | RF-20, RN-10 | Crea proyecto en `BORRADOR` con `organization_id` válido. |
+| **`TDD-INIT-04`** | `INIT-H02` | Negativa | `ProjectsService.initiateProject` | RN-10 | Rechaza con HTTP 400 si `organization_id` no existe en la BD. |
+| **`TDD-INIT-05`** | `INIT-H02` | Unitaria | `ProjectsRepository.normalizeStatus` | DG-INIT-04 | Normaliza bidireccionalmente `'ACTIVE'` a `'ACTIVO'` y `'CLOSED'` a `'CERRADO'`. |
+| **`TDD-INIT-06`** | `INIT-H02` | Seguridad | Mínimo Privilegio PostgreSQL | RNF-01 | Comprueba que `traceflow_app` no posee permiso `DELETE` sobre tablas de proyectos. |
+| **`TDD-INIT-07`** | `INIT-H03` | Unitaria | `ProjectsService.assignTeamMember` | RF-19, RN-11 (DA-06) | Asigna usuario al proyecto si es miembro activo (`ACTIVE`) de la organización. |
+| **`TDD-INIT-08`** | `INIT-H03` | Negativa | `ProjectsService.assignTeamMember` | RN-11 (DA-06) | Rechaza con HTTP 403 / Trigger error la asignación de usuario externo a la organización. |
+| **`TDD-INIT-09`** | `INIT-H03` | Unitaria | `ProjectMethodologyService.savePlan` | RF-22 | Persiste metodología, fases ordenadas y fechas válidas (`chk_phase_dates`). |
+| **`TDD-INIT-10`** | `INIT-H03` | Integración | `ProjectDeliverableService.linkEcs` | RF-22 | Asocia entregable planificado a un ítem de configuración existente (`associated_ecs_id`). |
+| **`TDD-INIT-11`** | `INIT-H04` | Unitaria | `GitHubCryptoService` | RNF-01 | Cifra y descifra con AES-256-GCM verificando autenticidad (auth tag). |
+| **`TDD-INIT-12`** | `INIT-H04` | Unitaria | `GitHubAppClientService.getInstallationToken` | DA-03 | Genera token temporal en memoria vía JWT RS256 sin escribir en la BD. |
+| **`TDD-INIT-13`** | `INIT-H04` | Unitaria | `GitHubAppClientService.linkRepo` | RF-21, DA-03 | Valida permisos en repositorio remoto existente y retorna `VALIDATED`. |
+| **`TDD-INIT-14`** | `INIT-H04` | Unitaria | `GitHubAppClientService.createRepo` | RF-21, DA-03 | Aprovisiona repositorio remoto en organización GitHub e inicializa ramas. |
+| **`TDD-INIT-15`** | `INIT-H04` | Integración | `GitHubWebhookController` | RNF-01 | Valida firma HMAC-SHA256 (`X-Hub-Signature-256`) y rechaza payload alterado con HTTP 401. |
+| **`TDD-INIT-16`** | `INIT-H04` | Integración | `GitHubWebhookController.idempotency` | RNF-03 | Descarta entregas duplicadas evaluando `X-GitHub-Delivery` sin reprocesar. |
+| **`TDD-INIT-17`** | `INIT-H05` | UI / Store | `ProjectWizardStore.autoSave` | RF-20, RN-14 (DA-05) | Persiste avance parcial de pasos en `project_setup.draft_payload`. |
+| **`TDD-INIT-18`** | `INIT-H05` | Integración | `ProjectLifecycleService.activate` | RF-23, RN-12 (DA-04) | Activa proyecto formalmente cuando GitHub está `VALIDATED` y roles cubiertos. |
+| **`TDD-INIT-19`** | `INIT-H05` | Negativa | `ProjectLifecycleService.activate` | RN-12 (DA-04) | Rechaza activación con HTTP 412 si la integración GitHub no está validada. |
+| **`TDD-INIT-20`** | `INIT-H05` | Integración | `ProjectActiveGuard` + `RfcsController` | RN-13 (DA-04) | Bloquea creación de RFC (HTTP 412) en proyecto en `BORRADOR` o `HISTORICO_PENDIENTE_GITHUB`. |
+| **`TDD-INIT-21`** | `INIT-H05` | Integración | `ProjectActiveGuard` + `RfcsController` | RN-13 (DA-04) | Permite creación de RFC cuando el proyecto se encuentra en estado `ACTIVO`. |
+| **`TDD-INIT-22`** | `INIT-H05` | E2E | Regularización Proyectos Históricos | DA-03, DA-04 | Vincula explícitamente repositorio dedicado a `PRJ-001` y promueve a `ACTIVO`. |
+| **`TDD-INIT-23`** | `INIT-H06` | E2E | Ciclo de Vida Completo | DG-INIT-04 | Flujo: `BORRADOR` $\rightarrow$ `EN_CONFIGURACION` $\rightarrow$ `PENDIENTE_VALIDACION` $\rightarrow$ `ACTIVO` $\rightarrow$ `SUSPENDIDO` $\rightarrow$ `ACTIVO` $\rightarrow$ `CERRADO` $\rightarrow$ `ARCHIVADO`. |
+| **`TDD-INIT-24`** | `INIT-H06` | Regresión | `AuditService.logEvent` | RF-17, RNF-03 | Verifica encadenamiento SHA-256 (`append_audit_log`) en todas las transiciones. |
+| **`TDD-INIT-25`** | `INIT-H06` | Regresión | Expedientes y Líneas Base Históricas | Zero Data Loss | Verifica que consultas sobre RFCs y ECS preexistentes operen al 100% sin alteraciones. |
 
 ---
 
@@ -497,27 +681,27 @@ TO traceflow_app;
 
 | Identificador | Descripción del Riesgo | Impacto | Mitigación Planificada |
 | :--- | :--- | :---: | :--- |
-| **RSK-INIT-01** | *Límites de tasa (Rate Limiting) en GitHub API:* El consumo intensivo de consultas de validación podría agotar la cuota de peticiones. | Medio | Implementación de caché en memoria para metadatos de repositorios y uso de GitHub App (5,000 req/h por instalación). |
+| **RSK-INIT-01** | *Límites de tasa (Rate Limiting) en GitHub API:* El consumo intensivo de consultas de validación podría agotar la cuota de peticiones. | Medio | Implementación de caché en memoria con TTL de 50 minutos para tokens y metadatos de repositorios; cuota GitHub App de 5,000 req/h por instalación. |
 | **RSK-INIT-02** | *Falla de conectividad hacia GitHub durante la activación:* Inestabilidad temporal de red que impida validar el repositorio. | Alto | Reintentos exponenciales con jitter y estado transitorio `PENDIENTE_VALIDACION` con mensaje descriptivo sin bloquear al usuario. |
 | **RSK-INIT-03** | *Desalineación de repositorios renombrados o transferidos:* El repositorio enlazado cambia de nombre o propietario en GitHub. | Medio | Detección mediante webhook de evento `repository` (`action: renamed/transferred`) y actualización automática por `github_repo_id` numérico inmutable. |
-| **RSK-INIT-04** | *Privilegios insuficientes en PostgreSQL (`traceflow_app`):* El usuario de la aplicación no puede escribir en tablas de proyectos. | Alto | Script DDL formal de mínimo privilegio (`GRANT SELECT, INSERT, UPDATE`) preparado para ejecución controlada en INIT-H02. |
+| **RSK-INIT-04** | *Privilegios insuficientes en PostgreSQL (`traceflow_app`):* El usuario de la aplicación no puede escribir en tablas de proyectos. | Alto | Script DDL formal de mínimo privilegio (`GRANT SELECT, INSERT, UPDATE`) preparado para ejecución controlada en `INIT-H02`. |
 | **RSK-INIT-05** | *Conflictos con proyectos preexistentes:* Los proyectos `PRJ-001`..`PRJ-003` carecen de integración GitHub histórica. | Alto | Estrategia de transición con estado `HISTORICO_PENDIENTE_GITHUB`: consulta histórica abierta y regularización obligatoria para nuevos cambios. |
 
 ---
 
 ## 12. Criterios de Aceptación y Estado de Aprobación
 
-### 12.1 Criterios de Aceptación Verificables del Hito INIT-H01
-1. **Auditoría Exhaustiva:** Se documentan con exactitud las brechas del código real frente a la especificación, con matrices de brechas y citas a archivos y líneas de código.
-2. **Cumplimiento de DA-01 a DA-06:** El diseño incorpora de manera estricta todas las decisiones aprobadas sin modificarlas ni omitirlas.
-3. **Modelado Gráfico Completo:** Se generan y compilan los 10 diagramas canónicos (`DG-INIT-01` a `DG-INIT-10`) en formatos SVG y PNG con estricto UTF-8 y legibilidad certificada.
-4. **Diseño de Persistencia Seguro:** Se propone un modelo de datos incremental normalizado con tipos, restricciones y mínimo privilegio, garantizando cero pérdida de datos históricos y sin ejecutar DDL sobre la base real.
-5. **Seguridad y Criptografía:** Se define la arquitectura de integración con GitHub mediante GitHub App, almacenamiento seguro de tokens con AES-256-GCM y validación de webhooks con HMAC-SHA256.
-6. **Estrategia TDD:** Se especifica el catálogo de pruebas y la secuencia estricta de desarrollo guiado por pruebas para el hito ejecutable `INIT-H02`.
-7. **Control de Calidad Documental:** Trazabilidad formal con SRS, SAD, Diccionario de Datos, Glosario, Matriz de Trazabilidad y Estándares de Programación.
+### 12.1 Criterios de Aceptación Verificables del Hito INIT-H01-R
+1. **Subsanación Integral de Observaciones:** Se subsanan las 6 observaciones arquitectónicas de forma completa y coherente con las decisiones `DA-01` a `DA-06`.
+2. **Modelo Canónico de Estados:** Se formaliza la máquina de estados en español con matriz de transiciones permitidas y capa de normalización retroactiva.
+3. **Regularización Histórica No Destructiva:** Se define la política de regularización individual por proyecto, descartando cualquier asociación a `TraceFlow.git`.
+4. **Matriz Oficial de Permisos GitHub:** Se documentan los permisos vigentes por operación y se adopta la generación de tokens bajo demanda sin almacenamiento en BD.
+5. **Integridad Referencial y Mínimo Privilegio:** Se revoca el privilegio `DELETE` de `traceflow_app`, se suprime el estado `INVITED` y se definen disparadores para `DA-06`.
+6. **Reorganización en 5 Hitos:** Se desglosa la implementación en `INIT-H02` a `INIT-H06` y se distribuyen las 25 pruebas TDD al hito correspondiente.
+7. **Consistencia Terminológica y Documental:** Se diferencia con precisión el encadenamiento SHA-256 frente a firmas digitales y se mantiene el estado formal en `PROPUESTO`.
 
 ### 12.2 Estado de Aprobación
-- **Estado del Documento:** CANDIDATO A APROBACIÓN FORMAL (INIT-H01)
+- **Estado del Documento:** PROPUESTO — Pendiente de Aprobación Formal por el Responsable / CCB
 - **Elaborado por:** C-SharkTeam (Arquitectura de Software y Seguridad)
 - **Destinatario para Dictamen:** Responsable del Proyecto / Comité de Control de Cambios (CCB)
-- **Fecha de Cierre H01:** 25 de noviembre de 2026
+- **Fecha de Cierre H01-R:** 25 de noviembre de 2026

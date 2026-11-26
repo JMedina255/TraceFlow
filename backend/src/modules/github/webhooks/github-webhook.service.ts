@@ -33,20 +33,20 @@ export class GitHubWebhookService {
   ) {}
 
   /**
-   * Obtiene el secreto de webhook configurado respetando fail-closed en producción.
+   * Obtiene el secreto de webhook configurado respetando fail-closed.
+   * H04B-R06: Prohibido usar secretos HMAC predeterminados en servicios operativos.
    */
   getWebhookSecret(): string {
     const secret = process.env.GITHUB_WEBHOOK_SECRET;
-    const nodeEnv = process.env.NODE_ENV || 'development';
+    const testSecret = process.env.TEST_GITHUB_WEBHOOK_SECRET;
 
     if (!secret || secret.trim() === '') {
-      if (nodeEnv === 'production') {
-        throw new InternalServerErrorException(
-          '[CONFIG_ERROR] Configuración de seguridad incompleta: GITHUB_WEBHOOK_SECRET ausente en entorno productivo.'
-        );
+      if (testSecret && testSecret.trim() !== '') {
+        return testSecret;
       }
-      // En desarrollo o pruebas locales se admite secreto por defecto si no está definido
-      return 'test-webhook-secret';
+      throw new InternalServerErrorException(
+        '[CONFIG_ERROR] Configuración de seguridad incompleta: GITHUB_WEBHOOK_SECRET ausente.'
+      );
     }
 
     return secret;
@@ -55,6 +55,7 @@ export class GitHubWebhookService {
   /**
    * Valida la firma HMAC-SHA256 del payload crudo contra X-Hub-Signature-256
    * utilizando comparación de tiempo constante (crypto.timingSafeEqual).
+   * H04B-R06: Exige Buffer de cuerpo HTTP original sin reconstrucción por JSON.stringify().
    */
   verifySignature(rawBody: Buffer | string, signatureHeader?: string): boolean {
     if (!signatureHeader || typeof signatureHeader !== 'string') {
@@ -65,18 +66,25 @@ export class GitHubWebhookService {
       return false;
     }
 
+    // Exigir explícitamente Buffer para garantizar exactitud de bytes
+    if (!Buffer.isBuffer(rawBody)) {
+      return false;
+    }
+
     const receivedHex = signatureHeader.substring(7);
     if (!/^[a-fA-F0-9]{64}$/.test(receivedHex)) {
       return false;
     }
 
-    const secret = this.getWebhookSecret();
-    const payloadBuffer = Buffer.isBuffer(rawBody)
-      ? rawBody
-      : Buffer.from(typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody), 'utf8');
+    let secret: string;
+    try {
+      secret = this.getWebhookSecret();
+    } catch {
+      return false;
+    }
 
     const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(payloadBuffer);
+    hmac.update(rawBody);
     const computedHex = hmac.digest('hex');
 
     const computedBuf = Buffer.from(computedHex, 'utf8');
@@ -95,7 +103,8 @@ export class GitHubWebhookService {
   async handleWebhook(
     headers: Record<string, string | string[] | undefined>,
     rawBody: Buffer | string,
-    parsedPayload: any
+    parsedPayload: any,
+    targetProjectId?: string
   ): Promise<WebhookHandlingResult> {
     // Normalizar cabeceras de GitHub (case-insensitive)
     const normalizedHeaders: Record<string, string | undefined> = {};
@@ -109,6 +118,11 @@ export class GitHubWebhookService {
 
     if (!deliveryId || deliveryId.trim() === '') {
       throw new BadRequestException('Cabecera obligatoria X-GitHub-Delivery ausente o vacía.');
+    }
+
+    // H04B-R06: Validar formato del identificador de entrega
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(deliveryId.trim())) {
+      throw new BadRequestException('Formato de cabecera X-GitHub-Delivery inválido.');
     }
 
     if (!eventType || eventType.trim() === '') {
@@ -146,8 +160,8 @@ export class GitHubWebhookService {
       ? Number(parsedPayload.repository.id)
       : null;
 
-    // 4. Mapeo a proyecto de TraceFlow si existe integración activa
-    let projectId: string | null = null;
+    // 4. Mapeo a proyecto de TraceFlow si existe integración activa o contexto de ruta
+    let projectId: string | null = targetProjectId || null;
     if (githubRepoId) {
       const integration = await this.githubRepo.findActiveByRepoId(githubRepoId);
       if (integration) {
@@ -191,11 +205,12 @@ export class GitHubWebhookService {
       this.logger.warn(`Error no fatal registrando auditoría de webhook: ${auditErr}`);
     }
 
-    // 7. Disparar procesamiento asíncrono desacoplado (sin bloquear la respuesta HTTP 202)
+    // 7. H04B-R04: Disparar el trabajador recuperable para procesar eventos pendientes
+    // sin bloquear la respuesta HTTP 202
     this.eventProcessor
-      .processEvent(savedEvent)
+      .triggerWorker()
       .catch((err) => {
-        this.logger.error(`Error en procesamiento asíncrono del evento ${savedEvent.id}: ${err.message}`);
+        this.logger.error(`Error no fatal disparando trabajador de eventos: ${err.message}`);
       });
 
     return {

@@ -7,8 +7,10 @@ import type {
   OrganizationGitHubInstallationEntity,
   GitHubEventEntity,
   GitHubEventProcessingStatus,
+  GitHubEventCorrelationStatus,
   ConfigItemPathHistoryEntity,
   ConfigItemPathHistoryChangeType,
+  ConfigItemPathHistoryStatus,
 } from './github.entity.js';
 
 @Injectable()
@@ -17,6 +19,52 @@ export class GitHubRepository {
   private mockEvents: GitHubEventEntity[] = [];
   private mockPathHistories: ConfigItemPathHistoryEntity[] = [];
   private mockConfigItems: any[] = [];
+  private mockRfcs: any[] = [
+    {
+      id: 'd0000001-0000-0000-0000-000000000001',
+      code: 'RFC-2026-0001',
+      project_id: 'PRJ-001',
+      status: 'AUTORIZADA',
+      target_ecs_id: 'c0000001-0000-0000-0000-000000000001',
+      requested_by: 'a0000001-0000-0000-0000-000000000001',
+    },
+    {
+      id: 'd0000001-0000-0000-0000-000000000002',
+      code: 'RFC-2026-0002',
+      project_id: 'PRJ-001',
+      status: 'REGISTRADA', // No aprobada
+      target_ecs_id: 'c0000001-0000-0000-0000-000000000001',
+      requested_by: 'a0000001-0000-0000-0000-000000000001',
+    },
+    {
+      id: 'd0000001-0000-0000-0000-000000000003',
+      code: 'RFC-2026-0003',
+      project_id: 'PRJ-002', // Proyecto ajeno
+      status: 'AUTORIZADA',
+      target_ecs_id: 'c0000001-0000-0000-0000-000000000005',
+      requested_by: 'a0000001-0000-0000-0000-000000000004',
+    },
+  ];
+  private mockChangeOrders: any[] = [
+    {
+      id: 'e0000001-0000-0000-0000-000000000001',
+      code: 'ECN-2026-0001',
+      rfc_id: 'd0000001-0000-0000-0000-000000000001',
+      ecs_id: 'c0000001-0000-0000-0000-000000000001',
+      status: 'EMITIDA',
+      issued_by: 'a0000001-0000-0000-0000-000000000001',
+      assigned_developer_id: 'a0000001-0000-0000-0000-000000000002',
+    },
+  ];
+  private mockSyncLocks: any[] = [
+    {
+      id: 'f0000001-0000-0000-0000-000000000001',
+      ecs_id: 'c0000001-0000-0000-0000-000000000001',
+      change_order_id: 'e0000001-0000-0000-0000-000000000001',
+      locked_by: 'a0000001-0000-0000-0000-000000000002',
+      status: 'ACTIVE',
+    },
+  ];
   private mockInstallations: OrganizationGitHubInstallationEntity[] = [
     {
       id: 'inst0001-0000-0000-0000-000000000001',
@@ -461,17 +509,23 @@ export class GitHubRepository {
       github_repo_id: row.github_repo_id ? Number(row.github_repo_id) : null,
       attempts: Number(row.attempts),
       max_attempts: Number(row.max_attempts),
+      correlation_status: row.correlation_status || 'NONE',
+      locked_by: row.locked_by || null,
+      locked_at: row.locked_at ? new Date(row.locked_at).toISOString() : null,
+      lease_expires_at: row.lease_expires_at ? new Date(row.lease_expires_at).toISOString() : null,
     };
   }
 
   private mapPathHistoryRow(row: any): ConfigItemPathHistoryEntity {
     return {
       ...row,
+      applied_to_ecs: Boolean(row.applied_to_ecs),
+      status: row.status || 'PENDING',
     };
   }
 
   // ==========================================================================
-  // H04B — GESTIÓN DE EVENTOS DE WEBHOOKS (traceflow.github_event)
+  // H04B / H04B-R — GESTIÓN DE EVENTOS DE WEBHOOKS (traceflow.github_event)
   // ==========================================================================
   async saveEvent(
     data: {
@@ -483,16 +537,18 @@ export class GitHubRepository {
       projectId?: string | null;
       payload: any;
       status?: GitHubEventProcessingStatus;
+      correlationStatus?: GitHubEventCorrelationStatus;
     },
     client?: pg.PoolClient | null
   ): Promise<GitHubEventEntity> {
     const status = data.status || 'PENDING';
+    const correlationStatus = data.correlationStatus || 'NONE';
     if (this.db.getDatabaseMode() === 'postgres') {
       const sql = `
         INSERT INTO traceflow.github_event (
-          delivery_id, event_type, action, installation_id, github_repo_id, project_id, payload, processing_status
+          delivery_id, event_type, action, installation_id, github_repo_id, project_id, payload, processing_status, correlation_status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7::jsonb, $8
+          $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9
         )
         ON CONFLICT (delivery_id) DO UPDATE SET
           last_attempt_at = NOW()
@@ -507,6 +563,7 @@ export class GitHubRepository {
         data.projectId || null,
         JSON.stringify(data.payload),
         status,
+        correlationStatus,
       ];
       const res = client
         ? await client.query(sql, params)
@@ -530,8 +587,12 @@ export class GitHubRepository {
       project_id: data.projectId || null,
       payload: data.payload,
       processing_status: status,
+      correlation_status: correlationStatus,
       attempts: 0,
       max_attempts: 3,
+      locked_by: null,
+      locked_at: null,
+      lease_expires_at: null,
       last_attempt_at: null,
       processed_at: null,
       error_message: null,
@@ -571,6 +632,113 @@ export class GitHubRepository {
     return this.mockEvents.find((e) => e.id === id) || null;
   }
 
+  /**
+   * H04B-R04: Reclamo transaccional seguro de eventos utilizando FOR UPDATE SKIP LOCKED
+   * con control de lease / tiempo de expiración y concurrencia garantizada.
+   */
+  async claimEvents(
+    workerId: string,
+    limit: number = 10,
+    leaseDurationSeconds: number = 30,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        WITH claimable AS (
+          SELECT id
+          FROM traceflow.github_event
+          WHERE (processing_status = 'PENDING' AND attempts < max_attempts)
+             OR (processing_status = 'PROCESSING' AND lease_expires_at < NOW() AND attempts < max_attempts)
+          ORDER BY created_at ASC
+          LIMIT $1
+          FOR UPDATE SKIP LOCKED
+        )
+        UPDATE traceflow.github_event e
+        SET processing_status = 'PROCESSING',
+            locked_by = $2,
+            locked_at = NOW(),
+            lease_expires_at = NOW() + ($3 || ' seconds')::interval,
+            attempts = e.attempts + 1,
+            last_attempt_at = NOW()
+        FROM claimable
+        WHERE e.id = claimable.id
+        RETURNING e.*;
+      `;
+      const res = client
+        ? await client.query(sql, [limit, workerId, leaseDurationSeconds])
+        : await this.db.query<GitHubEventEntity>(sql, [limit, workerId, leaseDurationSeconds]);
+      return res.rows.map((r) => this.mapEventRow(r));
+    }
+
+    const now = Date.now();
+    const claimable = this.mockEvents
+      .filter((e) => {
+        const isPending = e.processing_status === 'PENDING' && e.attempts < e.max_attempts && !e.locked_by;
+        const isAbandoned =
+          e.processing_status === 'PROCESSING' &&
+          Boolean(e.lease_expires_at) &&
+          new Date(e.lease_expires_at!).getTime() < now &&
+          e.attempts < e.max_attempts;
+        return isPending || isAbandoned;
+      })
+      .slice(0, limit);
+
+    const leaseExpiry = new Date(now + leaseDurationSeconds * 1000).toISOString();
+    for (const e of claimable) {
+      e.processing_status = 'PROCESSING';
+      e.locked_by = workerId;
+      e.locked_at = new Date(now).toISOString();
+      e.lease_expires_at = leaseExpiry;
+      e.attempts += 1;
+      e.last_attempt_at = new Date(now).toISOString();
+    }
+    return claimable;
+  }
+
+  /**
+   * H04B-R04: Liberación segura del evento tras completarlo o registrar fallo final.
+   */
+  async releaseEvent(
+    id: string,
+    status: GitHubEventProcessingStatus,
+    errorMessage?: string | null,
+    correlationStatus?: GitHubEventCorrelationStatus,
+    client?: pg.PoolClient | null
+  ): Promise<GitHubEventEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const processedAtClause = status === 'PROCESSED' ? ', processed_at = NOW()' : '';
+      const sql = `
+        UPDATE traceflow.github_event
+        SET processing_status = $2,
+            error_message = $3,
+            correlation_status = COALESCE($4, correlation_status),
+            locked_by = NULL,
+            lease_expires_at = NULL
+            ${processedAtClause}
+        WHERE id = $1
+        RETURNING *;
+      `;
+      const res = client
+        ? await client.query(sql, [id, status, errorMessage || null, correlationStatus || null])
+        : await this.db.query<GitHubEventEntity>(sql, [id, status, errorMessage || null, correlationStatus || null]);
+      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
+    }
+
+    const item = this.mockEvents.find((e) => e.id === id);
+    if (!item) return null;
+    item.processing_status = status;
+    item.error_message = errorMessage || null;
+    if (correlationStatus) {
+      item.correlation_status = correlationStatus;
+    }
+    item.locked_by = null;
+    item.lease_expires_at = null;
+    if (status === 'PROCESSED') {
+      item.processed_at = new Date().toISOString();
+    }
+    return item;
+  }
+
   async findPendingEvents(
     limit: number = 10,
     client?: pg.PoolClient | null
@@ -599,30 +767,7 @@ export class GitHubRepository {
     errorMessage?: string | null,
     client?: pg.PoolClient | null
   ): Promise<GitHubEventEntity | null> {
-    if (this.db.getDatabaseMode() === 'postgres') {
-      const processedAtClause = status === 'PROCESSED' ? ', processed_at = NOW()' : '';
-      const sql = `
-        UPDATE traceflow.github_event
-        SET processing_status = $2,
-            error_message = $3
-            ${processedAtClause}
-        WHERE id = $1
-        RETURNING *;
-      `;
-      const res = client
-        ? await client.query(sql, [id, status, errorMessage || null])
-        : await this.db.query<GitHubEventEntity>(sql, [id, status, errorMessage || null]);
-      return res.rows[0] ? this.mapEventRow(res.rows[0]) : null;
-    }
-
-    const item = this.mockEvents.find((e) => e.id === id);
-    if (!item) return null;
-    item.processing_status = status;
-    item.error_message = errorMessage || null;
-    if (status === 'PROCESSED') {
-      item.processed_at = new Date().toISOString();
-    }
-    return item;
+    return this.releaseEvent(id, status, errorMessage, undefined, client);
   }
 
   async incrementEventAttempts(
@@ -636,6 +781,8 @@ export class GitHubRepository {
         SET attempts = attempts + 1,
             last_attempt_at = NOW(),
             error_message = $2,
+            locked_by = NULL,
+            lease_expires_at = NULL,
             processing_status = CASE WHEN attempts + 1 >= max_attempts THEN 'FAILED' ELSE 'PENDING' END
         WHERE id = $1
         RETURNING *;
@@ -651,6 +798,8 @@ export class GitHubRepository {
     item.attempts += 1;
     item.last_attempt_at = new Date().toISOString();
     item.error_message = errorMessage || null;
+    item.locked_by = null;
+    item.lease_expires_at = null;
     if (item.attempts >= item.max_attempts) {
       item.processing_status = 'FAILED';
     } else {
@@ -660,7 +809,7 @@ export class GitHubRepository {
   }
 
   // ==========================================================================
-  // H04B — HISTORIAL DE RUTAS DE ECS (traceflow.config_item_path_history)
+  // H04B / H04B-R — HISTORIAL DE RUTAS DE ECS (traceflow.config_item_path_history)
   // ==========================================================================
   async recordPathChange(
     data: {
@@ -670,16 +819,27 @@ export class GitHubRepository {
       newPath: string;
       changeType: ConfigItemPathHistoryChangeType;
       gitCommitSha: string;
+      appliedToEcs?: boolean;
+      status?: ConfigItemPathHistoryStatus;
     },
     client?: pg.PoolClient | null
   ): Promise<ConfigItemPathHistoryEntity> {
+    const applied = Boolean(data.appliedToEcs);
+    const status = data.status || (applied ? 'APPLIED' : 'PENDING');
+    const appliedAt = applied ? new Date().toISOString() : null;
+
     if (this.db.getDatabaseMode() === 'postgres') {
       const sql = `
         INSERT INTO traceflow.config_item_path_history (
-          config_item_id, project_id, old_path, new_path, change_type, git_commit_sha
+          config_item_id, project_id, old_path, new_path, change_type, git_commit_sha,
+          applied_to_ecs, applied_at, status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6
+          $1, $2, $3, $4, $5, $6, $7, $8, $9
         )
+        ON CONFLICT (config_item_id, git_commit_sha, change_type) DO UPDATE SET
+          applied_to_ecs = EXCLUDED.applied_to_ecs,
+          applied_at = COALESCE(EXCLUDED.applied_at, traceflow.config_item_path_history.applied_at),
+          status = EXCLUDED.status
         RETURNING *;
       `;
       const params = [
@@ -689,11 +849,27 @@ export class GitHubRepository {
         data.newPath,
         data.changeType,
         data.gitCommitSha,
+        applied,
+        appliedAt,
+        status,
       ];
       const res = client
         ? await client.query(sql, params)
         : await this.db.query<ConfigItemPathHistoryEntity>(sql, params);
       return this.mapPathHistoryRow(res.rows[0]);
+    }
+
+    const existing = this.mockPathHistories.find(
+      (h) =>
+        h.config_item_id === data.configItemId &&
+        h.git_commit_sha === data.gitCommitSha &&
+        h.change_type === data.changeType
+    );
+    if (existing) {
+      existing.applied_to_ecs = applied;
+      existing.applied_at = appliedAt || existing.applied_at;
+      existing.status = status;
+      return existing;
     }
 
     const entity: ConfigItemPathHistoryEntity = {
@@ -704,6 +880,9 @@ export class GitHubRepository {
       new_path: data.newPath,
       change_type: data.changeType,
       git_commit_sha: data.gitCommitSha,
+      applied_to_ecs: applied,
+      applied_at: appliedAt,
+      status,
       detected_at: new Date().toISOString(),
     };
     this.mockPathHistories.push(entity);
@@ -888,6 +1067,393 @@ export class GitHubRepository {
       item.file_path = newPath;
       item.updated_at = new Date().toISOString();
     }
+  }
+
+  // ==========================================================================
+  // H04B-R01 / H04B-R02 — VERIFICACIÓN FORMAL DE GOBERNANZA SCM
+  // ==========================================================================
+  async verifyScmChangeAuthorization(
+    projectId: string,
+    commitSha: string,
+    commitMessage: string,
+    changedFilePaths: string[],
+    authorEmail?: string,
+    client?: pg.PoolClient | null
+  ): Promise<{
+    authorized: boolean;
+    rfcId?: string;
+    rfcCode?: string;
+    changeOrderId?: string;
+    configItemId?: string;
+    reason: string;
+    status: GitHubEventCorrelationStatus;
+  }> {
+    const rfcMatch = commitMessage.match(/\b(RFC-\d{4}-\d{4}|RFC-\d+)\b/i);
+    const ecnMatch = commitMessage.match(/\b(ECN-\d{4}-\d{4}|ECN-\d+)\b/i);
+    const code = (rfcMatch?.[1] || ecnMatch?.[1] || '').toUpperCase();
+
+    if (!code) {
+      return {
+        authorized: false,
+        reason: 'El commit no contiene ninguna referencia identificable a RFC o ECN en su mensaje o metadatos.',
+        status: 'OUT_OF_BAND',
+      };
+    }
+
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        SELECT
+          r.id AS rfc_id,
+          r.code AS rfc_code,
+          r.project_id AS rfc_project_id,
+          p.code AS project_code,
+          r.status AS rfc_status,
+          r.requested_by,
+          r.target_ecs_id,
+          co.id AS change_order_id,
+          co.code AS change_order_code,
+          co.status AS change_order_status,
+          co.assigned_developer_id,
+          ci.id AS config_item_id,
+          ci.code AS config_item_code,
+          ci.file_path AS config_item_file_path,
+          sl.id AS sync_lock_id,
+          sl.status AS sync_lock_status
+        FROM traceflow.change_request r
+        JOIN traceflow.project p ON p.id = r.project_id
+        LEFT JOIN traceflow.change_order co ON co.rfc_id = r.id AND co.status IN ('EMITIDA', 'EN_EJECUCION')
+        LEFT JOIN traceflow.config_item ci ON ci.id = r.target_ecs_id
+        LEFT JOIN traceflow.sync_lock sl ON sl.change_order_id = co.id AND sl.status = 'ACTIVE'
+        WHERE (UPPER(r.code) = $1 OR UPPER(co.code) = $1)
+        LIMIT 1;
+      `;
+      const res = client
+        ? await client.query(sql, [code])
+        : await this.db.query(sql, [code]);
+
+      if (res.rows.length === 0) {
+        return {
+          authorized: false,
+          reason: `La solicitud o expediente SCM referenciado ('${code}') no existe en el sistema.`,
+          status: 'OUT_OF_BAND',
+        };
+      }
+
+      const row = res.rows[0];
+
+      // Comprobar pertenencia al proyecto
+      if (row.rfc_project_id !== projectId && row.project_code !== projectId) {
+        return {
+          authorized: false,
+          rfcId: row.rfc_id,
+          rfcCode: row.rfc_code,
+          reason: `Violación de aislamiento interproyecto: La RFC '${row.rfc_code}' pertenece al proyecto '${row.project_code || row.rfc_project_id}', no al proyecto '${projectId}'.`,
+          status: 'RECHAZADO',
+        };
+      }
+
+      // Comprobar estado formal de aprobación
+      const validStatuses = ['AUTORIZADA', 'ORDEN_EMITIDA', 'EN_EJECUCION', 'EN_IMPLEMENTACION'];
+      if (!validStatuses.includes(row.rfc_status)) {
+        return {
+          authorized: false,
+          rfcId: row.rfc_id,
+          rfcCode: row.rfc_code,
+          reason: `La RFC '${row.rfc_code}' se encuentra en estado '${row.rfc_status}' y no cuenta con aprobación formal para implementación.`,
+          status: 'RECHAZADO',
+        };
+      }
+
+      // Comprobar existencia de Orden de Cambio activa
+      if (!row.change_order_id) {
+        return {
+          authorized: false,
+          rfcId: row.rfc_id,
+          rfcCode: row.rfc_code,
+          reason: `La RFC '${row.rfc_code}' no dispone de una Orden de Cambio (ECN) válida en ejecución para habilitar cambios en el repositorio.`,
+          status: 'PENDIENTE_DE_CORRELACION',
+        };
+      }
+
+      return {
+        authorized: true,
+        rfcId: row.rfc_id,
+        rfcCode: row.rfc_code,
+        changeOrderId: row.change_order_id,
+        configItemId: row.config_item_id,
+        reason: `Cambio validado formalmente contra persistencia SCM (RFC: ${row.rfc_code}, ECN: ${row.change_order_code || row.change_order_id}).`,
+        status: 'AUTORIZADO',
+      };
+    }
+
+    // Modo Mock
+    let matchedRfc = this.mockRfcs.find(
+      (r) =>
+        (r.code?.toUpperCase() === code || r.id === code) &&
+        (r.project_id === projectId || (projectId === 'b0000001-0000-0000-0000-000000000001' && r.project_id === 'PRJ-001'))
+    );
+    let matchedCo = this.mockChangeOrders.find((c) => c.code?.toUpperCase() === code || c.rfc_id === matchedRfc?.id);
+
+    if (!matchedRfc && !matchedCo) {
+      matchedRfc = this.mockRfcs.find((r) => r.code?.toUpperCase() === code || r.id === code);
+      matchedCo = this.mockChangeOrders.find((c) => c.code?.toUpperCase() === code || c.rfc_id === matchedRfc?.id);
+    }
+
+    if (!matchedRfc && !matchedCo) {
+      return {
+        authorized: false,
+        reason: `El expediente SCM '${code}' no existe en la persistencia del sistema.`,
+        status: 'OUT_OF_BAND',
+      };
+    }
+
+    if (!matchedRfc) {
+      matchedRfc = this.mockRfcs.find((r) => r.id === matchedCo?.rfc_id);
+    }
+    if (!matchedRfc) {
+      return {
+        authorized: false,
+        reason: `No se encontró RFC vinculada a la orden '${code}'.`,
+        status: 'OUT_OF_BAND',
+      };
+    }
+
+    const isProjectMatch =
+      matchedRfc.project_id === projectId ||
+      (projectId === 'b0000001-0000-0000-0000-000000000001' && matchedRfc.project_id === 'PRJ-001');
+
+    if (!isProjectMatch) {
+      return {
+        authorized: false,
+        rfcId: matchedRfc.id,
+        rfcCode: matchedRfc.code,
+        reason: `Violación de aislamiento interproyecto: La RFC '${matchedRfc.code}' pertenece a otro proyecto.`,
+        status: 'RECHAZADO',
+      };
+    }
+
+    const validStatuses = ['AUTORIZADA', 'ORDEN_EMITIDA', 'EN_EJECUCION', 'EN_IMPLEMENTACION'];
+    if (!validStatuses.includes(matchedRfc.status)) {
+      return {
+        authorized: false,
+        rfcId: matchedRfc.id,
+        rfcCode: matchedRfc.code,
+        reason: `La RFC '${matchedRfc.code}' no está aprobada (estado: ${matchedRfc.status}).`,
+        status: 'RECHAZADO',
+      };
+    }
+
+    matchedCo = matchedCo || this.mockChangeOrders.find((c) => c.rfc_id === matchedRfc.id && ['EMITIDA', 'EN_EJECUCION'].includes(c.status));
+    if (!matchedCo) {
+      return {
+        authorized: false,
+        rfcId: matchedRfc.id,
+        rfcCode: matchedRfc.code,
+        reason: `La RFC '${matchedRfc.code}' no tiene una orden de cambio activa.`,
+        status: 'PENDIENTE_DE_CORRELACION',
+      };
+    }
+
+    return {
+      authorized: true,
+      rfcId: matchedRfc.id,
+      rfcCode: matchedRfc.code,
+      changeOrderId: matchedCo.id,
+      configItemId: matchedCo.ecs_id || matchedRfc.target_ecs_id,
+      reason: `Cambio validado formalmente contra persistencia SCM (RFC: ${matchedRfc.code}).`,
+      status: 'AUTORIZADO',
+    };
+  }
+
+  // ==========================================================================
+  // H04B-R07 — GESTIÓN DE ACCESOS, REVOCACIONES Y CICLO DE VIDA DE INSTALACIÓN
+  // ==========================================================================
+  async findInstallationByInstallationId(
+    installationId: number,
+    client?: pg.PoolClient | null
+  ): Promise<OrganizationGitHubInstallationEntity | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = 'SELECT * FROM traceflow.organization_github_installation WHERE installation_id = $1 LIMIT 1;';
+      const res = client
+        ? await client.query(sql, [installationId])
+        : await this.db.query(sql, [installationId]);
+      return res.rows[0] ? this.mapInstallationRow(res.rows[0]) : null;
+    }
+
+    return this.mockInstallations.find((i) => i.installation_id === installationId) || null;
+  }
+
+  async updateInstallationStatus(
+    installationId: number,
+    status: 'ACTIVE' | 'SUSPENDED' | 'REVOKED' | 'DELETED',
+    client?: pg.PoolClient | null
+  ): Promise<void> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.organization_github_installation
+        SET status = $2,
+            updated_at = NOW()
+        WHERE installation_id = $1;
+      `;
+      if (client) {
+        await client.query(sql, [installationId, status]);
+      } else {
+        await this.db.query(sql, [installationId, status]);
+      }
+      return;
+    }
+
+    for (const inst of this.mockInstallations) {
+      if (inst.installation_id === installationId) {
+        inst.status = status;
+        inst.updated_at = new Date().toISOString();
+      }
+    }
+  }
+
+  async updateIntegrationsByInstallationId(
+    installationId: number,
+    status: GitHubValidationStatus,
+    errorMessage?: string | null,
+    client?: pg.PoolClient | null
+  ): Promise<string[]> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.github_integration
+        SET validation_status = $2,
+            validation_error_message = $3,
+            updated_at = NOW()
+        WHERE installation_id = $1
+        RETURNING project_id;
+      `;
+      const res = client
+        ? await client.query(sql, [installationId, status, errorMessage || null])
+        : await this.db.query(sql, [installationId, status, errorMessage || null]);
+      return res.rows.map((r: any) => r.project_id);
+    }
+
+    const affected: string[] = [];
+    for (const integ of this.mockIntegrations) {
+      if (integ.installation_id === installationId) {
+        integ.validation_status = status;
+        integ.validation_error_message = errorMessage || null;
+        integ.updated_at = new Date().toISOString();
+        affected.push(integ.project_id);
+      }
+    }
+    return affected;
+  }
+
+  async updateIntegrationStatusByRepoId(
+    repoId: number,
+    status: GitHubValidationStatus,
+    errorMessage?: string | null,
+    client?: pg.PoolClient | null
+  ): Promise<string | null> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.github_integration
+        SET validation_status = $2,
+            validation_error_message = $3,
+            updated_at = NOW()
+        WHERE github_repo_id = $1
+        RETURNING project_id;
+      `;
+      const res = client
+        ? await client.query(sql, [repoId, status, errorMessage || null])
+        : await this.db.query(sql, [repoId, status, errorMessage || null]);
+      return res.rows[0]?.project_id || null;
+    }
+
+    const item = this.mockIntegrations.find((i) => i.github_repo_id === repoId);
+    if (!item) return null;
+    item.validation_status = status;
+    item.validation_error_message = errorMessage || null;
+    item.updated_at = new Date().toISOString();
+    return item.project_id;
+  }
+
+  async setProjectGithubCompleted(
+    projectId: string,
+    completed: boolean,
+    client?: pg.PoolClient | null
+  ): Promise<void> {
+    if (this.db.getDatabaseMode() === 'postgres') {
+      const sql = `
+        UPDATE traceflow.project_setup s
+        SET github_completed = $2,
+            updated_at = NOW()
+        FROM traceflow.project p
+        WHERE (s.project_id = p.id) AND (p.id::text = $1 OR p.code = $1 OR s.project_id::text = $1);
+      `;
+      if (client) {
+        await client.query(sql, [projectId, completed]);
+      } else {
+        await this.db.query(sql, [projectId, completed]);
+      }
+      return;
+    }
+  }
+
+  addMockRfc(rfc: any): void {
+    this.mockRfcs.push(rfc);
+  }
+
+  addMockChangeOrder(order: any): void {
+    this.mockChangeOrders.push(order);
+  }
+
+  addMockSyncLock(lock: any): void {
+    this.mockSyncLocks.push(lock);
+  }
+
+  resetMockScmData(): void {
+    this.mockRfcs = [
+      {
+        id: 'd0000001-0000-0000-0000-000000000001',
+        code: 'RFC-2026-0001',
+        project_id: 'PRJ-001',
+        status: 'AUTORIZADA',
+        target_ecs_id: 'c0000001-0000-0000-0000-000000000001',
+        requested_by: 'a0000001-0000-0000-0000-000000000001',
+      },
+      {
+        id: 'd0000001-0000-0000-0000-000000000002',
+        code: 'RFC-2026-0002',
+        project_id: 'PRJ-001',
+        status: 'REGISTRADA',
+        target_ecs_id: 'c0000001-0000-0000-0000-000000000001',
+        requested_by: 'a0000001-0000-0000-0000-000000000001',
+      },
+      {
+        id: 'd0000001-0000-0000-0000-000000000003',
+        code: 'RFC-2026-0003',
+        project_id: 'PRJ-002',
+        status: 'AUTORIZADA',
+        target_ecs_id: 'c0000001-0000-0000-0000-000000000005',
+        requested_by: 'a0000001-0000-0000-0000-000000000004',
+      },
+    ];
+    this.mockChangeOrders = [
+      {
+        id: 'e0000001-0000-0000-0000-000000000001',
+        code: 'ECN-2026-0001',
+        rfc_id: 'd0000001-0000-0000-0000-000000000001',
+        ecs_id: 'c0000001-0000-0000-0000-000000000001',
+        status: 'EMITIDA',
+        issued_by: 'a0000001-0000-0000-0000-000000000001',
+        assigned_developer_id: 'a0000001-0000-0000-0000-000000000002',
+      },
+    ];
+    this.mockSyncLocks = [
+      {
+        id: 'f0000001-0000-0000-0000-000000000001',
+        ecs_id: 'c0000001-0000-0000-0000-000000000001',
+        change_order_id: 'e0000001-0000-0000-0000-000000000001',
+        locked_by: 'a0000001-0000-0000-0000-000000000002',
+        status: 'ACTIVE',
+      },
+    ];
   }
 
   resetMockEvents(): void {

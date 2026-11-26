@@ -18,7 +18,7 @@ export interface RealDbSetupOptions {
   appPassword?: string;
   database?: string;
   allowDestructiveReset?: boolean;
-  targetMigration?: 'H02' | 'H03' | 'H04A' | 'H04A-R' | 'H04B-PRE' | 'H04B';
+  targetMigration?: 'H02' | 'H03' | 'H04A' | 'H04A-R' | 'H04B-PRE' | 'H04B' | 'H04B-R';
 }
 
 export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
@@ -30,7 +30,7 @@ export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
   appPassword: process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!',
   database: process.env.TEST_DB_NAME || 'traceflow_cert',
   allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
-  targetMigration: 'H04B',
+  targetMigration: 'H04B-R',
 };
 
 export async function resetAndMigrateRealPostgres(
@@ -270,6 +270,20 @@ export async function resetAndMigrateRealPostgres(
       const migH04B = fs.readFileSync(path.join(migrationsDir, '202611260006_init_h04b_webhooks_and_git_sync.sql'), 'utf8');
       await adminDbClient.query(migH04B);
       appliedMigrations.push('202611260006_init_h04b_webhooks_and_git_sync.sql');
+    }
+
+    // Paso 11: Migración INIT-H04B-R (gobernanza, trabajador recuperable, lease e idempotencia)
+    if (
+      opts.targetMigration !== 'H02' &&
+      opts.targetMigration !== 'H03' &&
+      opts.targetMigration !== 'H04A' &&
+      opts.targetMigration !== 'H04A-R' &&
+      opts.targetMigration !== 'H04B-PRE' &&
+      opts.targetMigration !== 'H04B'
+    ) {
+      const migH04BR = fs.readFileSync(path.join(migrationsDir, '202611260007_init_h04b_r_webhooks_governance_and_worker.sql'), 'utf8');
+      await adminDbClient.query(migH04BR);
+      appliedMigrations.push('202611260007_init_h04b_r_webhooks_governance_and_worker.sql');
     }
   } finally {
     await adminDbClient.end();

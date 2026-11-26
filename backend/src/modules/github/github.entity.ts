@@ -69,7 +69,7 @@ export interface OrganizationGitHubInstallationEntity {
   target_id?: number | null;
   permissions: Record<string, string>;
   repository_selection?: 'all' | 'selected';
-  status: 'ACTIVE' | 'SUSPENDED' | 'REVOKED';
+  status: 'ACTIVE' | 'SUSPENDED' | 'REVOKED' | 'DELETED';
   installed_by?: string | null;
   installed_at: string;
   updated_at: string;
@@ -94,6 +94,7 @@ export interface GitHubInstallationDetails {
 // ============================================================================
 
 export type GitHubEventProcessingStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
+export type GitHubEventCorrelationStatus = 'NONE' | 'AUTORIZADO' | 'PENDIENTE_DE_CORRELACION' | 'OUT_OF_BAND' | 'RECHAZADO';
 
 export interface GitHubEventEntity {
   id: string;
@@ -105,8 +106,12 @@ export interface GitHubEventEntity {
   project_id?: string | null;
   payload: any;
   processing_status: GitHubEventProcessingStatus;
+  correlation_status?: GitHubEventCorrelationStatus;
   attempts: number;
   max_attempts: number;
+  locked_by?: string | null;
+  locked_at?: string | null;
+  lease_expires_at?: string | null;
   last_attempt_at?: string | null;
   processed_at?: string | null;
   error_message?: string | null;
@@ -114,6 +119,7 @@ export interface GitHubEventEntity {
 }
 
 export type ConfigItemPathHistoryChangeType = 'RENAME' | 'MOVE' | 'DELETE';
+export type ConfigItemPathHistoryStatus = 'PENDING' | 'APPLIED' | 'REJECTED';
 
 export interface ConfigItemPathHistoryEntity {
   id: string;
@@ -123,6 +129,9 @@ export interface ConfigItemPathHistoryEntity {
   new_path: string;
   change_type: ConfigItemPathHistoryChangeType;
   git_commit_sha: string;
+  applied_to_ecs: boolean;
+  applied_at?: string | null;
+  status: ConfigItemPathHistoryStatus;
   detected_at: string;
 }
 

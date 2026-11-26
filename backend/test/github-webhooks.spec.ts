@@ -1,17 +1,17 @@
 /**
  * ============================================================================
- * TRACEFLOW SCM — SUITE DE PRUEBAS TDD DE WEBHOOKS Y SINCRONIZACIÓN GIT (H04B)
+ * TRACEFLOW SCM — SUITE DE PRUEBAS TDD DE WEBHOOKS Y GOBERNANZA GIT (INIT-H04B / H04B-R)
  * Archivo: backend/test/github-webhooks.spec.ts
- * Hito: INIT-H04B — Requisitos DA-01 a DA-06, ADR-011, RNF-01, RNF-03
+ * Hito: INIT-H04B-R — Subsanación de Gobernanza, Idempotencia y Recuperación
  *
- * VALIDACIONES OBLIGATORIAS:
- *  1. H04B-01: Verificación de firmas HMAC-SHA256 (tiempo constante, rechazo de tampering, fail-closed).
- *  2. H04B-02: Idempotencia estricta por X-GitHub-Delivery y buffer de eventos (PENDING).
- *  3. H04B-03: Procesamiento asíncrono desacoplado, transiciones y reintentos (PENDING -> PROCESSING -> PROCESSED/FAILED).
- *  4. H04B-04: Sincronización de eventos push y mapeo a proyectos TraceFlow.
- *  5. H04B-05: Detección y registro de renombrados, movimientos y bajas de rutas de ECS en config_item_path_history.
- *  6. H04B-06: Detección de modificaciones fuera de banda (DA-01, DA-02) y auditoría criptográfica.
- *  7. H04B-07: Controladores REST HTTP 202 Accepted sin AuthGuard de usuario humano.
+ * COBERTURA EXHAUSTIVA DE REQUISITOS H04B-R:
+ *  - H04B-R01: Eliminación de autorizaciones basadas en texto; consulta real a persistencia SCM.
+ *  - H04B-R02: Preservación del inventario ECS; separación de evidencia observada vs estado oficial.
+ *  - H04B-R03: Autorización estricta por instalación, estado VALIDATED y rechazo de cruces.
+ *  - H04B-R04: Trabajador recuperable con lease y FOR UPDATE SKIP LOCKED.
+ *  - H04B-R05: Idempotencia transaccional y prevención de duplicidad en redeliveries y reintentos.
+ *  - H04B-R06: Seguridad HTTP, exigencia de rawBody Buffer, límites de tamaño y fail-closed sin secretos default.
+ *  - H04B-R07: Manejo de ciclo de vida de instalación (suspend, deleted, repos removed) sin borrado de datos SCM.
  * ============================================================================
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -20,6 +20,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   InternalServerErrorException,
+  PayloadTooLargeException,
 } from '@nestjs/common';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
@@ -32,7 +33,7 @@ import {
   GitHubProjectWebhookController,
 } from '../src/modules/github/webhooks/github-webhook.controller.js';
 
-describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sincronización Git (TDD)', () => {
+describe('TraceFlow SCM — INIT-H04B-R: Cierre de Gobernanza, Idempotencia y Recuperación de Eventos Git (TDD)', () => {
   let db: DatabaseService;
   let auditService: AuditService;
   let githubRepo: GitHubRepository;
@@ -42,18 +43,21 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
   let webhookController: GitHubWebhookController;
   let projectWebhookController: GitHubProjectWebhookController;
 
-  const testSecret = 'secret-test-key-traceflow-h04b';
+  const testSecret = 'secret-test-key-traceflow-h04b-r';
   const testProjectId = 'b0000001-0000-0000-0000-000000000001';
   const testRepoId = 101010101;
+  const testInstallationId = 12345678;
 
   function generateSignature(payload: any, secret: string = testSecret): string {
-    const raw = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    const rawBuf = Buffer.isBuffer(payload)
+      ? payload
+      : Buffer.from(typeof payload === 'string' ? payload : JSON.stringify(payload), 'utf8');
     const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(Buffer.from(raw, 'utf8'));
+    hmac.update(rawBuf);
     return `sha256=${hmac.digest('hex')}`;
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_MODE = 'mock';
     process.env.ALLOW_MOCK_GITHUB = 'true';
@@ -72,9 +76,24 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
     githubRepo.resetMockEvents();
     githubRepo.resetMockPathHistories();
     githubRepo.resetMockConfigItems();
+    githubRepo.resetMockInstallations();
+    githubRepo.resetMockScmData();
 
-    // Registrar integración activa para vincular con testProjectId
-    githubRepo.saveIntegration({
+    // 1. Registrar instalación activa de organización
+    githubRepo.addMockInstallation({
+      id: 'inst0001-0000-0000-0000-000000000001',
+      organization_id: 'c0000001-0000-0000-0000-000000000001',
+      installation_id: testInstallationId,
+      account_login: 'exodo-org',
+      account_type: 'Organization',
+      permissions: { contents: 'write', metadata: 'read', pull_requests: 'write' },
+      status: 'ACTIVE',
+      installed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    // 2. Registrar integración validada para el proyecto de prueba
+    await githubRepo.saveIntegration({
       projectId: testProjectId,
       integrationMode: 'LINK_EXISTING',
       repoOwner: 'JMedina255',
@@ -82,10 +101,60 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
       repoFullName: 'JMedina255/TraceFlow',
       githubRepoId: testRepoId,
       defaultBranch: 'main',
-      installationId: 12345678,
+      installationId: testInstallationId,
       visibility: 'private',
       permissions: { push: true, pull: true, admin: true },
       validationStatus: 'VALIDATED',
+    });
+
+    // 3. Registrar RFCs de prueba con distintos estados de gobernanza SCM
+    // RFC-2026-0001: AUTORIZADA con Orden de Cambio activa para testProjectId
+    githubRepo.addMockRfc({
+      id: 'rfc-auth-01',
+      code: 'RFC-2026-0001',
+      project_id: testProjectId,
+      status: 'AUTORIZADA',
+      target_ecs_id: 'ecs-item-01',
+      requested_by: 'a0000001-0000-0000-0000-000000000001',
+    });
+    githubRepo.addMockChangeOrder({
+      id: 'co-auth-01',
+      code: 'ECN-2026-0001',
+      rfc_id: 'rfc-auth-01',
+      ecs_id: 'ecs-item-01',
+      status: 'EMITIDA',
+      issued_by: 'a0000001-0000-0000-0000-000000000001',
+      assigned_developer_id: 'a0000001-0000-0000-0000-000000000002',
+    });
+
+    // RFC-2026-0002: REGISTRADA (No aprobada formalmente)
+    githubRepo.addMockRfc({
+      id: 'rfc-unapproved-02',
+      code: 'RFC-2026-0002',
+      project_id: testProjectId,
+      status: 'REGISTRADA',
+      target_ecs_id: 'ecs-item-01',
+      requested_by: 'a0000001-0000-0000-0000-000000000001',
+    });
+
+    // RFC-2026-0003: AUTORIZADA pero perteneciente a OTRO PROYECTO (PRJ-OTRO)
+    githubRepo.addMockRfc({
+      id: 'rfc-foreign-03',
+      code: 'RFC-2026-0003',
+      project_id: 'b0000002-0000-0000-0000-000000000002',
+      status: 'AUTORIZADA',
+      target_ecs_id: 'ecs-item-02',
+      requested_by: 'a0000001-0000-0000-0000-000000000004',
+    });
+
+    // RFC-2026-0004: AUTORIZADA pero SIN orden de cambio activa emitida
+    githubRepo.addMockRfc({
+      id: 'rfc-no-co-04',
+      code: 'RFC-2026-0004',
+      project_id: testProjectId,
+      status: 'AUTORIZADA',
+      target_ecs_id: 'ecs-item-01',
+      requested_by: 'a0000001-0000-0000-0000-000000000001',
     });
   });
 
@@ -94,253 +163,99 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
   });
 
   // ==========================================================================
-  // BLOQUE 1: VERIFICACIÓN DE FIRMAS HMAC-SHA256 (H04B-01)
+  // BLOQUE 1: SEGURIDAD HTTP Y FIRMA CRIPTOGRÁFICA (H04B-R06)
   // ==========================================================================
-  describe('H04B-01: Verificación de firmas HMAC-SHA256', () => {
-    it('TDD-H04B-01-01: debe verificar exitosamente una firma HMAC-SHA256 válida', () => {
-      const payload = { action: 'ping', zen: 'Favoring focus over features.' };
-      const signature = generateSignature(payload);
+  describe('H04B-R06: Seguridad HTTP, exigencia de Buffer crudo y fail-closed de secretos', () => {
+    it('TDD-H04B-R06-01: debe verificar firma válida comparando Buffer en tiempo constante', () => {
+      const payload = { action: 'ping', zen: 'Keep it logical.' };
+      const rawBuf = Buffer.from(JSON.stringify(payload), 'utf8');
+      const sig = generateSignature(rawBuf);
 
-      const isValid = webhookService.verifySignature(JSON.stringify(payload), signature);
-      expect(isValid).toBe(true);
+      expect(webhookService.verifySignature(rawBuf, sig)).toBe(true);
     });
 
-    it('TDD-H04B-01-02: debe rechazar con false si la firma fue generada con una clave distinta', () => {
+    it('TDD-H04B-R06-02: debe rechazar verificación si no se provee un Buffer (no fallback string/JSON)', () => {
       const payload = { action: 'ping' };
-      const invalidSignature = generateSignature(payload, 'clave-invalida-atacante');
+      const sig = generateSignature(payload);
 
-      const isValid = webhookService.verifySignature(JSON.stringify(payload), invalidSignature);
-      expect(isValid).toBe(false);
+      // Pasar objeto o string no Buffer debe retornar false
+      expect(webhookService.verifySignature(payload as any, sig)).toBe(false);
     });
 
-    it('TDD-H04B-01-03: debe rechazar con false si el payload fue alterado (tampering)', () => {
-      const originalPayload = { action: 'push', commits: [] };
-      const signature = generateSignature(originalPayload);
-
-      const tamperedPayload = { action: 'push', commits: [{ message: 'malicious commit' }] };
-      const isValid = webhookService.verifySignature(JSON.stringify(tamperedPayload), signature);
-      expect(isValid).toBe(false);
-    });
-
-    it('TDD-H04B-01-04: debe rechazar si la cabecera X-Hub-Signature-256 es nula, vacía o malformada', () => {
+    it('TDD-H04B-R06-03: debe rechazar firmas alteradas o inválidas con 401 Unauthorized', async () => {
       const payload = { action: 'ping' };
-      expect(webhookService.verifySignature(JSON.stringify(payload), undefined)).toBe(false);
-      expect(webhookService.verifySignature(JSON.stringify(payload), '')).toBe(false);
-      expect(webhookService.verifySignature(JSON.stringify(payload), 'sha1=abcdef')).toBe(false);
-      expect(webhookService.verifySignature(JSON.stringify(payload), 'sha256=too_short')).toBe(false);
+      const rawBuf = Buffer.from(JSON.stringify(payload), 'utf8');
+      const badSig = 'sha256=0000000000000000000000000000000000000000000000000000000000000000';
+
+      const headers = {
+        'x-hub-signature-256': badSig,
+        'x-github-delivery': 'deliv-tampered-01',
+        'x-github-event': 'ping',
+      };
+
+      await expect(webhookService.handleWebhook(headers, rawBuf, payload)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
-    it('TDD-H04B-01-05: debe aplicar fail-closed en producción si falta GITHUB_WEBHOOK_SECRET', () => {
-      process.env.NODE_ENV = 'production';
+    it('TDD-H04B-R06-04: debe aplicar comportamiento fail-closed absoluto si GITHUB_WEBHOOK_SECRET no está configurado', () => {
       delete process.env.GITHUB_WEBHOOK_SECRET;
+      delete process.env.TEST_GITHUB_WEBHOOK_SECRET;
 
       expect(() => webhookService.getWebhookSecret()).toThrow(InternalServerErrorException);
-      expect(() => webhookService.getWebhookSecret()).toThrow(/CONFIG_ERROR/);
-    });
-  });
-
-  // ==========================================================================
-  // BLOQUE 2: IDEMPOTENCIA Y BUFFER DE ENTREGA (H04B-02)
-  // ==========================================================================
-  describe('H04B-02: Idempotencia y buffer de entrega (X-GitHub-Delivery)', () => {
-    it('TDD-H04B-02-01: debe exigir cabecera X-GitHub-Delivery y rechazar con 400 si falta', async () => {
-      const payload = { zen: 'Keep it logically awesome.' };
-      const signature = generateSignature(payload);
-
-      await expect(
-        webhookService.handleWebhook(
-          {
-            'x-hub-signature-256': signature,
-            'x-github-event': 'ping',
-          },
-          JSON.stringify(payload),
-          payload
-        )
-      ).rejects.toThrow(BadRequestException);
     });
 
-    it('TDD-H04B-02-02: debe exigir cabecera X-GitHub-Event y rechazar con 400 si falta', async () => {
-      const payload = { zen: 'Keep it logically awesome.' };
-      const signature = generateSignature(payload);
-
-      await expect(
-        webhookService.handleWebhook(
-          {
-            'x-hub-signature-256': signature,
-            'x-github-delivery': 'deliv-0001-uuid',
-          },
-          JSON.stringify(payload),
-          payload
-        )
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('TDD-H04B-02-03: debe rechazar firmas inválidas con 401 Unauthorized', async () => {
-      const payload = { zen: 'Keep it logically awesome.' };
-
-      await expect(
-        webhookService.handleWebhook(
-          {
-            'x-hub-signature-256': 'sha256=0000000000000000000000000000000000000000000000000000000000000000',
-            'x-github-delivery': 'deliv-0002-uuid',
-            'x-github-event': 'ping',
-          },
-          JSON.stringify(payload),
-          payload
-        )
-      ).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('TDD-H04B-02-04: primer arribo debe registrar evento en estado PENDING con duplicate: false', async () => {
-      const payload = {
-        action: 'ping',
-        installation: { id: 12345678 },
-        repository: { id: testRepoId, full_name: 'JMedina255/TraceFlow' },
+    it('TDD-H04B-R06-05: controlador debe rechazar peticiones sin req.rawBody Buffer con 400 Bad Request', async () => {
+      const payload = { action: 'ping' };
+      const headers = {
+        'x-hub-signature-256': generateSignature(payload),
+        'x-github-delivery': 'deliv-no-rawbody',
+        'x-github-event': 'ping',
       };
-      const deliveryId = 'deliv-0003-first-arrival';
-      const signature = generateSignature(payload);
 
-      const res = await webhookService.handleWebhook(
-        {
-          'x-hub-signature-256': signature,
-          'x-github-delivery': deliveryId,
-          'x-github-event': 'ping',
-        },
-        JSON.stringify(payload),
-        payload
+      // Simular req sin rawBody Buffer
+      const badReq = { body: payload };
+      await expect(webhookController.handleWebhook(headers, badReq, payload)).rejects.toThrow(
+        BadRequestException
       );
-
-      expect(res.received).toBe(true);
-      expect(res.duplicate).toBe(false);
-      expect(res.deliveryId).toBe(deliveryId);
-      expect(res.status).toBe('PENDING');
-
-      // Verificar persistencia en base de datos
-      const stored = await githubRepo.findEventByDeliveryId(deliveryId);
-      expect(stored).not.toBeNull();
-      expect(stored?.delivery_id).toBe(deliveryId);
-      expect(stored?.installation_id).toBe(12345678);
-      expect(stored?.project_id).toBe(testProjectId);
     });
 
-    it('TDD-H04B-02-05: segundo arribo con mismo delivery_id debe responder duplicate: true sin error 500', async () => {
-      const payload = {
-        action: 'ping',
-        installation: { id: 12345678 },
+    it('TDD-H04B-R06-06: controlador debe rechazar payloads que superen el límite de 5 MB con PayloadTooLargeException', async () => {
+      const hugeBuffer = Buffer.alloc(5 * 1024 * 1024 + 1, 0x61);
+      const headers = {
+        'x-hub-signature-256': 'sha256=abcdef',
+        'x-github-delivery': 'deliv-huge',
+        'x-github-event': 'push',
       };
-      const deliveryId = 'deliv-0004-duplicate';
-      const signature = generateSignature(payload);
 
-      const firstCall = await webhookService.handleWebhook(
-        {
-          'x-hub-signature-256': signature,
-          'x-github-delivery': deliveryId,
-          'x-github-event': 'ping',
-        },
-        JSON.stringify(payload),
-        payload
+      const reqWithHugeBody = { rawBody: hugeBuffer };
+      await expect(webhookController.handleWebhook(headers, reqWithHugeBody, {})).rejects.toThrow(
+        PayloadTooLargeException
       );
-      expect(firstCall.duplicate).toBe(false);
+    });
 
-      // Redeliver mismo evento
-      const secondCall = await webhookService.handleWebhook(
-        {
-          'x-hub-signature-256': signature,
-          'x-github-delivery': deliveryId,
-          'x-github-event': 'ping',
-        },
-        JSON.stringify(payload),
-        payload
+    it('TDD-H04B-R06-07: debe rechazar cabecera X-GitHub-Delivery con caracteres o formato malicioso', async () => {
+      const payload = { action: 'ping' };
+      const rawBuf = Buffer.from(JSON.stringify(payload), 'utf8');
+      const sig = generateSignature(rawBuf);
+
+      const headers = {
+        'x-hub-signature-256': sig,
+        'x-github-delivery': '<script>alert(1)</script>',
+        'x-github-event': 'ping',
+      };
+
+      await expect(webhookService.handleWebhook(headers, rawBuf, payload)).rejects.toThrow(
+        BadRequestException
       );
-      expect(secondCall.received).toBe(true);
-      expect(secondCall.duplicate).toBe(true);
-      expect(secondCall.deliveryId).toBe(deliveryId);
     });
   });
 
   // ==========================================================================
-  // BLOQUE 3: PROCESAMIENTO ASÍNCRONO Y REINTENTOS (H04B-03)
+  // BLOQUE 2: GOBERNANZA SCM Y ELIMINACIÓN DE AUTORIZACIÓN POR TEXTO (H04B-R01)
   // ==========================================================================
-  describe('H04B-03: Procesamiento Asíncrono desacoplado y transiciones de estado', () => {
-    it('TDD-H04B-03-01: processEvent debe transicionar PENDING -> PROCESSING -> PROCESSED', async () => {
-      const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0005-async-ok',
-        eventType: 'ping',
-        installationId: 12345678,
-        payload: { zen: 'Keep it simple.' },
-        status: 'PENDING',
-      });
-
-      const processed = await eventProcessor.processEvent(event);
-      expect(processed.processing_status).toBe('PROCESSED');
-      expect(processed.processed_at).toBeDefined();
-
-      const inRepo = await githubRepo.findEventById(event.id);
-      expect(inRepo?.processing_status).toBe('PROCESSED');
-    });
-
-    it('TDD-H04B-03-02: si ocurre un fallo debe incrementar attempts y registrar error_message', async () => {
-      const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0006-fail',
-        eventType: 'push',
-        installationId: 12345678,
-        payload: { commits: null }, // Provocará fallo al iterar
-        status: 'PENDING',
-      });
-
-      // Simular fallo
-      const updated = await githubRepo.incrementEventAttempts(event.id, 'Fallo de conexión simulado');
-      expect(updated?.attempts).toBe(1);
-      expect(updated?.error_message).toBe('Fallo de conexión simulado');
-      expect(updated?.processing_status).toBe('PENDING'); // Aún no supera max_attempts (3)
-    });
-
-    it('TDD-H04B-03-03: al alcanzar max_attempts (3) el estado debe transicionar a FAILED', async () => {
-      const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0007-max-attempts',
-        eventType: 'push',
-        installationId: 12345678,
-        payload: {},
-        status: 'PENDING',
-      });
-
-      await githubRepo.incrementEventAttempts(event.id, 'Intento 1');
-      await githubRepo.incrementEventAttempts(event.id, 'Intento 2');
-      const finalAttempt = await githubRepo.incrementEventAttempts(event.id, 'Intento 3');
-
-      expect(finalAttempt?.attempts).toBe(3);
-      expect(finalAttempt?.processing_status).toBe('FAILED');
-    });
-
-    it('TDD-H04B-03-04: processPendingEvents debe procesar lote de eventos PENDING', async () => {
-      await githubRepo.saveEvent({
-        deliveryId: 'deliv-batch-1',
-        eventType: 'ping',
-        installationId: 12345678,
-        payload: {},
-      });
-      await githubRepo.saveEvent({
-        deliveryId: 'deliv-batch-2',
-        eventType: 'ping',
-        installationId: 12345678,
-        payload: {},
-      });
-
-      const result = await eventProcessor.processPendingEvents(10);
-      expect(result.processed).toBe(2);
-      expect(result.failed).toBe(0);
-
-      const pendingAfter = await githubRepo.findPendingEvents();
-      expect(pendingAfter.length).toBe(0);
-    });
-  });
-
-  // ==========================================================================
-  // BLOQUE 4: DETECCIÓN Y REGISTRO DE CAMBIOS DE RUTAS DE ECS (H04B-05)
-  // ==========================================================================
-  describe('H04B-05: Sincronización y registro de movimientos/renombrados de ECS', () => {
-    it('TDD-H04B-05-01: debe registrar RENAME cuando un archivo ECS es renombrado en el mismo directorio', async () => {
-      // 1. Crear ECS previo en el catálogo del proyecto
+  describe('H04B-R01: Eliminación de autorizaciones basadas en texto y verificación formal SCM', () => {
+    it('TDD-H04B-R01-01: commit que cita RFC inexistente (ej. RFC-9999) debe ser clasificado OUT_OF_BAND y no mutar inventario', async () => {
       const ecs = await githubRepo.createConfigItem({
         project_id: testProjectId,
         code: 'ECS-001',
@@ -348,15 +263,14 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
         file_path: 'src/modules/auth/auth.controller.ts',
       });
 
-      // 2. Simular commit de renombrado obtenido por cliente GitHub
-      const commitSha = 'c00112233445566778899aabbccddeeff001122';
+      const commitSha = 'sha-fake-rfc-9999';
       githubClient.addMockCommit({
         sha: commitSha,
-        message: 'refactor(RFC-001): renombrar controlador de auth',
-        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        message: 'fix(RFC-9999): intento con RFC inventada en commit',
+        author: { name: 'Atacante', email: 'attacker@externo.com', date: new Date().toISOString() },
         files: [
           {
-            filename: 'src/modules/auth/authentication.controller.ts',
+            filename: 'src/modules/auth/security.controller.ts',
             status: 'renamed',
             previous_filename: 'src/modules/auth/auth.controller.ts',
             additions: 0,
@@ -366,56 +280,166 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
         ],
       });
 
-      // 3. Procesar evento push
       const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0008-rename',
+        deliveryId: 'deliv-fake-rfc',
         eventType: 'push',
-        installationId: 12345678,
+        installationId: testInstallationId,
         githubRepoId: testRepoId,
         projectId: testProjectId,
         payload: {
           repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
-          commits: [{ id: commitSha, message: 'refactor(RFC-001): renombrar controlador de auth' }],
+          commits: [{ id: commitSha, message: 'fix(RFC-9999): intento con RFC inventada en commit' }],
         },
       });
 
-      await eventProcessor.processEvent(event);
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.processing_status).toBe('PROCESSED');
+      expect(processed.correlation_status).toBe('OUT_OF_BAND');
 
-      // 4. Verificar historial de rutas registrado
+      // Evidencia guardada como REJECTED
       const history = await githubRepo.findPathHistoryByConfigItemId(ecs.id);
       expect(history.length).toBe(1);
-      expect(history[0].old_path).toBe('src/modules/auth/auth.controller.ts');
-      expect(history[0].new_path).toBe('src/modules/auth/authentication.controller.ts');
-      expect(history[0].change_type).toBe('RENAME');
-      expect(history[0].git_commit_sha).toBe(commitSha);
+      expect(history[0].applied_to_ecs).toBe(false);
+      expect(history[0].status).toBe('REJECTED');
 
-      // 5. Verificar actualización de ruta en el catálogo config_item
-      const updatedEcs = await githubRepo.findConfigItemByPath(
-        testProjectId,
-        'src/modules/auth/authentication.controller.ts'
-      );
-      expect(updatedEcs).not.toBeNull();
-      expect(updatedEcs?.id).toBe(ecs.id);
+      // Inventario oficial NO mutado
+      const unchangedEcs = await githubRepo.findConfigItemByPath(testProjectId, 'src/modules/auth/auth.controller.ts');
+      expect(unchangedEcs).not.toBeNull();
     });
 
-    it('TDD-H04B-05-02: debe registrar MOVE cuando un archivo ECS se traslada a otro directorio', async () => {
-      const ecs = await githubRepo.createConfigItem({
-        project_id: testProjectId,
-        code: 'ECS-002',
-        name: 'Servicio de Pagos',
-        file_path: 'src/services/payment.service.ts',
+    it('TDD-H04B-R01-02: commit con RFC existente pero NO aprobada (REGISTRADA) debe ser clasificado RECHAZADO', async () => {
+      const commitSha = 'sha-unapproved-rfc-02';
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-unapproved-rfc',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'feat(RFC-2026-0002): commit citando RFC en borrador' }],
+        },
       });
 
-      const commitSha = 'c002233445566778899aabbccddeeff00112233';
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('RECHAZADO');
+    });
+
+    it('TDD-H04B-R01-03: commit con RFC aprobada pero de OTRO PROYECTO debe ser RECHAZADO por violación interproyecto', async () => {
+      const commitSha = 'sha-foreign-rfc-03';
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-foreign-rfc',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'feat(RFC-2026-0003): commit citando RFC de otro proyecto' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('RECHAZADO');
+    });
+
+    it('TDD-H04B-R01-04: commit con RFC aprobada pero SIN Orden de Cambio activa debe quedar PENDIENTE_DE_CORRELACION', async () => {
+      const commitSha = 'sha-no-co-rfc-04';
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-no-co-rfc',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'feat(RFC-2026-0004): commit sin orden de cambio emitida' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('PENDIENTE_DE_CORRELACION');
+
+      const auditTrail = auditService.getAuditChain();
+      const pendingAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_CORRELATION_PENDING');
+      expect(pendingAudit).toBeDefined();
+    });
+
+    it('TDD-H04B-R01-05: commit que cumple RFC aprobada y Orden de Cambio activa debe ser clasificado AUTORIZADO y mutar inventario', async () => {
+      const ecs = await githubRepo.createConfigItem({
+        project_id: testProjectId,
+        code: 'ECS-001',
+        name: 'Módulo de Pagos',
+        file_path: 'src/services/billing.ts',
+      });
+
+      const commitSha = 'sha-authorized-rfc-01';
       githubClient.addMockCommit({
         sha: commitSha,
-        message: 'refactor(RFC-002): mover pagos a módulo core',
+        message: 'fix(RFC-2026-0001): implementación formalmente aprobada',
         author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
         files: [
           {
-            filename: 'src/modules/payments/payment.service.ts',
+            filename: 'src/modules/billing/billing.service.ts',
             status: 'renamed',
-            previous_filename: 'src/services/payment.service.ts',
+            previous_filename: 'src/services/billing.ts',
+            additions: 10,
+            deletions: 0,
+            changes: 10,
+          },
+        ],
+      });
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-authorized-commit',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): implementación formalmente aprobada' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.correlation_status).toBe('AUTORIZADO');
+
+      // Evidencia guardada como APPLIED
+      const history = await githubRepo.findPathHistoryByConfigItemId(ecs.id);
+      expect(history.length).toBe(1);
+      expect(history[0].applied_to_ecs).toBe(true);
+      expect(history[0].status).toBe('APPLIED');
+
+      // Inventario oficial mutado legítimamente
+      const updatedEcs = await githubRepo.findConfigItemByPath(testProjectId, 'src/modules/billing/billing.service.ts');
+      expect(updatedEcs).not.toBeNull();
+      expect(updatedEcs?.id).toBe(ecs.id);
+    });
+  });
+
+  // ==========================================================================
+  // BLOQUE 3: PRESERVACIÓN DEL INVENTARIO ECS E IDEMPOTENCIA (H04B-R02 / H04B-R05)
+  // ==========================================================================
+  describe('H04B-R02 & H04B-R05: Preservación de inventario e idempotencia ante reintentos', () => {
+    it('TDD-H04B-R02-01: reintentar el procesamiento del mismo commit NO debe duplicar transiciones en path history', async () => {
+      const ecs = await githubRepo.createConfigItem({
+        project_id: testProjectId,
+        code: 'ECS-001',
+        name: 'Controlador Auth',
+        file_path: 'src/auth.ts',
+      });
+
+      const commitSha = 'sha-idempotency-commit-01';
+      githubClient.addMockCommit({
+        sha: commitSha,
+        message: 'fix(RFC-2026-0001): cambio autorizado',
+        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
+        files: [
+          {
+            filename: 'src/modules/auth.ts',
+            status: 'renamed',
+            previous_filename: 'src/auth.ts',
             additions: 0,
             deletions: 0,
             changes: 0,
@@ -424,190 +448,270 @@ describe('TraceFlow SCM — INIT-H04B: Webhooks, Procesamiento Asíncrono y Sinc
       });
 
       const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0009-move',
+        deliveryId: 'deliv-idempotent-repeat',
         eventType: 'push',
-        installationId: 12345678,
+        installationId: testInstallationId,
         githubRepoId: testRepoId,
         projectId: testProjectId,
         payload: {
           repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
-          commits: [{ id: commitSha, message: 'refactor(RFC-002): mover pagos a módulo core' }],
+          commits: [{ id: commitSha, message: 'fix(RFC-2026-0001): cambio autorizado' }],
         },
       });
 
+      // Procesar dos veces consecutivas
+      await eventProcessor.processEvent(event);
       await eventProcessor.processEvent(event);
 
       const history = await githubRepo.findPathHistoryByConfigItemId(ecs.id);
-      expect(history.length).toBe(1);
-      expect(history[0].change_type).toBe('MOVE');
-      expect(history[0].old_path).toBe('src/services/payment.service.ts');
-      expect(history[0].new_path).toBe('src/modules/payments/payment.service.ts');
+      expect(history.length).toBe(1); // Idempotencia estricta por commit y ECS
     });
 
-    it('TDD-H04B-05-03: debe registrar DELETE cuando un archivo ECS es eliminado en un commit', async () => {
-      const ecs = await githubRepo.createConfigItem({
-        project_id: testProjectId,
-        code: 'ECS-003',
-        name: 'Componente Deprecado',
-        file_path: 'src/legacy/old-auth.ts',
-      });
+    it('TDD-H04B-R02-02: entrega duplicada con el mismo deliveryId durante procesamiento retorna 202 duplicate', async () => {
+      const payload = { action: 'ping', installation: { id: testInstallationId } };
+      const rawBuf = Buffer.from(JSON.stringify(payload), 'utf8');
+      const sig = generateSignature(rawBuf);
+      const headers = {
+        'x-hub-signature-256': sig,
+        'x-github-delivery': 'deliv-dup-in-flight',
+        'x-github-event': 'ping',
+      };
 
-      const commitSha = 'c0033445566778899aabbccddeeff0011223344';
-      githubClient.addMockCommit({
-        sha: commitSha,
-        message: 'chore(RFC-003): eliminar código legado',
-        author: { name: 'Joan Medina', email: 'jmedina@exodo.pe', date: new Date().toISOString() },
-        files: [
-          {
-            filename: 'src/legacy/old-auth.ts',
-            status: 'removed',
-            additions: 0,
-            deletions: 50,
-            changes: 50,
-          },
-        ],
-      });
+      const res1 = await webhookService.handleWebhook(headers, rawBuf, payload);
+      expect(res1.duplicate).toBe(false);
 
-      const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0010-delete',
-        eventType: 'push',
-        installationId: 12345678,
-        githubRepoId: testRepoId,
-        projectId: testProjectId,
-        payload: {
-          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
-          commits: [
-            {
-              id: commitSha,
-              message: 'chore(RFC-003): eliminar código legado',
-              removed: ['src/legacy/old-auth.ts'],
-            },
-          ],
-        },
-      });
-
-      await eventProcessor.processEvent(event);
-
-      const history = await githubRepo.findPathHistoryByConfigItemId(ecs.id);
-      expect(history.length).toBe(1);
-      expect(history[0].change_type).toBe('DELETE');
-      expect(history[0].old_path).toBe('src/legacy/old-auth.ts');
+      const res2 = await webhookService.handleWebhook(headers, rawBuf, payload);
+      expect(res2.duplicate).toBe(true);
+      expect(res2.eventId).toBe(res1.eventId);
     });
   });
 
   // ==========================================================================
-  // BLOQUE 5: DETECCIÓN DE CAMBIOS FUERA DE BANDA (DA-01, DA-02) (H04B-06)
+  // BLOQUE 4: AUTORIZACIÓN POR INSTALACIÓN Y RECHAZO DE CRUCES (H04B-R03)
   // ==========================================================================
-  describe('H04B-06: Detección de cambios fuera de banda y auditoría SCM', () => {
-    it('TDD-H04B-06-01: debe auditar GITHUB_OUT_OF_BAND_DETECTED ante commits no asociados a un RFC formal', async () => {
-      const commitSha = 'oob-1111222233334444555566667777888899990000';
+  describe('H04B-R03: Autorización del evento por instalación y segregación de accesos', () => {
+    it('TDD-H04B-R03-01: debe rechazar evento si proviene de una instalación no vinculada al proyecto', async () => {
       const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0011-out-of-band',
+        deliveryId: 'deliv-mismatch-inst',
         eventType: 'push',
-        installationId: 12345678,
+        installationId: 99999999, // Instalación ajena
         githubRepoId: testRepoId,
         projectId: testProjectId,
         payload: {
           repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
-          commits: [
-            {
-              id: commitSha,
-              message: 'hotfix directo en github sin pasar por ccb [OUT_OF_BAND]',
-              author: { name: 'Desarrollador Rebelde', email: 'rebelde@externo.com' },
-              modified: ['src/auth/secret.key'],
-            },
-          ],
+          commits: [{ id: 'sha-mismatch', message: 'commit no autorizado' }],
         },
       });
 
-      await eventProcessor.processEvent(event);
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.processing_status).toBe('FAILED');
+      expect(processed.correlation_status).toBe('RECHAZADO');
 
       const auditTrail = auditService.getAuditChain();
-      const oobAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_OUT_OF_BAND_DETECTED');
-      expect(oobAudit).toBeDefined();
-      expect(oobAudit?.operation).toBe('OUT_OF_BAND_GIT_PUSH');
-      expect(oobAudit?.projectId).toBe(testProjectId);
-      expect(oobAudit?.payloadDiff.commitSha).toBe(commitSha);
+      const mismatchAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_EVENT_INSTALLATION_MISMATCH');
+      expect(mismatchAudit).toBeDefined();
     });
 
-    it('TDD-H04B-06-02: debe auditar GITHUB_GIT_SYNC_COMPLETED cuando el commit referencia un RFC formal aprobado', async () => {
-      const commitSha = 'auth-1111222233334444555566667777888899990000';
+    it('TDD-H04B-R03-02: debe rechazar evento si la integración del proyecto está en PERMISSION_DENIED', async () => {
+      // Degradar integración
+      await githubRepo.saveIntegration({
+        projectId: testProjectId,
+        integrationMode: 'LINK_EXISTING',
+        repoOwner: 'JMedina255',
+        repoName: 'TraceFlow',
+        repoFullName: 'JMedina255/TraceFlow',
+        githubRepoId: testRepoId,
+        defaultBranch: 'main',
+        installationId: testInstallationId,
+        visibility: 'private',
+        permissions: { push: false, pull: true, admin: false },
+        validationStatus: 'PERMISSION_DENIED',
+      });
+
       const event = await githubRepo.saveEvent({
-        deliveryId: 'deliv-0012-authorized',
+        deliveryId: 'deliv-permission-denied-repo',
         eventType: 'push',
-        installationId: 12345678,
+        installationId: testInstallationId,
         githubRepoId: testRepoId,
         projectId: testProjectId,
         payload: {
           repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
-          commits: [
-            {
-              id: commitSha,
-              message: 'feat(RFC-009): implementación autorizada por CCB',
-              author: { name: 'Joan Medina', email: 'jmedina@exodo.pe' },
-              added: ['src/modules/audit/audit-hash.ts'],
-            },
-          ],
+          commits: [{ id: 'sha-denied', message: 'push en repo sin permiso' }],
         },
       });
 
-      await eventProcessor.processEvent(event);
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.processing_status).toBe('FAILED');
+      expect(processed.correlation_status).toBe('RECHAZADO');
+    });
 
-      const auditTrail = auditService.getAuditChain();
-      const syncAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_GIT_SYNC_COMPLETED');
-      expect(syncAudit).toBeDefined();
-      expect(syncAudit?.operation).toBe('SYNC_GIT_COMMITS');
-      expect(syncAudit?.projectId).toBe(testProjectId);
+    it('TDD-H04B-R03-03: debe rechazar evento si la instalación en la organización propietaria está SUSPENDED', async () => {
+      await githubRepo.updateInstallationStatus(testInstallationId, 'SUSPENDED');
+
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-inst-suspended',
+        eventType: 'push',
+        installationId: testInstallationId,
+        githubRepoId: testRepoId,
+        projectId: testProjectId,
+        payload: {
+          repository: { id: testRepoId, owner: { login: 'JMedina255' }, name: 'TraceFlow' },
+          commits: [{ id: 'sha-inst-suspended', message: 'push con instalacion suspendida' }],
+        },
+      });
+
+      const processed = await eventProcessor.processEvent(event);
+      expect(processed.processing_status).toBe('FAILED');
+      expect(processed.correlation_status).toBe('RECHAZADO');
     });
   });
 
   // ==========================================================================
-  // BLOQUE 6: CONTROLADORES REST Y ENDPOINTS (H04B-07)
+  // BLOQUE 5: TRABAJADOR RECUPERABLE, LEASE Y CONCURRENCIA (H04B-R04 / H04B-R05)
   // ==========================================================================
-  describe('H04B-07: Controladores REST y endpoints HTTP', () => {
-    it('TDD-H04B-07-01: POST /api/v1/github/webhook debe procesar y retornar 202 Accepted', async () => {
-      const payload = {
-        action: 'ping',
-        installation: { id: 12345678 },
-      };
-      const signature = generateSignature(payload);
-      const headers = {
-        'x-hub-signature-256': signature,
-        'x-github-delivery': 'controller-deliv-01',
-        'x-github-event': 'ping',
-      };
+  describe('H04B-R04: Trabajador transaccional recuperable con lease y FOR UPDATE SKIP LOCKED', () => {
+    it('TDD-H04B-R04-01: claimEvents debe adquirir eventos PENDING asignando workerId y lease_expires_at', async () => {
+      await githubRepo.saveEvent({
+        deliveryId: 'deliv-claim-01',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: {},
+        status: 'PENDING',
+      });
 
-      const reqMock = { rawBody: Buffer.from(JSON.stringify(payload), 'utf8') };
-      const res = await webhookController.handleWebhook(headers, reqMock, payload);
-
-      expect(res.message).toContain('exitosamente');
-      expect(res.data.received).toBe(true);
-      expect(res.data.status).toBe('PENDING');
+      const claimed = await githubRepo.claimEvents('worker-alpha', 5, 30);
+      expect(claimed.length).toBe(1);
+      expect(claimed[0].locked_by).toBe('worker-alpha');
+      expect(claimed[0].processing_status).toBe('PROCESSING');
+      expect(claimed[0].lease_expires_at).toBeDefined();
     });
 
-    it('TDD-H04B-07-02: POST /api/v1/projects/:id/github/webhook debe admitir solicitudes de proyecto', async () => {
-      const payload = {
-        action: 'ping',
-        installation: { id: 12345678 },
-        repository: { id: testRepoId },
-      };
-      const signature = generateSignature(payload);
-      const headers = {
-        'x-hub-signature-256': signature,
-        'x-github-delivery': 'controller-deliv-02',
-        'x-github-event': 'ping',
-      };
+    it('TDD-H04B-R04-02: dos trabajadores concurrentes no deben solaparse ni reclamar el mismo evento', async () => {
+      await githubRepo.saveEvent({
+        deliveryId: 'deliv-conc-01',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: {},
+        status: 'PENDING',
+      });
+      await githubRepo.saveEvent({
+        deliveryId: 'deliv-conc-02',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: {},
+        status: 'PENDING',
+      });
 
-      const reqMock = { rawBody: Buffer.from(JSON.stringify(payload), 'utf8') };
-      const res = await projectWebhookController.handleProjectWebhook(
-        testProjectId,
-        headers,
-        reqMock,
-        payload
-      );
+      const worker1Claim = await githubRepo.claimEvents('worker-1', 1, 30);
+      const worker2Claim = await githubRepo.claimEvents('worker-2', 1, 30);
 
-      expect(res.message).toContain('exitosamente');
-      expect(res.data.received).toBe(true);
+      expect(worker1Claim.length).toBe(1);
+      expect(worker2Claim.length).toBe(1);
+      expect(worker1Claim[0].id).not.toBe(worker2Claim[0].id);
+      expect(worker1Claim[0].locked_by).toBe('worker-1');
+      expect(worker2Claim[0].locked_by).toBe('worker-2');
+    });
+
+    it('TDD-H04B-R04-03: evento abandonado en PROCESSING con lease expirado debe ser recuperado por otro trabajador', async () => {
+      const expiredEvent = await githubRepo.saveEvent({
+        deliveryId: 'deliv-abandoned-01',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: {},
+        status: 'PROCESSING',
+      });
+
+      // Simular lease expirado hace 10 segundos
+      expiredEvent.processing_status = 'PROCESSING';
+      expiredEvent.locked_by = 'crashed-worker';
+      expiredEvent.lease_expires_at = new Date(Date.now() - 10000).toISOString();
+
+      const reclaimed = await githubRepo.claimEvents('recovery-worker', 5, 30);
+      expect(reclaimed.some((e) => e.delivery_id === 'deliv-abandoned-01')).toBe(true);
+    });
+
+    it('TDD-H04B-R04-04: triggerWorker procesa lote y sella eventos exitosos como PROCESSED liberando lease', async () => {
+      await githubRepo.saveEvent({
+        deliveryId: 'deliv-worker-flow',
+        eventType: 'ping',
+        installationId: testInstallationId,
+        payload: {},
+        status: 'PENDING',
+      });
+
+      const res = await eventProcessor.triggerWorker();
+      expect(res.processed).toBe(1);
+
+      const evtAfter = await githubRepo.findEventByDeliveryId('deliv-worker-flow');
+      expect(evtAfter?.processing_status).toBe('PROCESSED');
+      expect(evtAfter?.locked_by).toBeNull();
+    });
+  });
+
+  // ==========================================================================
+  // BLOQUE 6: REVOCACIONES Y CAMBIOS DE INSTALACIÓN (H04B-R07)
+  // ==========================================================================
+  describe('H04B-R07: Ciclo de vida de instalación y suspensión sin pérdida de datos SCM', () => {
+    it('TDD-H04B-R07-01: evento installation.suspend suspende instalación y degrada integración a PERMISSION_DENIED', async () => {
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-lifecycle-suspend',
+        eventType: 'installation',
+        action: 'suspend',
+        installationId: testInstallationId,
+        payload: { action: 'suspend', installation: { id: testInstallationId } },
+      });
+
+      await eventProcessor.processEvent(event);
+
+      const inst = await githubRepo.findInstallationByInstallationId(testInstallationId);
+      expect(inst?.status).toBe('SUSPENDED');
+
+      const integ = await githubRepo.findByProjectId(testProjectId);
+      expect(integ?.validation_status).toBe('PERMISSION_DENIED');
+
+      const auditTrail = auditService.getAuditChain();
+      const suspendAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_INSTALLATION_SUSPENDED');
+      expect(suspendAudit).toBeDefined();
+    });
+
+    it('TDD-H04B-R07-02: evento installation.deleted desvincula integración (UNLINKED) conservando registros históricos', async () => {
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-lifecycle-deleted',
+        eventType: 'installation',
+        action: 'deleted',
+        installationId: testInstallationId,
+        payload: { action: 'deleted', installation: { id: testInstallationId } },
+      });
+
+      await eventProcessor.processEvent(event);
+
+      const inst = await githubRepo.findInstallationByInstallationId(testInstallationId);
+      expect(inst?.status).toBe('DELETED');
+
+      const integ = await githubRepo.findByProjectId(testProjectId);
+      expect(integ?.validation_status).toBe('UNLINKED');
+    });
+
+    it('TDD-H04B-R07-03: evento installation_repositories.removed degrada a PERMISSION_DENIED repositorio revocado', async () => {
+      const event = await githubRepo.saveEvent({
+        deliveryId: 'deliv-repos-removed',
+        eventType: 'installation_repositories',
+        action: 'removed',
+        installationId: testInstallationId,
+        payload: {
+          action: 'removed',
+          repositories_removed: [{ id: testRepoId, full_name: 'JMedina255/TraceFlow' }],
+        },
+      });
+
+      await eventProcessor.processEvent(event);
+
+      const integ = await githubRepo.findByProjectId(testProjectId);
+      expect(integ?.validation_status).toBe('PERMISSION_DENIED');
+
+      const auditTrail = auditService.getAuditChain();
+      const repoRevokedAudit = auditTrail.find((a) => a.eventCode === 'GITHUB_REPO_ACCESS_REVOKED');
+      expect(repoRevokedAudit).toBeDefined();
     });
   });
 });

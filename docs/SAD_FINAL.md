@@ -253,6 +253,39 @@ Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`]
   2. **13 pruebas físicas** en `real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real.
   3. **Cobertura Total Consolidada:** 166 pruebas unitarias backend, 70 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**333 pruebas consolidadas en verde**).
 
+## 37. Gobernanza, Idempotencia y Recuperación de Eventos Git (INIT-H04B-R)
+- **Desacoplamiento Estricto entre Mensajes Git y Autorización SCM (H04B-R01):**
+  1. Se eliminó la validación laxa por patrones de texto (`RFC-123`, `ECN-123`) en los mensajes de commit como mecanismo de autorización directa.
+  2. La autorización formal exige verificar la existencia física de la solicitud en `traceflow.change_request`, comprobar que pertenezca al `project_id` del repositorio, validar que su estado sea formalmente aprobado (`AUTORIZADA`, `ORDEN_EMITIDA`, `EN_EJECUCION`, `EN_IMPLEMENTACION`), y confirmar la existencia de una orden de cambio activa en `traceflow.change_order` con segregación de funciones (SoD).
+  3. Los commits sin expediente o no autorizados se clasifican como `PENDIENTE_DE_CORRELACION` u `OUT_OF_BAND`, impidiendo mutaciones canónicas en el inventario.
+- **Preservación Canónica del Inventario ECS (H04B-R02):**
+  1. Separación física y probatoria entre el estado canónico oficial (`traceflow.config_item`) y la evidencia observada en el árbol de Git (`traceflow.config_item_path_history`).
+  2. Todo cambio de ruta no autorizado o fuera de banda se registra con `applied_to_ecs = false` y `status = 'PENDING' | 'REJECTED'`, manteniendo inmutable el atributo `file_path` oficial del ECS.
+- **Autorización por Instalación y Repositorio (H04B-R03):**
+  1. Resolución unívoca de la integración mediante `github_repo_id`, exigiendo estado operativo `VALIDATED`.
+  2. Comparación estricta entre el `installation_id` del evento y el registrado en la integración del proyecto.
+  3. Comprobación obligatoria de estado `ACTIVE` en `traceflow.organization_github_installation`. Cualquier discrepancia o suspensión marca el evento como `FAILED` con auditoría de seguridad y rechazo sin procesamiento SCM.
+- **Trabajador Persistente Concurrente con Lease Transaccional (H04B-R04):**
+  1. Reemplazo del procesador en memoria desacoplado por un trabajador transaccional persistente basado en `FOR UPDATE SKIP LOCKED`.
+  2. Atributos de lease en `traceflow.github_event`: `locked_by VARCHAR(100)`, `locked_at TIMESTAMPTZ`, `lease_expires_at TIMESTAMPTZ`, e índice optimizado `idx_github_event_claimable`.
+  3. Mecanismo de auto-recuperación de eventos abandonados con lease expirado (`lease_expires_at < NOW()`) y reanudación automática al iniciar el módulo NestJS (`OnModuleInit`).
+- **Idempotencia Transicional de Rutas (H04B-R05):**
+  1. Creación del índice único `uq_cip_history_commit_ecs_change` sobre `(config_item_id, git_commit_sha, change_type)`.
+  2. Las entregas repetidas o reintentos se gestionan mediante `ON CONFLICT DO UPDATE`, asegurando convergencia y evitando colisiones de clave única o errores HTTP 500.
+- **Seguridad Perimetral HTTP y Validación Binaria (H04B-R06):**
+  1. Exigencia de `req.rawBody` Buffer nativo para el cómputo HMAC-SHA256, prohibiendo conversiones intermedias vía `JSON.stringify()`.
+  2. Límite estricto de tamaño de payload de 5MB con excepción controlada `PayloadTooLargeException`.
+  3. Validación de formato de `X-GitHub-Delivery` mediante regex `/^[a-zA-Z0-9_-]{1,128}$/`.
+  4. Política fail-closed absoluta ante la ausencia de secretos en entornos no autorizados.
+- **Gestión Integral de Revocaciones de GitHub (H04B-R07):**
+  1. Procesamiento transaccional de eventos `installation` (`suspend`, `deleted`, `unsuspend`) e `installation_repositories` (`removed`, `added`).
+  2. Ante suspensión o revocación, el estado de la integración conmuta a `PERMISSION_DENIED` y `project_setup.github_completed = false`, suspendiendo sincronizaciones activas sin destruir expedientes históricos ni configuraciones de proyecto.
+- **Salvaguardas de Rollback y Cobertura Física Certificada:**
+  1. Script `202611260007_init_h04b_r_webhooks_governance_and_worker_rollback.sql` con protección contra reversiones en presencia de eventos en procesamiento (`locked_by IS NOT NULL` o `status = 'PROCESSING'`), admitiendo forzado deliberado con `SET LOCAL traceflow.allow_force_h04_rollback = 'true'`.
+  2. **17 pruebas físicas** en `real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real.
+  3. **24 pruebas unitarias** en `github-webhooks.spec.ts` certificando todos los requisitos de gobernanza.
+  4. **Cobertura Total Consolidada:** 169 pruebas unitarias backend, 74 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**340 pruebas consolidadas en verde**), con 0 errores de compilación `tsc --noEmit`.
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B / INIT-H04B-R — C-SharkTeam / ÉXODO S.A.C.*

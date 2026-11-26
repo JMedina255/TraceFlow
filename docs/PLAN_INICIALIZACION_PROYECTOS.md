@@ -842,6 +842,18 @@ flowchart LR
   - **Salvaguardas de Rollback y Mínimo Privilegio:** Script `202611260006_..._rollback.sql` blindado con bloqueo de seguridad PITR ante registros operativos. Mínimo privilegio para `traceflow_app` (SELECT, INSERT, UPDATE; DELETE revocado).
   - **Certificación Integral:** 21 pruebas unitarias TDD y 13 pruebas físicas en PostgreSQL 16 real 100% aprobadas (total **70/70 pruebas en la suite de certificación física**, **166/166 unitarias backend**, **333 consolidadas en verde**).
 
+#### Hito INIT-H04B-R — Cierre de Gobernanza, Idempotencia y Recuperación de Eventos Git (Completado y Certificado)
+- **Alcance Técnico Ejecutado y Certificado:**
+  - **Eliminación de Autorizaciones por Mensaje Git (H04B-R01):** Validación formal contra persistencia SCM (`traceflow.change_request`, `traceflow.change_order`, `traceflow.sync_lock`). Commits no autorizados o sin expediente formal aprobado son clasificados como `PENDIENTE_DE_CORRELACION` u `OUT_OF_BAND`, prohibiendo mutaciones por coincidencia textual.
+  - **Preservación Canónica del Inventario ECS (H04B-R02):** Separación física entre la evidencia observada en Git (`config_item_path_history`) y el estado canónico oficial (`config_item`). Los eventos no respaldados no mutan `file_path` y se registran como `applied_to_ecs = false` y `status = 'PENDING' | 'REJECTED'`.
+  - **Autorización Estricta de Eventos (H04B-R03):** Coincidencia obligatoria de `installation_id` del evento con la integración y comprobación de estado `ACTIVE` en `traceflow.organization_github_installation`. Eventos anómalos quedan registrados como `FAILED` con auditoría de seguridad.
+  - **Trabajador Transaccional Concurrente con Lease (H04B-R04):** Adquisición atómica de lotes con `FOR UPDATE SKIP LOCKED`, columnas `locked_by`, `locked_at` y `lease_expires_at`, e índice `idx_github_event_claimable`. Recuperación automática de eventos huérfanos con lease expirado tras fallos o reinicio de la aplicación (`OnModuleInit`).
+  - **Idempotencia Transicional de Rutas (H04B-R05):** Índice único `uq_cip_history_commit_ecs_change (config_item_id, git_commit_sha, change_type)` y resolución de reentregas mediante `ON CONFLICT DO UPDATE`.
+  - **Seguridad Perimetral HTTP y Cómputo Binario (H04B-R06):** Validación de firmas HMAC-SHA256 con `req.rawBody` Buffer, límite estricto de 5MB, validación regex de `X-GitHub-Delivery`, y fail-closed absoluto ante ausencia de secretos.
+  - **Gestión Integral de Revocaciones (H04B-R07):** Recepción de eventos `installation` (`suspend`, `deleted`, `unsuspend`) e `installation_repositories` (`removed`, `added`), degradando el estado a `PERMISSION_DENIED` y `project_setup.github_completed = false` sin destruir expedientes históricos.
+  - **Salvaguardas de Rollback y Mínimo Privilegio:** Script `202611260007_init_h04b_r_webhooks_governance_and_worker_rollback.sql` con bloqueo PITR ante eventos bloqueados o en procesamiento (`status = 'PROCESSING'`), con bypass deliberado `traceflow.allow_force_h04_rollback = 'true'`.
+  - **Certificación Integral:** 24 pruebas unitarias TDD en `github-webhooks.spec.ts` y 17 pruebas físicas en `real-postgres-h04b-certification.spec.ts` 100% aprobadas (**74/74 pruebas en la suite física de PostgreSQL 16**, **169/169 unitarias backend**, **97/97 frontend** = **340 pruebas consolidadas en verde**, con 0 errores `tsc --noEmit`). Persistencia productiva en pausa bajo Governance Gate.
+
 #### Hito INIT-H04C — Puertas de Gobernanza SCM, Policy Gates y Bloqueo de PRs (Siguiente Incremento)
 - **Alcance Técnico:**
   - GitHub Commit Status Checks & Check Runs API.

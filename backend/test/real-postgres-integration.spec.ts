@@ -39,11 +39,13 @@ import { RfcsRepository } from '../src/modules/rfcs/rfcs.repository.js';
 import { RfcsService } from '../src/modules/rfcs/rfcs.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
 import type { AuthenticatedUser } from '../src/common/types/index.js';
+import { assertSafeTestDatabase } from '../src/common/guards/test-isolation.guard.js';
 
-const dbUrl = process.env.DATABASE_URL;
+const dbUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
 if (!dbUrl) {
-  throw new Error('[SEC-01] DATABASE_URL no configurada. Las pruebas de integración en vivo requieren variables de entorno explícitas.');
+  throw new Error('[SEC-01] DATABASE_URL o TEST_DATABASE_URL no configurada. Las pruebas de integración requieren variables de entorno explícitas.');
 }
+assertSafeTestDatabase(dbUrl, 'Certificación Física PostgreSQL en Vivo (DB-T01 a DB-T14)', process.env.ALLOW_REMOTE_TEST_DML === 'true');
 const certPath = path.resolve(process.cwd(), process.env.DATABASE_SSL_CA_PATH || 'cert/prod-ca-2021.crt');
 const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath, 'utf8') : undefined;
 

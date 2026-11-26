@@ -39,10 +39,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       let sslConfig: pg.ConnectionConfig['ssl'] = undefined;
 
       // Configuración TLS segura (H-06: Sin rejectUnauthorized: false no justificado)
+      const isLocal = config.databaseUrl.includes('127.0.0.1') || config.databaseUrl.includes('localhost');
       if (
-        config.databaseUrl.includes('supabase.co') ||
-        config.databaseUrl.includes('pooler.supabase.com') ||
-        process.env.DATABASE_SSL === 'true'
+        !isLocal && (
+          config.databaseUrl.includes('supabase.co') ||
+          config.databaseUrl.includes('pooler.supabase.com') ||
+          process.env.DATABASE_SSL === 'true'
+        )
       ) {
         sslConfig = {
           rejectUnauthorized: config.databaseSslRejectUnauthorized,
@@ -103,5 +106,32 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       return this.pool.connect();
     }
     throw new Error('[DatabaseModeError] Invocación directa de getClient en modo mock.');
+  }
+
+  async transaction<T>(callback: (client: pg.PoolClient | null) => Promise<T>): Promise<T> {
+    if (this.databaseMode === 'postgres') {
+      const client = await this.getClient();
+      const memDbBackup = (this.pool as any)?._memDbBackup ? (this.pool as any)._memDbBackup() : null;
+      try {
+        await client.query('BEGIN');
+        const result = await callback(client);
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        try {
+          await client.query('ROLLBACK');
+        } catch {
+          // Ignorar fallo de comando si la conexión fue terminada
+        }
+        if (memDbBackup) {
+          memDbBackup.restore();
+        }
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+    // En modo mock en memoria, ejecuta la operación atómicamente
+    return callback(null);
   }
 }

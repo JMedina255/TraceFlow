@@ -275,3 +275,26 @@ it('debe denegar el registro de RFC cuando el rol efectivo no es PU-01 (SoD-01)'
 ---
 
 *Estándar oficial de programación de TraceFlow SCM — Etapa DOC-02.3 — C-SharkTeam / ÉXODO S.A.C.*
+
+
+---
+
+## 11. Convenciones para Inicialización, Organizaciones y GitHub (INIT-H01 / INIT-H02)
+
+### 11.1 Aislamiento Multitenant Organizacional (DA-02, DA-06)
+- Todo endpoint de creación o asignación de proyectos debe exigir el identificador UUID de la organización (`organizationId`).
+- Toda incorporación de usuarios al equipo de un proyecto debe validar primero la membresía activa en la organización (`organization_member.status = 'ACTIVE'`).
+
+### 11.2 Criptografía de Credenciales GitHub (AES-256-GCM)
+- Los tokens y secretos de GitHub deben cifrarse exclusivamente con **AES-256-GCM** mediante `crypto.createCipheriv('aes-256-gcm', key, iv)`.
+- El vector de inicialización (`iv`) debe tener exactamente 12 bytes aleatorios (`crypto.randomBytes(12)`).
+- La etiqueta de autenticación (`tag`) debe tener 16 bytes (`cipher.getAuthTag()`).
+- La clave maestra (`APP_SECRET_KEY`) debe tener 32 bytes (256 bits), cargada desde variables de entorno y **nunca expuesta** en logs ni respuestas HTTP.
+
+### 11.3 Validación Segura de Webhooks GitHub
+- La firma `X-Hub-Signature-256` debe validarse calculando el HMAC-SHA256 del cuerpo sin procesar (`raw body`) con el secreto compartido.
+- La comparación de firmas debe realizarse obligatoriamente con `crypto.timingSafeEqual` para prevenir ataques de canal lateral basados en temporización (Timing Attacks).
+
+### 11.4 Salvaguardas SCM de Activación (DA-04)
+- Los controladores de procesos SCM (`RfcsController`, `ChangeOrdersController`, etc.) deben incorporar el guardián `@UseGuards(ProjectActiveGuard)`.
+- Si el proyecto referenciado no se encuentra en estado `ACTIVO`, el guardián debe emitir una excepción controlada con código HTTP **412 Precondition Failed**.

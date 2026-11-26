@@ -1,0 +1,85 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-10: Mapa de Navegación del Frontend TO-BE (React 19 Router)</b>
+
+rectangle "Ruta Pública" {
+    [LoginView\n(/login)] as Login
+}
+
+rectangle "Rutas Protegidas (ProtectedRoute + AppLayout)" {
+
+    package "Dashboard & Resumen" {
+        [DashboardView\n(/dashboard)] as Dash
+    }
+
+    package "Gestión Organizacional (Nuevo MOD-10)" {
+        [OrganizationsListView\n(/organizations)] as OrgList
+        [OrganizationDetailView\n(/organizations/:orgId)] as OrgDetail
+        [OrganizationMembersView\n(/organizations/:orgId/members)] as OrgMembers
+    }
+
+    package "Gestión y Configuración de Proyectos (MOD-02)" {
+        [ProjectsDirectoryView\n(/projects)] as ProjDir
+        [ProjectDetailView\n(/projects/:projectId)] as ProjDetail
+
+        package "Asistente de Inicialización (DA-05)" {
+            [ProjectWizardLayout\n(/projects/new)] as WizRoot
+            [Step1Identity\n(/projects/new/step-1)] as W1
+            [Step2Team\n(/projects/new/step-2)] as W2
+            [Step3Methodology\n(/projects/new/step-3)] as W3
+            [Step4GitHub\n(/projects/new/step-4)] as W4
+            [Step5ReviewActivate\n(/projects/new/step-5)] as W5
+        }
+
+        package "Panel de Configuración Posterior (DA-05)" {
+            [ProjectSettingsLayout\n(/projects/:projectId/settings)] as SetRoot
+            [SettingsGeneral\n(.../settings/general)] as S_Gen
+            [SettingsTeam\n(.../settings/team)] as S_Team
+            [SettingsMethodology\n(.../settings/methodology)] as S_Meth
+            [SettingsGitHub\n(.../settings/github)] as S_GH
+            [SettingsLifecycle\n(.../settings/lifecycle)] as S_Life
+        }
+    }
+
+    package "Procesos SCM Gobernados (MOD-04..MOD-09)" {
+        [RfcListView\n(/rfcs)] as RfcList
+        [RfcCreateView\n(/rfcs/new)] as RfcCreate
+        [RfcDetailView\n(/rfcs/:rfcId)] as RfcDetail
+    }
+}
+
+Login --> Dash : Autenticación exitosa
+Dash --> ProjDir : Acceso al módulo proyectos
+ProjDir --> ProjDetail : Consultar ficha (CU-03)
+ProjDir --> WizRoot : "Nuevo Proyecto" (PU-02)
+
+WizRoot --> W1
+W1 --> W2 : Guardar borrador
+W2 --> W3 : Validar equipo DA-06
+W3 --> W4 : Definir metodología
+W4 --> W5 : Validar GitHub DA-03/04
+W5 --> ProjDetail : Activación exitosa (DA-04)
+W1 ..> ProjDir : Guardado parcial (Reanudar luego)
+
+ProjDetail --> SetRoot : "Configuración del Proyecto"
+SetRoot --> S_Gen
+SetRoot --> S_Team
+SetRoot --> S_Meth
+SetRoot --> S_GH
+SetRoot --> S_Life
+
+ProjDetail --> RfcList : Navegar a RFCs del proyecto
+RfcList --> RfcCreate : "Nueva RFC" (Exclusivo ACTIVO)
+
+note right of RfcCreate
+  <b>ProjectActiveGuard:</b>
+  Si el proyecto no está ACTIVO,
+  la interfaz bloquea el acceso
+  y muestra advertencia DA-04.
+end note
+
+@enduml

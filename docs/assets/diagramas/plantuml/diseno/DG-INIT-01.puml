@@ -1,0 +1,38 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-01: Diagrama de Contexto del Sistema (TraceFlow SCM TO-BE)</b>
+
+actor "Administrador de Organización\n(PU-02 / Gestor)" as UserOrg
+actor "Líder Técnico / Arquitecto\n(PU-03)" as UserArch
+actor "Comité CCB y Equipo SCM\n(PU-04, PU-05, PU-06, PU-07)" as UserSCM
+
+boundary "TraceFlow SCM\nPortal Web (SPA React 19)" as Frontend
+control "TraceFlow Core Backend\n(NestJS 11 Monolito Modular)" as Backend
+database "Base de Datos Central\n(PostgreSQL 17 / Supabase)" as Database
+entity "Plataforma GitHub\n(GitHub REST & GraphQL API v3/v4)" as GitHubAPI
+entity "GitHub Webhooks\n(HMAC-SHA256 Signatures)" as GitHubHooks
+
+UserOrg --> Frontend : 1. Gestiona organización, crea proyecto\ny configura equipo autorizado (DA-02, DA-06)
+UserArch --> Frontend : 2. Configura metodología, cronograma\ny vincula/crea repositorio GitHub (DA-03)
+UserSCM --> Frontend : 3. Opera procesos SCM (RFC, ECN, Check-In/Out)\n[Condicionado a Proyecto ACTIVO (DA-04)]
+
+Frontend --> Backend : Llamadas REST seguras (/api/v1/*)\nCookie HttpOnly tf_session + CSRF
+
+Backend --> Database : Persistencia ACID, aislamiento multitenant\nCadena SHA-256 de auditoría (ADR-008)
+
+Backend --> GitHubAPI : Vincula/Crea repositorios, verifica permisos\nInstalación de GitHub App / OAuth (DA-03, DA-04)
+GitHubHooks --> Backend : Eventos asíncronos (push, pull_request, release)\nValidación de firma X-Hub-Signature-256
+
+note right of Backend
+  <b>Salvaguarda SCM (DA-04):</b>
+  Las operaciones SCM (RFC, ECN, Check-In)
+  quedan estrictamente bloqueadas (HTTP 412)
+  hasta que el proyecto complete la vinculación
+  GitHub y alcance el estado ACTIVO.
+end note
+
+@enduml

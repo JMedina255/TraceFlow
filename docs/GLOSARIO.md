@@ -43,6 +43,13 @@ El presente archivo se mantiene exclusivamente como **guía rápida de siglas no
 | **Aceptación de Usuario** | `UAT` | `aceptacion_uat` | `uat_acceptance` | [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) |
 | **Incidencia** | `INC` | `incidencia` | `incident_ticket` | [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) |
 | **Registro de Auditoría** | `EVT` | `registro_auditoria` | `audit_log` | [`DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md) |
+| **Organización** | `ORG` | `organizacion` | `organization` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Membresía Organizacional** | `ORG_MEM` | `miembro_organizacion` | `organization_member` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Configuración de Asistente** | `SETUP` | `configuracion_asistente` | `project_setup` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Rol en Proyecto** | `PROJ_ROLE` | `rol_equipo_proyecto` | `project_team_role` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Metodología y Fases** | `METH/PHASE` | `metodologia_proyecto` / `fase_proyecto` | `project_methodology` / `project_phase` | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Integración GitHub** | `GH` | `integracion_github` | `github_integration` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
+| **Evento / Webhook GitHub** | `GHEVT` | `evento_github` | `github_event` (Propuesta INIT-H01) | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
 
 ---
 

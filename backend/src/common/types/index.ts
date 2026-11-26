@@ -26,6 +26,52 @@ export type RFCStatus =
 export type ChangeClassification = 'CAMBIO_MENOR' | 'CAMBIO_MAYOR' | 'PENDIENTE';
 export type Priority = 'BAJA' | 'MEDIA' | 'ALTA' | 'CRITICA';
 
+export type OrganizationRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'AUDITOR';
+export type OrganizationStatus = 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+export type MemberStatus = 'ACTIVE' | 'SUSPENDED';
+
+export type CanonicalProjectStatus =
+  | 'BORRADOR'
+  | 'CONFIGURACION_INICIAL'
+  | 'PENDIENTE_VALIDACION'
+  | 'ACTIVO'
+  | 'SUSPENDIDO'
+  | 'CERRADO'
+  | 'ARCHIVADO'
+  | 'HISTORICO_PENDIENTE_GITHUB';
+
+export function normalizeProjectStatus(rawStatus: string): CanonicalProjectStatus {
+  if (!rawStatus) return 'BORRADOR';
+  const upper = rawStatus.trim().toUpperCase();
+  switch (upper) {
+    case 'ACTIVE':
+      return 'HISTORICO_PENDIENTE_GITHUB';
+    case 'CLOSED':
+      return 'CERRADO';
+    case 'ARCHIVED':
+      return 'ARCHIVADO';
+    case 'ACTIVO':
+      return 'ACTIVO';
+    case 'BORRADOR':
+      return 'BORRADOR';
+    case 'CONFIGURACION_INICIAL':
+    case 'EN_CONFIGURACION':
+      return 'CONFIGURACION_INICIAL';
+    case 'PENDIENTE_VALIDACION':
+      return 'PENDIENTE_VALIDACION';
+    case 'SUSPENDIDO':
+      return 'SUSPENDIDO';
+    case 'CERRADO':
+      return 'CERRADO';
+    case 'ARCHIVADO':
+      return 'ARCHIVADO';
+    case 'HISTORICO_PENDIENTE_GITHUB':
+      return 'HISTORICO_PENDIENTE_GITHUB';
+    default:
+      return 'BORRADOR';
+  }
+}
+
 export interface AuthenticatedUser {
   id: string; // UUID
   code: string; // ej. USR-001

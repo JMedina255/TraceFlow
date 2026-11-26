@@ -122,7 +122,8 @@ TraceFlow/
 │   ├── MATRIZ_NOMENCLATURA.md   # Equivalencias inglés–español por capa
 │   ├── MATRIZ_TRAZABILIDAD.md   # Trazabilidad integral RF/RNF -> CU -> BD -> Pruebas
 │   ├── PLAN_REFACTORIZACION.md  # Plan progresivo REF-01 de normalización al español
-│   ├── adr/                     # Registros de Decisiones Arquitectónicas (ADR-001 a ADR-010)
+│   ├── PLAN_INICIALIZACION_PROYECTOS.md # Plan Maestro de Inicialización, Organización y GitHub (INIT-H01)
+│   ├── adr/                     # Registros de Decisiones Arquitectónicas (ADR-001 a ADR-011)
 │   └── evidence/int-01/         # Evidencias visuales de integración E2E (capturas de pantalla)
 └── README.md                    # Este documento
 ```
@@ -136,7 +137,8 @@ TraceFlow/
 - **Estándar de Programación:** [docs/ESTANDAR_PROGRAMACION.md](docs/ESTANDAR_PROGRAMACION.md)
 - **Glosario y Nomenclatura:** [docs/GLOSARIO.md](docs/GLOSARIO.md) | [docs/MATRIZ_NOMENCLATURA.md](docs/MATRIZ_NOMENCLATURA.md)
 - **Trazabilidad y Plan REF-01:** [docs/MATRIZ_TRAZABILIDAD.md](docs/MATRIZ_TRAZABILIDAD.md) | [docs/PLAN_REFACTORIZACION.md](docs/PLAN_REFACTORIZACION.md)
-- **Reglas de Gobernanza, Tablas y Diagramas SSOT:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) | [docs/TABLES.md](docs/TABLES.md) | [docs/DIAGRAMS.md](docs/DIAGRAMS.md)
+- **Plan Maestro de Inicialización (INIT-H01):** [docs/PLAN_INICIALIZACION_PROYECTOS.md](docs/PLAN_INICIALIZACION_PROYECTOS.md)
+- **Reglas de Gobernanza, Tablas y Diagramas SSOT:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) | [docs/TABLES.md](docs/TABLES.md) | [docs/DIAGRAMS.md](docs/DIAGRAMS.md) | [docs/adr/ADR-011.md](docs/adr/ADR-011.md)
 
 ---
 

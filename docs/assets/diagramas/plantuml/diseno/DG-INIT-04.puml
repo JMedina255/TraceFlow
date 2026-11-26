@@ -1,0 +1,52 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-INIT-04: Máquina de Estados del Ciclo de Vida del Proyecto</b>
+
+[*] --> BORRADOR : Crear proyecto inicial\n(Paso 1 Asistente)
+
+state BORRADOR {
+    [*] --> DatosIdentidad
+    DatosIdentidad --> AsignacionEquipo : Identidad guardada
+    AsignacionEquipo --> ConfiguracionMetodologia : Equipo asignado
+}
+
+BORRADOR --> EN_CONFIGURACION : Guardado parcial\n(Reanudar posterior DA-05)
+EN_CONFIGURACION --> BORRADOR : Retorno al asistente
+
+BORRADOR --> PENDIENTE_VALIDACION : Enlace GitHub configurado\n(Paso 4 completado)
+EN_CONFIGURACION --> PENDIENTE_VALIDACION : Solicitud de validación
+
+state PENDIENTE_VALIDACION {
+    [*] --> VerificandoGitHub
+    VerificandoGitHub --> VerificandoIntegridadEquipo : Conexión OK, permisos OK
+    VerificandoIntegridadEquipo --> RequisitosCompletos : Roles mínimos cubiertos
+}
+
+PENDIENTE_VALIDACION --> EN_CONFIGURACION : Falla validación GitHub\n(Credencial revocada o permisos insuficientes)
+
+PENDIENTE_VALIDACION --> ACTIVO : <b>Activación Formal (DA-04)</b>\n[GitHub VALIDADO + Roles mínimos cubiertos]
+
+state ACTIVO {
+    [*] --> OperacionSCM
+    OperacionSCM : • Registro de RFC (CU-04)\n• Control de Cambios (CU-05..08)\n• Check-In/Check-Out (CU-10..12)\n• Líneas Base (CU-20)
+}
+
+ACTIVO --> SUSPENDIDO : Suspensión por Gestor (PU-02)\n[Bloqueo temporal de operaciones SCM]
+SUSPENDIDO --> ACTIVO : Reactivación formal con auditoría
+
+ACTIVO --> CERRADO : Culminación contractual
+CERRADO --> ARCHIVADO : Cierre definitivo (Solo lectura)
+
+state HISTORICO_PENDIENTE_GITHUB {
+    [*] --> ProyectoMigrado
+    ProyectoMigrado : Proyectos preexistentes (PRJ-001..003)\nOperaciones de consulta permitidas\nOperaciones de mutación bloqueadas
+}
+
+HISTORICO_PENDIENTE_GITHUB --> PENDIENTE_VALIDACION : Regularización explícita repositorio dedicado (PU-02, DA-04)
+
+ARCHIVADO --> [*]
+
+@enduml

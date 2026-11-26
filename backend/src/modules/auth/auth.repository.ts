@@ -166,7 +166,7 @@ export class AuthRepository {
             WHERE upa.user_id = u.id
           ), ARRAY[]::varchar[]) as assigned_project_codes
         FROM traceflow.app_user u
-        WHERE u.id = $1
+        WHERE u.id::text = $1 OR u.code = $1
         LIMIT 1;
       `;
       const res = await this.db.query(query, [id]);

@@ -25,6 +25,7 @@ TraceFlow/docs/
 ├── INDICE_DOCUMENTAL.md               <- [ESTE DOCUMENTO] Navegación centralizada (v2.0.0)
 ├── ESTADO_DEL_PROYECTO.md             <- Estado real, pendientes e historial compacto de hitos
 ├── DOCUMENTATION_RULES.md             <- Normativa de gobernanza documental y SSOT (v1.0 Aprobada)
+├── PLAN_INICIALIZACION_PROYECTOS.md   <- Plan Maestro de Inicialización, Organización y GitHub (INIT-H01)
 ├── GLOSARIO.md                        <- Terminología oficial en español y siglas normativas
 ├── MATRIZ_NOMENCLATURA.md             <- Auditoría e inventario de equivalencias inglés–español
 ├── DICCIONARIO_DATOS.md               <- Modelo físico actual (21 tablas, 198 cols) y objetivo en español
@@ -43,7 +44,7 @@ TraceFlow/docs/
 │   └── FD05-EPIS-Informe_SAD_Diseno.md       <- Baseline institucional SAD de Diseño (v0.5)
 │
 ├── [Decisiones Arquitectónicas (ADR)]
-│   └── adr/                           <- Registros ADR-001 a ADR-010 aprobados
+│   └── adr/                           <- Registros ADR-001 a ADR-011 (ADR-011 Propuesto INIT-H01)
 │
 ├── [Especificaciones Técnicas Complementarias]
 │   ├── PROTOTYPE_SPECIFICATION.md     <- Matriz de pantallas del prototipo React
@@ -86,6 +87,7 @@ TraceFlow/docs/
 | **Estado del Proyecto** | *Consolidado DOC-02* | Estado real de implementación, pendientes e historial compacto de hitos y commits. | [`ESTADO_DEL_PROYECTO.md`](ESTADO_DEL_PROYECTO.md) |
 | **Matriz de Trazabilidad** | *Candidato DOC-02* | Trazabilidad bidireccional `RF/RNF -> RN -> CU -> Módulo -> Componente -> Tabla -> Endpoint -> Prueba`. | [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md) |
 | **Plan de Refactorización REF-01** | *Candidato DOC-02* | Estrategia progresiva `REF-01.1`..`REF-01.6` con migraciones seguras y rollback. | [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md) |
+| **Plan de Inicialización de Proyectos** | *Candidato INIT-H01* | Gobernanza multiorganización, asistente híbrido y salvaguarda GitHub (DA-01..DA-06, ADR-011). | [`PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) |
 
 ### 3.3 Gobernanza y Fuentes Oficiales SSOT
 
@@ -93,8 +95,8 @@ TraceFlow/docs/
 |---|---:|---|---|---|
 | **Reglas de Gobernanza Documental** | **v1.0** | *Aprobado* | Estándares de nomenclatura, jerarquía documental y políticas SSOT. | [`DOCUMENTATION_RULES.md`](DOCUMENTATION_RULES.md) |
 | **Cuadros y Tablas Maestras** | **v1.0** | *Aprobado (SSOT Tabular)* | 15 tablas canónicas `TB-01` a `TB-14` (incluyendo `TB-11.1`). | [`TABLES.md`](TABLES.md) |
-| **Catálogo Central de Diagramas** | **v1.0** | *Aprobado (SSOT Gráfico)* | Compendio PlantUML oficial (`114` especificaciones base + modelos ER actuales). | [`DIAGRAMS.md`](DIAGRAMS.md) |
-| **Decisiones Arquitectónicas (ADR)** | **v1.0** | *Aprobado* | `ADR-001` a `ADR-010` aprobados el `2026-10-01`. | [`adr/README.md`](adr/README.md) |
+| **Catálogo Central de Diagramas** | **v1.0** | *Aprobado (SSOT Gráfico)* | Compendio PlantUML oficial (`114` base + 2 ER + 10 `DG-INIT-01..10`). | [`DIAGRAMS.md`](DIAGRAMS.md) |
+| **Decisiones Arquitectónicas (ADR)** | **v1.1** | *Aprobado / Propuesto* | `ADR-001` a `ADR-010` (Aprobados) y `ADR-011` (Propuesto INIT-H01). | [`adr/README.md`](adr/README.md) |
 
 ---
 

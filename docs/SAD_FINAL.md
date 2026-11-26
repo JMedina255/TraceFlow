@@ -1,12 +1,12 @@
 # Documento de Arquitectura de Software Consolidado (SAD Final Candidato) — TraceFlow SCM
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam (Medina Quispe, Antayhua Mamani, Loyola Vilca Choque, Rivera Muñoz)  
-> **Documento:** `docs/SAD_FINAL.md`  
-> **Fuentes Consolidadas:** `FD04-EPIS-Informe_SAD_Analisis.md` (v1.2), `FD05-EPIS-Informe_SAD_Diseno.md` (v0.5), `ADR-001`..`ADR-010`, `DICCIONARIO_DATOS.md`, `ESTANDAR_PROGRAMACION.md`  
-> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`  
-> **Estado:** Candidato a Aprobación del Responsable / CCB (DOC-02.6)  
-> **Fecha:** 25 de noviembre de 2026  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam (Medina Quispe, Antayhua Mamani, Loyola Vilca Choque, Rivera Muñoz)
+> **Documento:** `docs/SAD_FINAL.md`
+> **Fuentes Consolidadas:** `FD04-EPIS-Informe_SAD_Analisis.md` (v1.2), `FD05-EPIS-Informe_SAD_Diseno.md` (v0.5), `ADR-001`..`ADR-010`, `DICCIONARIO_DATOS.md`, `ESTANDAR_PROGRAMACION.md`
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` | **Línea Base Código:** `master @ 84c832f`
+> **Estado:** Candidato a Aprobación del Responsable / CCB (DOC-02.6)
+> **Fecha:** 25 de noviembre de 2026
 
 ---
 
@@ -65,7 +65,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | Módulo | Responsabilidad principal | Casos de uso | Estado actual en código |
 |---|---|---|---|
 | **MOD-01** Autenticación, Usuarios y RBAC | Login Argon2id, sesiones opacas, roles `PU-01..07` | `CU-01` | **Operativo** (`AuthModule`, falta CRUD UI de usuarios) |
-| **MOD-02** Gestión de Proyectos | Catálogo de proyectos y aislamiento multitenant | `CU-02`, `CU-03` | **Operativo lectura** (`ProjectsModule`, falta CRUD UI) |
+| **MOD-02** Gestión de Proyectos | Catálogo de proyectos, aislamiento multitenant, planificación metodológica, equipos y asistente progresivo | `CU-02`, `CU-03`, `CU-32`, `CU-34` | **Operativo lectura y planificación** (`ProjectsModule`, `ProjectPlanningService`, entidades `project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`; UI React en INIT-H05) |
 | **MOD-03** Catálogo de ECS | Registro y clasificación de Elementos de Configuración | `CU-09` | Lectura parcial vía `Projects`/`Rfcs` + `ecsService` mock |
 | **MOD-04** Control de Cambios (RFC/CCB/ECN) | Registro, admisión, subsanación, impacto, Doble Llave, CCB, ECN | `CU-04`, `04.1`, `05..08`, `30` | `CU-04` real (`RfcsModule`); `CU-05/04.1/06/30/07` simulados en UI |
 | **MOD-05** Administración SCM Core | Check-Out, Check-In, `sync_lock`, `StoragePort`, Líneas Base, Rollback | `CU-10..14`, `20..22`, `26` | Tablas y triggers desplegados; lógica backend/UI pendiente |
@@ -73,6 +73,8 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 | **MOD-07** Auditoría e Integridad | Bitácora SHA-256 append-only e inspección de cadena | `CU-27` | **Operativo base** (`AuditModule` + `append_audit_log()`); falta visor UI |
 | **MOD-08** Incidencias y Soporte | Tickets de falla y derivación a RFC | `CU-23..25` | Tabla `incident_ticket` desplegada; endpoints/UI pendientes |
 | **MOD-09** Reportería y Tableros | Dashboards adaptativos por rol e informes de estado | `CU-28` | `DashboardView.tsx` operativo; generador de reportes en placeholder |
+| **MOD-10 (Nuevo)** Organizaciones y Membresías | Tenant raíz institucional, políticas corporativas y membresía (DA-02, DA-06) | `CU-31` | **Operativo Backend** (`OrganizationsModule`, certificado en H02/H03) |
+| **MOD-11 (Nuevo)** Integración GitHub | Vinculación y validación de repositorios, Installation Access Tokens en memoria bajo demanda, índice uq_active_github_repo_id, webhooks HMAC-SHA256, buffer idempotente github_event, sincronización asíncrona de rutas ECS y detección out-of-band (DA-03, DA-04) | `CU-33` | **Operativo Backend y Certificado** (`GitHubModule`, `GitHubWebhookService`, `GitHubEventProcessorService`; certificado en INIT-H04A y INIT-H04B) |
 
 ## 11. Modelo de Dominio (`DG-12`)
 *(Resolución `DOC-030` en DOC-03.1: `analisis/DG-12.svg` queda establecido como el único `DG-12` canónico; el diagrama histórico de clases se preserva reclasificado como [`DG-12-HIST`](assets/diagramas/render/generales/DG-12-HIST.svg)).*
@@ -80,7 +82,7 @@ Monolito Modular (`ADR-001`, `ADR-003`) donde cada módulo encapsula Controlador
 ![Modelo Conceptual del Dominio (DG-12 Canónico)](assets/diagramas/render/analisis/DG-12.svg)
 
 ## 12. Modelo de Datos (`DICCIONARIO_DATOS.md`)
-Consta de **21 tablas** en el esquema privado `traceflow`, verificadas en PostgreSQL 17.12.
+Consta de **21 tablas base** en el esquema privado `traceflow` de la línea base histórica, ampliadas a **23 tablas en INIT-H02** (`organization`, `organization_member`), a **29 tablas en INIT-H03** (`project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone`, `project_deliverable`), a **31 tablas en INIT-H04A-R** (`github_integration`, `organization_github_installation`), y a **33 tablas físicas en INIT-H04B** (`github_event` con índice de entrega único `uq_github_event_delivery` y `config_item_path_history` con índice `idx_cip_history_config_item`), certificadas íntegramente sobre PostgreSQL 16 real con revocación de `DELETE` para `traceflow_app`.
 - **Modelo Físico Vigente (`DG-ER-ACTUAL`):**
 ![Modelo ER Físico Vigente](assets/diagramas/render/diseno/DG-ER-ACTUAL.svg)
 - **Modelo Objetivo en Español (`DG-ER-OBJETIVO`):** *(Propuesta para `REF-01.5`, aún NO desplegada en Supabase)*
@@ -88,7 +90,7 @@ Consta de **21 tablas** en el esquema privado `traceflow`, verificadas en Postgr
 
 ## 13. Contratos de Comunicación (`/api/v1`) y Navegación UI
 - **Protocolo (`ADR-009`):** RESTful JSON bajo prefijo global `/api/v1` con `ValidationPipe` estricto (`whitelist`, `forbidNonWhitelisted`).
-- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/projects{,/:id}`, `/api/v1/rfcs{,/:id}`.
+- **Rutas operativas actuales:** `/api/v1/health`, `/api/v1/auth/{login,me,logout}`, `/api/v1/organizations{,/:id/members}`, `/api/v1/projects{,/:id}`, `/api/v1/projects/:id/{team-members,methodology,phases,milestones,deliverables,setup,setup/step-2,setup/step-3,setup/progress}`, `/api/v1/projects/:id/github{,/available-repos,/link,/validate,/unlink,/create-draft}`, `/api/v1/github/webhook` (Recepción global de eventos GitHub), `/api/v1/projects/:id/github/webhook` (Recepción de eventos vinculados a proyecto), `/api/v1/rfcs{,/:id}`.
 - **Contratos diseñados para próximos hitos:** `/api/v1/rfcs/:id/{classify,rectification,impact-assessment,minor-approval,ccb-votes}`, `/api/v1/change-orders/*`, `/api/v1/scm/*` (ver `contracts.ts` y `ESTANDAR_PROGRAMACION.md` §6).
 - **Navegación SPA (`DG-UWE-NAV-01`):**
 ![Modelo General de Navegación UWE](assets/diagramas/render/uwe/DG-UWE-NAV-01.svg)
@@ -150,9 +152,9 @@ El puerto `StoragePort` (`ADR-005`) desacopla los metadatos relacionales del alm
 ## 24. Disponibilidad y Recuperación (`ADR-010`)
 Metas de diseño: respaldos diarios automatizados de PostgreSQL/storage (`RPO <= 24h`, `RTO <= 2h`) y protocolo de rollback controlado de ECS ante fallos en QA/UAT (`CU-21`, `DG-DSEQ-21`).
 
-## 25. Decisiones Arquitectónicas (`ADR-001` a `ADR-010`)
-Todas aprobadas el `2026-10-01` en [`docs/adr/`](adr/README.md):
-`ADR-001` (Monolito Modular), `ADR-002` (React SPA), `ADR-003` (NestJS/Node 24), `ADR-004` (PostgreSQL), `ADR-005` (`StoragePort` + 3 Bibliotecas), `ADR-006` (Sesiones Opacas `HttpOnly`; Keycloak diferido), `ADR-007` (Bloqueo Exclusivo en BD), `ADR-008` (Auditoría Append-Only SHA-256), `ADR-009` (API REST JSON/OpenAPI), `ADR-010` (Docker & Continuidad).
+## 25. Decisiones Arquitectónicas (`ADR-001` a `ADR-011`)
+Todas aprobadas el `2026-10-01` en [`docs/adr/`](adr/README.md) y `ADR-011` propuesto en `2026-11-25`:
+`ADR-001` (Monolito Modular), `ADR-002` (React SPA), `ADR-003` (NestJS/Node 24), `ADR-004` (PostgreSQL), `ADR-005` (`StoragePort` + 3 Bibliotecas), `ADR-006` (Sesiones Opacas `HttpOnly`; Keycloak diferido), `ADR-007` (Bloqueo Exclusivo en BD), `ADR-008` (Auditoría Append-Only SHA-256), `ADR-009` (API REST JSON/OpenAPI), `ADR-010` (Docker & Continuidad), `ADR-011` (Inicialización, Gobernanza GitHub y Salvaguardas SCM).
 
 ## 26. Trazabilidad con Requerimientos
 La trazabilidad bidireccional completa entre `RF-01`..`RF-18`, `RNF-01`..`RNF-09`, `RN-01`..`RN-09`, `CU-01`..`CU-30`/`CU-04.1`, módulos, tablas actuales/objetivo, endpoints y pruebas se mantiene en [`MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md).
@@ -171,6 +173,147 @@ Para mantener [`FD03-EPIS-Informe_SRS.md`](FD03-EPIS-Informe_SRS.md) estrictamen
 - **Diseñado pendiente de implementación (`SCM-02+`):** `CU-08`..`CU-26`, `CU-28`, `CU-29`, adaptador `StoragePort` físico y UI de las 12 pantallas en placeholder.
 - **Propuesta de normalización (`REF-01`):** La traducción al español de código, rutas y tablas (`DG-ER-OBJETIVO`) es una **arquitectura objetivo documental pendiente de aprobación** conforme a [`PLAN_REFACTORIZACION.md`](PLAN_REFACTORIZACION.md); **no ha sido desplegada aún en Supabase ni en código fuente**.
 
+## 29. Inicialización de Proyectos, Gobernanza GitHub y Salvaguardas SCM (INIT-H01-R)
+Diseño técnico formal consolidado en [`docs/PLAN_INICIALIZACION_PROYECTOS.md`](PLAN_INICIALIZACION_PROYECTOS.md) y [`docs/adr/ADR-011.md`](adr/ADR-011.md) (subsanación arquitectónica `INIT-H01-R`):
+- **Gobernanza Multitenant e Integridad (`DA-01`, `DA-02`, `DA-06`):** Entidades `organization` y `organization_member`, membresía activa obligatoria para incorporación a proyectos (`RN-10`, `RN-11`) blindada mediante disparador PL/pgSQL `enforce_project_member_organization_integrity`. Se suprime el estado no admitido `INVITED`.
+- **Modelo Canónico de Estados:** Máquina de 8 estados en español (`BORRADOR`, `EN_CONFIGURACION`, `PENDIENTE_VALIDACION`, `ACTIVO`, `SUSPENDIDO`, `CERRADO`, `ARCHIVADO`, `HISTORICO_PENDIENTE_GITHUB`) con matriz de transiciones permitidas y capa de normalización retroactiva para compatibilidad DTO.
+- **Asistente Híbrido 5 Pasos (`DA-05`, `RN-14`):** Entidad `project_setup` con `draft_payload JSONB` para autosave sin alterar restricciones relacionales (`DG-INIT-05`) y Panel de Configuración Posterior.
+- **Integración GitHub Segura (`DA-03`, `DA-04`):** Soporte de vinculación y creación de repositorios (`DG-INIT-07`, `DG-INIT-08`), tokens de instalación generados bajo demanda en memoria vía JWT RS256 (sin almacenamiento en BD), webhooks HMAC-SHA256 con tiempo constante (`crypto.timingSafeEqual`) y tabla idempotente `github_event` (`X-GitHub-Delivery`).
+- **Salvaguarda Operacional SCM (`DA-04`, `RN-12`, `RN-13`):** El guardián `ProjectActiveGuard` bloquea formalmente (HTTP 412) todo registro de RFC u operación en bibliotecas en proyectos que no cuenten con GitHub validado y estado `ACTIVO` (`DG-INIT-09`).
+- **Regularización Estricta de Proyectos Históricos:** Vinculación individual y explícita por el Gestor (`PU-02`) de cada proyecto cliente (`PRJ-001`..`003`) a su propio repositorio dedicado en GitHub, prohibiendo cualquier asociación a `TraceFlow.git` y sin alteración masiva de datos.
+- **Fundamento Operativo SCM en GitHub (`DG-INIT-11`):** Mapeo de ECS lógicos (`config_item`) a repositorios y rutas de archivos Git (`file_path`, `git_blob_sha`, `git_commit_sha`), correlación automática de commits/PRs por diff y trailers Git, puertas de calidad en Pull Requests mediante GitHub Checks API (`Policy Gate`), líneas base verificables con Git Tags inmutables, detección automática de cambios no autorizados *out-of-band* con apertura de incidencias, e historial inmutable de renombres/movimientos (`config_item_path_history`).
+- **Mínimo Privilegio e Integridad Referencial:** Revocación del privilegio `DELETE` a `traceflow_app` (solo `SELECT, INSERT, UPDATE`), y uso de `ON DELETE RESTRICT` sobre entidades hijas para garantizar custodia e inmutabilidad probatoria.
+- **Hoja de Ruta en 5 Hitos (`INIT-H02` a `INIT-H06`):** Desglose secuencial con 30 pruebas TDD mapeadas exhaustivamente.
+- **Compendio Gráfico Canónico:** 11 modelos canónicos compilados `DG-INIT-01` a `DG-INIT-11` en [`docs/assets/diagramas/render/diseno/`](assets/diagramas/MANIFEST.md).
+
+## 30. Remediaciones de Persistencia, Aislamiento y Transaccionalidad (INIT-H02-R)
+- **Transaccionalidad Atómica (`DatabaseService.transaction`):** Operaciones compuestas (creación de organización/miembro, creación de proyecto/asignación, actualización de estado de miembro) se ejecutan dentro de transacciones atómicas `BEGIN ... COMMIT / ROLLBACK` compartiendo un `PoolClient` para garantizar consistencia ACID.
+- **Fail-Fast Sin Fallbacks Silenciosos:** En modo PostgreSQL, cualquier ausencia de tabla (error `42P01`) o fallo relacional produce una excepción HTTP controlada (`ServiceUnavailableException` 503 / `ForbiddenException` 403), eliminando sustituciones silenciosas por datos en memoria. Mocks restringidos a `DATABASE_MODE=mock`.
+- **Mínimo Privilegio de Asignaciones (`H02-R01`):** Otorgamiento explícito de `SELECT, INSERT, UPDATE` sobre `traceflow.user_project_assignment` al rol `traceflow_app`, reteniendo la revocación total de `DELETE`.
+- **Segregación Estricta SoD (`H02-R06`):** Validación en backend del rol activo `activeRoleId === 'PU-02'` para la inicialización institucional y de proyectos, bloqueando intentos de adopción pasiva desde `allowedRoleIds`. La suspensión de membresías revoca automáticamente el acceso operacional a los proyectos.
+- **Estrategia Segura de Recuperación y Rollback (PITR):** Procedimiento de reversión condicional que aborta si existen datos dependientes post-migración, preservando la información y redirigiendo a copias de seguridad Point-In-Time-Recovery (PITR).
+- **Certificación Aislada en PostgreSQL:** Batería de 10 escenarios ejecutados en motor PostgreSQL 14+ aislado (`pg-mem`) certificando transaccionalidad, disparadores de integridad `DA-06`, concurrencia y seguridad.
+
+## 31. Certificación Real de PostgreSQL y Cierre de Persistencia (INIT-H02-V)
+- **Certificación Física sobre PostgreSQL 16.14 Real:** Ejecución secuencial y limpia de la cadena completa de migraciones históricas (`202611250001`, `202611250002`, seeds, `202611250003` y `202611260001`) sobre una instancia relacional física en `127.0.0.1:5432`, verificando tablas, FKs, restricciones CHECK, triggers y permisos reales de `traceflow_app`.
+- **Auditoría Física Real SHA-256:** Verificación de la función `append_audit_log` con encadenamiento de hash fidedigno utilizando la extensión `pgcrypto` bajo el esquema `extensions` (sin simulaciones ni mocks).
+- **Aislamiento Obligatorio de Pruebas:** Implementación del guardián `assertSafeTestDatabase()` que detecta hosts remotos (`supabase.co`, `pooler.supabase.com`, `amazonaws.com`) y bloquea escrituras no autorizadas durante `npm test`. Exclusión automática de suites remotas en `vitest.config.ts`.
+- **Eliminación de Condiciones de Carrera:** Serialización pesimista con bloqueo por fila (`SELECT id ... FOR UPDATE`) en `countActiveOwners` dentro de `DatabaseService.transaction()`, impidiendo la suspensión concurrente del último propietario institucional.
+- **Revocación Efectiva de Acceso a Suspendidos:** Modificación de `RfcsService` para revocar consultas y creación de RFCs (HTTP 403 Forbidden) para usuarios suspendidos en la organización del proyecto.
+- **Rollback Seguro sin CASCADE:** Eliminación de borrado en cascada en `202611260001_init_h02_organizations_and_projects_rollback.sql` y parametrización con marcas de tiempo dinámicas en UTC y LSN para restauración Point-In-Time-Recovery (PITR).
+- **Cobertura de Certificación:** 15 pruebas físicas en `real-postgres-certification.spec.ts` (100% aprobadas), 77 pruebas backend (`npm test`) y 97 pruebas en prototipo frontend (189 pruebas en verde).
+
+## 32. Cierre Final de Seguridad y Blindaje de Persistencia (INIT-H02-VF)
+- **Protección contra Borrado Destructivo:** Establecimiento de lista blanca estricta de bases de datos descartables (`ALLOWED_DISPOSABLE_DATABASES`), prohibición de eliminación de bases no identificadas, remotas o de sistema, y formateo seguro mediante `quoteSqlIdentifier()` y `format(%I, %L)` en creación de roles.
+- **Desacoplamiento Estricto de Permisos de Prueba:** La autorización de DML remoto (`ALLOW_REMOTE_TEST_DML`) no autoriza la eliminación destructiva de bases de datos (`DROP DATABASE`). Se exige la variable explícita `ALLOW_DESTRUCTIVE_DATABASE_RESET=true`.
+- **Aislamiento No Destructivo de `npm test`:** Exclusión automática de las suites de recreación física de base de datos de la ejecución estándar de `npm test`. La certificación física se ejecuta exclusivamente vía comando explícito (`npm run test:real-postgres`).
+- **Autorización SCM Obligatoria Fail-Closed:** Modificación de `RfcsService` para exigir validación obligatoria de membresía organizacional (error 503 ante falta de dependencia), rechazar proyectos sin organización (error 403), impedir que sesiones antiguas permitan el acceso a usuarios suspendidos, y preservar la lectura de expedientes históricos conforme a los estados del proyecto.
+- **Salvaguarda Exhaustiva de Rollback:** Bloqueo de reversión en `202611260001_init_h02_organizations_and_projects_rollback.sql` ante cualquier adición o alteración de miembros en la organización semilla o cambios estructurales post-migración.
+- **Cobertura Final Consolidada:** 15 pruebas físicas reales en `test:real-postgres`, 76 pruebas backend seguras en `npm test` (incluyendo 8 pruebas de salvaguardas destructivas y 10 pruebas SCM) y 97 pruebas en prototipo frontend (188 pruebas en verde).
+
+## 33. Cierre de Observaciones Residuales de Persistencia, Rollback y Salvaguardas SCM (INIT-H02 Residuales)
+- **Coherencia Total del Rollback con los Cuatro Fundadores Semilla:** Corrección del script `202611260001_init_h02_organizations_and_projects_rollback.sql` para validar íntegramente los 4 registros fundadores legítimos (`USR-001` como `OWNER ACTIVE`, `USR-002`..`USR-004` como `MEMBER ACTIVE`). Si no existen datos creados post-migración, la reversión elimina limpiamente las tablas `organization` y `organization_member`, elimina la columna `organization_id` de `project` y restaura el estado canónico `ACTIVE` de los proyectos históricos. Si se altera el rol o estado de cualquiera de los cuatro fundadores o se detectan nuevos miembros, el rollback aborta emitiendo `BLOQUEO DE SEGURIDAD`.
+- **Salvaguarda de Gobernanza SCM Fail-Closed en Proyectos en Estado `ACTIVE`:** En `RfcsService.createRfc()`, un estado `ACTIVE` heredado o `ACTIVO` no autoriza la emisión de RFCs en modo PostgreSQL real hasta que la integración física con GitHub sea verificada en `INIT-H04` (DA-04, RN-12). Se rechaza con HTTP 403 Forbidden (`Operación rechazada (DA-04 / RN-12): El proyecto ... no dispone de una integración GitHub validada`).
+- **Introspección de Socket PostgreSQL en Runtime y Desacoplamiento de Pruebas Externas:** En `real-db-helper.ts`, antes de ejecutar `DROP DATABASE`, se verifica en el motor PostgreSQL mediante `inet_server_addr()`, `current_database()` y `datistemplate` que la conexión sea estrictamente local (`127.0.0.1` / `::1`) y no una plantilla. En `run-supabase-tests.ts`, se eliminó la asignación automática de `ALLOW_REMOTE_TEST_DML=true`, requiriendo autorización previa y verificando que el host sea remoto vía `isRemoteDatabaseHost()`.
+- **Cobertura de Certificación Física Ampliada:** 18 pruebas físicas en `real-postgres-certification.spec.ts` (100% aprobadas, incorporando `V-13`, `V-16`, `V-17` y `V-18`), 76 pruebas backend (`npm test`) y 97 pruebas en prototipo frontend (**191 pruebas consolidadas en verde**).
+
+## 34. Implementación y Subsanación de Planificación de Proyectos (INIT-H03 / INIT-H03-R)
+- **Entidades de Planificación Multiproyecto:** Creación de `project_setup`, `project_team_role`, `project_methodology`, `project_phase`, `project_milestone` y `project_deliverable` (**29 tablas físicas** en esquema `traceflow`).
+- **Aislamiento Estricto y Transaccionalidad Atómica:** Aislamiento de mutación de roles por proyecto (HTTP 403), transaccionalidad atómica única por lote en `saveStep2Team`, y preservación acumulada sin regresión en `project_setup` (`GREATEST` y fusión `draft_payload` JSONB).
+- **Cobertura Certificada:** 20 pruebas físicas en PostgreSQL 16 real para H03, 102 pruebas unitarias backend y 97 pruebas en prototipo frontend.
+
+## 35. Integración Segura de Repositorios GitHub y Blindaje de Instalaciones (INIT-H04A / INIT-H04A-R)
+- **Blindaje de Instalaciones de GitHub App (H04A-R02):** Creación de la entidad `traceflow.organization_github_installation` (catálogo físico de **31 tablas relacionales** en `traceflow`). Restricción estricta multiorganización: ningún proyecto puede operar sobre instalaciones ajenas a su organización (HTTP 403) y se valida la coincidencia de cuentas con GitHub API.
+- **Eliminación de Modo Mock Implícito (H04A-R01):** Prohibición terminante de clientes simulados en modo operacional y producción; fail-closed en `createGitHubApiClient()` ante ausencia de credenciales de GitHub App.
+- **Unicidad Canónica de Repositorios (H04A-R03):** Creación del índice `uq_active_github_repo_id` sobre `github_repo_id` (y auxiliar `uq_active_github_repo_name`), impidiendo duplicidad aun ante renombramiento de repositorios en GitHub.
+- **Sincronización Transaccional de Estado y Degradación (H04A-R04):** `validateIntegrationAccess()` atómico en transacción: degradación de estado a `PERMISSION_DENIED`, conmutación de `project_setup.github_completed = false` y registro inmutable en auditoría SHA-256 (`GITHUB_INTEGRATION_DEGRADED`); recuperación a `true` mediante `GITHUB_INTEGRATION_VERIFIED`. Validación de ramas Git reales con `getBranch()`.
+- **Salvaguardas de Rollback y Protección de Datos (H04A-R05):** Reversión en `202611260004` y `202611260003` bloqueada ante la existencia de datos operativos en las tablas de integración o instalación.
+- **Cobertura Final Consolidada:** 19 pruebas físicas en `real-postgres-h04a-certification.spec.ts`, 20 pruebas en H03, 18 pruebas en H02 (**57/57 pruebas físicas en PostgreSQL 16 real**), **136 pruebas unitarias backend** y **97 pruebas en prototipo frontend** (**290 pruebas consolidadas en verde**).
+
+## 36. Webhooks, Procesamiento Asíncrono y Sincronización Git (INIT-H04B)
+- **Topología de Integración y Principio de Autoridad Dual:** GitHub funge como autoridad exclusiva sobre archivos versionados, repositorios, ramas y commits. TraceFlow funge como autoridad soberana de gobernanza SCM, catálogo de ECS, RFCs, aprobaciones CCB, auditoría inmutable y líneas base.
+- **Recepción Segura y Validación Criptográfica:**
+  1. Los endpoints `POST /api/v1/github/webhook` y `POST /api/v1/projects/:id/github/webhook` operan sin sesión humana (`AuthGuard` bypass) y capturan el cuerpo binario crudo mediante `{ rawBody: true }`.
+  2. La autenticación perimetral valida la cabecera `X-Hub-Signature-256` utilizando HMAC-SHA256 con tiempo constante (`crypto.timingSafeEqual`). Secretos ausentes o inválidos en modo operativo/producción provocan rechazo inmediato (`401 Unauthorized` fail-closed).
+  3. Desduplicación e idempotencia absoluta mediante la cabecera `X-GitHub-Delivery`: el índice único `uq_github_event_delivery` rechaza entregas duplicadas sin reprocesamiento (HTTP 202 Accepted).
+- **Buffer Transaccional de Eventos y Desacoplamiento Asíncrono:**
+  1. Todo webhook válido se persiste de inmediato en `traceflow.github_event` con estado `PENDING` y respuesta HTTP `202 Accepted` de latencia ultrabaja (< 50 ms), garantizando la continuidad ante ráfagas de GitHub.
+  2. El procesador asíncrono `GitHubEventProcessorService` gestiona la máquina de estados del evento: `PENDING` -> `PROCESSING` -> `PROCESSED` (o `FAILED` con contador incremental hasta 3 intentos).
+- **Inspección de Commits y Sincronización de Rutas ECS:**
+  1. Ante eventos `push`, se inspecciona cada commit a través de `IGitHubApiClient.getCommit()`, extrayendo archivos agregados, modificados, eliminados y renombrados (`previous_filename`).
+  2. Mapeo bidireccional contra el catálogo de Elementos de Configuración (`traceflow.config_item`): renombres y movimientos se reflejan en la base de datos y se archivan inmutablemente en `traceflow.config_item_path_history` (`RENAME`, `MOVE`, `DELETE`).
+- **Detección de Cambios No Autorizados Fuera de Banda (Out-of-Band):**
+  1. Si un commit altera archivos correspondientes a un ECS sin existir una orden de cambio (`change_order`) autorizada o un bloqueo activo (`sync_lock`), el procesador clasifica el evento como cambio fuera de banda.
+  2. Emisión del evento de auditoría criptográfica `GITHUB_OUT_OF_BAND_DETECTED` registrando el commit SHA, autor Git, y rutas afectadas para su subsanación mediante apertura de incidencias. Los cambios legítimos se auditan como `GITHUB_GIT_SYNC_COMPLETED`.
+- **Mínimo Privilegio de Base de Datos y Salvaguardas de Rollback:**
+  1. Otorgamiento mínimo a `traceflow_app`: solo `SELECT, INSERT, UPDATE` sobre `github_event` y `config_item_path_history`. Privilegio `DELETE` revocado terminantemente.
+  2. El script de reversión `202611260006_...rollback.sql` aborta con error fatal si existen eventos o historial de rutas registrados post-migración, protegiendo la custodia forense y orientando al uso de PITR.
+- **Cobertura de Pruebas y Certificación:**
+  1. **21 pruebas unitarias** en `github-webhooks.spec.ts` certificando firmas, idempotencia, procesamiento asíncrono, detección out-of-band y reintentos.
+  2. **13 pruebas físicas** en `real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real.
+  3. **Cobertura Total Consolidada:** 166 pruebas unitarias backend, 70 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**333 pruebas consolidadas en verde**).
+
+## 37. Gobernanza, Idempotencia y Recuperación de Eventos Git (INIT-H04B-R)
+- **Desacoplamiento Estricto entre Mensajes Git y Autorización SCM (H04B-R01):**
+  1. Se eliminó la validación laxa por patrones de texto (`RFC-123`, `ECN-123`) en los mensajes de commit como mecanismo de autorización directa.
+  2. La autorización formal exige verificar la existencia física de la solicitud en `traceflow.change_request`, comprobar que pertenezca al `project_id` del repositorio, validar que su estado sea formalmente aprobado (`AUTORIZADA`, `ORDEN_EMITIDA`, `EN_EJECUCION`, `EN_IMPLEMENTACION`), y confirmar la existencia de una orden de cambio activa en `traceflow.change_order` con segregación de funciones (SoD).
+  3. Los commits sin expediente o no autorizados se clasifican como `PENDIENTE_DE_CORRELACION` u `OUT_OF_BAND`, impidiendo mutaciones canónicas en el inventario.
+- **Preservación Canónica del Inventario ECS (H04B-R02):**
+  1. Separación física y probatoria entre el estado canónico oficial (`traceflow.config_item`) y la evidencia observada en el árbol de Git (`traceflow.config_item_path_history`).
+  2. Todo cambio de ruta no autorizado o fuera de banda se registra con `applied_to_ecs = false` y `status = 'PENDING' | 'REJECTED'`, manteniendo inmutable el atributo `file_path` oficial del ECS.
+- **Autorización por Instalación y Repositorio (H04B-R03):**
+  1. Resolución unívoca de la integración mediante `github_repo_id`, exigiendo estado operativo `VALIDATED`.
+  2. Comparación estricta entre el `installation_id` del evento y el registrado en la integración del proyecto.
+  3. Comprobación obligatoria de estado `ACTIVE` en `traceflow.organization_github_installation`. Cualquier discrepancia o suspensión marca el evento como `FAILED` con auditoría de seguridad y rechazo sin procesamiento SCM.
+- **Trabajador Persistente Concurrente con Lease Transaccional (H04B-R04):**
+  1. Reemplazo del procesador en memoria desacoplado por un trabajador transaccional persistente basado en `FOR UPDATE SKIP LOCKED`.
+  2. Atributos de lease en `traceflow.github_event`: `locked_by VARCHAR(100)`, `locked_at TIMESTAMPTZ`, `lease_expires_at TIMESTAMPTZ`, e índice optimizado `idx_github_event_claimable`.
+  3. Mecanismo de auto-recuperación de eventos abandonados con lease expirado (`lease_expires_at < NOW()`) y reanudación automática al iniciar el módulo NestJS (`OnModuleInit`).
+- **Idempotencia Transicional de Rutas (H04B-R05):**
+  1. Creación del índice único `uq_cip_history_commit_ecs_change` sobre `(config_item_id, git_commit_sha, change_type)`.
+  2. Las entregas repetidas o reintentos se gestionan mediante `ON CONFLICT DO UPDATE`, asegurando convergencia y evitando colisiones de clave única o errores HTTP 500.
+- **Seguridad Perimetral HTTP y Validación Binaria (H04B-R06):**
+  1. Exigencia de `req.rawBody` Buffer nativo para el cómputo HMAC-SHA256, prohibiendo conversiones intermedias vía `JSON.stringify()`.
+  2. Límite estricto de tamaño de payload de 5MB con excepción controlada `PayloadTooLargeException`.
+  3. Validación de formato de `X-GitHub-Delivery` mediante regex `/^[a-zA-Z0-9_-]{1,128}$/`.
+  4. Política fail-closed absoluta ante la ausencia de secretos en entornos no autorizados.
+- **Gestión Integral de Revocaciones de GitHub (H04B-R07):**
+  1. Procesamiento transaccional de eventos `installation` (`suspend`, `deleted`, `unsuspend`) e `installation_repositories` (`removed`, `added`).
+  2. Ante suspensión o revocación, el estado de la integración conmuta a `PERMISSION_DENIED` y `project_setup.github_completed = false`, suspendiendo sincronizaciones activas sin destruir expedientes históricos ni configuraciones de proyecto.
+- **Salvaguardas de Rollback y Cobertura Física Certificada:**
+  1. Script `202611260007_init_h04b_r_webhooks_governance_and_worker_rollback.sql` con protección contra reversiones en presencia de eventos en procesamiento (`locked_by IS NOT NULL` o `status = 'PROCESSING'`), admitiendo forzado deliberado con `SET LOCAL traceflow.allow_force_h04_rollback = 'true'`.
+  2. **17 pruebas físicas** en `real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real.
+  3. **24 pruebas unitarias** en `github-webhooks.spec.ts` certificando todos los requisitos de gobernanza.
+  4. **Cobertura Total Consolidada:** 169 pruebas unitarias backend, 74 pruebas físicas en PostgreSQL 16 real, y 97 pruebas en prototipo frontend (**340 pruebas consolidadas en verde**), con 0 errores de compilación `tsc --noEmit`.
+
+## 38. Cierre Final de Aceptación de Gobernanza, Leases y Recuperación Continua (INIT-H04B-C)
+- **Verificación Efectiva de Autorización SCM Multinivel:**
+  1. Comprobación exhaustiva en persistencia PostgreSQL real de la solicitud de cambio (`traceflow.change_request`), verificando que se encuentre formalmente aprobada (`AUTORIZADA`, `ORDEN_EMITIDA`, `EN_EJECUCION`, `EN_IMPLEMENTACION`).
+  2. Existencia de una orden de cambio vigente (`traceflow.change_order`) correspondiente a la misma RFC, con segregación de funciones (SoD) estricta.
+  3. Comprobación de que el ECS asignado a la ECN pertenezca al mismo proyecto del repositorio Git.
+  4. Exigencia de bloqueo activo `traceflow.sync_lock` coherente con la ECN y el ECS. Si el bloqueo está ausente, el evento permanece como `PENDIENTE_DE_CORRELACION`.
+  5. Verificación de identidad del ejecutor Git: debe corresponder a un usuario activo en `traceflow.app_user` con rol técnico activo en `traceflow.project_team_role` (`DEVELOPER`, `LEAD_DEVELOPER` o `SCM_ADMIN`).
+  6. Correspondencia estricta de alcance de archivos modificados (`files` / `previous_filename`): archivos ajenos al ECS objetivo de la ECN no mutan la ruta canónica en `traceflow.config_item`, registrándose en `traceflow.config_item_path_history` con `applied_to_ecs = false` y `status = 'REJECTED'`.
+- **Recuperación Continua y Ciclo de Vida del Trabajador:**
+  1. Temporizador continuo y periódico (`startPolling(5000)` / `stopPolling()`) acoplado al ciclo de vida NestJS (`OnModuleDestroy`), operando de forma autónoma sin depender de nuevos webhooks entrantes.
+  2. Recuperación proactiva de eventos pendientes o con lease expirado tras reinicios del servicio en lotes acotados (`LIMIT $2`).
+  3. Liberación ordenada y graceful de leases transaccionales (`releaseWorkerLeases()`) durante el apagado del módulo.
+- **Propiedad del Lease Atómica y Prevención de Split-Brain con `claim_token`:**
+  1. Migración DDL `202611260008_init_h04b_c_governance_and_leases.sql`: adición de la columna `claim_token UUID` a `traceflow.github_event`.
+  2. Al adquirir un lote con `claimEvents()`, se genera un identificador unívoco efímero (`gen_random_uuid()`).
+  3. Modificación atómica de `releaseEvent()` exigiendo coincidencia simultánea de `workerId` y `claim_token` (`WHERE id = $1 AND ($5::text IS NULL OR locked_by IS NULL OR locked_by = $5) AND ($6::uuid IS NULL OR claim_token IS NULL OR claim_token = $6)`).
+  4. Si el lease expiró y el evento fue reclamado concurrentemente por otro trabajador, la liberación retorna `null`, se descartan mutaciones canónicas en el ECS y se previenen colisiones de split-brain.
+- **Coherencia del Ciclo de Vida de Instalaciones de GitHub:**
+  1. Actualización de la restricción `CHECK` sobre `traceflow.organization_github_installation` para admitir formalmente el estado `DELETED`.
+  2. Procesamiento transaccional de eventos `installation.deleted`: actualización del registro de instalación a `DELETED` e invalidación sincronizada de las integraciones activas del proyecto a `UNLINKED` (`project_setup.github_completed = false`) sin eliminación física ni pérdida de historial.
+- **Protección de Rollback y Seguridad HMAC Fail-Closed:**
+  1. Scripts de reversión `202611260008` y `202611260007` blindados contra la eliminación de estructuras si existen registros con `claim_token` asignado, instalaciones en `DELETED`, eventos correlacionados o rutas aplicadas a ECS, requiriendo `SET LOCAL traceflow.allow_force_h04_rollback = 'true'` en pruebas.
+  2. Validación estricta de secretos de webhooks en `getWebhookSecret()`: rechazo absoluto de `TEST_GITHUB_WEBHOOK_SECRET` en entornos de producción con excepción `InternalServerErrorException`.
+- **Cobertura Física y Certificación Consolidada:**
+  1. **9 escenarios de aceptación certificados** (`TDD-H04B-C-01`..`09`) en `backend/test/github-webhooks.spec.ts` (32 pruebas unitarias totales en la suite).
+  2. **20 pruebas físicas certificadas** en `backend/test/real-postgres-h04b-certification.spec.ts` sobre PostgreSQL 16 real, validando competencia de leases concurrentes (`CERT-H04B-C-18`), ciclo de vida de instalación `DELETED` (`CERT-H04B-C-19`), control de `sync_lock` (`CERT-H04B-C-20`) y reversión completa de migraciones 11, 10 y 9.
+  3. **Cobertura Total Consolidada:** 177 pruebas unitarias backend, 77 pruebas físicas en PostgreSQL 16 real (18 H02, 20 H03, 19 H04A-R, 20 H04B-C), y 97 pruebas en prototipo frontend (**351 pruebas consolidadas en verde**), con 0 errores `tsc --noEmit`.
+
 ---
 
-*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 — C-SharkTeam / ÉXODO S.A.C.*
+*SAD Final Consolidado de TraceFlow SCM — Etapa DOC-02.6 / INIT-H01-R / INIT-H02-R / INIT-H02-V / INIT-H02-VF / INIT-H02-Residuales / INIT-H03-R / INIT-H04A-R / INIT-H04B / INIT-H04B-R / INIT-H04B-C — C-SharkTeam / ÉXODO S.A.C.*

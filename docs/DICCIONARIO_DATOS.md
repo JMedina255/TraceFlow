@@ -1,12 +1,12 @@
 # Diccionario de Datos — Modelo Físico Vigente y Modelo Objetivo en Español (TraceFlow SCM)
 
-> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios  
-> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam  
-> **Instancia Supabase:** `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`, AWS `us-west-2`)  
-> **Motor Verificado:** `PostgreSQL 17.12` (introspección de solo lectura vía `traceflow_app` sobre `information_schema` y `pg_catalog`)  
-> **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)  
-> **Estado:** Candidato a Aprobación (DOC-02.2 / Revisado en DOC-03) — *El esquema físico en Supabase NO ha sido renombrado*  
-> **Fecha:** 25 de noviembre de 2026  
+> **Proyecto:** TraceFlow SCM — Sistema de Gestión de Configuración de Software y Control de Cambios
+> **Organización Cliente:** ÉXODO S.A.C. | **Equipo:** C-SharkTeam
+> **Instancia Supabase:** `TraceFlow-UPT` (`xmyfqxlvveiawnxgydtz`, AWS `us-west-2`)
+> **Motor Verificado:** `PostgreSQL 17.12` (introspección de solo lectura vía `traceflow_app` sobre `information_schema` y `pg_catalog`)
+> **Rama:** `docs/alineacion-srs-sad-2026-11-12` (Commit base `84c832f`)
+> **Estado:** Candidato a Aprobación (DOC-02.2 / Revisado en DOC-03) — *El esquema físico en Supabase NO ha sido renombrado*
+> **Fecha:** 25 de noviembre de 2026
 
 > [!IMPORTANT]
 > **Cobertura de verificación y límites de privilegio (`traceflow_app`):**
@@ -78,7 +78,7 @@ Complementariamente, el repositorio conserva el modelo lógico conceptual [`DG-D
 | 16 | `qa_certification` | `certificacion_qa` | 7 | MOD-06 Calidad y Pruebas | CU-16..CU-19 | `INSERT, SELECT, UPDATE` |
 | 17 | `sync_lock` | `bloqueo_sincronizacion` | 9 | MOD-05 Administración SCM | CU-10, CU-11, CU-12, CU-21, CU-22 | `INSERT, SELECT, UPDATE` |
 | 18 | `uat_acceptance` | `aceptacion_uat` | 7 | MOD-06 Calidad y Pruebas | CU-29, RN-09 | `INSERT, SELECT, UPDATE` |
-| 19 | `user_project_assignment` | `asignacion_proyecto_usuario` | 4 | MOD-02 Gestión de Proyectos | CU-01, CU-02, CU-03 | `SELECT` |
+| 19 | `user_project_assignment` | `asignacion_proyecto_usuario` | 4 | MOD-02 Gestión de Proyectos | CU-01, CU-02, CU-03 | `SELECT, INSERT, UPDATE` (H02-R01) |
 | 20 | `user_role_assignment` | `asignacion_rol_usuario` | 5 | MOD-01 Autenticación y RBAC | CU-01 | `SELECT` |
 | 21 | `user_session` | `sesion_usuario` | 10 | MOD-01 Autenticación y RBAC | CU-01, RNF-01 | `INSERT, SELECT, UPDATE` |
 
@@ -660,3 +660,25 @@ Consultar detalle completo por tabla en Sección 7 y por identificador en [`docs
 
 ---
 *Diccionario de Datos de TraceFlow SCM — Etapa DOC-02.2 / Auditado DOC-03 — C-SharkTeam / ÉXODO S.A.C.*
+
+
+---
+
+## 20. Entidades Candidatas para la Etapa de Inicialización y Gobierno GitHub (INIT-H01-R / INIT-H02..05)
+
+*(Diseño propuesto en `PLAN_INICIALIZACION_PROYECTOS.md` y `ADR-011`; certificado físicamente en PostgreSQL 16.14 aislado durante `INIT-H02-V` para las tablas 22 y 23. Despliegue productivo en Supabase en pausa bajo Governance Gate. Privilegios auditados bajo mínimo privilegio sin `DELETE` para preservar inmutabilidad probatoria. Columna `traceflow.project.status` expandida a `VARCHAR(40)` para compatibilidad canónica).*
+
+| ID | Tabla Actual Propuesta | Equivalente Objetivo Español | Propósito y Cardinalidad | Claves y Restricciones | Privilegios `traceflow_app` |
+|---|---|---|---|---|---|
+| **22** | `organization` | `organizacion` | Tenant raíz institucional (DA-02). 1:N con `project` y `organization_member`. | PK `id UUID`, UQ `code`, UQ `slug`, CHECK `status IN ('ACTIVE','SUSPENDED','ARCHIVED')`. | `SELECT, INSERT, UPDATE` |
+| **23** | `organization_member` | `miembro_organizacion` | Membresía previa obligatoria para asignación (DA-06). N:M entre `organization` y `app_user`. | PK `id UUID`, FK `organization_id`, FK `user_id`, UQ `(organization_id, user_id)`, CHECK `status IN ('ACTIVE','SUSPENDED')`. | `SELECT, INSERT, UPDATE` |
+| **24** | `project_setup` | `configuracion_asistente` | Estado y autosave del Asistente de 5 pasos (DA-05). 1:1 con `project`. | PK `id UUID`, UQ `project_id`, `draft_payload JSONB`, CHECK `wizard_step BETWEEN 1 AND 5`. | `SELECT, INSERT, UPDATE` |
+| **25** | `project_team_role` | `rol_equipo_proyecto` | Especialidades y roles funcionales del equipo en el proyecto. N:M con rol canónico. | PK `id UUID`, FK `project_id [RESTRICT]`, FK `user_id`, FK `role_id`, UQ `(project_id, user_id, role_id)`. | `SELECT, INSERT, UPDATE` |
+| **26** | `project_methodology` | `metodologia_proyecto` | Adopción metodológica (Scrum, Cascada, Híbrida). 1:1 con `project`. | PK `id UUID`, UQ `project_id [RESTRICT]`, CHECK `methodology_type`. | `SELECT, INSERT, UPDATE` |
+| **27** | `project_phase` | `fase_proyecto` | Fases cronológicas planificadas. 1:N con `project`. | PK `id UUID`, FK `project_id [RESTRICT]`, UQ `(project_id, sequence_order)`, CHECK `end_date >= start_date`. | `SELECT, INSERT, UPDATE` |
+| **28** | `project_milestone` | `hito_proyecto` | Hitos clave de control temporal. 1:N con `project`. | PK `id UUID`, FK `project_id [RESTRICT]`, FK `phase_id [RESTRICT]`, UQ `(project_id, code)`. | `SELECT, INSERT, UPDATE` |
+| **29** | `project_deliverable` | `entregable_proyecto` | Entregables técnicos asociados a ECS. 1:N con `project`. | PK `id UUID`, FK `project_id [RESTRICT]`, FK `milestone_id [RESTRICT]`, FK `associated_ecs_id [RESTRICT]`. | `SELECT, INSERT, UPDATE` |
+| **30** | `github_integration` | `integracion_github` | Integración GitHub obligatoria (DA-03, DA-04). 1:1 con `project`. | PK `id UUID`, UQ `project_id [RESTRICT]`, UQ `(repo_owner, repo_name)`, UQ `github_repo_id` (activos), tokens efímeros bajo demanda en memoria. | `SELECT, INSERT, UPDATE` |
+| **31** | `organization_github_installation` | `instalacion_github_organizacion` | Asociación institucional de instalaciones GitHub App autorizadas por organización (H04A-R / H04B-C). 1:N con `organization`. | PK `id UUID`, FK `organization_id [RESTRICT]`, UQ `(organization_id, installation_id)`, `account_login`, `target_id BIGINT`, `installed_by UUID`, CHECK `status IN ('ACTIVE', 'SUSPENDED', 'REVOKED', 'DELETED')`. | `SELECT, INSERT, UPDATE` |
+| **32** | `github_event` | `evento_github` | Buffer idempotente para recepción y procesamiento asíncrono con trabajador recuperable, lease atómico (`claim_token`) y ciclo periódico continuo de eventos webhook (H04B / H04B-R / H04B-C). 1:N con `project`. | PK `id UUID`, UQ `delivery_id`, `event_type`, `action`, `installation_id BIGINT`, `github_repo_id BIGINT`, FK `project_id [SET NULL]`, `payload JSONB`, CHECK `processing_status IN ('PENDING', 'PROCESSING', 'PROCESSED', 'FAILED')`, `locked_by VARCHAR(100)`, `claim_token UUID`, `locked_at TIMESTAMPTZ`, `lease_expires_at TIMESTAMPTZ`, CHECK `correlation_status IN ('NONE', 'AUTORIZADO', 'PENDIENTE_DE_CORRELACION', 'OUT_OF_BAND', 'RECHAZADO')`, IDX `idx_github_event_claimable`. | `SELECT, INSERT, UPDATE` (REVOKE DELETE) |
+| **33** | `config_item_path_history` | `historial_ruta_ecs` | Historial inmutable de renombres (`git mv`), movimientos y bajas (`git rm`) de ECS con evidencia segregada e idempotencia compuesta (H04B / H04B-R). 1:N con `config_item`. | PK `id UUID`, FK `config_item_id [RESTRICT]`, FK `project_id [RESTRICT]`, `old_path VARCHAR(500)`, `new_path VARCHAR(500)`, CHECK `change_type IN ('RENAME', 'MOVE', 'DELETE')`, `git_commit_sha VARCHAR(64)`, `applied_to_ecs BOOLEAN DEFAULT FALSE`, `applied_at TIMESTAMPTZ`, CHECK `status IN ('PENDING', 'APPLIED', 'REJECTED')`, UQ `uq_cip_history_commit_ecs_change (config_item_id, git_commit_sha, change_type)`. | `SELECT, INSERT, UPDATE` (REVOKE DELETE) |

@@ -1,0 +1,52 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+
+title <b>DG-INIT-08: Secuencia de Creación de Nuevo Repositorio GitHub (DA-03)</b>
+
+actor "Gestor / Arquitecto\n(PU-02 / PU-03)" as User
+boundary "Panel / Asistente UI\n(React SPA)" as UI
+control "GitHubController\n(NestJS)" as GHCtrl
+control "GitHubAppClientService\n(Backend Service)" as GHService
+control "GitHubCryptoService\n(AES-256-GCM)" as Crypto
+entity "GitHub API v3/v4\n(Remote)" as GitHub
+database "PostgreSQL 17\n(traceflow)" as DB
+control "AuditService\n(SHA-256)" as Audit
+
+User -> UI : 1. Selecciona "Crear Nuevo Repositorio GitHub"\nDefine: nombre, organización destino, visibilidad, ramas
+UI -> GHCtrl : POST /api/v1/projects/:id/github/create\n{ repoName: "crm-mobile", orgName: "ÉXODO-ORG", private: true }
+activate GHCtrl
+
+GHCtrl -> GHService : createAndLinkRepository(projectId, params, user)
+activate GHService
+
+GHService -> GitHub : POST /orgs/{org}/repos (Crear repositorio en organización)
+GitHub --> GHService : 201 Created { id: 98765432, full_name: "ÉXODO-ORG/crm-mobile", default_branch: "main" }
+
+GHService -> GitHub : PUT /repos/{owner}/{repo}/contents/README.md\n(Inicializar commit base con convención institucional)
+GitHub --> GHService : 201 Created
+
+GHService -> GitHub : POST /repos/{owner}/{repo}/branches\n(Crear ramas canónicas: develop, staging)
+GitHub --> GHService : 201 Created
+
+GHService -> GitHub : POST /repos/{owner}/{repo}/hooks (Instalar Webhook con secret)
+GitHub --> GHService : 201 Created { id: hook_id }
+
+GHService -> Crypto : encryptSecret(webhookSecret)
+Crypto --> GHService : { encryptedSecret, iv, tag }
+
+GHService -> DB : INSERT INTO traceflow.github_integration\n(status: 'VALIDATED', integration_mode: 'CREATE_NEW')
+DB --> GHService : OK
+
+GHService -> Audit : logEvent('GH_REPO_CREATED', projectId, user, 'SUCCESS')
+Audit --> GHService : auditRecordId
+
+GHService --> GHCtrl : { status: 'VALIDATED', repoUrl: "https://github.com/..." }
+GHCtrl --> UI : 201 Created { success: true, repo: {...} }
+UI --> User : Muestra repositorio creado exitosamente, ramas inicializadas y enlace activo
+
+deactivate GHService
+deactivate GHCtrl
+
+@enduml

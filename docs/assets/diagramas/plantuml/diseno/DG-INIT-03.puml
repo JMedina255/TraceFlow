@@ -1,0 +1,85 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-03: Modelo de Organización y Multiproyecto (DA-01, DA-02, DA-06)</b>
+
+package "Nivel Organización (DA-02: Tenant Raíz)" {
+    class Organization {
+        +UUID id
+        +VARCHAR code (ORG-001)
+        +VARCHAR name (ÉXODO S.A.C.)
+        +VARCHAR slug (exodo-sac)
+        +VARCHAR status (ACTIVE)
+    }
+
+    class OrganizationMember {
+        +UUID id
+        +UUID organization_id
+        +UUID user_id
+        +VARCHAR role_in_org (OWNER, ADMIN, MEMBER)
+        +VARCHAR status (ACTIVE)
+    }
+
+    class AppUser {
+        +UUID id
+        +VARCHAR code (USR-001)
+        +VARCHAR username
+        +VARCHAR email
+        +VARCHAR status (ACTIVE)
+    }
+}
+
+package "Nivel Proyecto (DA-01: Espacio Aislado)" {
+    class Project {
+        +UUID id
+        +UUID organization_id
+        +VARCHAR code (PRJ-001)
+        +VARCHAR project_key (EXO-CORE)
+        +VARCHAR name
+        +VARCHAR status (BORRADOR, ACTIVO, ...)
+    }
+
+    class ProjectTeamRole {
+        +UUID id
+        +UUID project_id
+        +UUID user_id
+        +INT role_id (PU-01..PU-07)
+        +VARCHAR functional_title
+        +BOOLEAN is_lead
+    }
+
+    class GitHubIntegration {
+        +UUID id
+        +UUID project_id
+        +VARCHAR repo_full_name
+        +VARCHAR validation_status (VALIDATED)
+        +VARCHAR default_branch (main)
+    }
+
+    class ProjectMethodology {
+        +UUID id
+        +UUID project_id
+        +VARCHAR methodology_type (SCRUM)
+        +INT iteration_duration_weeks
+    }
+}
+
+Organization "1" *-- "0..*" Project : agrupa (DA-02)
+Organization "1" *-- "1..*" OrganizationMember : administra
+AppUser "1" <-- "0..*" OrganizationMember : pertenece (DA-06)
+
+Project "1" *-- "1..*" ProjectTeamRole : asigna equipo
+ProjectTeamRole --> AppUser : referencia usuario registrado
+Project "1" *-- "1" GitHubIntegration : vincula obligatoriamente (DA-04)
+Project "1" *-- "0..1" ProjectMethodology : adopta
+
+note bottom of OrganizationMember
+  <b>Regla DA-06:</b> Solo usuarios registrados
+  y activos como OrganizationMember
+  pueden ser asignados a un proyecto.
+end note
+
+@enduml

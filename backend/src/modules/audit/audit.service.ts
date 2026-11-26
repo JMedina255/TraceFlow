@@ -46,11 +46,12 @@ export class AuditService {
 
   constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
-  async logEvent(input: AuditEventInput): Promise<string> {
+  async logEvent(input: AuditEventInput, client?: any): Promise<string> {
     if (this.db.getDatabaseMode() === 'postgres') {
+      const runner = client || this.db;
       let projectId = input.projectId || null;
       if (projectId && (!projectId.includes('-') || projectId.startsWith('PRJ-'))) {
-        const pRes = await this.db.query<{ id: string }>(
+        const pRes = await runner.query(
           'SELECT id FROM traceflow.project WHERE code = $1 OR id::text = $1 LIMIT 1',
           [projectId]
         );
@@ -58,7 +59,7 @@ export class AuditService {
       }
       let actorUserId = input.actorUserId || null;
       if (actorUserId && (!actorUserId.includes('-') || actorUserId.startsWith('USR-'))) {
-        const uRes = await this.db.query<{ id: string }>(
+        const uRes = await runner.query(
           'SELECT id FROM traceflow.app_user WHERE code = $1 OR id::text = $1 LIMIT 1',
           [actorUserId]
         );
@@ -66,14 +67,14 @@ export class AuditService {
       }
       let relatedEcnId = input.relatedEcnId || null;
       if (relatedEcnId && (!relatedEcnId.includes('-') || relatedEcnId.startsWith('ECN-'))) {
-        const eRes = await this.db.query<{ id: string }>(
+        const eRes = await runner.query(
           'SELECT id FROM traceflow.change_order WHERE code = $1 OR id::text = $1 LIMIT 1',
           [relatedEcnId]
         );
         relatedEcnId = eRes.rows.length > 0 ? eRes.rows[0].id : null;
       }
 
-      const res = await this.db.query(
+      const res = await runner.query(
         `SELECT traceflow.append_audit_log($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) as id`,
         [
           input.eventCode,

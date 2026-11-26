@@ -1,0 +1,88 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title <b>DG-INIT-02: Arquitectura por Componentes Backend TO-BE (Monolito Modular)</b>
+
+package "TraceFlow SCM Backend Application" {
+
+    package "OrganizationsModule (MOD-10: Nuevo)" as ModOrg {
+        [OrganizationsController] as C_Org
+        [OrganizationsService] as S_Org
+        [OrganizationsRepository] as R_Org
+        C_Org --> S_Org
+        S_Org --> R_Org
+    }
+
+    package "ProjectsModule (MOD-02: Evolucionado)" as ModProj {
+        [ProjectsController] as C_Proj
+        [ProjectSetupWizardService] as S_Wizard
+        [ProjectLifecycleService] as S_Life
+        [ProjectsRepository] as R_Proj
+        [ProjectSetupRepository] as R_Setup
+        C_Proj --> S_Wizard
+        C_Proj --> S_Life
+        S_Wizard --> R_Setup
+        S_Life --> R_Proj
+    }
+
+    package "GitHubIntegrationModule (MOD-11: Nuevo)" as ModGH {
+        [GitHubController] as C_GH
+        [GitHubWebhookController] as C_GHHook
+        [GitHubAppClientService] as S_GHClient
+        [GitHubCryptoService] as S_GHCrypto
+        [GitHubIntegrationRepository] as R_GH
+        C_GH --> S_GHClient
+        C_GHHook --> S_GHClient
+        S_GHClient --> S_GHCrypto
+        S_GHClient --> R_GH
+    }
+
+    package "SCMGuard & Core Interceptor" as ModGuard {
+        [ProjectActiveGuard] as G_Active
+        [ProjectMembershipGuard] as G_Member
+    }
+
+    package "RfcsModule (MOD-04: Gobernado)" as ModRFC {
+        [RfcsController] as C_RFC
+        [RfcsService] as S_RFC
+        C_RFC --> S_RFC
+    }
+
+    package "AuthModule (MOD-01: Endurecido)" as ModAuth {
+        [AuthService] as S_Auth
+        [RolesGuard] as G_Roles
+    }
+
+    package "AuditModule (MOD-07: Append-Only)" as ModAudit {
+        [AuditService] as S_Audit
+    }
+}
+
+database "PostgreSQL 17 (traceflow)" as PG {
+    [organization]
+    [organization_member]
+    [project]
+    [project_setup]
+    [project_methodology]
+    [github_integration]
+    [github_event]
+    [audit_log]
+    [change_request]
+}
+
+C_RFC ..> G_Active : Protegido con\n@UseGuards(ProjectActiveGuard)
+G_Active ..> S_Life : Verifica status == 'ACTIVO'\ny GitHub validado
+S_Wizard ..> S_GHClient : Valida enlace GitHub
+S_Wizard ..> S_Audit : Registra pasos completados
+S_Life ..> S_Audit : Registra transición de estado
+S_GHClient ..> S_Audit : Registra eventos GitHub
+
+R_Org --> PG
+R_Proj --> PG
+R_Setup --> PG
+R_GH --> PG
+
+@enduml

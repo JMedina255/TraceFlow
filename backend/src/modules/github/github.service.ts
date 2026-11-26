@@ -161,6 +161,7 @@ export class GitHubService {
     await this.assertAdminOrManager(project, callerUser);
 
     let targetInstallationId = installationId;
+    let orgInstallation: OrganizationGitHubInstallationEntity | null = null;
 
     if (targetInstallationId !== undefined) {
       if (!targetInstallationId || targetInstallationId <= 0 || isNaN(targetInstallationId)) {
@@ -168,7 +169,7 @@ export class GitHubService {
       }
 
       // H04A-R02: Validar que el installationId pertenezca a la organización del proyecto
-      const orgInstallation = await this.githubRepo.findInstallationByOrgAndId(
+      orgInstallation = await this.githubRepo.findInstallationByOrgAndId(
         project.organization_id!,
         targetInstallationId
       );
@@ -187,7 +188,42 @@ export class GitHubService {
           `La organización '${project.organization_id}' no posee ninguna instalación de GitHub App activa registrada.`
         );
       }
-      targetInstallationId = activeInstallations[0].installation_id;
+      orgInstallation = activeInstallations[0];
+      targetInstallationId = orgInstallation.installation_id;
+    }
+
+    // SEC-04: Revalidar instalación con GitHub API antes de listar repositorios
+    let installDetails: GitHubInstallationDetails;
+    try {
+      installDetails = await this.githubClient.getInstallation(targetInstallationId);
+    } catch (err: any) {
+      if (err.code === 'INSTALLATION_NOT_FOUND' || err.status === 404) {
+        throw new NotFoundException(
+          `La instalación GitHub ID ${targetInstallationId} ya no se encuentra activa o no existe en GitHub.`
+        );
+      }
+      throw new BadRequestException(
+        `Error al revalidar instalación en GitHub: ${err.message || 'Fallo de acceso'}`
+      );
+    }
+
+    if (
+      installDetails.account.login.toLowerCase() !== orgInstallation.account_login.toLowerCase()
+    ) {
+      throw new ForbiddenException(
+        `Inconsistencia de cuenta GitHub: La instalación remota pertenece a '${installDetails.account.login}', pero está registrada como '${orgInstallation.account_login}'.`
+      );
+    }
+
+    // SEC-04: Validar identidad estable de cuenta GitHub cuando esté disponible
+    if (
+      orgInstallation.target_id &&
+      installDetails.account.id &&
+      orgInstallation.target_id !== installDetails.account.id
+    ) {
+      throw new ForbiddenException(
+        `Inconsistencia crítica de identidad: El ID numérico de cuenta GitHub (${installDetails.account.id}) no coincide con el registrado (${orgInstallation.target_id}).`
+      );
     }
 
     return this.githubClient.listInstallationRepositories(targetInstallationId);
@@ -247,6 +283,17 @@ export class GitHubService {
       ) {
         throw new ForbiddenException(
           `La cuenta GitHub de la instalación (${installDetails.account.login}) no coincide con la registrada (${orgInstallation.account_login}).`
+        );
+      }
+
+      // SEC-04: Comprobar identidad numérica estable de cuenta
+      if (
+        orgInstallation.target_id &&
+        installDetails.account.id &&
+        orgInstallation.target_id !== installDetails.account.id
+      ) {
+        throw new ForbiddenException(
+          `Inconsistencia crítica de identidad: El ID numérico de cuenta GitHub (${installDetails.account.id}) no coincide con el registrado (${orgInstallation.target_id}).`
         );
       }
 
@@ -605,5 +652,84 @@ export class GitHubService {
       governanceNotice:
         'Contrato validado exitosamente. En esta iteración INIT-H04A no se aprovisionan repositorios remotos automáticamente para prevenir mutaciones externas no supervisadas.',
     };
+  }
+
+  // ==========================================================================
+  // REGISTRO AUTORIZADO DE INSTALACIONES GITHUB APP (SEC-02)
+  // ==========================================================================
+  async registerOrganizationInstallation(
+    organizationIdOrCode: string,
+    installationId: number,
+    callerUser: AuthenticatedUser
+  ): Promise<OrganizationGitHubInstallationEntity> {
+    const org = await this.orgRepo.findByIdOrSlugOrCode(organizationIdOrCode);
+    if (!org) {
+      throw new NotFoundException(`Organización '${organizationIdOrCode}' no encontrada.`);
+    }
+
+    const member = await this.orgRepo.findMember(org.id, callerUser.id);
+    if (!member || member.status !== 'ACTIVE' || !['OWNER', 'ADMIN'].includes(member.role_in_org)) {
+      throw new ForbiddenException(
+        'Acceso denegado: Se requiere rol de Propietario (OWNER) o Administrador (ADMIN) de la organización para registrar instalaciones de GitHub App.'
+      );
+    }
+
+    if (!installationId || installationId <= 0 || isNaN(installationId)) {
+      throw new BadRequestException('El installationId debe ser un número entero positivo válido.');
+    }
+
+    // Verificar identidad con GitHub API previamente
+    let installDetails: GitHubInstallationDetails;
+    try {
+      installDetails = await this.githubClient.getInstallation(installationId);
+    } catch (err: any) {
+      if (err.code === 'INSTALLATION_NOT_FOUND' || err.status === 404) {
+        throw new NotFoundException(
+          `La instalación GitHub ID ${installationId} no existe o no tiene acceso a la GitHub App.`
+        );
+      }
+      throw new BadRequestException(
+        `Error al validar instalación en GitHub: ${err.message || 'Fallo de comunicación con GitHub'}`
+      );
+    }
+
+    return await this.db.transaction(async (client) => {
+      const saved = await this.githubRepo.saveOrganizationInstallation(
+        {
+          organizationId: org.id,
+          installationId: installDetails.id,
+          accountLogin: installDetails.account.login,
+          accountType: installDetails.account.type || 'Organization',
+          targetId: installDetails.account.id || null,
+          permissions: installDetails.permissions || {},
+          repositorySelection: installDetails.repository_selection || 'selected',
+          status: 'ACTIVE',
+          installedBy: callerUser.id,
+        },
+        client
+      );
+
+      await this.auditService.logEvent(
+        {
+          eventCode: 'GITHUB_INSTALLATION_REGISTERED',
+          actorUserId: callerUser.id,
+          actorRole: callerUser.activeRoleId,
+          operation: 'REGISTER_GITHUB_INSTALLATION',
+          entityName: 'organization_github_installation',
+          entityId: saved.id,
+          resultStatus: 'SUCCESS',
+          payloadDiff: {
+            organizationId: org.id,
+            installationId: saved.installation_id,
+            accountLogin: saved.account_login,
+            targetId: saved.target_id,
+            installedBy: callerUser.code,
+          },
+        },
+        client
+      );
+
+      return saved;
+    });
   }
 }

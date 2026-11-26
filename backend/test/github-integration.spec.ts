@@ -22,6 +22,8 @@
  * ============================================================================
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import * as path from 'path';
+import * as fs from 'fs';
 import { DatabaseService } from '../src/database/database.service.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
 import { AuthRepository } from '../src/modules/auth/auth.repository.js';
@@ -611,6 +613,27 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
       );
     });
 
+    it('TDD-SEC-01-01: debe lanzar error si NODE_ENV=production y DATABASE_MODE=mock', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.DATABASE_MODE = 'mock';
+      delete process.env.ALLOW_MOCK_GITHUB;
+      expect(() => createGitHubApiClient()).toThrow(
+        'Configuración inconsistente: No se permite DATABASE_MODE=mock en entorno de producción'
+      );
+    });
+
+    it('TDD-SEC-01-02: debe exigir credenciales reales completas en producción', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.DATABASE_MODE = 'postgres';
+      delete process.env.GITHUB_CLIENT_MODE;
+      delete process.env.ALLOW_MOCK_GITHUB;
+      delete process.env.GITHUB_APP_ID;
+      delete process.env.GITHUB_APP_PRIVATE_KEY;
+      expect(() => createGitHubApiClient()).toThrow(
+        'En producción se requieren credenciales válidas'
+      );
+    });
+
     it('TDD-H04A-R01-03: debe lanzar error en modo PostgreSQL operativo sin ALLOW_MOCK_GITHUB', () => {
       process.env.NODE_ENV = 'development';
       process.env.DATABASE_MODE = 'postgres';
@@ -960,6 +983,130 @@ describe('TraceFlow SCM — INIT-H04A: Integración Segura de Repositorios GitHu
       expect(verifiedEvents.length).toBeGreaterThan(0);
       const lastVerified = verifiedEvents[verifiedEvents.length - 1];
       expect(lastVerified.resultStatus).toBe('SUCCESS');
+    });
+  });
+
+  // ==========================================================================
+  // H04B-00: Precondiciones Obligatorias de Seguridad (SEC-01 a SEC-04)
+  // ==========================================================================
+  describe('H04B-00: Precondiciones de Seguridad (SEC-01 a SEC-04)', () => {
+    it('TDD-SEC-02-01: saveOrganizationInstallation debe persistir installedBy, targetId y repositorySelection', async () => {
+      const saved = await githubRepo.saveOrganizationInstallation({
+        organizationId: 'c0000001-0000-0000-0000-000000000001',
+        installationId: 44556677,
+        accountLogin: 'exodo-security',
+        accountType: 'Organization',
+        targetId: 987654,
+        repositorySelection: 'selected',
+        status: 'ACTIVE',
+        installedBy: userJoanGestor.id,
+      });
+
+      expect(saved.installed_by).toBe(userJoanGestor.id);
+      expect(saved.target_id).toBe(987654);
+      expect(saved.repository_selection).toBe('selected');
+    });
+
+    it('TDD-SEC-02-02: registerOrganizationInstallation debe verificar identidad en GitHub, guardar installed_by y auditar', async () => {
+      githubClient.addMockInstallation({
+        id: 55667788,
+        account: { login: 'exodo-verified', id: 112233, type: 'Organization' },
+        app_id: 1234,
+        target_type: 'Organization',
+        permissions: { contents: 'read' },
+      });
+
+      const registered = await githubService.registerOrganizationInstallation(
+        'ORG-EXODO',
+        55667788,
+        userJoanGestor
+      );
+
+      expect(registered.installation_id).toBe(55667788);
+      expect(registered.account_login).toBe('exodo-verified');
+      expect(registered.target_id).toBe(112233);
+      expect(registered.installed_by).toBe(userJoanGestor.id);
+
+      const chain = auditService.getAuditChain();
+      const auditEvt = chain.find((e) => e.eventCode === 'GITHUB_INSTALLATION_REGISTERED');
+      expect(auditEvt).toBeDefined();
+      expect(auditEvt?.resultStatus).toBe('SUCCESS');
+    });
+
+    it('TDD-SEC-02-03: registerOrganizationInstallation debe rechazar a usuarios que no sean OWNER ni ADMIN de la organización', async () => {
+      await expect(
+        githubService.registerOrganizationInstallation(
+          'ORG-EXODO',
+          55667788,
+          userRenzoArqui // No es OWNER ni ADMIN en la organización
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('TDD-SEC-02-04: registerOrganizationInstallation debe rechazar instalaciones inexistentes en GitHub con 404', async () => {
+      await expect(
+        githubService.registerOrganizationInstallation(
+          'ORG-EXODO',
+          99999999, // Inexistente en GitHub
+          userJoanGestor
+        )
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('TDD-SEC-03-01: el script de rollback H04A-R no debe contener exclusiones arbitrarias de instalaciones semilla', async () => {
+      const rollbackSqlPath = path.resolve(
+        process.cwd(),
+        '..',
+        'supabase',
+        'migrations',
+        '202611260004_init_h04a_r_github_security_rollback.sql'
+      );
+      const rollbackContent = fs.readFileSync(rollbackSqlPath, 'utf8');
+      expect(rollbackContent).not.toContain('WHERE installation_id != 12345678');
+    });
+
+    it('TDD-SEC-04-01: getAvailableRepositories debe rechazar con 403 si el target_id numérico de la cuenta no coincide con el registrado', async () => {
+      // Registrar instalación con target_id = 999
+      githubRepo.addMockInstallation({
+        id: 'inst-target-mismatch',
+        organization_id: 'c0000001-0000-0000-0000-000000000001',
+        installation_id: 33445566,
+        account_login: 'exodo-mismatch',
+        account_type: 'Organization',
+        target_id: 999, // Esperado
+        permissions: { contents: 'read' },
+        status: 'ACTIVE',
+        installed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      // Simular que GitHub devuelve account.id = 888 (mismatch numérico)
+      githubClient.addMockInstallation({
+        id: 33445566,
+        account: { login: 'exodo-mismatch', id: 888, type: 'Organization' },
+        app_id: 1111,
+        target_type: 'Organization',
+        permissions: { contents: 'read' },
+      });
+
+      await expect(
+        githubService.getAvailableRepositories(testProjectDraftId, 33445566, userJoanGestor)
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('TDD-SEC-04-02: linkExistingRepository debe rechazar con 403 si el target_id numérico de la cuenta no coincide con el registrado', async () => {
+      // Usar la instalación 33445566 configurada arriba
+      await expect(
+        githubService.linkExistingRepository(
+          testProjectDraftId,
+          {
+            repoOwner: 'exodo-mismatch',
+            repoName: 'TraceFlow',
+            installationId: 33445566,
+          },
+          userJoanGestor
+        )
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });

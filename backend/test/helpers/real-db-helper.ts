@@ -245,6 +245,19 @@ export async function resetAndMigrateRealPostgres(
       await adminDbClient.query(migH04AR);
       appliedMigrations.push('202611260004_init_h04a_r_github_security.sql');
     }
+
+    // Paso 9: Migración INIT-H04B (saneamiento de instalaciones y precondiciones SEC-02)
+    if (
+      opts.targetMigration !== 'H02' &&
+      opts.targetMigration !== 'H03' &&
+      opts.targetMigration !== 'H04A' &&
+      opts.targetMigration !== 'H04A-R'
+    ) {
+      const migH04BPre = fs.readFileSync(path.join(migrationsDir, '202611260005_init_h04b_github_installations_remediation.sql'), 'utf8');
+      await adminDbClient.query("SET traceflow.is_test_environment = 'true';");
+      await adminDbClient.query(migH04BPre);
+      appliedMigrations.push('202611260005_init_h04b_github_installations_remediation.sql');
+    }
   } finally {
     await adminDbClient.end();
   }

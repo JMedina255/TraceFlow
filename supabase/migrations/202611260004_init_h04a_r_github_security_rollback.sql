@@ -32,10 +32,9 @@ BEGIN
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'traceflow' AND table_name = 'organization_github_installation') THEN
-        -- Descontar la instalación semilla inicial si no hay adicionales
+        -- SEC-03: No excluir arbitrariamente ninguna fila de instalación
         SELECT COUNT(*) INTO v_total_installations
-        FROM traceflow.organization_github_installation
-        WHERE installation_id != 12345678;
+        FROM traceflow.organization_github_installation;
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'traceflow' AND table_name = 'github_integration') THEN

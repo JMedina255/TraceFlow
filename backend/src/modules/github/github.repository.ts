@@ -99,8 +99,11 @@ export class GitHubRepository {
       installationId: number;
       accountLogin: string;
       accountType: 'Organization' | 'User';
+      targetId?: number | null;
       permissions?: Record<string, string>;
+      repositorySelection?: 'all' | 'selected';
       status?: 'ACTIVE' | 'SUSPENDED' | 'REVOKED';
+      installedBy?: string | null;
     },
     client?: pg.PoolClient | null
   ): Promise<OrganizationGitHubInstallationEntity> {
@@ -110,19 +113,25 @@ export class GitHubRepository {
       metadata: 'read',
       pull_requests: 'write',
     };
+    const targetId = data.targetId || null;
+    const repoSelection = data.repositorySelection || 'selected';
+    const installedBy = data.installedBy || null;
 
     if (this.db.getDatabaseMode() === 'postgres') {
       const sql = `
         INSERT INTO traceflow.organization_github_installation (
-          organization_id, installation_id, account_login, account_type, permissions, status
+          organization_id, installation_id, account_login, account_type, target_id, permissions, repository_selection, status, installed_by
         ) VALUES (
-          $1, $2, $3, $4, $5::jsonb, $6
+          $1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9
         )
         ON CONFLICT (organization_id, installation_id) DO UPDATE SET
           account_login = EXCLUDED.account_login,
           account_type = EXCLUDED.account_type,
+          target_id = COALESCE(EXCLUDED.target_id, organization_github_installation.target_id),
           permissions = EXCLUDED.permissions,
+          repository_selection = EXCLUDED.repository_selection,
           status = EXCLUDED.status,
+          installed_by = COALESCE(EXCLUDED.installed_by, organization_github_installation.installed_by),
           updated_at = NOW()
         RETURNING *;
       `;
@@ -131,8 +140,11 @@ export class GitHubRepository {
         data.installationId,
         data.accountLogin,
         data.accountType,
+        targetId,
         JSON.stringify(permissions),
+        repoSelection,
         status,
+        installedBy,
       ];
       const res = client
         ? await client.query(sql, params)
@@ -155,8 +167,11 @@ export class GitHubRepository {
       installation_id: data.installationId,
       account_login: data.accountLogin,
       account_type: data.accountType,
+      target_id: targetId,
       permissions,
+      repository_selection: repoSelection,
       status,
+      installed_by: installedBy,
       installed_at:
         existingIndex >= 0
           ? this.mockInstallations[existingIndex].installed_at

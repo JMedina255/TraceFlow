@@ -20,13 +20,28 @@ export function createGitHubApiClient(): IGitHubApiClient {
   const isTest = nodeEnv === 'test';
   const dbMode = process.env.DATABASE_MODE || 'mock';
 
-  // H04A-R01: En producción, se prohíbe terminantemente el cliente mock
+  // SEC-01: Prohibición absoluta de GitHub mock en producción y validación de consistencia
   if (nodeEnv === 'production') {
     if (clientMode === 'mock' || allowMock) {
       throw new Error(
         'CONFIG_ERROR: El cliente mock de GitHub está estrictamente prohibido en entorno de producción.'
       );
     }
+    if (dbMode === 'mock') {
+      throw new Error(
+        'CONFIG_ERROR: Configuración inconsistente: No se permite DATABASE_MODE=mock en entorno de producción.'
+      );
+    }
+    const appId = process.env.GITHUB_APP_ID;
+    const privateKey =
+      process.env.GITHUB_APP_PRIVATE_KEY || process.env.GITHUB_APP_PRIVATE_KEY_PATH;
+
+    if (!appId || !privateKey) {
+      throw new Error(
+        'CONFIG_ERROR: Configuración incompleta de GitHub App: En producción se requieren credenciales válidas (GITHUB_APP_ID y GITHUB_APP_PRIVATE_KEY).'
+      );
+    }
+    return new HttpGitHubApiClient();
   }
 
   // Si se solicita modo en vivo o es PostgreSQL operativo sin autorización explícita de mock en test/dev

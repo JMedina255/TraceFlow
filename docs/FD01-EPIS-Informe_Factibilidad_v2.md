@@ -299,7 +299,7 @@ Al ser $F_t$ una variable cuantitativa indeterminada en todos los periodos, la s
 La factibilidad operativa evalúa la receptividad organizacional de **ÉXODO S.A.C.**, la adaptación del personal, la segregación de responsabilidades y la compatibilidad del flujo propuesto con los ritmos de trabajo de la consultora.
 
 ### 1. Actores y Segregación de Responsabilidades
-El sistema se gobierna estrictamente sobre los **7 roles canónicos oficiales** definidos en la norma [`docs/DOCUMENTATION_RULES.md`](docs/DOCUMENTATION_RULES.md) (Sección 5):
+El sistema se gobierna estrictamente sobre los **7 roles canónicos oficiales** definidos en la norma [`DOCUMENTATION_RULES.md`](DOCUMENTATION_RULES.md) (Sección 5):
 1. **`Solicitante / Usuario Final` (`PU-01`):** Cliente de ÉXODO S.A.C. o usuario interno; registra la RFC, subsana observaciones, realiza la validación de conformidad del entregable y es notificado al cierre.
 2. **`Analista de Requerimientos / Gestor` (`PU-02`):** Recepciona la solicitud, valida la suficiencia de datos, categoriza criticidad y evalúa preliminarmente la pertinencia del cambio.
 3. **`Arquitecto / Especialista Técnico` (`PU-03`):** Analiza dependencias e impacto sobre la arquitectura, esfuerzo en horas, cronograma, costos y riesgos; emite el Informe Técnico de Impacto vinculante (`RF-05`, `RN-05`).

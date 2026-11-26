@@ -1,600 +1,151 @@
-<!-- Conversión a Markdown del documento PDF original. -->
-
-# Sistema de Gestión de Configuración de Software - TraceFlow SCM
-
-
-> Documento de Especificación de Requerimientos de Software (SRS) — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal por CCB)
-
-
-<!-- Página 1 del PDF original -->
-
-
-UNIVERSIDAD PRIVADA DE TACNA FACULTAD DE INGENIERÍA ESCUELA DE INGENIERÍA DE SISTEMAS “Sistema de Gestión de Configuración de Software - TraceFlow SCM”
-
-**Curso:**
-
-Gestión de la Configuración de Software
-
-**Docente:**
-
-Dr. RICARDO EDUARDO VALCARCEL ALVARADO
-
-**AUTOR:**
-
-ANTAYHUA MAMANI, Renzo Antonio (2022073504) MEDINA QUISPE, Joan Cristian (2022074255) LOYOLA VILCA CHOQUE, Renzo Fernando (2021072615) RIVERA MUÑOZ, Augusto Joaquin (2022073505) TACNA – PERÚ 2026
-
-
-<!-- Página 2 del PDF original -->
-
-
-| CONTROL DE VERSIONES |  |  |  |  |  |
-| --- | --- | --- | --- | --- | --- |
-| Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
-| 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
-| 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
-
-Sistema de Gestión de Configuración de Software - TraceFlow SCM Documento de Especificación de Requerimientos de Software — Revisión Candidata v1.1 (Borrador en Revisión — Pendiente de Aprobación Formal)
-
-
-<!-- Página 3 del PDF original -->
-
-
-| CONTROL DE VERSIONES |  |  |  |  |  |
-| --- | --- | --- | --- | --- | --- |
-| Versión | Hecha por | Revisada por | Aprobada por | Fecha | Motivo |
-| 1.0 | JCM/RAA/ RFL/AJR | RVA | RVA | 16/09/2026 | Versión 1.0 |
-| 1.1 | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Revisión Candidata v1.1: conciliación integral de 31 casos de uso (CU-04.1, CU-29 y CU-30), delimitación técnica sistema objetivo vs prototipo (§1.2), resolución de enlaces de figuras relativas (DOC-006), tratamiento normativo de diagramas pendientes de render (DOC-004/005), alerta de obsolescencia de DG-13 (DOC-025), redacción técnica de Viabilidad Ambiental (DOC-023) y eliminación de remanentes académicos (DOC-022). |
-
-## Índice general
-
-# 1. Introducción 5
-
-## 1.1. Propósito y Contexto Operativo 5
-
-## 1.2. Alcance del Sistema y Delimitación Técnica: Sistema Objetivo vs. Prototipo Demostrativo 5
-
-# 2. Generalidades de la Empresa 6
-
-## 2.1. Nombre de la Empresa 6
-
-## 2.2. Visión 6
-
-## 2.3. Misión 6
-
-## 2.4. Organigrama 7
-
-# 3. Visionamiento de la Empresa 8
-
-## 3.1. Descripción del Problema 8
-
-## 3.2. Objetivos de Negocios 9
-
-### 3.2.1. Objetivo General de Negocio 9
-
-### 3.2.2. Objetivos Específicos de Negocio 9
-
-## 3.3. Objetivos de Diseño 10
-
-### 3.3.1. Objetivo General de Negocio 10
-
-### 3.3.2. Objetivos Específicos de Negocio 10
-
-## 3.4. Alcance del proyecto 10
-
-### 3.4.1. Alcance Funcional 11
-
-### 3.4.2. Alcance No Funcional 11
-
-### 3.4.3. Alcance Tecnológico 11
-
-### 3.4.4. Delimitación del Proyecto 12
-
-## 3.5. Viabilidad del Sistema 12
-
-## 3.6. Información obtenida del Levantamiento de Información 16
-
-# 4. Análisis de Procesos 17
-
-## 4.1. Diagrama del Proceso Actual - Diagrama de actividades 17
-
-## 4.2. Diagrama del Proceso Propuesto - Diagrama de actividades Inicial 18
-
-# 5. Especificación de Requerimientos de Software 22
-
-## 5.1. Cuadro de Requerimientos Funcionales 22
-
-## 5.2. Cuadro de Requerimientos No funcionales 24
-
-## 5.3. Reglas de Negocio 25
-
-# 6. Fase de Desarrollo 28
-
-## 6.1. Perfiles de Usuario 29
-
-### 6.1.1. Diagrama de Paquetes 31
-
-### 6.1.2. Diagrama de Casos de Uso 33
-
-### 6.1.3. Escenarios de Caso de Uso (narrativa) 35
-
-## 6.2. Modelo Lógico 94
-
-### 6.2.1. Diagrama de Secuencia 95
-
-
-<!-- Página 4 del PDF original -->
-
-
-### 6.2.2. Diagrama de Clases 114
-### 6.2.3. Diagramas de Análisis de Objetos (Patrón BCE) 115
-## 6.3. Matrices de Trazabilidad SCM 116
-
-Conclusiones 115 Bibliografía 117
-
-
-<!-- Página 5 del PDF original -->
-
-
-# Informe de Especificación de Requisitos de Software
+# Sistema de Gestión de Configuración de Software — TraceFlow SCM
+
+> **Documento de Especificación de Requerimientos de Software (SRS)** — Revisión Funcional v2.0 (Consolidación SRS-02, Bloques 01 y 02 — Pendiente de Aprobación CCB)
+
+**Institución:** Universidad Privada de Tacna — Facultad de Ingeniería — Escuela Profesional de Ingeniería de Sistemas (EPIS)  
+**Curso:** Gestión de la Configuración de Software  
+**Docente:** Dr. Ricardo Eduardo Valcarcel Alvarado  
+**Organización Cliente:** ÉXODO S.A.C.  
+**Equipo de Desarrollo:** C-SharkTeam — Antayhua Mamani, Renzo Antonio (2022073504); Medina Quispe, Joan Cristian (2022074255); Loyola Vilca Choque, Renzo Fernando (2021072615); Rivera Muñoz, Augusto Joaquin (2022073505)  
+**Ubicación y Año:** Tacna – Perú, 2026
+
+---
+
+## Control de Versiones
+
+| Versión | Elaborado por | Revisado por | Aprobado por | Fecha | Motivo |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| **1.0** | JCM / RAA / RFL / AJR | RVA | RVA | 16/09/2026 | Versión 1.0 inicial de especificación académica EPIS-UPT. |
+| **1.1** | Equipo de Requisitos y GCSW | En revisión técnica | Pendiente CCB | 12/11/2026 | Conciliación integral de 31 casos de uso (`CU-04.1`, `CU-29`, `CU-30`), delimitación funcional y tratamiento normativo de diagramas y viabilidad. |
+| **1.2** | Equipo Arquitectura y GCSW | En revisión técnica | Pendiente CCB | 25/11/2026 | Alineación documental inicial (`DOC-02`), delimitación de capacidades implementadas y trazabilidad integral. |
+| **2.0** | Agente 01 (Documentación y Requisitos) | Pendiente CCB | Pendiente CCB | 25/11/2026 | Reestructuración funcional orientada al cliente (**SRS-02**): nuevo índice funcional, traslado del modelado técnico al SAD, integración del glosario del dominio, corrección piloto de `CU-04` y desarrollo completo de Bloques 01 (`CU-01`..`CU-03`) y 02 (`CU-04`..`CU-06`) con diagramas `DG-ACT-01`..`DG-ACT-06`. |
+
+---
+
+## Índice General
+
+- [1. Introducción](#1-introducción)
+  - [1.1. Propósito del documento](#11-propósito-del-documento)
+  - [1.2. Problema que resuelve el sistema y beneficios esperados](#12-problema-que-resuelve-el-sistema-y-beneficios-esperados)
+  - [1.3. Alcance funcional del sistema](#13-alcance-funcional-del-sistema)
+  - [1.4. Terminología y glosario del dominio](#14-terminología-y-glosario-del-dominio)
+- [2. Contexto Organizacional y Problemática (ÉXODO S.A.C.)](#2-contexto-organizacional-y-problemática-éxodo-sac)
+  - [2.1. Identidad organizacional y estructura de participantes](#21-identidad-organizacional-y-estructura-de-participantes)
+  - [2.2. Diagnóstico de la situación actual (AS-IS)](#22-diagnóstico-de-la-situación-actual-as-is)
+  - [2.3. Necesidades identificadas, objetivos y viabilidad](#23-necesidades-identificadas-objetivos-y-viabilidad)
+- [3. Descripción General del Sistema y Usuarios Participantes](#3-descripción-general-del-sistema-y-usuarios-participantes)
+  - [3.1. Qué ofrece TraceFlow SCM: capacidades por área funcional](#31-qué-ofrece-traceflow-scm-capacidades-por-área-funcional)
+  - [3.2. Flujo integral del ciclo de vida del cambio (TO-BE v2)](#32-flujo-integral-del-ciclo-de-vida-del-cambio-to-be-v2)
+  - [3.3. Usuarios participantes y opciones por perfil (PU-01 a PU-07)](#33-usuarios-participantes-y-opciones-por-perfil-pu-01-a-pu-07)
+  - [3.4. Políticas transversales y Segregación de Funciones (SoD)](#34-políticas-transversales-y-segregación-de-funciones-sod)
+- [4. Especificación de Requisitos](#4-especificación-de-requisitos)
+  - [4.1. Requisitos Funcionales (RF-01 a RF-18)](#41-requisitos-funcionales-rf-01-a-rf-18)
+  - [4.2. Requisitos No Funcionales (RNF-01 a RNF-09)](#42-requisitos-no-funcionales-rnf-01-a-rnf-09)
+  - [4.3. Reglas de Negocio (RN-01 a RN-09)](#43-reglas-de-negocio-rn-01-a-rn-09)
+- [5. Catálogo y Narrativas Funcionales de Casos de Uso](#5-catálogo-y-narrativas-funcionales-de-casos-de-uso)
+  - [5.1. Diagramas de Casos de Uso (DG-05 a DG-10)](#51-diagramas-de-casos-de-uso-dg-05-a-dg-10)
+  - [5.2. Matriz Resumen del Catálogo de Casos de Uso (TB-10)](#52-matriz-resumen-del-catálogo-de-casos-de-uso-tb-10)
+  - [5.3. Narrativas Funcionales Reestructuradas — Bloques 01 y 02](#53-narrativas-funcionales-reestructuradas--bloques-01-y-02)
+  - [5.4. Casos de Uso Pendientes de Reestructuración (CU-07 a CU-30)](#54-casos-de-uso-pendientes-de-reestructuración-cu-07-a-cu-30)
+- [6. Trazabilidad Funcional y Estado de Capacidades](#6-trazabilidad-funcional-y-estado-de-capacidades)
+  - [6.1. Matrices de Trazabilidad Funcional (TB-12, TB-13 y TB-14)](#61-matrices-de-trazabilidad-funcional-tb-12-tb-13-y-tb-14)
+  - [6.2. Estado funcional de capacidades entregadas frente al alcance aprobado](#62-estado-funcional-de-capacidades-entregadas-frente-al-alcance-aprobado)
+  - [6.3. Remisión del modelado técnico al SAD](#63-remisión-del-modelado-técnico-al-sad)
+- [7. Conclusiones y Referencias Normativas](#7-conclusiones-y-referencias-normativas)
+
+---
 
 # 1. Introducción
 
-## 1.1. Propósito y Contexto Operativo
+## 1.1. Propósito del documento
 
-El presente documento contiene la especificación de requerimientos de software (SRS) para el desarrollo del Sistema de Gestión de Configuración de Software - TraceFlow SCM, concebido para optimizar y formalizar los procesos operativos de la empresa consultora ÉXODO S.A.C. en el marco del semestre académico 2026-II en la EPIS-UPT. En el contexto productivo de ÉXODO S.A.C., la prestación de servicios de desarrollo y mantenimiento de software a medida se realiza actualmente sin un sistema formal ni centralizado de Gestión de la Configuración del Software (SCM). El código fuente, los esquemas de bases de datos y la documentación técnica de los proyectos se encuentran dispersos entre los equipos locales de los consultores y cuentas personales en diversas plataformas, careciendo de un estándar estricto de versionamiento e identificación de artefactos. Esta desarticulación operativa ocasiona la coexistencia de múltiples copias divergentes, pérdidas críticas de avances por sobreescritura durante el trabajo concurrente y la ausencia de líneas base (baselines) estables a las cuales retornar ante incidentes imprevistos en los entornos de producción de los clientes. Para resolver esta brecha y mitigar los riesgos de retrabajo y pérdida de información, el equipo de desarrollo C-Shark Team formula la presente especificación de requisitos con la finalidad de diseñar e implementar una solución integral. TraceFlow SCM provee una plataforma web centralizada que automatiza y estandariza el flujo integral de Solicitudes de Cambio (RFC) bajo la supervisión del Comité de Control de Cambios (CCB), gestiona la transferencia controlada de Elementos de Configuración (ECS) entre las bibliotecas de Trabajo, Soporte y Maestra mediante Check-Out/Check-In, impone bloqueos de sincronización para evitar conflictos de concurrencia y garantiza la trazabilidad e integridad criptográfica (SHA-256) de todos los activos de software liberados.
+El presente documento contiene la **Especificación de Requisitos de Software (SRS)** del **Sistema de Gestión de Configuración de Software — TraceFlow SCM**, elaborado para **ÉXODO S.A.C.** en el marco del curso Gestión de la Configuración de Software de la EPIS-UPT (semestre académico 2026-II).
 
-## 1.2. Alcance del Sistema y Delimitación Técnica: Sistema Objetivo vs. Prototipo Demostrativo
+Su finalidad es definir con claridad, desde la perspectiva funcional del cliente y de los usuarios finales, qué problema resuelve el sistema, qué capacidades ofrece, quiénes participan en cada etapa del flujo de cambios, qué reglas obligatorias gobiernan su operación y cuáles son los criterios de aceptación verificables para cada funcionalidad. Los aspectos técnicos de arquitectura interna, diseño de datos y contratos de programación residen en el Documento de Arquitectura de Software ([`SAD_FINAL.md`](SAD_FINAL.md)).
 
-Para asegurar la máxima transparencia en la auditoría de configuración y prevenir ambigüedades entre los requisitos de ingeniería y los entregables de software evaluables, se establece formalmente la delimitación técnica entre el **Sistema Objetivo en Producción (TraceFlow SCM Enterprise)** y el **Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)**:
+## 1.2. Problema que resuelve el sistema y beneficios esperados
 
-### 1.2.1. Sistema Objetivo en Producción (TraceFlow SCM Enterprise)
-Corresponde a la solución integral corporativa diseñada para gobernar la infraestructura SCM de ÉXODO S.A.C. en entornos de producción:
-- **Arquitectura:** Desacoplada en microservicios contenerizados (Docker/Kubernetes) con backend en Java (Spring Boot) o Node.js/TypeScript.
-- **Persistencia:** Base de datos relacional PostgreSQL con particionamiento de auditoría y soporte de transacciones ACID estrictas.
-- **Almacenamiento de Artefactos:** Servidor de almacenamiento de objetos compatible con S3 (MinIO) para el control de versiones binarias y fuentes de ECS con cálculo forzoso de hash SHA-256.
-- **Seguridad e Identidad:** Servidor IAM centralizado (Keycloak / OAuth2 / OIDC) con segregación estricta de funciones bajo control de acceso basado en roles (RBAC) para los 7 perfiles canónicos (`PU-01` a `PU-07`).
-- **Capacidades Operativas:** Automatización completa de pipelines CI/CD, agentes de sincronización para repositorios Git, escaneo automatizado de vulnerabilidades y notificaciones SMTP/WebSocket en tiempo real.
+En la operación cotidiana de **ÉXODO S.A.C.**, el desarrollo y mantenimiento de software a medida para distintos clientes se venía realizando sin un sistema centralizado de Gestión de la Configuración del Software (`SCM`). El código fuente, los esquemas de datos y la documentación técnica se distribuían en equipos personales y cuentas individuales, coordinando modificaciones mediante acuerdos verbales o mensajería instantánea sin aprobaciones ni trazabilidad formal.
 
-### 1.2.2. Prototipo Demostrativo Funcional (TraceFlow SCM Prototype v1.0.0-beta)
-Corresponde al software interactivo desarrollado y desplegado en el repositorio (`prototype/`), concebido como prueba de concepto de alta fidelidad para validar la usabilidad, navegación, flujos de negocio y experiencia de usuario (UX):
-- **Tecnología:** Single Page Application (SPA) desarrollada en React 19, TypeScript 5, Vite 6 y estilizada con TailwindCSS.
-- **Gestión de Estado y Persistencia:** Servicio reactivo en memoria (`MockDataService`) con persistencia local en el navegador (`localStorage`), inicializado con un dataset preconfigurado de proyectos, ECS, usuarios y solicitudes RFC representativas.
-- **Catálogo de Vistas e Interfaz:** El prototipo implementa formalmente **20 pantallas canónicas** (`SCREEN-01` a `SCREEN-20`), estructuradas según el inventario de auditoría:
-  - **8 Pantallas Funcionales Interactivas (implementadas mediante 9 componentes de vista especializados):**
-    1. `SCREEN-01` — Inicio de Sesión / Login (`LoginView.tsx`): Autenticación simulada y selector contextual de rol activo (`PU-01` a `PU-07`).
-    2. `SCREEN-02` — Panel de Control Principal / Dashboard (`DashboardView.tsx`): Métricas de RFC por estado, volumen de cambios y accesos directos.
-    3. `SCREEN-05` — Bandeja de Solicitudes de Cambio (`RfcListView.tsx`): Listado paginado, búsqueda, filtrado multidimensional por estado y prioridad.
-    4. `SCREEN-06` — Expediente 360° de la RFC (`RfcDetailView.tsx`): Visualización exhaustiva del expediente, historial de transiciones, actas, hashes y trazabilidad completa.
-    5. `SCREEN-07` — Registro y Subsanación de RFC: Implementada mediante 2 vistas independientes para respetar el principio de responsabilidad única:
-       - `RfcCreateView.tsx`: Captura inicial de RFC en borrador / enviada (`CU-04`).
-       - `RfcEditView.tsx`: Edición y subsanación de RFC observadas (`CU-04.1`).
-    6. `SCREEN-08` — Análisis de Impacto Técnico (`ImpactAnalysisView.tsx`): Evaluación arquitectónica de esfuerzo, riesgos, dependencias y costos (`CU-06`).
-    7. `SCREEN-09` — Deliberación y Dictamen del CCB (`CcbDeliberationView.tsx`): Interfaz de votación, emisión de acta de comité y dictamen formal de cambios mayores (`CU-07`).
-    8. `SCREEN-10` — Autorización de Cambio Menor (`MinorApprovalView.tsx`): Procedimiento abreviado de aprobación para cambios de bajo riesgo por la autoridad delegada (`CU-30`).
-  - **12 Pantallas de Demostración Estructurada (Placeholders Guiados):**
-    - `SCREEN-03` (Registro de Proyectos), `SCREEN-04` (Catálogo de ECS), `SCREEN-11` (Bandeja ECN/ECO), `SCREEN-12` (Operación Check-Out), `SCREEN-13` (Operación Check-In), `SCREEN-14` (Gestión de Líneas Base), `SCREEN-15` (Rollback y Reversión), `SCREEN-16` (Gestión de Incidencias), `SCREEN-17` (Auditoría y Trazabilidad SCM), `SCREEN-18` (Generador de Reportes), `SCREEN-19` (Administración de Usuarios) y `SCREEN-20` (Configuración del Sistema). Todas gobernadas por el componente unificado `ScreenPlaceholder.tsx` que especifica los casos de uso (`CU`), requisitos funcionales (`RF`), reglas de negocio (`RN`) y roles autorizados asociados a cada módulo.
-  - **2 Vistas de Soporte del Sistema:**
-    - `AccessDeniedView.tsx`: Control de acceso contextual (error 403) ante intentos de navegación no autorizados según la matriz RBAC.
-    - `NotFoundView.tsx`: Control de rutas inválidas (error 404).
+Esta forma de trabajo generaba copias divergentes, pérdida de avances por sobreescritura cuando varios consultores intervenían un mismo componente, entregas sin verificación independiente de calidad e imposibilidad de retornar con seguridad a una versión estable ante fallos en producción.
 
-Esta delimitación garantiza que las afirmaciones de verificación en el presente documento diferencien explícitamente entre la funcionalidad validada en el prototipo y los requisitos que serán instrumentados en la fase de construcción del sistema objetivo.
+**TraceFlow SCM** resuelve esta problemática proporcionando una plataforma web institucional centralizada que:
+- Ordena y documenta cada solicitud de modificación (`RFC`) desde su registro hasta su cierre formal.
+- Garantiza que todo cambio sea evaluado técnicamente y autorizado por la instancia correspondiente antes de modificar artefactos estables.
+- Separa los entornos de **Trabajo**, **Soporte** y **Maestra**, evitando modificaciones concurrentes destructivas mediante bloqueos exclusivos de sincronización.
+- Asegura la doble validación previa a la entrega definitiva (conformidad técnica de Calidad `QA` y aceptación del Usuario `UAT`), conservando trazabilidad e integridad verificable de cada versión liberada.
 
+## 1.3. Alcance funcional del sistema
 
-<!-- Página 6 del PDF original -->
+TraceFlow SCM gobierna el ciclo completo de Gestión de la Configuración de Software y Control de Cambios para múltiples proyectos de clientes de **ÉXODO S.A.C.** operando de forma aislada entre sí:
 
+- **Qué hace el sistema:** administración de usuarios y perfiles funcionales (`RF-01`); gestión y consulta aislada de proyectos (`RF-02`); registro y clasificación de Elementos de Configuración de Software (`RF-03`); registro, subsanación y validación inicial de Solicitudes de Cambio (`RF-04`); evaluación técnica de impacto y clasificación Menor/Mayor (`RF-05`); deliberación colegiada del Comité de Control de Cambios (`RF-06`) y autorización delegada para cambios menores; emisión formal de Órdenes de Cambio (`RF-07`); gestión de las tres bibliotecas mediante operaciones controladas de extracción y reintegración (`RF-08`, `RF-09`); pruebas unitarias, certificación de calidad, re-testeo y aceptación de usuario (`RF-10`, `RF-11`); reversión controlada y cancelación de órdenes (`RF-12`); congelamiento de líneas base (`RF-13`); cierre formal diferenciado y notificaciones (`RF-14`); gestión de incidencias y derivación a solicitudes de cambio (`RF-15`); trazabilidad histórica, auditoría e integridad (`RF-16`, `RF-17`) y emisión de reportes (`RF-18`).
+- **Qué excluye el alcance:** soporte físico de hardware, administración de redes externas y procesos comerciales, contables o de facturación de ÉXODO S.A.C.
+- **Delimitación entre alcance aprobado y estado de construcción:** todos los requisitos funcionales (`RF-01` a `RF-18`), reglas de negocio (`RN-01` a `RN-09`) y casos de uso (`CU-01` a `CU-30` y `CU-04.1`) permanecen aprobados y vigentes como alcance completo del sistema. Las diferencias entre lo ya operativo y lo planificado para siguientes hitos de desarrollo se registran en la Sección 6.2 sin recortar los requisitos aprobados.
 
-# 2. Generalidades de la Empresa
+## 1.4. Terminología y glosario del dominio
 
-## 2.1. Nombre de la Empresa
+Con el fin de garantizar una lectura uniforme por parte del cliente y de todos los participantes del proyecto, a continuación se consolidan los términos funcionales oficiales de **TraceFlow SCM**:
 
-La empresa objeto del presente proyecto es ÉXODO S.A.C., una consultora peruana dedicada al desarrollo de software a medida, mantenimiento de sistemas y prestación de servicios de tecnologías de la información para clientes de distintos sectores productivos.
+| Término oficial | Sigla | Significado funcional dentro de TraceFlow SCM |
+|---|---:|---|
+| **Solicitud de Cambio** | `RFC` | Expediente formal mediante el cual el Solicitante registra una necesidad de cambio correctivo, adaptativo o perfectivo sobre un componente del proyecto, incluyendo justificación, prioridad y seguimiento por estados oficiales. |
+| **Elemento de Configuración de Software** | `ECS` | Artefacto de software o documento técnico controlado formalmente por el sistema (código fuente, manual, especificación o esquema de datos) sujeto a versionamiento, custodia en bibliotecas y trazabilidad. |
+| **Orden de Cambio** | `ECN/ECO` | Autorización ejecutiva formal emitida tras aprobarse una RFC, que habilita e instruye la ejecución controlada de la modificación sobre el ECS asignado. |
+| **Comité de Control de Cambios** | `CCB` | Órgano colegiado encargado de deliberar, votar de forma individual e irrevocable y emitir resoluciones formales sobre cambios clasificados como Mayores. |
+| **Informe Técnico de Impacto** | `TIA` | Evaluación elaborada por el Arquitecto / Especialista Técnico que analiza dependencias, riesgos, plan de reversión y afectación a la Triple Restricción (alcance, tiempo y costo), dictaminando si un cambio es Menor o Mayor. |
+| **Autorización Delegada (Doble Llave)** | — | Mecanismo ágil de decisión para cambios clasificados como Menores que exige la autorización concurrente de dos responsables distintos: Gestor (`PU-02`) y Arquitecto (`PU-03`). |
+| **Biblioteca de Trabajo** | — | Espacio controlado y temporal donde el Desarrollador implementa modificaciones autorizadas sobre copias extraídas bajo bloqueo exclusivo. |
+| **Biblioteca de Soporte** | — | Entorno intermedio de integración y verificación donde se ejecutan pruebas de integración, certificación de Calidad (`QA`) y validación de usuario (`UAT`). |
+| **Biblioteca Maestra** | — | Repositorio definitivo y protegido que resguarda únicamente versiones aprobadas, certificadas, aceptadas por el usuario y congeladas en Línea Base. |
+| **Línea Base** | `LB` | Conjunto congelado e inmutable de versiones aprobadas de ECS en un hito del proyecto, identificado mediante numeración `mayor.menor.parche` como referencia segura de entrega o retorno. |
+| **Check-Out / Extracción** | — | Operación controlada mediante la cual el Administrador SCM extrae un ECS autorizado hacia la Biblioteca de Trabajo activando un bloqueo exclusivo mientras dura la modificación. |
+| **Check-In / Reintegración** | — | Operación controlada que reintegra un ECS verificado hacia la Biblioteca Maestra o de Soporte una vez cumplidas las validaciones exigidas, liberando el bloqueo de sincronización. |
+| **Bloqueo de Sincronización** | — | Mecanismo exclusivo que impide que dos personas modifiquen simultáneamente un mismo ECS mientras exista una orden de cambio en ejecución. |
+| **Certificación de Conformidad** | `QA` | Dictamen técnico emitido por el Equipo de Calidad tras superar satisfactoriamente las pruebas de integración y verificación funcional de un cambio. |
+| **Aceptación del Usuario** | `UAT` | Validación y conformidad final suscrita por el Solicitante / Usuario Final en entorno controlado como requisito previo al pase definitivo a Biblioteca Maestra. |
+| **Subsanación** | — | Etapa correctiva mediante la cual el Solicitante aclara o completa una RFC observada por el Gestor durante la revisión inicial (`CU-04.1`), pudiendo también desistir voluntariamente. |
+| **Desestimación** | — | Cierre formal anticipado de una solicitud que resulta improcedente, duplicada, fuera de alcance o que no es subsanada dentro del plazo establecido. |
+| **Reversión** | `Rollback` | Procedimiento ejecutado en la Biblioteca de Trabajo para restituir un ECS a su última versión estable ante fallos no subsanados en pruebas o rechazo en aceptación de usuario. |
+| **Incidencia** | `INC` | Reporte operativo de falla o anomalía atendido en mesa de soporte que puede ser resuelto o derivado formalmente a una nueva Solicitud de Cambio (`RFC`). |
+| **Registro de Auditoría** | `EVT` | Bitácora histórica inalterable de operaciones críticas realizadas por los usuarios, con identificación del responsable, perfil, fecha y verificación de integridad. |
+| **Control de Acceso Basado en Roles** | `RBAC` | Política de seguridad que restringe cada pantalla y operación exclusivamente a los perfiles funcionales habilitados para ello. |
+| **Segregación de Funciones** | `SoD` | Principio de control interno que impide que una misma persona concentre facultades incompatibles en un mismo trámite (por ejemplo: evaluar o aprobar su propia solicitud, o certificar en calidad el código que implementó). |
 
-## 2.2. Visión
+*(Las equivalencias técnicas entre este glosario y los nombres de tablas o componentes de programación se documentan en [`GLOSARIO.md`](GLOSARIO.md) y [`MATRIZ_NOMENCLATURA.md`](MATRIZ_NOMENCLATURA.md)).*
 
-ÉXODO S.A.C. tiene como visión consolidarse como una empresa referente en desarrollo de software en la región sur del Perú, reconocida por la calidad, la trazabilidad y la confiabilidad de las soluciones tecnológicas que entrega a sus clientes.
+---
 
-## 2.3. Misión
+# 2. Contexto Organizacional y Problemática (ÉXODO S.A.C.)
 
-Brindar soluciones de software a medida que resuelvan problemas reales de negocio, aplicando buenas prácticas de ingeniería de software, control de calidad y gestión de configuración, garantizando la satisfacción y confianza de nuestros clientes.
+## 2.1. Identidad organizacional y estructura de participantes
 
-
-<!-- Página 7 del PDF original -->
-
-
-## 2.4. Organigrama
-
-ÉXODO S.A.C. presenta una estructura organizacional funcional orientada a la ejecución de proyectos de software. En el contexto del sistema TraceFlow SCM, los actores relevantes se ubican en los niveles estratégico (Gerencia de Proyectos), táctico (Jefaturas de Proyecto) y operativo (equipos de desarrollo, control de calidad y soporte).
-
-**Organigrama del C-SharkTeam**
-
-Nota: Elaboración Propia
-
-**Estructura del Equipo de Desarrollo**
-
-Para el análisis, especificación y construcción del sistema TraceFlow SCM, el equipo de desarrollo se estructura de manera especializada asignando
-
-**responsabilidades técnicas a sus cuatro integrantes:**
-
-Dirección de Proyecto y Gobernanza SCM: Liderada por Joan Cristian Medina Quispe, responsable de la coordinación general del ciclo de vida del software, modelado de procesos de control de cambios (RFC/ECN), definición de políticas de bibliotecas (Trabajo, Soporte y Maestra) y arquitectura de seguridad basada en roles (RBAC). Ingeniería de Backend y Servicios de Integración: A cargo de Renzo Antonio Antayhua Mamani, responsable del desarrollo de la lógica de negocio centralizada, microservicios para el motor de versionamiento, algoritmos de validación de integridad criptográfica (SHA-256) y mecanismos de bloqueo de concurrencia para evitar sobreescrituras en la Biblioteca de Trabajo.
-
-
-**Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente**
+- **Nombre de la Empresa:** **ÉXODO S.A.C.**, consultora peruana dedicada al desarrollo de software a medida, mantenimiento de sistemas y prestación de servicios de tecnologías de la información para clientes de diversos sectores productivos.
+- **Visión:** Consolidarse como una empresa referente en desarrollo de software en la región sur del Perú, reconocida por la calidad, la trazabilidad y la confiabilidad de las soluciones tecnológicas que entrega a sus clientes.
+- **Misión:** Brindar soluciones de software a medida que resuelvan problemas reales de negocio, aplicando buenas prácticas de ingeniería de software, control de calidad y gestión de configuración, garantizando la satisfacción y confianza de los clientes.
+- **Estructura de trabajo y participantes:** La organización vincula sus niveles estratégico (Gerencia de Proyectos), táctico (Jefaturas de Proyecto) y operativo (desarrollo, calidad y soporte) con el equipo responsable de análisis, arquitectura, construcción y aseguramiento de calidad (**C-SharkTeam**).
 
 ![Diagrama DG-01: Organigrama del C-SharkTeam y Entorno Cliente](assets/diagramas/render/generales/DG-01.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-01.*
+*Fuente: Elaboración propia (`DG-01`, compendio [`DIAGRAMS.md`](DIAGRAMS.md)).*
 
-#### Código PlantUML del Diagrama
+## 2.2. Diagnóstico de la situación actual (AS-IS)
 
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
+El levantamiento de información en **ÉXODO S.A.C.** evidenció las siguientes deficiencias operativas en el proceso actual sin herramientas formales de control de configuración:
 
-title <b>TraceFlow SCM - Organigrama del Equipo C-SharkTeam y Entorno Cliente</b>
+1. **Almacenamiento disperso:** El código fuente y la documentación residen en equipos personales y cuentas individuales sin repositorio institucional centralizado.
+2. **Control de versiones empírico:** Se emplean nombres manuales de carpetas o archivos comprimidos (por ejemplo, `"Proyecto_Cliente_Final_v2"`) sin estándares de versionamiento ni líneas base definidas.
+3. **Flujo de cambios informal:** Los ajustes se solicitan y coordinan de forma verbal o por mensajería instantánea sin registrar quién autorizó el cambio, qué impacto tiene o por qué se modificó un componente.
+4. **Sobreescritura por falta de sincronización:** La ausencia de bloqueos exclusivos provoca pérdida de avances cuando varios consultores trabajan simultáneamente sobre los mismos componentes.
+5. **Entregas sin validación ni retorno seguro:** Los cambios llegan a entornos de cliente sin certificación previa de calidad ni puntos estables para revertir defectos críticos.
 
-package "C-SharkTeam (Equipo de Desarrollo TraceFlow SCM)" as DEV {
-    class "Joan Cristian Medina Quispe" as JCM {
-        + Dirección, Análisis y Gobernanza SCM
-        --
-        * Coordinación del ciclo de vida
-        * Análisis de requerimientos y SSOT
-        * Modelado de procesos (RFC/ECN)
-        * Políticas de bibliotecas y RBAC
-    }
+![Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)](assets/diagramas/render/generales/DG-02.svg)
 
-    class "Renzo Antonio Antayhua Mamani" as RAA {
-        + Backend y Mecanismos SCM
-        --
-        * Lógica de negocio centralizada
-        * Motor de versionamiento
-        * Integridad criptográfica (SHA-256)
-        * Bloqueos de sincronización
-    }
+*Fuente: Elaboración propia (`DG-02`, compendio [`DIAGRAMS.md`](DIAGRAMS.md)).*
 
-    class "Renzo Fernando Loyola Vilca Choque" as RFL {
-        + Frontend, UX y Mockups
-        --
-        * Interfaz web responsiva
-        * Navegación y diseño de mockups
-        * Tableros de trazabilidad
-        * Consolas para el CCB
-        * Formularios de RFC y subsanación
-    }
+## 2.3. Necesidades identificadas, objetivos y viabilidad
 
-    class "Augusto Joaquin Rivera Muñoz" as AJR {
-        + QA, Persistencia y Validación
-        --
-        * Modelado relacional y persistencia
-        * Registro y módulo de auditoría
-        * Suite de pruebas unitarias/integración
-        * Validación técnica de entregables
-    }
-
-    JCM --> RAA : Coordina lógica SCM
-    JCM --> RFL : Coordina interfaces y UX
-    JCM --> AJR : Coordina aseguramiento de calidad
-}
-
-package "Entorno Cliente / Beneficiario (ÉXODO S.A.C.)" as CLIENT {
-    class "Jefes de Proyecto y Administradores SCM" as ADM {
-        * Supervisión de proyectos aislados
-        * Custodia de Bibliotecas Maestras
-    }
-
-    class "Comité de Control de Cambios (CCB)" as CCB {
-        * Evaluación colegiada de RFC
-        * Emisión de Órdenes de Cambio (ECN/ECO)
-    }
-
-    class "Consultores y Desarrolladores de Software" as DEV_CLI {
-        * Ejecución de Check-Out / Check-In
-        * Implementación de modificaciones
-    }
-
-    ADM --> CCB : Consulta decisiones
-    CCB --> DEV_CLI : Emite orden de cambio
-}
-
-DEV ..> CLIENT : Provee plataforma TraceFlow SCM
-@enduml
-```
-
-
-<!-- Página 8 del PDF original -->
-
-
-Ingeniería de Frontend y Experiencia de Usuario (UI/UX): Liderada por Renzo Fernando Loyola Vilca Choque, responsable de la construcción de la interfaz web responsiva, tableros de control para la trazabilidad de cambios, consolas de gestión para el Comité de Control de Cambios (CCB) y formularios dinámicos para el registro y subsanación de solicitudes. Aseguramiento de la Calidad (QA), Auditoría y Persistencia: A cargo de Augusto Joaquin Rivera Muñoz, responsable del diseño y modelado de persistencia de datos relacionales, administración de esquemas de trazabilidad histórica, implementación del módulo de registro de auditoría de acciones del sistema y definición de la suite de pruebas unitarias y de integración. Entorno Cliente / Beneficiario (ÉXODO S.A.C.):Jefes de Proyecto y Administradores SCM: Supervisión de proyectos aislados y custodia de las Bibliotecas Maestras.Comité de Control de Cambios (CCB): Evaluación colegiada y emisión de Órdenes de Cambio.Consultores y Desarrolladores de Software: Usuarios operativos que ejecutan Check-Out/Check-In e implementan las modificaciones asignadas.
-
-
-<!-- Página 9 del PDF original -->
-
-
-# 3. Visionamiento de la Empresa
-
-## 3.1. Descripción del Problema
-
-Actualmente, ÉXODO S.A.C. gestiona el desarrollo de software para sus clientes sin un sistema formal de Gestión de la Configuración. El código fuente, la documentación y los artefactos de cada proyecto se encuentran dispersos entre los equipos de cómputo de los consultores y cuentas personales en distintas plataformas, sin un repositorio centralizado ni un estándar de identificación de versiones. Esta situación provoca la coexistencia de múltiples copias de un mismo componente sin un registro histórico confiable, generando conflictos al integrar el trabajo de distintos desarrolladores, pérdida de avances por sobreescritura de archivos y retrasos en la entrega de los proyectos comprometidos con los clientes. Asimismo, la ausencia de un flujo formal de control de cambios y de líneas base claramente definidas impide identificar con certeza qué versión de un producto se encuentra en producción, quién autorizó una modificación específica o cómo revertir un cambio que introdujo un defecto crítico, comprometiendo la calidad del servicio y la relación de confianza con los clientes de ÉXODO S.A.C.
-
-
-<!-- Página 10 del PDF original -->
-
-
-## 3.2. Objetivos de Negocios
-
-### 3.2.1. Objetivo General de Negocio
-
-Optimizar la calidad y la continuidad de los servicios de desarrollo de software que ÉXODO S.A.C. entrega a sus clientes, mediante la implementación de un sistema de gestión de configuración que reduzca los riesgos de pérdida de información y los costos asociados a la corrección de errores por versiones conflictivas.
-
-### 3.2.2. Objetivos Específicos de Negocio
-
-- Reducción de Retrabajo: Disminuir en un 25% el tiempo invertido por
-
-los equipos de desarrollo en la resolución de conflictos de código y en la recuperación de archivos perdidos.
-
-- Garantía de Integridad: Asegurar que el 100% de las versiones
-
-entregadas a los clientes correspondan a versiones validadas y aprobadas mediante el flujo formal de control de cambios.
-
-- Mejora de la Transparencia: Establecer una trazabilidad total que permita
-
-identificar el origen, autor y justificación de cualquier cambio realizado en un proyecto en menos de 24 horas.
-
-- Estandarización de Procesos: Unificar los flujos de trabajo de los
-
-distintos equipos de proyecto de ÉXODO S.A.C. bajo una única política de control de cambios.
-
-- Satisfacción del Cliente: Reducir en un 30% las incidencias relacionadas
-
-con entregas de versiones incorrectas o no autorizadas al cliente.
-
-## 3.3. Objetivos de Diseño
-
-### 3.3.1. Objetivo General de Negocio
-
-Definir la arquitectura lógica y funcional de TraceFlow SCM, un sistema robusto de gestión de configuración que centralice, proteja y organice los artefactos de software de los proyectos de ÉXODO S.A.C., asegurando una estructura escalable que facilite el control de cambios sin afectar la productividad de los equipos de desarrollo.
-
-
-<!-- Página 11 del PDF original -->
-
-
-### 3.3.2. Objetivos Específicos de Negocio
-
-- Diseño de Repositorio Centralizado: Definir una estructura de
-
-almacenamiento jerárquica que permita organizar el código fuente, la documentación técnica y los recursos de cada proyecto de cliente.
-
-- Establecimiento de Líneas Base (Baselines): Diseñar mecanismos de
-
-control para identificar y congelar versiones estables del software, garantizando puntos de recuperación confiables.
-
-- Modelado del Flujo de Cambios: Estructurar un proceso formal de
-
-solicitud, evaluación y aprobación de cambios que garantice que ninguna modificación sea integrada sin previa validación técnica.
-
-- Definición de Roles y Permisos: Diseñar un esquema de seguridad
-
-basado en roles que restrinja el acceso a los repositorios críticos y asegure que solo el personal autorizado libere versiones oficiales.
-
-- Trazabilidad y Auditoría: Diseñar mecanismos de registro e integridad
-
-que permitan reconstruir el historial completo de un elemento de configuración.
-
-## 3.4. Alcance del proyecto
-
-El presente proyecto abarca el análisis y definición funcional de TraceFlow SCM, un Sistema de Gestión de Configuración de Software diseñado específicamente para las necesidades de ÉXODO S.A.C. El alcance se centra en establecer las reglas, procesos y controles necesarios para administrar el ciclo de vida de los artefactos digitales de los proyectos de la empresa y de sus clientes.
-
-### 3.4.1. Alcance Funcional
-
-- Identificación de Elementos de Configuración (ECS): registro y
-
-catalogación de los componentes de software (código fuente, documentación, esquemas de base de datos) de cada proyecto.
-
-- Gestión de Versiones: mantenimiento de un historial completo de
-
-cambios mediante operaciones de Check-in y Check-out, con posibilidad de retorno a estados anteriores.
-
-
-<!-- Página 12 del PDF original -->
-
-
-- Control de Cambios: flujo formal para solicitar, evaluar y aprobar
-
-modificaciones antes de su integración al proyecto.
-
-- Gestión de Líneas Base: funcionalidad para crear y congelar versiones
-
-estables destinadas a la entrega o despliegue oficial al cliente.
-
-- Gestión de Incidencias y Soporte: registro y seguimiento de incidencias
-
-reportadas por los equipos internos o por los clientes.
-
-- Generación de Reportes y Auditoría: emisión de informes sobre el estado
-
-de la configuración y trazabilidad de las acciones realizadas.
-
-### 3.4.2. Alcance No Funcional
-
-- Seguridad y Acceso: restricción de permisos basada en roles
-
-(Administrador SCM, Jefe de Proyecto, Desarrollador, QA, Auditor).
-
-- Disponibilidad: el sistema debe operar con un tiempo de actividad
-
-objetivo del 99.9% durante los periodos críticos de desarrollo y entrega.
-
-- Integridad de Datos: garantía de que los artefactos almacenados no
-
-sufran corrupciones durante transferencias, fusiones o respaldos.
-
-- Escalabilidad: capacidad de soportar el crecimiento de la cartera de
-
-proyectos de ÉXODO S.A.C. (más de 50 proyectos simultáneos).
-
-- Usabilidad: curva de aprendizaje mínima para los nuevos consultores o
-
-practicantes que se incorporen a los equipos de proyecto.
-
-### 3.4.3. Alcance Tecnológico
-
-- Arquitectura de Repositorios: análisis basado en sistemas de control de
-
-versiones distribuidos (Git).
-
-- Entornos de Desarrollo: compatibilidad con las herramientas utilizadas
-
-por los equipos de ÉXODO S.A.C. (Visual Studio Code, IntelliJ IDEA, Android Studio).
-
-- Integración: compatibilidad con herramientas de automatización de
-
-compilación, pruebas y despliegue (CI/CD).
-
-- Almacenamiento: evaluación de necesidades de almacenamiento en
-
-servidores propios o servicios en la nube (GitHub, GitLab, Azure DevOps).
-
-
-<!-- Página 13 del PDF original -->
-
-
-### 3.4.4. Delimitación del Proyecto
-
-- Delimitación Espacial: el proyecto se circunscribe a las áreas de
-
-desarrollo y gestión de proyectos de ÉXODO S.A.C.
-
-- Delimitación Temporal: el análisis abarca el ciclo académico
-
-correspondiente al semestre 2026-II.
-
-- Delimitación Social: el sistema está dirigido al personal de desarrollo,
-
-jefes de proyecto, personal de control de calidad y auditores de ÉXODO S.A.C.
-
-- Frontera Técnica: se excluye explícitamente el soporte de hardware, la
-
-administración de redes externas y la gestión comercial o contable de la empresa.
-
-## 3.5. Viabilidad del Sistema
-
-La evaluación de viabilidad analiza la factibilidad técnica, económica,
-
-**operativa, legal, social y ambiental del software antes de iniciar su construcción:**
-
-1. Viabilidad Técnica
-
-Infraestructura: ÉXODO S.A.C. cuenta con servidores propios y acceso a servicios en la nube, lo que facilita la implementación de un repositorio centralizado. Capacidad Técnica: los equipos de desarrollo manejan herramientas estándar de control de versiones (Git), por lo que la curva de aprendizaje para adoptar TraceFlow SCM es baja. Compatibilidad: es técnicamente viable integrar las políticas de control de cambios con los entornos de desarrollo actuales sin interrumpir los proyectos en curso.
-
-2. Viabilidad Económica
-
-El análisis financiero se calculó para un horizonte de evaluación a 5 años (2026-2030) con una tasa de descuento (COK) del 12.00%, considerando los costos reales de desarrollo asumidos por el equipo C-SharkTeam durante el
-
-**semestre 2026-II:**
-
-
-<!-- Página 14 del PDF original -->
-
-
-**Tabla TB-02: Indicadores Financieros de Viabilidad Económica**
-
-| Indicador Financiero | Valor Proyectado | Interpretación Técnica / Financiera |
-| :--- | :--- | :--- |
-| Inversión Inicial (CAPEX) | S/. 5,475.00 | Cubre 500 horas de desarrollo agregadas para el equipo C-SharkTeam (Joan Medina, Renzo Antayhua, Renzo Loyola y Augusto Rivera a razón referencial de S/. 9.00/hr; **PENDIENTE DE VALIDACIÓN DE ESFUERZO** individual), depreciación de equipos (3.5 meses), conectividad, dominio web e imprevistos. |
-| Costo Operativo Anual (OPEX) | S/. 1,140.00 | Mantenimiento de infraestructura PaaS (Render/Supabase), renovación de dominio, soporte preventivo y materiales de difusión. |
-| Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida (COK 12.00%). |
-| Tasa Interna de Retorno (TIR) | 68.20% | Supera ampliamente el COK referencial (12.00%), otorgando un margen de seguridad amplio frente a variaciones de costos. |
-| Relación Beneficio / Costo (B/C) | 1.97 | Por cada sol invertido en el ciclo del proyecto, se generarán S/. 1.97 en beneficios y ahorros valorizados para la empresa consultora ÉXODO S.A.C. y sus clientes. |
-| Periodo de Recuperación (Payback) | 1 año y 9.7 meses | La inversión inicial se recuperará plenamente durante el transcurso del segundo año de operación. |
-3. Viabilidad Operativa
-
-Apoyo Institucional: existe respaldo de la Gerencia de Proyectos de ÉXODO S.A.C. para formalizar el control de sus activos digitales.
-
-
-<!-- Página 15 del PDF original -->
-
-
-Facilidad de Integración: el flujo propuesto se adapta a las rutinas actuales de los consultores, quienes percibirán el sistema como una herramienta de protección de su trabajo. Sostenibilidad: la definición de roles claros (Jefe de Proyecto, Desarrollador, QA, Auditor) permite que el sistema se mantenga vigente ante la rotación de personal.
-
-4. Viabilidad Legal
-
-1. Propiedad Intelectual y Derechos de Autor: de acuerdo con el Decreto
-
-Legislativo N.° 822 (Ley sobre el Derecho de Autor), el software desarrollado por los consultores de ÉXODO S.A.C. en el ejercicio de sus funciones pertenece a la empresa o al cliente contratante según lo pactado contractualmente. TraceFlow SCM garantiza que dicha propiedad intelectual quede debidamente registrada, versionada y resguardada.
-
-2. Protección de Datos Personales: el análisis del sistema considera el
-
-cumplimiento de la Ley N.° 29733 (Ley de Protección de Datos Personales), dado que los proyectos gestionados por ÉXODO S.A.C. pueden incluir información sensible de los clientes finales, por lo que el acceso al código y a la documentación debe restringirse únicamente al personal autorizado.
-
-3. Contratos con Clientes: el sistema apoya el cumplimiento de los acuerdos de
-
-nivel de servicio (SLA) pactados con los clientes, al permitir demostrar mediante trazabilidad y auditoría qué versión fue entregada, cuándo y bajo qué aprobación.
-
-4. Uso de Software y Licenciamiento: el análisis prioriza el uso de
-
-herramientas bajo licencias de código abierto (GPL, MIT) para el control de versiones, evitando el uso de software no licenciado y mitigando riesgos de sanciones por infracción de derechos de autor.
-
-
-<!-- Página 16 del PDF original -->
-
-
-5. Viabilidad Social
-
-1. Optimización de Recursos de Hardware: la centralización del desarrollo en
-
-repositorios institucionales evita la necesidad de adquirir nuevo hardware, extendiendo la vida útil de los equipos actuales.
-
-2. Reducción de la Huella de Carbono Digital: un flujo de trabajo ordenado
-
-reduce compilaciones fallidas y procesos redundantes, disminuyendo el consumo energético de los servidores.
-
-3. Digitalización y Cero Papel: la automatización de solicitudes de cambio,
-
-actas y reportes elimina la necesidad de documentación impresa.
-
-4. Promoción del Trabajo Remoto: un sistema de configuración robusto
-
-facilita el trabajo colaborativo a distancia entre los equipos de ÉXODO S.A.C. y sus clientes, reduciendo desplazamientos innecesarios.
-
-6. Viabilidad Ambiental (Green IT y Eficiencia Energética)
-
-1. Política de Cero Papel (Paperless Office): La digitalización integral del ciclo de vida de los cambios (solicitud RFC, evaluación técnica, deliberación de actas CCB, aprobación y órdenes de cambio) elimina el 100% del consumo de papel, tóner e insumos de impresión física asociados a la gestión documental de configuración.
-
-2. Eficiencia Energética en Infraestructura Cloud: El diseño arquitectónico sobre servicios cloud bajo demanda y arquitecturas de microservicios contenerizados maximiza el aprovechamiento por vCPU/RAM y permite el apagado automático o escalado a cero de instancias en horarios no laborales, reduciendo el consumo eléctrico de centros de datos frente a servidores locales sobredimensionados.
-
-3. Reducción de Emisiones por Teletrabajo y Auditoría Remota: La plataforma web centralizada permite que los comités de control de cambios, aprobaciones de emergencia y auditorías de configuración se realicen de forma 100% remota y asíncrona, suprimiendo traslados vehiculares urbanos de consultores y clientes y mitigando las emisiones de CO2 asociadas.
-
-4. Extensión del Ciclo de Vida del Hardware Cliente: Al tratarse de una arquitectura cliente ligera (Single Page Application web optimizada), no se exigen estaciones de trabajo de alto rendimiento para la operación del sistema, permitiendo la reutilización de equipos de cómputo existentes en ÉXODO S.A.C. y postergando la generación de residuos de aparatos eléctricos y electrónicos (RAEE).
-
-
-<!-- Página 17 del PDF original -->
-
-
-## 3.6. Información obtenida del Levantamiento de Información
-
-# 1. Diagnóstico de la Situación Actual:
-
-- Almacenamiento: el código de los proyectos está disperso en equipos
-
-locales y cuentas personales, sin un repositorio institucional centralizado.
-
-- Control de Versiones: es inexistente o empírico; se emplean nombres de
-
-carpetas (por ejemplo, “Proyecto_Cliente_Final_v2”) en lugar de un estándar de versionamiento.
-
-- Flujo de Cambios: las modificaciones se coordinan de forma verbal o por
-
-chat, sin registro de quién, cuándo o por qué se alteró un componente.
-
-- Sincronización: existe un alto índice de pérdida de avances por
-
-sobreescritura de archivos al trabajar varios consultores en un mismo proyecto.
-
-# 2. Necesidades Identificadas (Requerimiento)
-
-**Cuadro de Necesidades Identificadas**
+### Necesidades detectadas
 
 **Tabla TB-03: Cuadro de Necesidades Identificadas**
 
@@ -607,482 +158,124 @@ sobreescritura de archivos al trabajar varios consultores en un mismo proyecto.
 | Entregas | Entregas al cliente sin validación previa | Aprobación formal antes de la liberación. |
 Nota: Elaboración Propia
 
+### Objetivos de negocio y diseño funcional
 
-<!-- Página 18 del PDF original -->
+- **Objetivo general de negocio:** Optimizar la calidad y continuidad de los servicios de software que ÉXODO S.A.C. entrega a sus clientes, eliminando pérdidas de información y sobrecostos por versiones conflictivas.
+- **Objetivos específicos cuantificables:**
+  1. **Reducción de retrabajo:** Disminuir en un **25%** el tiempo invertido por los equipos técnicos en resolver conflictos y recuperar archivos perdidos.
+  2. **Garantía de integridad:** Asegurar que el **100%** de las versiones entregadas a clientes correspondan a versiones validadas y aprobadas por el flujo formal de cambios.
+  3. **Trazabilidad oportuna:** Identificar el origen, responsable y justificación de cualquier cambio realizado en un proyecto en **menos de 24 horas**.
+  4. **Estandarización operativa:** Unificar la gestión de cambios de todos los equipos bajo una misma política institucional.
+  5. **Satisfacción del cliente:** Reducir en un **30%** las incidencias derivadas de entregas no autorizadas o versiones incorrectas.
 
+### Delimitación y viabilidad resumida
 
-# 4. Análisis de Procesos
+- **Delimitación organizacional y temporal:** Orientado a las áreas de proyectos, desarrollo, calidad y soporte de **ÉXODO S.A.C.**, formulado en el semestre académico **2026-II** y evaluado financieramente a un horizonte de 5 años (2026–2030).
+- **Viabilidad técnica, operativa y legal:** Factible sobre infraestructura institucional/nube compatible con herramientas estándar de desarrollo; alineada al **Decreto Legislativo N.° 822** (protección de propiedad intelectual) y a la **Ley N.° 29733** (protección de datos personales y acceso restringido por rol), además de promover una operación digital libre de papel.
+- **Viabilidad económica:**
 
-## 4.1. Diagrama del Proceso Actual - Diagrama de actividades
+**Tabla TB-02: Indicadores Financieros de Viabilidad Económica**
 
-El proceso actual es empírico y desorganizado, pues el código reside en equipos personales sin estándares de versionamiento. La integración se realiza por medios informales (correo, chat, USB), lo que provoca pérdida de avances por sobreescritura. Al no existir líneas base, ante una falla en producción no es posible identificar ni recuperar de forma inmediata una versión estable anterior, afectando la calidad del servicio entregado a los clientes de ÉXODO S.A.C.
+| Indicador Financiero | Valor Proyectado | Interpretación Técnica / Financiera |
+| :--- | :--- | :--- |
+| Inversión Inicial (CAPEX) | S/. 5,475.00 | Cubre 500 horas de desarrollo agregadas para el equipo C-SharkTeam (Joan Medina, Renzo Antayhua, Renzo Loyola y Augusto Rivera a razón referencial de S/. 9.00/hr; **PENDIENTE DE VALIDACIÓN DE ESFUERZO** individual), depreciación de equipos (3.5 meses), conectividad, dominio web e imprevistos. |
+| Costo Operativo Anual (OPEX) | S/. 1,140.00 | Mantenimiento de infraestructura PaaS (Render/Supabase), renovación de dominio, soporte preventivo y materiales de difusión. |
+| Valor Actual Neto (VAN) | +S/. 10,801.64 | Estrictamente positivo (VAN > 0), ratificando que el proyecto generará valor económico y retención institucional por encima de la tasa exigida (COK 12.00%). |
+| Tasa Interna de Retorno (TIR) | 68.20% | Supera ampliamente el COK referencial (12.00%), otorgando un margen de seguridad amplio frente a variaciones de costos. |
+| Relación Beneficio / Costo (B/C) | 1.97 | Por cada sol invertido en el ciclo del proyecto, se generarán S/. 1.97 en beneficios y ahorros valorizados para la empresa consultora ÉXODO S.A.C. y sus clientes. |
+| Periodo de Recuperación (Payback) | 1 año y 9.7 meses | La inversión inicial se recuperará plenamente durante el transcurso del segundo año de operación. |
 
-**Diagrama de Actividades del Proceso Actual**
+---
 
-Nota: Elaboración Propia
+# 3. Descripción General del Sistema y Usuarios Participantes
 
+## 3.1. Qué ofrece TraceFlow SCM: capacidades por área funcional
 
-**Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)**
+TraceFlow SCM organiza sus funcionalidades en ocho áreas de negocio integradas que cubren desde la gestión de identidades hasta la auditoría de entregas:
 
-![Diagrama DG-02: Diagrama de Actividades del Proceso Actual (AS-IS)](assets/diagramas/render/generales/DG-02.svg)
+1. **Gobernanza y Seguridad:** Control de acceso por perfiles funcionales, inicio de sesión con selección de perfil activo y segregación de funciones.
+2. **Gestión de Proyectos:** Administración de la cartera de proyectos de clientes con aislamiento estricto entre ellos.
+3. **Gestión de Configuración (`ECS`):** Catalogación e identificación tipificada de todos los artefactos bajo control.
+4. **Gestión de Bibliotecas:** Segregación operativa entre **Biblioteca de Trabajo**, **Biblioteca de Soporte** y **Biblioteca Maestra**, gobernada por bloqueos exclusivos de sincronización.
+5. **Control de Cambios:** Tramitación integral de `RFC`, subsanación, evaluación de impacto, decisión colegiada (`CCB`) o delegada (*Doble Llave*), emisión de `ECN/ECO`, validación `QA`/`UAT`, líneas base y reversión.
+6. **Soporte e Incidencias:** Atención de tickets reportados y derivación formal a solicitudes de cambio.
+7. **Trazabilidad y Auditoría:** Registro histórico inalterable de decisiones y verificación de integridad.
+8. **Reportes:** Emisión de informes de estado de solicitudes, inventario de configuración y actas formales.
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-02.*
+![Diagrama DG-04: Diagrama de Paquetes Arquitecturales](assets/diagramas/render/generales/DG-04.svg)
 
-#### Código PlantUML del Diagrama
+*Fuente: Elaboración propia (`DG-04`, compendio [`DIAGRAMS.md`](DIAGRAMS.md)).*
 
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam ActivityMaxWidth 220
-skinparam conditionStyle inside
+## 3.2. Flujo integral del ciclo de vida del cambio (TO-BE v2)
 
-title <b>ÉXODO S.A.C. - Proceso Actual Empírico de Modificación (AS-IS)</b>
+El proceso propuesto (**TO-BE v2**) articula diez etapas secuenciales y controladas que garantizan trazabilidad desde la detección de la necesidad hasta el congelamiento de la nueva Línea Base:
 
-|Consultor / Desarrollador|
-start
-:Identificar necesidad o requerimiento
-arbitrario de cambio;
-
-:Modificar código directamente
-en equipo personal local;
-
-:Nombrar archivos o carpetas
-de forma arbitraria
-(ej. "Proyecto_Final_v2");
-
-:Enviar archivos alterados
-por medios informales
-(correo electrónico, chat, USB);
-
-|Entorno de Integración / Servidor|
-:Recibir archivos divergentes
-sin control de versiones centralizado;
-
-if (¿Trabajo concurrente de varios consultores?) then (Sí)
-    :Sobreescribir archivos
-    y generar pérdida de avances;
-    note right
-        Conflicto de concurrencia:
-        no existen bloqueos de sincronización.
-    end note
-else (No)
-    :Integrar copia directamente;
-endif
-
-:Desplegar a producción del cliente
-sin validación previa de QA
-ni pruebas formales;
-
-|Entorno de Producción del Cliente|
-if (¿Se presenta fallo en producción?) then (Sí)
-    :Detectar incidente crítico;
-    
-    :Intentar identificar versión
-    previa o autor del cambio;
-    
-    note right
-        Fallo crítico:
-        No existen líneas base
-        ni registro de auditoría.
-        No es posible ejecutar Rollback inmediato.
-    end note
-    
-    :Retrabajo forzado y demora en servicio;
-    stop
-else (No)
-    :Operación inestable sin baseline;
-    stop
-endif
-@enduml
-```
-
-
-<!-- Página 19 del PDF original -->
-
-
-## 4.2. Diagrama del Proceso Propuesto - Diagrama de actividades Inicial
-
-El proceso propuesto (TO-BE v2) formaliza el ciclo de vida completo de una Solicitud de Cambio (RFC) mediante siete roles especializados estructurados en diez fases operativas. El Solicitante identifica la necesidad de cambio y registra la RFC indicando justificación, prioridad y ECS afectado (CU-04). El Analista de Requerimientos / Gestor recepciona la solicitud, valida que la información esté completa y sea consistente (CU-05); si presenta omisiones se abre un ciclo de subsanación y, de no subsanarse o resultar inviable, la solicitud concluye en el estado terminal **Desestimada**. Una vez clasificada, el Arquitecto / Especialista Técnico elabora el Informe Técnico de Impacto (CU-06) evaluando exhaustivamente la afectación a la Triple Restricción (alcance, tiempo y costo). Si el cambio no afecta ninguna dimensión de la triple restricción, se clasifica como **Cambio Menor** y se canaliza hacia la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto (CU-30); si afecta al menos una dimensión, se clasifica como **Cambio Mayor** y se eleva a evaluación colegiada del Comité de Control de Cambios (CCB) (CU-07). Si la evaluación resulta desfavorable por motivos técnicos o administrativos, la RFC pasa al estado terminal **Rechazada** con notificación motivada al solicitante. Si el cambio es autorizado por la autoridad correspondiente, pasa al estado **Autorizada** y se formaliza mediante la emisión obligatoria de una Orden de Cambio (ECN/ECO) (CU-08), la cual puede ser emitida por el CCB (Cambios Mayores) o bajo autoridad operativa delegada (Cambios Menores), pasando al estado **Orden Emitida**.
-
-Con la ECN/ECO formalmente vigente, el Administrador de Configuración / Bibliotecario verifica su validez y efectúa el Check-Out del ECS desde la Biblioteca de Soporte hacia la Biblioteca de Trabajo (CU-10), aplicando un bloqueo de sincronización exclusivo que evita sobreescrituras concurrentes (CU-11), situando la RFC en estado **En Implementación**. El Ingeniero de Software / Desarrollador ejecuta las modificaciones autorizadas (CU-14) y valida sus cambios mediante pruebas unitarias locales (CU-15). Concluidas las pruebas unitarias, el ECS modificado se remite al Equipo de Calidad / Testing situando la RFC en estado **En Pruebas** para la ejecución de pruebas de integración y validación técnica funcional (CU-16). Si se presentan no conformidades, se reportan los defectos (CU-18) para su corrección y re-testeo (CU-19); de subsistir fallos técnicos no subsanables, el Administrador ejecuta el Rollback en la Biblioteca de Trabajo (CU-21), libera los bloqueos y cancela la orden de cambio (CU-22), derivando al estado terminal **Cancelada**. Si la validación de QA es satisfactoria, se emite la Certificación Técnica de Conformidad (CU-17) y el cambio se pone a disposición del Solicitante / Usuario Final en estado **En Aceptación**. El Solicitante ejecuta las pruebas de aceptación de usuario (UAT) (CU-29) y, tras validar plenamente el comportamiento y la cobertura de la necesidad, suscribe el acta de aceptación formal. Con la doble validación superada (Certificación QA y Aceptación UAT), el Administrador de Configuración realiza el Check-In del ECS hacia la Biblioteca Maestra y de Soporte (CU-12), registra la nueva versión unívoca, crea y congela una nueva Línea Base (CU-20), libera el bloqueo de sincronización y actualiza el inventario. Finalmente, el CCB registra el cierre administrativo formal del cambio y consolida la trazabilidad integral (RF-14), alcanzando el estado terminal **Implementada** y notificando formalmente al Solicitante y a los interesados.
-
-
-<!-- Página 20 del PDF original -->
-
-
-**Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)**
+1. El **Solicitante** registra la `RFC` asociando un proyecto y un `ECS` (`CU-04`).
+2. El **Analista de Requerimientos / Gestor** verifica completitud y coherencia (`CU-05`): puede admitir (`CLASIFICADA`), devolver con observaciones para corrección (`EN_SUBSANACION`, atendida en `CU-04.1`) o cerrar anticipadamente por improcedencia/duplicidad (`DESESTIMADA`).
+3. El **Arquitecto / Especialista Técnico** elabora el Informe Técnico de Impacto (`CU-06`), evaluando afectación a la Triple Restricción y clasificando el trámite en **Cambio Menor** o **Cambio Mayor**.
+4. **Decisión según clasificación:** los Cambios Menores pasan a autorización conjunta **Doble Llave** entre Gestor y Arquitecto (`CU-30`); los Cambios Mayores pasan a deliberación colegiada del **CCB** (`CU-07`). Un dictamen negativo cierra la solicitud como `RECHAZADA`.
+5. Con dictamen aprobatorio (`AUTORIZADA`), se emite formalmente la Orden de Cambio `ECN/ECO` (`CU-08`, estado `ORDEN_EMITIDA`).
+6. El **Administrador de Configuración / Bibliotecario** ejecuta el `Check-Out` hacia la Biblioteca de Trabajo (`CU-10`) e impone el bloqueo exclusivo de sincronización (`CU-11`, estado `EN_IMPLEMENTACION`).
+7. El **Desarrollador** implementa los cambios (`CU-14`) y ejecuta pruebas unitarias locales (`CU-15`).
+8. El **Equipo de Calidad / Testing** ejecuta pruebas de integración en Biblioteca de Soporte (`CU-16`, estado `EN_PRUEBAS`). Ante hallazgos abre ciclos de no conformidad y re-testeo (`CU-18`, `CU-19`); si persiste un fallo insubsanable, el Administrador SCM realiza `Rollback` (`CU-21`) y cancela la orden (`CU-22`, estado `CANCELADA`). Al resultar conforme, QA emite su Certificación (`CU-17`).
+9. El **Solicitante** ejecuta las pruebas de aceptación en entorno controlado (`CU-29`, estado `EN_ACEPTACION`).
+10. Con la doble conformidad concurrente (**QA + UAT**), el Administrador SCM ejecuta el `Check-In` a Biblioteca Maestra (`CU-12`), congela la nueva Línea Base (`CU-20`) y libera el bloqueo, consolidando el cierre formal exitoso (`IMPLEMENTADA`).
 
 ![Diagrama DG-03: Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)](assets/diagramas/render/generales/DG-03.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-03.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-title <b>TraceFlow SCM - Proceso de Gestión de Cambios de Elementos de Configuración (TO-BE v2)</b>
-
-' =========================================================
-' CONFIGURACIÓN GENERAL
-' =========================================================
-skinparam ActivityMaxWidth 220
-skinparam ranksep 22
-skinparam nodesep 18
-skinparam defaultFontName Arial
-skinparam defaultFontSize 11
-skinparam roundCorner 8
-skinparam shadowing false
-skinparam conditionStyle inside
-
-skinparam arrowColor #2C3E50
-skinparam arrowThickness 1.2
-skinparam swimlaneBorderColor #7F8C8D
-skinparam swimlaneBorderThickness 1.2
-
-skinparam activity {
-    BackgroundColor #FFFFFF
-    BorderColor #34495E
-    BorderThickness 1.2
-    FontColor #2C3E50
-}
-
-skinparam note {
-    BackgroundColor #FFFDE7
-    BorderColor #FBC02D
-    FontSize 10
-}
-
-' =========================================================
-' ACTORES / SWIMLANES CANÓNICOS
-' =========================================================
-|#E8F4F8|Solicitante|
-|#EBF5FB|Analista de Requerimientos / Gestor|
-|#E8F8F5|Arquitecto / Especialista Técnico|
-|#FEF9E7|Comité de Control de Cambios (CCB)|
-|#F5EEF8|Administrador de Configuración / Bibliotecario|
-|#EAEDED|Ingeniero de Software / Desarrollador|
-|#FDEDEC|Equipo de Calidad / Testing|
-
-' =========================================================
-' FASE 1 - REGISTRO DE LA RFC
-' =========================================================
-|Solicitante|
-start
-:<color:white><b>FASE 1
-Registro de Solicitud de Cambio (RFC)</b></color>; <<#34495E>>
-
-:Identificar necesidad o defecto;
-
-:Registrar RFC con justificación,
-prioridad y ECS afectado (CU-04);
-
-note left
-<b>RFC [Estado: Registrada]</b>
-- Descripción de necesidad
-- Justificación de negocio
-- Nivel de prioridad inicial
-- ECS y versión base afectada
-end note
-
-' =========================================================
-' FASE 2 - VALIDACIÓN Y CLASIFICACIÓN INICIAL
-' =========================================================
-|Analista de Requerimientos / Gestor|
-:<color:white><b>FASE 2
-Validación y Clasificación Inicial</b></color>; <<#34495E>>
-
-:Recepcionar y evaluar completitud
-de la RFC (CU-05);
-
-if (¿Información suficiente y consistente?) then (No)
-    :Registrar observaciones (CU-05);
-    note right: RFC pasa a [En Subsanación]
-
-    |Solicitante|
-    if (¿Solicitante subsana dentro del plazo?) then (Sí)
-        :Subsanar información requerida;
-        |Analista de Requerimientos / Gestor|
-        :Reevaluar información subsanada;
-    else (No)
-        |Analista de Requerimientos / Gestor|
-        :Emitir dictamen de no conformidad
-        inicial y desestimar solicitud;
-        
-        |Solicitante|
-        :Recibir notificación de desestimación;
-        note left
-            <b>Estado Terminal 1:</b>
-            <b>DESESTIMADA</b>
-            (Filtro inicial no superado)
-        end note
-        stop
-    endif
-endif
-
-|Analista de Requerimientos / Gestor|
-:Validar consistencia de la RFC;
-note right: RFC pasa a [Clasificada]
-
-' =========================================================
-' FASE 3 - ANÁLISIS DE IMPACTO TÉCNICO
-' =========================================================
-|Arquitecto / Especialista Técnico|
-:<color:white><b>FASE 3
-Análisis de Impacto Técnico</b></color>; <<#34495E>>
-note right: RFC pasa a [En Análisis Técnico]
-
-:Analizar impacto sobre arquitectura,
-dependencias y trazabilidad (CU-06);
-
-:Evaluar afectación a la Triple Restricción
-(Alcance, Tiempo y Costo);
-
-:Elaborar Informe Técnico de Impacto (CU-06);
-
-if (¿Afecta alcance, tiempo o costo?) then (Sí)
-    :Clasificar como <b>CAMBIO MAYOR</b>;
-    note right
-        <b>Criterio Normativo:</b>
-        Afecta al menos 1 dimensión
-        de la Triple Restricción.
-        Requiere aprobación del CCB.
-    end note
-    
-    ' =========================================================
-    ' FASE 4A - EVALUACIÓN COLEGIADA CCB (CAMBIO MAYOR)
-    ' =========================================================
-    |Comité de Control de Cambios (CCB)|
-    :<color:white><b>FASE 4A
-Evaluación Colegiada en CCB (Cambio Mayor)</b></color>; <<#34495E>>
-    note right: RFC pasa a [En Evaluación]
-
-    :Evaluar Informe Técnico, riesgos,
-    viabilidad y conveniencia (CU-07);
-
-    if (¿Cambio Mayor Aprobado por CCB?) then (Sí)
-        :Aprobar formalmente el cambio (CU-07);
-        note right: RFC pasa a [Autorizada]
-
-        :Emitir Orden de Cambio
-        formal (ECN / ECO) (CU-08);
-        note right: RFC pasa a [Orden Emitida]
-    else (No)
-        :Registrar dictamen formal
-        de rechazo (técnico o de gestión);
-
-        |Solicitante|
-        :Recibir notificación con fundamentación;
-        note left
-            <b>Estado Terminal 2:</b>
-            <b>RECHAZADA</b>
-            (Dictamen formal negativo del CCB)
-        end note
-        stop
-    endif
-
-else (No)
-    :Clasificar como <b>CAMBIO MENOR</b>;
-    note right
-        <b>Criterio Normativo:</b>
-        NO afecta alcance, tiempo ni costo.
-        Ruta operativa delegada sin CCB.
-    end note
-
-    ' =========================================================
-    ' FASE 4B - AUTORIZACIÓN OPERATIVA DELEGADA (CAMBIO MENOR)
-    ' =========================================================
-    |Analista de Requerimientos / Gestor|
-    :<color:white><b>FASE 4B
-Autorización Operativa Delegada (Cambio Menor)</b></color>; <<#34495E>>
-    note right: RFC pasa a [En Evaluación]
-
-    :Revisar impacto operativo del Cambio Menor (CU-30);
-
-    |Arquitecto / Especialista Técnico|
-    :Revisar viabilidad técnica del Cambio Menor (CU-30);
-
-    if (¿Conformidad de ambas autoridades delegadas?) then (Sí)
-        :Autorizar Cambio Menor conjuntamente (CU-30);
-        note right: RFC pasa a [Autorizada]
-
-        :Emitir Orden de Cambio (ECN/ECO)
-        bajo autoridad operativa delegada (CU-08/CU-30);
-        note right: RFC pasa a [Orden Emitida]
-    else (No)
-        :Registrar dictamen de no autorización;
-
-        |Solicitante|
-        :Recibir notificación de rechazo operativo;
-        note left
-            <b>Estado Terminal 2:</b>
-            <b>RECHAZADA</b>
-            (Rechazo bajo autoridad delegada)
-        end note
-        stop
-    endif
-endif
-
-' =========================================================
-' FASE 5 - CHECK-OUT Y CONTROL DE CONCURRENCIA
-' =========================================================
-|Administrador de Configuración / Bibliotecario|
-:<color:white><b>FASE 5
-Check-Out y Bloqueo de Sincronización</b></color>; <<#34495E>>
-
-:Verificar validez formal de la ECN/ECO;
-
-:Efectuar Check-Out del ECS desde
-Biblioteca de Soporte hacia Trabajo (CU-10);
-
-:Aplicar bloqueo de sincronización
-exclusivo sobre el ECS (CU-11);
-note right: RFC pasa a [En Implementación]
-
-' =========================================================
-' FASE 6 - IMPLEMENTACIÓN Y PRUEBAS UNITARIAS
-' =========================================================
-|Ingeniero de Software / Desarrollador|
-:<color:white><b>FASE 6
-Implementación y Pruebas Unitarias</b></color>; <<#34495E>>
-
-:Recibir ECN/ECO y espacio en
-Biblioteca de Trabajo;
-
-:Modificar ECS según especificación (CU-14);
-
-:Ejecutar pruebas unitarias locales (CU-15);
-
-if (¿Pruebas unitarias conformes?) then (No)
-    :Corregir defectos en código local;
-    :Reejecutar pruebas unitarias locales;
-endif
-
-:Poner ECS a disposición para validación QA;
-
-' =========================================================
-' FASE 7 - VALIDACIÓN TÉCNICA DE CALIDAD (QA)
-' =========================================================
-|Equipo de Calidad / Testing|
-:<color:white><b>FASE 7
-Validación Técnica de Calidad (QA)</b></color>; <<#34495E>>
-note right: RFC pasa a [En Pruebas]
-
-:Ejecutar pruebas de integración
-y verificación técnica funcional (CU-16);
-
-if (¿Defectos o no conformidades identificadas?) then (Sí)
-    :Registrar reporte de no conformidad (CU-18);
-
-    |Ingeniero de Software / Desarrollador|
-    :Corregir defectos reportados;
-
-    |Equipo de Calidad / Testing|
-    :Reevaluar y re-testear (CU-19);
-
-    if (¿Fallo técnico no subsanado?) then (Sí)
-        |Administrador de Configuración / Bibliotecario|
-        :Ejecutar Rollback en Biblioteca de Trabajo (CU-21);
-        :Liberar bloqueo de sincronización;
-        :Cancelar Orden de Cambio (ECN/ECO) (CU-22);
-
-        |Solicitante|
-        :Recibir notificación de cancelación;
-        note left
-            <b>Estado Terminal 3:</b>
-            <b>CANCELADA</b>
-            (Rollback por fallo no subsanado)
-        end note
-        stop
-    endif
-endif
-
-|Equipo de Calidad / Testing|
-:Emitir Certificación Técnica
-de Conformidad (CU-17);
-
-' =========================================================
-' FASE 8 - VALIDACIÓN Y ACEPTACIÓN POR EL USUARIO (UAT)
-' =========================================================
-|Solicitante|
-:<color:white><b>FASE 8
-Validación y Aceptación por el Usuario (UAT)</b></color>; <<#34495E>>
-note left: RFC pasa a [En Aceptación]
-
-:Ejecutar pruebas de aceptación en
-entorno de validación (CU-29);
-
-if (¿Comportamiento y necesidad plenamente conformes?) then (No)
-    :Registrar observaciones de aceptación;
-    |Ingeniero de Software / Desarrollador|
-    :Ajustar implementación según observaciones;
-    |Equipo de Calidad / Testing|
-    :Revalidar técnicamente la corrección;
-    |Solicitante|
-    :Reejecutar pruebas de aceptación (CU-29);
-endif
-
-:Emitir y suscribir Aceptación
-Formal del Usuario (CU-29);
-
-' =========================================================
-' FASE 9 - CHECK-IN, LÍNEA BASE Y DESBLOQUEO
-' =========================================================
-|Administrador de Configuración / Bibliotecario|
-:<color:white><b>FASE 9
-Check-In, Nueva Línea Base y Desbloqueo</b></color>; <<#34495E>>
-
-:Verificar Certificación QA y Aceptación UAT;
-
-:Efectuar Check-In del ECS hacia
-Biblioteca Maestra y de Soporte (CU-12);
-
-:Registrar nueva versión identificada unívocamente;
-
-:Crear y congelar nueva Línea Base (CU-20);
-
-:Liberar bloqueo de sincronización del ECS;
-
-:Actualizar catálogo e inventario de configuración;
-
-' =========================================================
-' FASE 10 - CIERRE FORMAL Y NOTIFICACIÓN
-' =========================================================
-|Comité de Control de Cambios (CCB)|
-:<color:white><b>FASE 10
-Cierre Formal Administrativo</b></color>; <<#34495E>>
-
-:Registrar cierre administrativo formal (RF-14);
-
-:Consolidar trazabilidad completa
-(RFC - ECN/ECO - ECS - QA - UAT - Baseline);
-
-|Solicitante|
-:Recibir notificación de cambio implementado y cerrado;
-
-note left
-    <b>Estado Terminal 4:</b>
-    <b>IMPLEMENTADA</b>
-    (Cambio validado, promovido a Maestra,
-    congelado en Baseline y cerrado formalmente)
-end note
-
-stop
-@enduml
-```
-
-
-<!-- Página 22 del PDF original -->
-
-
-# 5. Especificación de Requerimientos de Software
-
-## 5.1. Cuadro de Requerimientos Funcionales
-
-A continuación se detalla el cuadro de Requerimientos Funcionales (RF-01 a RF-18) de TraceFlow SCM, elaborado a partir del levantamiento de información y de los escenarios de caso de uso descritos previamente. Cada requerimiento especifica el módulo funcional al que pertenece, una descripción de la capacidad que el sistema debe ofrecer y su nivel de prioridad, sirviendo como base para la definición de los casos de uso y del alcance de la implementación.
-
-**Tabla: Cuadro de Requerimientos Funcionales**
+### Estados oficiales del ciclo de vida de una Solicitud de Cambio (`TB-07`)
+
+**Tabla TB-07: Estados Oficiales del Ciclo de Vida de una RFC**
+
+| N.º | Nombre del Estado | Actor / Responsable Principal | Tipo de Estado | Descripción y Criterio de Transición |
+| :---: | :--- | :--- | :--- | :--- |
+| 1 | **Registrada** | Solicitante | Inicial | La Solicitud de Cambio (RFC) ha sido creada y registrada en el sistema mediante CU-04, quedando pendiente de revisión inicial de completitud. |
+| 2 | **En Subsanación** | Solicitante | Intermedio (Bucle) | El Analista de Requerimientos identificó datos incompletos o inconsistentes (CU-05); el Solicitante dispone de un plazo reglamentario para subsanar observaciones. |
+| 3 | **Clasificada** | Analista de Requerimientos / Gestor | Intermedio | La solicitud superó el filtro inicial de completitud (CU-05), se categorizó preliminarmente y queda formalmente admitida para análisis técnico de impacto. |
+| 4 | **En Análisis Técnico** | Arquitecto / Especialista Técnico | Intermedio | El Arquitecto elabora el Informe Técnico de Impacto (CU-06), evaluando arquitectura, dependencias y la afectación a la Triple Restricción (Alcance, Tiempo, Costo) para determinar si es Cambio Menor o Mayor. |
+| 5 | **En Evaluación** | CCB / Autoridad Operativa Delegada | Intermedio | La solicitud y su informe de impacto son deliberados colegiadamente por el CCB (Cambio Mayor, CU-07) o evaluados conjuntamente por la Autoridad Delegada (Cambio Menor, CU-30). |
+| 6 | **Autorizada** | CCB / Autoridad Operativa Delegada | Intermedio | El cambio recibió dictamen aprobatorio formal (CU-07 o CU-30), habilitando la emisión de la orden de cambio y la asignación de recursos. |
+| 7 | **Orden Emitida** | CCB / Autoridad Operativa Delegada | Intermedio | Se emitió y formalizó la Orden de Cambio (ECN/ECO) mediante CU-08, autorizando el Check-Out del ECS y el inicio de los trabajos en la Biblioteca de Trabajo. |
+| 8 | **En Implementación** | Ingeniero de Software / Desarrollador | Intermedio | El Administrador ejecutó el Check-Out (CU-10) con bloqueo de sincronización (CU-11) y el Desarrollador efectúa las modificaciones y pruebas unitarias locales (CU-14, CU-15). |
+| 9 | **En Pruebas** | Equipo de Calidad / Testing | Intermedio | El ECS modificado fue entregado a QA para ejecución de pruebas de integración y funcionales (CU-16), incluyendo posibles ciclos de corrección y re-testeo (CU-18, CU-19). |
+| 10 | **En Aceptación** | Solicitante / Usuario Final | Intermedio | Habiéndose emitido la Certificación Técnica de Conformidad por QA (CU-17), el Solicitante evalúa el comportamiento del cambio en entorno de validación (CU-29, UAT). |
+| 11 | **Desestimada** | Analista de Requerimientos / Gestor | Terminal | Cierre formal anticipado debido a que la solicitud fue declarada inviable/improcedente en revisión inicial o no se subsanaron las observaciones requeridas en el plazo establecido (CU-05). |
+| 12 | **Rechazada** | CCB / Autoridad Operativa Delegada | Terminal | Cierre formal por dictamen colegiado negativo del CCB (por inviabilidad técnica o motivos de gestión/alcance, CU-07) o rechazo de la Autoridad Delegada (CU-30). Se notifica al Solicitante con fundamentación. |
+| 13 | **Cancelada** | Administrador de Configuración / Bibliotecario | Terminal | Cierre formal por fallo técnico no subsanado tras re-testeo en QA o desistimiento justificado; el Administrador ejecuta rollback del ECS en la Biblioteca de Trabajo (CU-21) y cancela la ECN/ECO (CU-22). |
+| 14 | **Implementada** | Administrador de Configuración / CCB | Terminal | Cierre formal exitoso: con la doble conformidad (QA + UAT), el Administrador ejecutó Check-In a Biblioteca Maestra (CU-12), congeló la nueva Línea Base (CU-20), liberó el bloqueo y el CCB formalizó el cierre (RF-14). |
+
+![Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC](assets/diagramas/render/generales/DG-11.svg)
+
+## 3.3. Usuarios participantes y opciones por perfil (`PU-01` a `PU-07`)
+
+Cada participante opera en TraceFlow SCM con un **perfil efectivo único por sesión**, accediendo únicamente a las opciones habilitadas para su rol dentro de los proyectos asignados:
+
+**Tabla TB-09: Matriz de Perfiles y Roles de Usuario del Sistema (PU-01 a PU-07)**
+
+| ID | Tipo de Usuario / Actor | Descripción | Nivel Técnico | Funciones en el Sistema TraceFlow SCM |
+| :--- | :--- | :--- | :--- | :--- |
+| PU-01 | Solicitante | Persona (interna o del cliente) que identifica una necesidad de cambio y origina el trámite mediante un RFC. | Básico | Registrar Solicitudes de Cambio (RFC), subsanar información observada, consultar el estado de tickets/solicitudes y recibir notificaciones de cierre o rechazo. |
+| PU-02 | Analista de Requerimientos / Gestor | Responsable de la recepción, validación formal y clasificación inicial de las solicitudes de cambio. | Avanzado | Registrar y validar RFC, solicitar subsanación de datos, clasificar tipo y criticidad, registrar causales de no aprobación, actualizar el plan de gestión del proyecto y derivar incidencias a RFC. |
+| PU-03 | Arquitecto / Especialista Técnico | Responsable del análisis de impacto técnico de los cambios propuestos. | Experto | Realizar análisis de impacto en arquitectura y dependencias, estimar esfuerzo/costo/tiempo, generar el Informe Técnico de Impacto y registrar/clasificar nuevos ECS. |
+| PU-04 | Comité de Control de Cambios (CCB) | Grupo colegiado de decisión que evalúa la viabilidad técnica y aprueba o rechaza formalmente los cambios. | Avanzado | Evaluar el informe técnico y solicitudes, aprobar o rechazar RFC, emitir Órdenes de Cambio (ECN/ECO), auditar acciones del sistema y formalizar cierres. |
+| PU-05 | Administrador de Configuración / Bibliotecario | Responsable de administrar las bibliotecas (Trabajo, Soporte, Maestra), los bloqueos y las líneas base. | Experto | Ejecutar Check-Out/Check-In entre bibliotecas, aplicar y liberar bloqueos de sincronización, ejecutar rollback, establecer y congelar líneas base, validar integridad (SHA-256) y generar reportes. |
+| PU-06 | Ingeniero de Software / Desarrollador | Consultor técnico que implementa el cambio aprobado sobre el ECS en la Biblioteca de Trabajo. | Medio | Recibir Orden de Cambio y ECS autorizado, implementar modificaciones, ejecutar pruebas unitarias locales y corregir defectos reportados por QA. |
+| PU-07 | Equipo de Calidad / Testing | Responsable de validar funcional y técnicamente el cambio antes de su integración a la Biblioteca Maestra. | Medio | Ejecutar pruebas de integración y validación funcional, emitir Certificación de Conformidad, reportar no conformidades y hallazgos, y re-testear correcciones. |
+Nota: Elaboración Propia
+
+## 3.4. Políticas transversales y Segregación de Funciones (`SoD`)
+
+1. **Aislamiento por proyecto:** Ningún usuario puede visualizar o operar sobre solicitudes o elementos de proyectos que no tenga expresamente asignados.
+2. **Propiedad de trámites del Solicitante (`PU-01`):** El Solicitante únicamente visualiza, subsana o acepta en UAT las solicitudes de su propia autoría.
+3. **Prohibición de autoevaluación y autoaprobación:** Quien registra una RFC tiene prohibido admitirla como Gestor, dictaminar su impacto técnico como Arquitecto o votar su aprobación en el CCB.
+4. **Doble Llave obligatoria en Cambios Menores:** La autorización delegada exige dos firmas de personas físicas distintas (Gestor y Arquitecto).
+5. **Separación entre desarrollo y aseguramiento de calidad:** Quien implementa un cambio no puede certificarlo en QA.
+
+---
+
+# 4. Especificación de Requisitos
+
+## 4.1. Requisitos Funcionales (`RF-01` a `RF-18`)
 
 **Tabla TB-04: Cuadro de Requerimientos Funcionales (RF-01 a RF-18)**
 
@@ -1107,11 +300,7 @@ A continuación se detalla el cuadro de Requerimientos Funcionales (RF-01 a RF-1
 | RF-17 | Auditoría e Integridad | El sistema debe registrar las acciones críticas de los usuarios en cada etapa del flujo y validar la integridad de los artefactos mediante checksums (SHA-256). | Alta |
 | RF-18 | Generación de Reportes | El sistema debe permitir generar reportes de estado del flujo de cambios, inventario de ECS y actas de cambios, con posibilidad de exportación. | Media |
 
-## 5.2. Cuadro de Requerimientos No funcionales
-
-El siguiente cuadro presenta los Requerimientos No Funcionales (RNF-01 a RNF-09) que establecen los atributos de calidad exigidos a TraceFlow SCM, tales como seguridad, disponibilidad, integridad, usabilidad, escalabilidad, rendimiento, compatibilidad, mantenibilidad y respaldo. Estos requerimientos condicionan las decisiones de arquitectura y diseño técnico que se adoptarán en las siguientes fases del proyecto, y se derivan directamente de los objetivos de negocio y de diseño planteados por ÉXODO S.A.C.
-
-**Tabla: Cuadro de Requerimientos No Funcionales**
+## 4.2. Requisitos No Funcionales (`RNF-01` a `RNF-09`)
 
 **Tabla TB-05: Cuadro de Requerimientos No Funcionales (RNF-01 a RNF-09)**
 
@@ -1128,28 +317,19 @@ El siguiente cuadro presenta los Requerimientos No Funcionales (RNF-01 a RNF-09)
 | RNF-09 | Respaldo | El sistema debe programar copias de seguridad automáticas diarias del repositorio central. | Alta |
 Nota: Elaboración Propia
 
-> [!NOTE]
-> **Criterios de Verificación y Aplicabilidad de RNF (Sistema Objetivo vs. Prototipo Demostrativo):**
-> Los requisitos no funcionales RNF-01 a RNF-09 establecen los atributos de calidad normativos exigidos para la arquitectura de producción del sistema objetivo (TraceFlow SCM Enterprise). Para la versión del prototipo demostrativo actual (v1.0.0-beta en React/TypeScript con almacenamiento en memoria del navegador), su evaluación se sujeta a las siguientes consideraciones:
-> - **RNF-01 (Seguridad - RBAC):** Implementado y verificable en el prototipo mediante el selector de sesión y control de acceso contextual por rol (PU-01 a PU-07); la capa de cifrado en tránsito (HTTPS/SSH) corresponde al despliegue en servidor.
-> - **RNF-02 (Disponibilidad 99.9%):** Atributo objetivo del entorno de producción; no aplica medición de SLA en entorno de demostración cliente local.
-> - **RNF-03 (Integridad SHA-256):** Implementado y verificable en el prototipo en el cálculo y validación de hash criptográfico en la vista de expediente y auditoría de ECS.
-> - **RNF-04 (Usabilidad < 3h):** Evaluado positivamente en pruebas heurísticas preliminares sobre el prototipo de 8 pantallas funcionales y flujos guiados.
-> - **RNF-05 (Escalabilidad > 50 proyectos):** Requisito del backend y base de datos relacional objetivo (PostgreSQL); el prototipo opera sobre un conjunto controlado de proyectos de demostración.
-> - **RNF-06 (Rendimiento < 3s):** Verificado plenamente en el prototipo cliente SPA con tiempos de respuesta sub-segundo en memoria.
-> - **RNF-07 (Compatibilidad IDEs):** Capacidad de integración del sistema objetivo mediante CLI/API REST; el prototipo actual valida la interfaz de usuario web.
-> - **RNF-08 (Mantenibilidad / Zero Downtime):** Diseñado a nivel de arquitectura objetivo mediante desacoplamiento en microservicios y despliegues canary; el prototipo demuestra modularidad por componentes React.
-> - **RNF-09 (Respaldo automatizado diario):** Operación de base de datos del sistema objetivo (pg_dump / snapshot de storage MinIO); en el prototipo se provee exportación y persistencia en localStorage.
+### Criterios medibles de verificación y operabilidad orientados al servicio
 
+- **RNF-01 (Seguridad):** Todo acceso exige autenticación previa, comunicaciones cifradas en tránsito y restricción efectiva de menús y acciones según el perfil asignado (`PU-01`..`PU-07`) y el proyecto del usuario.
+- **RNF-02 (Disponibilidad):** Meta de disponibilidad operativa del **99.9%** en periodos críticos de entrega, respaldada por procedimientos de continuidad y recuperación definidos en la arquitectura.
+- **RNF-03 (Integridad):** Toda operación crítica y artefacto versionado genera constancia verificable que permite detectar alteraciones no autorizadas.
+- **RNF-04 (Usabilidad):** Los flujos principales (como registro de RFC, revisión inicial y evaluación) se organizan en pantallas guiadas con validaciones explícitas para que un nuevo consultor los adopte en **menos de 3 horas**.
+- **RNF-05 (Escalabilidad):** Capacidad planificada para administrar más de **50 proyectos simultáneos** sin pérdida de aislamiento ni degradación en las consultas.
+- **RNF-06 (Rendimiento):** Las consultas de expedientes, historiales y comparaciones de versiones deben responder en un tiempo objetivo **inferior a 3 segundos**.
+- **RNF-07 (Compatibilidad):** Accesible mediante navegadores web modernos desde los equipos habituales de consultores que utilizan entornos como Visual Studio Code, IntelliJ IDEA o Android Studio.
+- **RNF-08 (Mantenibilidad):** Organización funcional modular que facilita actualizaciones evolutivas sin detener el negocio de forma prolongada.
+- **RNF-09 (Respaldo):** Programación automatizada de copias de seguridad diarias del repositorio central y registros institucionales (sujeta a homologación formal de metas de recuperación ante desastres por el CCB).
 
-<!-- Página 25 del PDF original -->
-
-
-## 5.3. Reglas de Negocio
-
-Las Reglas de Negocio (RN-01 a RN-09) formalizan las políticas y restricciones que TraceFlow SCM debe hacer cumplir de manera obligatoria dentro del flujo de gestión de configuración, tales como la aprobación previa del CCB, la identificación unívoca de versiones, el bloqueo de sincronización y la validación de QA antes de integrar un ECS a la Biblioteca Maestra. Cada regla identifica la autoridad responsable de su cumplimiento y la situación problemática que motivó su definición, evidenciando la trazabilidad entre el diagnóstico inicial de ÉXODO S.A.C. y las restricciones incorporadas al sistema.
-
-**Cuadro de las Reglas de Negocio**
+## 4.3. Reglas de Negocio (`RN-01` a `RN-09`)
 
 **Tabla TB-06: Cuadro de Reglas de Negocio (RN-01 a RN-09)**
 
@@ -1167,662 +347,31 @@ Las Reglas de Negocio (RN-01 a RN-09) formalizan las políticas y restricciones 
 
 Nota: Elaboración Propia
 
-**Estados del Ciclo de Vida de una Solicitud de Cambio**
+---
 
-En concordancia con el flujo de gestión de cambios adoptado por TraceFlow
+# 5. Catálogo y Narrativas Funcionales de Casos de Uso
 
-**SCM, toda Solicitud de Cambio transita por los siguientes estados principales:**
+## 5.1. Diagramas de Casos de Uso (`DG-05` a `DG-10`)
 
-**Tabla TB-07: Estados Oficiales del Ciclo de Vida de una RFC**
-
-| N.º | Nombre del Estado | Actor / Responsable Principal | Tipo de Estado | Descripción y Criterio de Transición |
-| :---: | :--- | :--- | :--- | :--- |
-| 1 | **Registrada** | Solicitante | Inicial | La Solicitud de Cambio (RFC) ha sido creada y registrada en el sistema mediante CU-04, quedando pendiente de revisión inicial de completitud. |
-| 2 | **En Subsanación** | Solicitante | Intermedio (Bucle) | El Analista de Requerimientos identificó datos incompletos o inconsistentes (CU-05); el Solicitante dispone de un plazo reglamentario para subsanar observaciones. |
-| 3 | **Clasificada** | Analista de Requerimientos / Gestor | Intermedio | La solicitud superó el filtro inicial de completitud (CU-05), se categorizó preliminarmente y queda formalmente admitida para análisis técnico de impacto. |
-| 4 | **En Análisis Técnico** | Arquitecto / Especialista Técnico | Intermedio | El Arquitecto elabora el Informe Técnico de Impacto (CU-06), evaluando arquitectura, dependencias y la afectación a la Triple Restricción (Alcance, Tiempo, Costo) para determinar si es Cambio Menor o Mayor. |
-| 5 | **En Evaluación** | CCB / Autoridad Operativa Delegada | Intermedio | La solicitud y su informe de impacto son deliberados colegiadamente por el CCB (Cambio Mayor, CU-07) o evaluados conjuntamente por la Autoridad Delegada (Cambio Menor, CU-30). |
-| 6 | **Autorizada** | CCB / Autoridad Operativa Delegada | Intermedio | El cambio recibió dictamen aprobatorio formal (CU-07 o CU-30), habilitando la emisión de la orden de cambio y la asignación de recursos. |
-| 7 | **Orden Emitida** | CCB / Autoridad Operativa Delegada | Intermedio | Se emitió y formalizó la Orden de Cambio (ECN/ECO) mediante CU-08, autorizando el Check-Out del ECS y el inicio de los trabajos en la Biblioteca de Trabajo. |
-| 8 | **En Implementación** | Ingeniero de Software / Desarrollador | Intermedio | El Administrador ejecutó el Check-Out (CU-10) con bloqueo de sincronización (CU-11) y el Desarrollador efectúa las modificaciones y pruebas unitarias locales (CU-14, CU-15). |
-| 9 | **En Pruebas** | Equipo de Calidad / Testing | Intermedio | El ECS modificado fue entregado a QA para ejecución de pruebas de integración y funcionales (CU-16), incluyendo posibles ciclos de corrección y re-testeo (CU-18, CU-19). |
-| 10 | **En Aceptación** | Solicitante / Usuario Final | Intermedio | Habiéndose emitido la Certificación Técnica de Conformidad por QA (CU-17), el Solicitante evalúa el comportamiento del cambio en entorno de validación (CU-29, UAT). |
-| 11 | **Desestimada** | Analista de Requerimientos / Gestor | Terminal | Cierre formal anticipado debido a que la solicitud fue declarada inviable/improcedente en revisión inicial o no se subsanaron las observaciones requeridas en el plazo establecido (CU-05). |
-| 12 | **Rechazada** | CCB / Autoridad Operativa Delegada | Terminal | Cierre formal por dictamen colegiado negativo del CCB (por inviabilidad técnica o motivos de gestión/alcance, CU-07) o rechazo de la Autoridad Delegada (CU-30). Se notifica al Solicitante con fundamentación. |
-| 13 | **Cancelada** | Administrador de Configuración / Bibliotecario | Terminal | Cierre formal por fallo técnico no subsanado tras re-testeo en QA o desistimiento justificado; el Administrador ejecuta rollback del ECS en la Biblioteca de Trabajo (CU-21) y cancela la ECN/ECO (CU-22). |
-| 14 | **Implementada** | Administrador de Configuración / CCB | Terminal | Cierre formal exitoso: con la doble conformidad (QA + UAT), el Administrador ejecutó Check-In a Biblioteca Maestra (CU-12), congeló la nueva Línea Base (CU-20), liberó el bloqueo y el CCB formalizó el cierre (RF-14). |
-
-**Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC**
-
-![Diagrama DG-11: Diagrama de Estados del Ciclo de Vida de la RFC](assets/diagramas/render/generales/DG-11.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-11.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>TraceFlow SCM - Diagrama de Estados del Ciclo de Vida de una RFC (14 Estados Oficiales)</b>
-
-[*] --> Registrada : Solicitante registra RFC (CU-04)
-
-state Registrada {
-    Registrada : Esperando validación de completitud
-}
-
-Registrada --> EnSubsanacion : Analista detecta datos incompletos (CU-05)
-EnSubsanacion --> Registrada : Solicitante entrega datos subsanados
-EnSubsanacion --> Desestimada : Plazo vencido sin subsanación
-
-Registrada --> Clasificada : Analista valida consistencia y completitud (CU-05)
-Registrada --> Desestimada : Solicitud inviable o improcedente (CU-05)
-
-state Clasificada {
-    Clasificada : Lista para análisis de impacto técnico
-}
-
-Clasificada --> EnAnalisisTecnico : Asignada a Arquitecto (CU-06)
-
-state EnAnalisisTecnico {
-    EnAnalisisTecnico : Evaluación de impacto y Triple Restricción
-}
-
-EnAnalisisTecnico --> EnEvaluacion : Informe Técnico generado (CU-06)
-
-state EnEvaluacion {
-    state "Ruta Cambio Mayor (CCB)" as S_MAYOR
-    state "Ruta Cambio Menor (Delegada)" as S_MENOR
-}
-
-EnEvaluacion --> Rechazada : CCB rechaza Mayor (CU-07) o Autoridad Delegada rechaza Menor (CU-30)
-EnEvaluacion --> Autorizada : CCB aprueba Mayor (CU-07) o Autoridad Delegada autoriza Menor (CU-30)
-
-state Autorizada {
-    Autorizada : Dictamen formal aprobatorio registrado
-}
-
-Autorizada --> OrdenEmitida : Emisión formal de ECN/ECO (CU-08 / CU-30)
-
-state OrdenEmitida {
-    OrdenEmitida : ECN/ECO formalmente vigente
-}
-
-OrdenEmitida --> EnImplementacion : Administrador ejecuta Check-Out y aplica bloqueo (CU-10, CU-11)
-
-state EnImplementacion {
-    EnImplementacion : Desarrollador modifica ECS en Biblioteca de Trabajo
-y ejecuta pruebas unitarias (CU-14, CU-15)
-}
-
-EnImplementacion --> EnPruebas : Pruebas unitarias conformes;
-entrega a QA (CU-16)
-
-state EnPruebas {
-    state "Validación de Integración" as S_INTEG
-    state "Re-testeo por Corrección" as S_RETEST
-    [*] --> S_INTEG
-    S_INTEG --> S_RETEST : Defectos reportados (CU-18) y subsanados
-    S_RETEST --> S_INTEG : Reevaluación (CU-19)
-}
-
-EnPruebas --> Cancelada : Fallo no subsanado; Rollback y cancelación (CU-21, CU-22)
-EnPruebas --> EnAceptacion : QA emite Certificación Técnica de Conformidad (CU-17)
-
-state EnAceptacion {
-    EnAceptacion : Solicitante ejecuta pruebas de aceptación UAT (CU-29)
-}
-
-EnAceptacion --> EnImplementacion : Hallazgo o disconformidad UAT; requiere ajuste
-EnAceptacion --> Implementada : Solicitante valida UAT (CU-29); Administrador ejecuta Check-In a Maestra (CU-12),
-congela Línea Base (CU-20), libera bloqueo y CCB formaliza cierre (RF-14)
-
-' =========================================================
-' ESTADOS TERMINALES (4 Estados Normativos)
-' =========================================================
-state Desestimada #FFCDD2 {
-    Desestimada : Terminal 1: Filtro inicial no superado
-}
-
-state Rechazada #FFCDD2 {
-    Rechazada : Terminal 2: Dictamen formal negativo (CCB o Delegado)
-}
-
-state Cancelada #FFCDD2 {
-    Cancelada : Terminal 3: Rollback por fallo técnico o desistimiento
-}
-
-state Implementada #C8E6C9 {
-    Implementada : Terminal 4: Promovida a Maestra, congelada en Baseline y cerrada con éxito
-}
-
-Desestimada --> [*] : Cierre formal y notificación
-Rechazada --> [*] : Cierre formal y notificación
-Cancelada --> [*] : Cierre formal y notificación
-Implementada --> [*] : Cierre formal exitoso y trazabilidad total
-@enduml
-```
-
-# 6. Fase de Desarrollo
-
-El ciclo de vida del proyecto TraceFlow SCM adopta la metodología UWE (UML-Based Web Engineering), orientada a aplicaciones web adaptativas, ejecutándose en un periodo intensivo de 15.5 semanas (108 días calendario) correspondiente al semestre académico 2026-II (del 29 de agosto al 14 de diciembre de 2026). Se estructura en 5 fases secuenciales e iterativas que cubren desde el análisis de requisitos hasta el despliegue en la nube y la prueba piloto con los equipos de ÉXODO S.A.C. El desglose de fases organiza el avance técnico del equipo de TraceFlow SCM, articulando el modelado conceptual (RFC, ECS, bibliotecas y líneas base) y la arquitectura en la etapa inicial para respaldar la implementación del motor de control de cambios en Node.js/TypeScript y de la interfaz web en React, culminando con la validación de usabilidad (SUS) y una prueba piloto sobre un proyecto real de la cartera de clientes de ÉXODO S.A.C.
-
-**Tabla TB-08: Fases del Ciclo de Vida del Desarrollo (Metodología UWE)**
-
-| Fase | Duración | Periodo | Enfoque UWE | Entregables Principales |
-| :--- | :--- | :--- | :--- | :--- |
-| 1. Análisis de Requisitos y Modelado Conceptual | 3 semanas | 29 ago – 18 sep 2026 | Modelo Conceptual (clases de dominio, casos de uso) | SRS, escenarios de caso de uso, modelo lógico, diagrama de clases preliminar. |
-| 2. Diseño (Navegación, Presentación y Arquitectura) | 3.5 semanas | 19 sep – 9 oct 2026 | Modelo de Navegación y de Presentación | SAD, diagramas de secuencia, prototipos de interfaz, modelo de navegación web. |
-| 3. Implementación | 5 semanas | 10 oct – 13 nov 2026 | Construcción del sistema | Módulos de RFC, ECS/bibliotecas, líneas base, auditoría; repositorio versionado. |
-| 4. Pruebas y Validación | 2.5 semanas | 14 nov – 30 nov 2026 | Verificación funcional y de usabilidad | Casos de prueba ejecutados, informe de defectos, evaluación de usabilidad (SUS). |
-| 5. Despliegue Cloud y Prueba Piloto | 1.5 semanas | 1 dic – 14 dic 2026 | Despliegue e implantación | Ambiente productivo desplegado, informe de prueba piloto, acta de cierre. |
-
-Nota: Elaboración Propia Cada fase conserva un carácter iterativo respecto de la anterior: los hallazgos obtenidos durante la Implementación pueden retroalimentar ajustes menores al Modelo Conceptual o al Modelo de Navegación, y los defectos detectados en la fase de Pruebas y Validación son corregidos antes de avanzar al Despliegue Cloud y Prueba Piloto, replicando así el ciclo formal de control de cambios (RFC → análisis de impacto → aprobación → implementación → validación QA → liberación) que el propio sistema TraceFlow SCM está diseñado para gestionar.
-
-## 6.1. Perfiles de Usuario
-
-El siguiente cuadro describe los siete perfiles de usuario (PU-01 a PU-07) que interactúan con TraceFlow SCM, correspondientes a los actores identificados en los casos de uso: Solicitante, Analista de Requerimientos/Gestor, Arquitecto/Especialista Técnico, Comité de Control de Cambios (CCB), Administrador de Configuración/Bibliotecario, Ingeniero de Software/Desarrollador y Equipo de Calidad/Testing. Para cada perfil se especifica su nivel técnico esperado y las funciones concretas que puede ejecutar en el sistema, información que sustenta la definición de los permisos y del control de acceso basado en roles (RBAC).
-
-
-<!-- Página 30 del PDF original -->
-
-
-**Tabla: Matriz de Perfiles y Roles de Usuario del Sistema**
-
-**Tabla TB-09: Matriz de Perfiles y Roles de Usuario del Sistema (PU-01 a PU-07)**
-
-| ID | Tipo de Usuario / Actor | Descripción | Nivel Técnico | Funciones en el Sistema TraceFlow SCM |
-| :--- | :--- | :--- | :--- | :--- |
-| PU-01 | Solicitante | Persona (interna o del cliente) que identifica una necesidad de cambio y origina el trámite mediante un RFC. | Básico | Registrar Solicitudes de Cambio (RFC), subsanar información observada, consultar el estado de tickets/solicitudes y recibir notificaciones de cierre o rechazo. |
-| PU-02 | Analista de Requerimientos / Gestor | Responsable de la recepción, validación formal y clasificación inicial de las solicitudes de cambio. | Avanzado | Registrar y validar RFC, solicitar subsanación de datos, clasificar tipo y criticidad, registrar causales de no aprobación, actualizar el plan de gestión del proyecto y derivar incidencias a RFC. |
-| PU-03 | Arquitecto / Especialista Técnico | Responsable del análisis de impacto técnico de los cambios propuestos. | Experto | Realizar análisis de impacto en arquitectura y dependencias, estimar esfuerzo/costo/tiempo, generar el Informe Técnico de Impacto y registrar/clasificar nuevos ECS. |
-| PU-04 | Comité de Control de Cambios (CCB) | Grupo colegiado de decisión que evalúa la viabilidad técnica y aprueba o rechaza formalmente los cambios. | Avanzado | Evaluar el informe técnico y solicitudes, aprobar o rechazar RFC, emitir Órdenes de Cambio (ECN/ECO), auditar acciones del sistema y formalizar cierres. |
-| PU-05 | Administrador de Configuración / Bibliotecario | Responsable de administrar las bibliotecas (Trabajo, Soporte, Maestra), los bloqueos y las líneas base. | Experto | Ejecutar Check-Out/Check-In entre bibliotecas, aplicar y liberar bloqueos de sincronización, ejecutar rollback, establecer y congelar líneas base, validar integridad (SHA-256) y generar reportes. |
-| PU-06 | Ingeniero de Software / Desarrollador | Consultor técnico que implementa el cambio aprobado sobre el ECS en la Biblioteca de Trabajo. | Medio | Recibir Orden de Cambio y ECS autorizado, implementar modificaciones, ejecutar pruebas unitarias locales y corregir defectos reportados por QA. |
-| PU-07 | Equipo de Calidad / Testing | Responsable de validar funcional y técnicamente el cambio antes de su integración a la Biblioteca Maestra. | Medio | Ejecutar pruebas de integración y validación funcional, emitir Certificación de Conformidad, reportar no conformidades y hallazgos, y re-testear correcciones. |
-Nota: Elaboración Propia
-
-La delimitación de perfiles asegura una estricta segregación de funciones y responsabilidades dentro del ciclo de vida de la gestión de configuración de software (SCM) en TraceFlow SCM:
-
-1. **Solicitante:** Origina las solicitudes formales de cambio (RFC), subsana datos observados, consulta el estado de sus trámites y realiza la validación de aceptación funcional final del cambio (UAT).
-2. **Analista de Requerimientos / Gestor:** Efectúa el triaje, validación formal y clasificación preliminar de las RFC, solicita subsanaciones, actualiza el plan de gestión, deriva incidencias operativas a solicitudes formales de cambio y ejerce la Autoridad Operativa Delegada para Cambios Menores en coordinación con el Arquitecto.
-3. **Arquitecto / Especialista Técnico:** Realiza el análisis de impacto técnico y arquitectural, define las dependencias entre Elementos de Configuración de Software (ECS), estima esfuerzo, costo y cronograma, emite el Informe Técnico de Impacto, identifica y cataloga los ECS, y co-autoriza Cambios Menores bajo la Autoridad Operativa Delegada.
-4. **Comité de Control de Cambios (CCB):** Máxima autoridad colegiada de gobernanza técnica y de negocio encargada de evaluar, aprobar o rechazar Cambios Mayores fundamentados en el Informe de Impacto, emitir formalmente las Órdenes de Cambio (ECN/ECO) mayores y auditar la trazabilidad integral del sistema.
-5. **Administrador de Configuración / Bibliotecario:** Custodio operativo de la infraestructura de configuración; gestiona la promoción controlada de ECS entre las bibliotecas de Soporte, Trabajo y Maestra mediante Check-Out y Check-In, impone y libera bloqueos exclusivos de sincronización, congela líneas base, ejecuta reversiones (rollback) ante fallos no subsanados y verifica la integridad criptográfica mediante sumas de verificación SHA-256.
-6. **Ingeniero de Software / Desarrollador:** Implementa las modificaciones técnicas autorizadas por la ECN/ECO sobre los ECS exclusivamente en la Biblioteca de Trabajo en aislamiento controlado, ejecuta pruebas unitarias locales y corrige defectos técnicos reportados durante los ciclos de verificación.
-7. **Equipo de Calidad / Testing:** Actúa como ente independiente de aseguramiento de la calidad; diseña y ejecuta pruebas de integración sobre los ECS modificados, emite Certificaciones de Conformidad, reporta no conformidades o defectos y re-evalúa correcciones previas al pase a la Biblioteca Maestra.
-
-
-<!-- Página 31 del PDF original -->
-
-### 6.1.1. Diagrama de Paquetes
-
-El sistema se organiza en ocho paquetes principales: Gobernanza y Seguridad, Gestión de Proyectos, Gestión de Configuración (ECS), Gestión de Bibliotecas (Trabajo, Soporte y Maestra), Control de Cambios, Soporte e Incidencias, Trazabilidad y Auditoría, y Reportes. El paquete de Gestión de Bibliotecas administra los ECS y es orquestado por Control de Cambios mediante las operaciones de Check-Out y Check-In descritas en el flujo de gestión de cambios; los paquetes de negocio dependen de Gobernanza y Seguridad para la autenticación y el control de acceso, mientras que Trazabilidad y Auditoría recibe eventos desde Control de Cambios y desde la Gestión de Configuración
-
-
-**Diagrama DG-04: Diagrama de Paquetes Arquitecturales**
-
-![Diagrama DG-04: Diagrama de Paquetes Arquitecturales](assets/diagramas/render/generales/DG-04.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-04.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam packageStyle rectangle
-
-title <b>TraceFlow SCM - Diagrama de Paquetes Arquitecturales</b>
-
-package "Gobernanza y Seguridad" as PKG_GOB {
-    class "Autenticación y RBAC" as MOD_RBAC
-    class "Administración de Usuarios" as MOD_USER
-}
-
-package "Gestión de Proyectos" as PKG_PROJ {
-    class "Aislamiento de Proyectos" as MOD_PROJ
-    class "Asignación de Responsables" as MOD_RESP
-}
-
-package "Gestión de Configuración" as PKG_ECS {
-    class "Catálogo de ECS" as MOD_ECS
-    class "Identificación y Tipado" as MOD_TYPE
-}
-
-package "Gestión de Bibliotecas" as PKG_LIB {
-    class "Biblioteca de Trabajo" as LIB_WRK
-    class "Biblioteca de Soporte" as LIB_SUP
-    class "Biblioteca Maestra" as LIB_MST
-    class "Bloqueos de Sincronización" as MOD_LOCK
-}
-
-package "Control de Cambios" as PKG_CHG {
-    class "Gestión y Clasificación de RFC" as MOD_RFC
-    class "Análisis de Impacto Técnico" as MOD_IMP
-    class "Evaluación CCB (Cambios Mayores)" as MOD_CCB
-    class "Autorización Delegada (Cambios Menores)" as MOD_AUTH_MIN
-    class "Emisión de ECN/ECO" as MOD_ECN
-    class "Validación QA y Aceptación UAT" as MOD_QA_UAT
-    class "Orquestación Check-Out / Check-In" as MOD_ORQ
-}
-
-package "Soporte e Incidencias" as PKG_SUPP {
-    class "Tickets de Incidencias" as MOD_TCK
-    class "Derivación a RFC" as MOD_DERIV
-}
-
-package "Trazabilidad y Auditoría" as PKG_AUD {
-    class "Registro de Auditoría" as MOD_LOG
-    class "Verificación Criptográfica (SHA-256)" as MOD_SHA
-    class "Matriz de Trazabilidad RFC-ECN-ECS" as MOD_TRAC
-}
-
-package "Reportes" as PKG_REP {
-    class "Generador de Reportes e Inventarios" as MOD_RPT
-}
-
-' Relaciones de dependencia descritas en la sección 6.1.1 del SRS
-PKG_PROJ ..> PKG_GOB : <<use>> Seguridad
-PKG_ECS ..> PKG_GOB : <<use>> Seguridad
-PKG_CHG ..> PKG_GOB : <<use>> Seguridad
-
-PKG_LIB ..> PKG_ECS : administra ECS
-PKG_CHG ..> PKG_LIB : orquesta Check-Out / Check-In
-
-PKG_SUPP ..> PKG_CHG : deriva incidencia a RFC
-PKG_AUD <.. PKG_CHG : emite eventos de cambio
-PKG_AUD <.. PKG_ECS : emite eventos de configuración
-
-PKG_REP ..> PKG_AUD : consulta historial
-PKG_REP ..> PKG_LIB : consulta inventario
-@enduml
-```
-
-
-<!-- Página 33 del PDF original -->
-
-
-### 6.1.2. Diagrama de Casos de Uso
-
-Se identifican los siete roles definidos en el flujo de gestión de cambios de TraceFlow SCM (Solicitante, Analista de Requerimientos/Gestor, Arquitecto/Especialista Técnico, Comité de Control de Cambios, Administrador de Configuración/Bibliotecario, Ingeniero de Software/Desarrollador y Equipo de Calidad/Testing), que interactúan con los casos de uso agrupados en seis paquetes funcionales: Gestión de Usuarios y Proyectos, Registro y Evaluación de la RFC, Gestión de ECS y Bibliotecas, Implementación y Validación, Líneas Base y Rollback, e Incidencias/Trazabilidad/Reportes.
-
-**Diagrama de Casos de Uso General - Sistema TraceFlow SCM**
-
-Nota: Elaboración Propia
-
-
-**Diagrama DG-05: Diagrama General de Casos de Uso**
-
+- **Vista General del Sistema (`DG-05`):**
 ![Diagrama DG-05: Diagrama General de Casos de Uso](assets/diagramas/render/generales/DG-05.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-05.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Diagrama General de Casos de Uso</b>
-
-' =========================================================
-' ACTORES CANÓNICOS
-' =========================================================
-actor "Solicitante" as ACT_SOL
-actor "Analista de Requerimientos / Gestor" as ACT_ANA
-actor "Arquitecto / Especialista Técnico" as ACT_ARQ
-actor "Comité de Control de Cambios (CCB)" as ACT_CCB
-actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
-actor "Ingeniero de Software / Desarrollador" as ACT_DEV
-actor "Equipo de Calidad / Testing" as ACT_QA
-
-' =========================================================
-' PAQUETES FUNCIONALES
-' =========================================================
-rectangle "TraceFlow SCM" {
-    package "Gestión de Usuarios y Proyectos" {
-        usecase "CU-01: Gestionar usuarios y roles" as UC01
-        usecase "CU-02: Crear y administrar proyectos" as UC02
-        usecase "CU-03: Consultar proyecto" as UC03
-    }
-
-    package "Registro y Evaluación de la RFC" {
-        usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
-        usecase "CU-05: Validar y clasificar la solicitud" as UC05
-        usecase "CU-06: Realizar análisis de impacto técnico" as UC06
-        usecase "CU-07: Evaluar viabilidad y aprobar/rechazar" as UC07
-        usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
-        usecase "CU-30: Autorizar Cambio Menor" as UC30
-    }
-
-    package "Gestión de ECS y Bibliotecas" {
-        usecase "CU-09: Registrar ECS" as UC09
-        usecase "CU-10: Efectuar Check-Out (Soporte → Trabajo)" as UC10
-        usecase "CU-11: Aplicar bloqueo de sincronización" as UC11
-        usecase "CU-12: Efectuar Check-In (Trabajo → Maestra/Soporte)" as UC12
-        usecase "CU-13: Consultar historial de versiones" as UC13
-    }
-
-    package "Implementación y Validación" {
-        usecase "CU-14: Implementar cambio en el ECS" as UC14
-        usecase "CU-15: Ejecutar pruebas unitarias locales" as UC15
-        usecase "CU-16: Ejecutar pruebas de integración" as UC16
-        usecase "CU-17: Certificar conformidad del cambio" as UC17
-        usecase "CU-18: Reportar no conformidad" as UC18
-        usecase "CU-19: Reevaluar y re-testear" as UC19
-        usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
-    }
-
-    package "Líneas Base y Rollback" {
-        usecase "CU-20: Crear y congelar línea base" as UC20
-        usecase "CU-21: Ejecutar rollback en Biblioteca de Trabajo" as UC21
-        usecase "CU-22: Cancelar Orden de Cambio" as UC22
-    }
-
-    package "Incidencias, Trazabilidad y Reportes" {
-        usecase "CU-23: Registrar incidencia" as UC23
-        usecase "CU-24: Consultar estado de ticket" as UC24
-        usecase "CU-25: Derivar incidencia a RFC" as UC25
-        usecase "CU-26: Validar integridad (checksum)" as UC26
-        usecase "CU-27: Auditar acciones del sistema" as UC27
-        usecase "CU-28: Generar reportes de estado" as UC28
-    }
-}
-
-' Asociaciones Principales
-ACT_ADM --> UC01
-ACT_ANA --> UC02
-ACT_ANA --> UC03
-
-ACT_SOL --> UC04
-ACT_ANA --> UC05
-ACT_ARQ --> UC06
-ACT_CCB --> UC07
-ACT_CCB --> UC08
-
-ACT_ANA --> UC30
-ACT_ARQ --> UC30
-
-ACT_ARQ --> UC09
-ACT_ADM --> UC10
-ACT_ADM --> UC11
-ACT_ADM --> UC12
-ACT_ADM --> UC13
-
-ACT_DEV --> UC14
-ACT_DEV --> UC15
-ACT_QA --> UC16
-ACT_QA --> UC17
-ACT_QA --> UC18
-ACT_QA --> UC19
-ACT_SOL --> UC29
-
-ACT_ADM --> UC20
-ACT_ADM --> UC21
-ACT_ADM --> UC22
-
-ACT_SOL --> UC23
-ACT_SOL --> UC24
-ACT_ANA --> UC25
-ACT_ADM --> UC26
-ACT_CCB --> UC27
-ACT_ADM --> UC28
-@enduml
-```
-
-
-<!-- Página 34 del PDF original -->
-
-
-**Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos**
-
+- **Administración de Usuarios y Proyectos (`DG-06`):**
 ![Diagrama DG-06: Casos de Uso: Administración de Usuarios y Proyectos](assets/diagramas/render/generales/DG-06.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-06.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Casos de Uso: Administración de Usuarios y Proyectos</b>
-
-actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
-actor "Analista de Requerimientos / Gestor" as ACT_ANA
-actor "Usuarios del sistema" as ACT_USR
-
-rectangle "Módulo de Usuarios y Proyectos" {
-    usecase "CU-01: Gestionar usuarios y roles" as UC01
-    usecase "CU-02: Crear y administrar proyectos" as UC02
-    usecase "CU-03: Consultar proyecto" as UC03
-
-    usecase "Asignar permisos RBAC" as UC_RBAC
-    usecase "Aislar datos de cliente" as UC_ISOLATE
-}
-
-ACT_ADM --> UC01
-UC01 ..> UC_RBAC : <<include>>
-
-ACT_ANA --> UC02
-ACT_ANA --> UC03
-ACT_USR --> UC03
-
-UC02 ..> UC_ISOLATE : <<include>>
-UC02 ..> ACT_ADM : <<secundario>>
-@enduml
-```
-
-**Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias**
-
+- **Registro y Evaluación de RFC e Incidencias (`DG-07`):**
 ![Diagrama DG-07: Casos de Uso: Registro y Evaluación de RFC e Incidencias](assets/diagramas/render/generales/DG-07.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-07.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Casos de Uso: Registro y Evaluación de RFC e Incidencias</b>
-
-actor "Solicitante" as ACT_SOL
-actor "Analista de Requerimientos / Gestor" as ACT_ANA
-actor "Arquitecto / Especialista Técnico" as ACT_ARQ
-actor "Comité de Control de Cambios (CCB)" as ACT_CCB
-
-rectangle "Gestión de Solicitudes e Incidencias" {
-    usecase "CU-23: Registrar incidencia" as UC23
-    usecase "CU-24: Consultar estado de ticket" as UC24
-    usecase "CU-25: Derivar incidencia a RFC" as UC25
-
-    usecase "CU-04: Registrar Solicitud de Cambio (RFC)" as UC04
-    usecase "CU-05: Validar y clasificar la solicitud" as UC05
-    usecase "CU-06: Realizar análisis de impacto técnico" as UC06
-    usecase "CU-07: Evaluar Cambio Mayor en CCB" as UC07
-    usecase "CU-30: Autorizar Cambio Menor" as UC30
-    usecase "CU-08: Emitir Orden de Cambio (ECN/ECO)" as UC08
-
-    usecase "Subsanar información de RFC" as UC_SUBSANAR
-}
-
-ACT_SOL --> UC23
-ACT_SOL --> UC24
-ACT_ANA --> UC25
-
-UC25 ..> UC04 : <<triggers>>
-
-ACT_SOL --> UC04
-ACT_ANA --> UC05
-UC05 ..> UC_SUBSANAR : <<extend>> (datos incompletos)
-ACT_SOL --> UC_SUBSANAR
-
-ACT_ARQ --> UC06
-
-' Evaluación y Decisión: Ruta Mayor (CCB) vs Menor (Delegada)
-ACT_CCB --> UC07
-UC07 ..> UC08 : <<include>> (si aprueba)
-
-ACT_ANA --> UC30
-ACT_ARQ --> UC30
-UC30 ..> UC08 : <<include>> (si autoriza)
-@enduml
-```
-
-**Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)**
-
+- **SCM Core — ECS, Bibliotecas y Líneas Base (`DG-08`):**
 ![Diagrama DG-08: Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)](assets/diagramas/render/generales/DG-08.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-08.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Casos de Uso: SCM Core (ECS, Bibliotecas y Líneas Base)</b>
-
-actor "Arquitecto / Especialista Técnico" as ACT_ARQ
-actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
-
-rectangle "Núcleo de Configuración (SCM Core)" {
-    usecase "CU-09: Registrar ECS" as UC09
-    usecase "CU-10: Efectuar Check-Out (Soporte → Trabajo)" as UC10
-    usecase "CU-11: Aplicar bloqueo de sincronización" as UC11
-    usecase "CU-12: Efectuar Check-In (Trabajo → Maestra/Soporte)" as UC12
-    usecase "CU-13: Consultar historial de versiones" as UC13
-    usecase "CU-20: Crear y congelar línea base" as UC20
-    usecase "CU-21: Ejecutar rollback en Biblioteca de Trabajo" as UC21
-    usecase "CU-22: Cancelar Orden de Cambio" as UC22
-}
-
-ACT_ARQ --> UC09
-ACT_ADM --> UC10
-ACT_ADM --> UC11
-ACT_ADM --> UC12
-ACT_ADM --> UC13
-ACT_ADM --> UC20
-ACT_ADM --> UC21
-ACT_ADM --> UC22
-
-UC10 ..> UC11 : <<include>> (impone bloqueo)
-UC12 ..> UC20 : <<triggers>> (tras certificación)
-UC21 ..> UC22 : <<include>> (si re-test falla)
-@enduml
-```
-
-**Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad**
-
+- **Implementación y Validación de Calidad (`DG-09`):**
 ![Diagrama DG-09: Casos de Uso: Implementación y Validación de Calidad](assets/diagramas/render/generales/DG-09.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-09.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Casos de Uso: Implementación y Validación de Calidad</b>
-
-actor "Ingeniero de Software / Desarrollador" as ACT_DEV
-actor "Equipo de Calidad / Testing" as ACT_QA
-actor "Solicitante" as ACT_SOL
-
-rectangle "Módulo de Implementación y QA" {
-    usecase "CU-14: Implementar cambio en el ECS" as UC14
-    usecase "CU-15: Ejecutar pruebas unitarias locales" as UC15
-    usecase "CU-16: Ejecutar pruebas de integración" as UC16
-    usecase "CU-17: Certificar conformidad del cambio" as UC17
-    usecase "CU-18: Reportar no conformidad" as UC18
-    usecase "CU-19: Reevaluar y re-testear" as UC19
-    usecase "CU-29: Validar aceptación del cambio por el usuario (UAT)" as UC29
-}
-
-ACT_DEV --> UC14
-ACT_DEV --> UC15
-UC14 ..> UC15 : <<include>>
-
-ACT_QA --> UC16
-ACT_QA --> UC17
-ACT_QA --> UC18
-ACT_QA --> UC19
-
-UC16 ..> UC17 : <<extend>> (si conforme)
-UC16 ..> UC18 : <<extend>> (si defectos)
-UC18 ..> UC19 : <<triggers>> (tras corrección)
-ACT_DEV ..> UC19 : <<secundario>> (corrige defectos)
-
-' Validación UAT del Solicitante / Usuario Final
-ACT_SOL --> UC29
-UC17 ..> UC29 : <<triggers>> (tras certificación técnica QA)
-@enduml
-```
-
-**Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad**
-
+- **Trazabilidad, Auditoría e Integridad (`DG-10`):**
 ![Diagrama DG-10: Casos de Uso: Trazabilidad, Auditoría e Integridad](assets/diagramas/render/generales/DG-10.svg)
 
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-10.*
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-left to right direction
-
-title <b>TraceFlow SCM - Casos de Uso: Trazabilidad, Auditoría e Integridad</b>
-
-actor "Administrador de Configuración / Bibliotecario" as ACT_ADM
-actor "Comité de Control de Cambios (CCB)" as ACT_CCB
-
-rectangle "Trazabilidad, Auditoría y Reportes" {
-    usecase "CU-26: Validar integridad (checksum SHA-256)" as UC26
-    usecase "CU-27: Auditar acciones del sistema" as UC27
-    usecase "CU-28: Generar reportes de estado" as UC28
-
-    usecase "Verificar hash del ECS" as UC_HASH
-    usecase "Exportar acta de cambios" as UC_EXP
-}
-
-ACT_ADM --> UC26
-ACT_CCB --> UC27
-ACT_ADM --> UC28
-
-UC26 ..> UC_HASH : <<include>>
-UC28 ..> UC_EXP : <<extend>>
-@enduml
-```
-
-### 6.1.3. Escenarios de Caso de Uso (narrativa)
-
-El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo canónico consolidado de 31 casos de uso (`CU-01` a `CU-30`, incluyendo la extensión correctiva `CU-04.1`). Esta estructura conserva la numeración histórica de los 28 casos de uso originales (`CU-01` a `CU-28`), incorporando explícitamente las dos capacidades normativas del proceso TO-BE v2: `CU-29: Validar aceptación del cambio por el usuario (UAT)` a cargo del actor Solicitante, y `CU-30: Autorizar Cambio Menor` a cargo de la Autoridad Operativa Delegada compartida entre el Analista de Requerimientos y el Arquitecto. A continuación se presenta el catálogo general consolidado (TB-10) y la especificación detallada de cada escenario:
+## 5.2. Matriz Resumen del Catálogo de Casos de Uso (`TB-10`)
 
 **Tabla TB-10: Catálogo General de Casos de Uso del Sistema TraceFlow SCM**
 
@@ -1860,541 +409,721 @@ El sistema TraceFlow SCM articula su alcance funcional mediante un catálogo can
 | CUS29 | CU-29 | Validar aceptación del cambio por el usuario (UAT) | Primario, validación usuario | Solicitante | Administrador de Configuración / Bibliotecario | Implementación y Validación | RF-10 – Gestión de Pruebas, Certificación QA y Aceptación del Usuario |
 | CUS30 | CU-30 | Autorizar Cambio Menor | Primario, decisional | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico | Solicitante, Ingeniero de Software / Desarrollador | Registro y Evaluación de la RFC | RF-05, RF-07 – Clasificación, Análisis de Impacto y Gestión de Órdenes de Cambio |
 
+## 5.3. Narrativas Funcionales Reestructuradas — Bloques 01 y 02
+
+*(Las narrativas de los Bloques 01 y 02 siguen el estándar funcional aprobado en `SRS-01`: ficha descriptiva, flujo normal por fases en tabla `Acción del Actor | Respuesta del Sistema`, flujos alternativos, excepciones, reglas de negocio, estados afectados, criterios de aceptación y diagramas de actividades y de casos de uso. Se diferencia de forma transparente el requisito aprobado respecto del estado de implementación actual sin reducir el alcance aprobado.)*
+
 ---
 
-## CU-01 — Gestionar usuarios y roles
+### Bloque 01 — Usuarios y proyectos
 
-| Campo | Descripción |
+#### CU-01 — Gestionar usuarios y roles
+
+##### 1.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-01 |
+| **Id Caso de Uso** | `CU-01` (Código histórico: `CUS01`) |
 | **Nombre** | Gestionar usuarios y roles |
-| **Tipo** | Secundario, administrativo |
-| **Actor principal** | Administrador de Configuración / Bibliotecario |
-| **Actores secundarios** | Usuarios del sistema |
-| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
-| **RF asociados** | RF-01 — Gestión de Usuarios y Roles |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
-| **Objetivo** | Registrar, actualizar, asignar roles canónicos y dar de baja cuentas de usuario en TraceFlow SCM, restringiendo las funcionalidades operativas disponibles según la matriz de control de acceso basado en roles (RBAC). |
-| **Disparador** | Solicitud administrativa de alta, modificación o baja de personal en el equipo de desarrollo, calidad o gestión. |
-| **Precondiciones** | El Administrador de Configuración / Bibliotecario ha iniciado sesión con privilegios administrativos en el sistema. |
-| **Postcondiciones** | La cuenta de usuario queda registrada, actualizada o desactivada en el directorio del sistema con su perfil y permisos RBAC formalmente asociados. |
-| **Entradas** | Datos de identidad del usuario (nombres, apellidos, correo corporativo, código de colaborador) y rol oficial seleccionado de la lista canónica de 7 roles. |
-| **Salidas / Entregables** | Cuenta de usuario habilitada en el sistema, credenciales de acceso iniciales emitidas y registro de asignación de rol en auditoría. |
+| **Tipo** | Primario de gobernanza / administrativo |
+| **Requisito ID** | `RF-01` — Gestión de Usuarios y Roles<br>`RN-01` — Aprobación Obligatoria Previa a Modificación e Integración *(marco de facultades acreditadas)* |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Administrador de Configuración / Bibliotecario (`PU-05`)<br>**Secundarios:** Usuarios del sistema (`PU-01` a `PU-07`) |
+| **Interacción** | Consola web de Administración de Usuarios y Roles |
+| **Descripción** | Permite administrar el directorio institucional de usuarios autorizados, registrando cuentas nuevas, asignando uno o más de los siete roles oficiales (`PU-01`..`PU-07`) y proyectos de ÉXODO S.A.C., actualizando asignaciones o desactivando lógicamente cuentas cuando corresponda, preservando íntegramente el historial de auditoría. |
+| **Referencias** | `RF-01`, `RN-01`, `TB-09`, `DG-06`, `DG-ACT-01` |
+| **Precondiciones** | 1. El operador ha iniciado sesión en TraceFlow SCM.<br>2. El rol activo de la sesión corresponde a **Administrador de Configuración / Bibliotecario (`PU-05`)**. |
+| **Postcondiciones** | **Éxito:** La cuenta queda creada, actualizada o desactivada en el directorio corporativo con sus roles oficiales y proyectos asociados, y se registra el evento en auditoría.<br>**Error o cancelación:** No se crean ni modifican cuentas en el directorio del sistema. |
 
-### Flujo Principal
+##### 1.2. Flujo normal de eventos
 
-1. El Administrador de Configuración / Bibliotecario selecciona la opción de gestión de usuarios y roles en el panel de administración.
-2. TraceFlow SCM presenta el directorio de cuentas de usuario activas y el catálogo de los siete roles canónicos oficiales.
-3. El Administrador de Configuración / Bibliotecario ingresa los datos de identidad del colaborador y selecciona uno de los roles oficiales de la gobernanza documental.
-4. TraceFlow SCM valida que todos los campos requeridos contengan información válida, que el correo corporativo no se encuentre duplicado y que el rol asignado corresponda a la nomenclatura oficial.
-5. TraceFlow SCM registra al usuario en el directorio del sistema, asocia los privilegios de acceso basados en roles (RBAC) correspondientes al rol asignado y activa la cuenta para operaciones del proyecto.
-6. TraceFlow SCM emite confirmación de registro exitoso en pantalla y remite una notificación formal con las instrucciones de acceso seguro al colaborador.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Acceso al directorio de usuarios y validación de perfil** | |
+| **1.** El Administrador de Configuración / Bibliotecario selecciona la opción **"Usuarios y Roles"** en el menú de administración. | **2.** El sistema verifica que el rol activo en sesión corresponda a **Administrador de Configuración / Bibliotecario (`PU-05`)** (`E001`) y presenta el directorio de cuentas registradas junto con el catálogo de los siete perfiles oficiales (`PU-01` a `PU-07`) y los proyectos activos. |
+| **Fase 2: Captura de datos de identidad y asignación de roles/proyectos** | |
+| **3.** El Administrador selecciona **"Registrar Usuario"** (`A001` para modificar existente, `A002` para desactivar/reactivar) e ingresa código de colaborador, nombre completo, correo corporativo, credencial inicial de acceso, perfil(es) asignado(s) y proyectos autorizados. Luego pulsa **"Guardar Usuario"**. | **4.** El sistema valida que los campos obligatorios estén completos, que el formato de correo sea válido, que no exista otro usuario con el mismo correo o código (`E002`) y que todos los perfiles seleccionados pertenezcan al catálogo oficial de los siete roles (`E003`). |
+| **Fase 3: Activación, registro de auditoría y notificación** | |
+| **5.** El Administrador confirma el alta en pantalla. | **6.** El sistema registra la nueva cuenta en estado **Activo** con sus permisos de acceso basados en roles (`RBAC`) y proyectos asignados, deja constancia en la bitácora de auditoría, muestra el mensaje de confirmación en pantalla y envía al colaborador la notificación con sus instrucciones de acceso inicial. |
 
-### Flujos Alternativos
+##### 1.3. Flujos alternativos
 
-- **A1 — Modificación de rol a un usuario registrado**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Un colaborador cambia de funciones en el flujo de gestión de configuración.  
-  - **Secuencia:**  
-    1. El Administrador selecciona la cuenta existente y modifica el rol asignado.  
-    2. TraceFlow SCM actualiza los permisos RBAC asociados conservando la trazabilidad histórica de acciones previas del usuario.  
-  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
+###### A001: Modificar roles o proyectos de un usuario registrado
+* **Paso origen:** Paso 3.
+* **Condición de activación:** Un colaborador cambia de funciones o se incorpora/retira de un proyecto de ÉXODO S.A.C.
 
-- **A2 — Desactivación lógica de una cuenta de usuario**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Desvinculación de un colaborador o retiro temporal de acceso.  
-  - **Secuencia:**  
-    1. El Administrador selecciona la opción de desactivar cuenta.  
-    2. TraceFlow SCM bloquea el acceso al sistema sin eliminar los registros históricos ni firmas de auditoría generadas por el usuario.  
-  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Administrador busca y selecciona la cuenta existente, modifica los perfiles asignados (`PU-01`..`PU-07`) o los proyectos autorizados y confirma la actualización. | **A001-2.** El sistema valida que al menos permanezca un rol oficial válido (`E003`), actualiza las autorizaciones vigentes para futuras sesiones y conserva intacto el historial de decisiones y auditoría ejecutadas previamente por el usuario. |
 
-### Excepciones
+###### A002: Desactivar o reactivar lógicamente una cuenta de usuario
+* **Paso origen:** Paso 3.
+* **Condición de activación:** Desvinculación temporal/definitiva de un colaborador o reincorporación operativa.
 
-- **E1 — Correo corporativo o identificador ya registrado**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Los datos de correo o colaborador coinciden con una cuenta preexistente.  
-  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e informa que la cuenta ya existe en el sistema.  
-  - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se altera el directorio de usuarios.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A002-1.** El Administrador selecciona la cuenta, elige **"Desactivar Cuenta"** (o **"Reactivar Cuenta"**) y confirma la acción. | **A002-2.** El sistema cambia el estado de la cuenta a **Desactivado** (bloqueando el inicio de sesión y cerrando sesiones vigentes sin borrar registros históricos ni firmas previas) o a **Activo**, registrando el cambio en auditoría. |
 
-- **E2 — Intento de asignación de rol informal o no canónico**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Selección de un rol no admitido por la directriz de gobernanza documental.  
-  - **Respuesta del sistema:** TraceFlow SCM restringe la asignación únicamente a los 7 roles canónicos de DOCUMENTATION_RULES.md §5.  
-  - **Resultado:** Retorna al Paso 3 para seleccionar un rol oficial válido.
+##### 1.4. Flujos de excepción
 
-### Reglas aplicadas
+###### E001: Operador sin perfil de Administrador de Configuración
+* **Paso origen:** Paso 2.
+* **Condición de activación:** El usuario autenticado no posee el rol activo `PU-05`.
 
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Gobierna la asignación de facultades al garantizar que solo los usuarios con perfiles acreditados (CCB o Autoridad Delegada) puedan ejercer acciones resolutivas de cambio.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** Un usuario con otro rol intenta acceder a la gestión de usuarios y roles. | **E001-2.** El sistema deniega el acceso mostrando el aviso de restricción por control de acceso (`RBAC`) y no permite altas, modificaciones ni bajas. Fin del caso de uso. |
 
-### Estados afectados
+###### E002: Datos incompletos, correo corporativo o código duplicado
+* **Paso origen:** Paso 4.
+* **Condición de activación:** Falta un dato obligatorio o el correo/código ya pertenece a una cuenta registrada.
 
-- **Estado inicial:** N/A (Administración de identidades; no interviene directamente en el ciclo de vida de una RFC).
-- **Transición:** Registro o actualización de credenciales y permisos RBAC.
-- **Estado final:** N/A (Usuario en estado `Activo` o `Desactivado`).
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** El Administrador intenta guardar la ficha con omisiones o identificadores duplicados. | **E002-2.** El sistema resalta los campos observados, informa si el correo o código ya existe y solicita su corrección sin crear registros parciales. Retorna al paso 3. |
 
-### Entregables
+###### E003: Intento de asignar un rol fuera del catálogo oficial
+* **Paso origen:** Paso 4 y `A001`.
+* **Condición de activación:** Se intenta asignar un perfil distinto a `PU-01`..`PU-07` o dejar al usuario sin rol.
 
-- Ficha de usuario habilitada en el directorio corporativo con perfil y privilegios RBAC asignados.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El sistema detecta un perfil no reconocido o ausencia de rol oficial. | **E003-2.** El sistema rechaza la operación e indica que solo se admiten los siete perfiles oficiales del flujo SCM. Retorna al paso 3. |
 
-### Trazabilidad
-- **RF:** RF-01
-- **RN:** RN-01
-- **Estado(s):** N/A
-- **DG relacionado:** DG-04, DG-05
+##### 1.5. Reglas de negocio aplicables
+* **`RN-01`:** Respalda que las facultades de decisión, evaluación y aprobación recaigan únicamente sobre cuentas formalmente acreditadas con los perfiles correspondientes.
+
+##### 1.6. Estados afectados
+* **Ciclo de vida RFC:** No aplica directamente (administración transversal de identidades).
+* **Estado de cuenta de usuario:** `Inexistente` → `Activo` / `Desactivado`.
+
+##### 1.7. Criterios de aceptación funcionales
+1. Solo el perfil `Administrador de Configuración / Bibliotecario (PU-05)` puede acceder a crear, modificar o desactivar cuentas.
+2. No se permiten cuentas con correo o código duplicado ni roles ajenos a los siete perfiles canónicos (`PU-01`..`PU-07`).
+3. La desactivación de un usuario bloquea su acceso futuro sin eliminar sus trámites, dictámenes ni registros históricos de auditoría.
+4. *Estado respecto al alcance aprobado:* el inicio de sesión seguro, la selección de perfil único por sesión y el control de acceso por rol están operativos; la interfaz web completa y operaciones interactivas de alta, edición y desactivación administrativa forman parte del requisito aprobado y permanecen pendientes de construcción (actualmente representadas en vista informativa).
+
+##### 1.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-01`):**
+![DG-ACT-01: Flujo de Actividades — CU-01](assets/diagramas/render/analisis/DG-ACT-01.svg)
+* **Diagrama de caso de uso (`DG-06`):** [`DG-06: Administración de Usuarios y Proyectos`](assets/diagramas/render/generales/DG-06.svg).
 
 ---
 
-## CU-02 — Crear y administrar proyectos
+#### CU-02 — Crear y administrar proyectos
 
-| Campo | Descripción |
+##### 2.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-02 |
+| **Id Caso de Uso** | `CU-02` (Código histórico: `CUS02`) |
 | **Nombre** | Crear y administrar proyectos |
 | **Tipo** | Primario, administrativo |
-| **Actor principal** | Analista de Requerimientos / Gestor |
-| **Actores secundarios** | Administrador de Configuración / Bibliotecario |
-| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
-| **RF asociados** | RF-02 — Gestión de Proyectos |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
-| **Objetivo** | Registrar y mantener los proyectos de clientes de ÉXODO S.A.C., delimitando sus espacios lógicos de trabajo, asignando responsables y garantizando el aislamiento estricto de los datos entre clientes. |
-| **Disparador** | Apertura contractual de un nuevo proyecto de software o necesidad de reconfiguración de un proyecto en curso. |
-| **Precondiciones** | El Analista de Requerimientos / Gestor cuenta con sesión activa y permisos administrativos para apertura de proyectos. |
-| **Postcondiciones** | El proyecto queda formalmente registrado en el catálogo del sistema con un espacio de configuración lógico aislado, bibliotecas inicializadas y equipo de trabajo asignado. |
-| **Entradas** | Nombre del proyecto, cliente destinatario, descripción de objetivos, fecha de inicio, plazos contractuales y equipo técnico asignado. |
-| **Salidas / Entregables** | Expediente de proyecto formalmente registrado con espacio de configuración aislado y bibliotecas inicializadas. |
+| **Requisito ID** | `RF-02` — Gestión de Proyectos<br>`RN-01`, `RN-04` *(marco de aislamiento de bibliotecas por proyecto)* |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Analista de Requerimientos / Gestor (`PU-02`)<br>**Secundario:** Administrador de Configuración / Bibliotecario (`PU-05`) |
+| **Interacción** | Consola web de Directorio y Administración de Proyectos |
+| **Descripción** | Permite registrar nuevos proyectos de clientes de ÉXODO S.A.C., delimitar sus datos contractuales, asignar los participantes autorizados y habilitar su espacio lógico aislado junto con las tres bibliotecas de configuración, así como actualizar parámetros o cerrar/archivar proyectos culminados. |
+| **Referencias** | `RF-02`, `RN-01`, `RN-04`, `CU-03`, `CU-09`, `DG-06`, `DG-ACT-02` |
+| **Precondiciones** | 1. El usuario ha iniciado sesión con el rol activo **Analista de Requerimientos / Gestor (`PU-02`)**.<br>2. Los colaboradores que se asignarán al proyecto existen previamente en el directorio institucional (`CU-01`). |
+| **Postcondiciones** | **Éxito:** El proyecto queda registrado o actualizado con aislamiento estricto de sus datos frente a otros clientes, equipo asignado y bibliotecas inicializadas (o en estado `Archivado` de solo lectura si se cierra).<br>**Error:** No se crea ni modifica el proyecto. |
 
-### Flujo Principal
+##### 2.2. Flujo normal de eventos
 
-1. El Analista de Requerimientos / Gestor selecciona la opción de registrar un nuevo proyecto de software.
-2. TraceFlow SCM presenta el formulario de configuración de proyecto y el directorio corporativo de clientes.
-3. El Analista de Requerimientos / Gestor ingresa los datos generales del proyecto, cliente, objetivos contractuales y selecciona al equipo técnico asignado.
-4. TraceFlow SCM valida que el nombre del proyecto sea unívoco en el sistema y que los plazos contractuales guarden coherencia temporal.
-5. TraceFlow SCM crea el proyecto estableciendo un espacio lógico independiente, garantizando el aislamiento estricto de los datos del cliente respecto a otros proyectos y aprovisionando las estructuras iniciales de Biblioteca Maestra, Soporte y Trabajo.
-6. TraceFlow SCM emite confirmación de creación del proyecto en pantalla y notifica al Administrador de Configuración / Bibliotecario para la inicialización formal del catálogo de ECS.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Apertura del módulo de proyectos** | |
+| **1.** El Analista de Requerimientos / Gestor selecciona **"Proyectos"** en el menú lateral y pulsa **"Nuevo Proyecto"** (`A001` editar existente, `A002` archivar culminado). | **2.** El sistema valida los permisos del rol activo **Gestor (`PU-02`)** (`E001`) y presenta el formulario de registro junto con la lista de usuarios activos disponibles para asignación. |
+| **Fase 2: Registro, validación de unicidad y configuración de aislamiento** | |
+| **3.** El Gestor ingresa el código del proyecto, nombre formal, cliente de ÉXODO S.A.C., descripción de objetivos, fecha de inicio, plazo contractual y usuarios asignados al equipo del proyecto. Luego pulsa **"Guardar Proyecto"**. | **4.** El sistema verifica que los campos mandatorios estén completos, que ni el código ni la denominación existan ya en el catálogo (`E002`) y que las fechas contractuales sean coherentes entre sí (`E003`). |
+| **Fase 3: Inicialización de espacio lógico y notificación** | |
+| **5.** El Gestor confirma la creación. | **6.** El sistema registra el proyecto en estado **Activo** estableciendo un espacio lógico independiente aislado de los demás clientes, habilita sus tres bibliotecas de configuración (**Trabajo**, **Soporte** y **Maestra**), registra la acción en auditoría, confirma en pantalla y notifica al **Administrador de Configuración / Bibliotecario (`PU-05`)** para iniciar el catálogo de ECS (`CU-09`). |
 
-### Flujos Alternativos
+##### 2.3. Flujos alternativos
 
-- **A1 — Actualización de parámetros o equipo de un proyecto existente**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Modificación de fechas, asignación de nuevos consultores o ampliación de alcance.  
-  - **Secuencia:**  
-    1. El Analista selecciona el proyecto existente y edita los parámetros autorizados.  
-    2. TraceFlow SCM valida los cambios y actualiza el registro del proyecto manteniendo la integridad del historial.  
-  - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
+###### A001: Actualizar parámetros o equipo de un proyecto activo
+* **Paso origen:** Paso 1.
+* **Condición de activación:** Ampliación de plazos, ajuste de descripción o incorporación/retiro de miembros del equipo.
 
-- **A2 — Archivado o cierre formal de un proyecto culminado**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** Culminación del contrato y entrega final aceptada.  
-  - **Secuencia:**  
-    1. El Analista selecciona la opción de archivado de proyecto.  
-    2. TraceFlow SCM congela el acceso de modificación, conserva las líneas base y coloca el proyecto en estado `Archivado`.  
-  - **Convergencia:** Finaliza el trámite de cierre de proyecto.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Gestor selecciona un proyecto existente en el directorio, edita los campos autorizados o el equipo asignado y pulsa **"Actualizar Proyecto"**. | **A001-2.** El sistema valida coherencia de fechas (`E003`) y no duplicidad (`E002`), actualiza la configuración preservando el historial de auditoría y confirma los cambios en pantalla. |
 
-### Excepciones
+###### A002: Archivar o cerrar formalmente un proyecto culminado
+* **Paso origen:** Paso 1.
+* **Condición de activación:** Finalización contractual y aceptación definitiva del proyecto por el cliente.
 
-- **E1 — Nombre de proyecto duplicado en el catálogo**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El identificador o denominación ingresada coincide con un proyecto registrado previamente.  
-  - **Respuesta del sistema:** TraceFlow SCM rechaza el registro e instruye especificar una denominación unívoca.  
-  - **Resultado:** Retorna al Paso 3 del Flujo Principal sin crear el espacio lógico.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A002-1.** El Gestor selecciona **"Archivar Proyecto"** sobre un proyecto finalizado y confirma el cierre. | **A002-2.** El sistema cambia el estado del proyecto a **Archivado**, congela nuevas solicitudes o modificaciones de ECS y conserva todas las líneas base y expedientes históricos en modo consulta. |
 
-### Reglas aplicadas
+##### 2.4. Flujos de excepción
 
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que todo flujo de cambios opere únicamente dentro del marco delimitado de un proyecto formalmente aprobado.
+###### E001: Usuario sin privilegios de administración de proyectos
+* **Paso origen:** Paso 2.
+* **Condición de activación:** Un usuario con perfil distinto a `PU-02` intenta crear, editar o archivar un proyecto.
 
-### Estados afectados
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** El actor intenta ejecutar una acción administrativa de proyecto sin autorización. | **E001-2.** El sistema restringe la acción informando que la creación y administración de proyectos corresponde al Gestor autorizado. Fin del caso de uso. |
 
-- **Estado inicial:** N/A (Gestión de proyectos; no altera directamente el ciclo de vida de una RFC).
-- **Transición:** Creación y aprovisionamiento de espacio lógico de configuración.
-- **Estado final:** N/A (Proyecto en estado `Activo`).
+###### E002: Código o nombre de proyecto duplicado
+* **Paso origen:** Paso 4.
+* **Condición de activación:** El código o denominación ingresada coincide con otro proyecto ya registrado.
 
-### Entregables
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** El sistema detecta duplicidad de código o nombre. | **E002-2.** Rechaza la operación solicitando ingresar un identificador y nombre únicos. Retorna al paso 3. |
 
-- Registro formal de proyecto activo con espacio lógico independiente y bibliotecas de configuración inicializadas.
+###### E003: Incoherencia de fechas o campos obligatorios faltantes
+* **Paso origen:** Paso 4.
+* **Condición de activación:** Fecha de cierre anterior a fecha de inicio o campos obligatorios vacíos.
 
-### Trazabilidad
-- **RF:** RF-02
-- **RN:** RN-01
-- **Estado(s):** N/A
-- **DG relacionado:** DG-04, DG-05
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El sistema detecta fechas invertidas o datos faltantes. | **E003-2.** Señala los campos con error indicando la corrección necesaria sin guardar cambios. Retorna al paso 3. |
+
+##### 2.5. Reglas de negocio aplicables
+* **`RN-01`:** Todo proceso de cambios opera exclusivamente dentro del marco de un proyecto formalmente registrado.
+* **`RN-04`:** Cada proyecto delimita sus propias bibliotecas segregadas (**Trabajo**, **Soporte** y **Maestra**).
+
+##### 2.6. Estados afectados
+* **Ciclo de vida RFC:** No aplica directamente.
+* **Estado del proyecto:** `Inexistente` → `Activo` / `Archivado`.
+
+##### 2.7. Criterios de aceptación funcionales
+1. Cada proyecto creado cuenta con identificador y denominación únicos, cliente asociado, equipo asignado y aislamiento estricto frente a otros proyectos.
+2. Ningún usuario fuera del equipo asignado a un proyecto puede visualizar sus datos ni tramitar cambios en él.
+3. Al archivarse un proyecto se impiden nuevas alteraciones conservando las líneas base e historial íntegro.
+4. *Estado respecto al alcance aprobado:* el catálogo corporativo de proyectos y las reglas de aislamiento por usuario ya están activos; las pantallas interactivas de alta, edición y archivado permanecen pendientes de construcción (actualmente en vista informativa).
+
+##### 2.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-02`):**
+![DG-ACT-02: Flujo de Actividades — CU-02](assets/diagramas/render/analisis/DG-ACT-02.svg)
+* **Diagrama de caso de uso (`DG-06`):** [`DG-06: Administración de Usuarios y Proyectos`](assets/diagramas/render/generales/DG-06.svg).
 
 ---
 
-## CU-03 — Consultar proyecto
+#### CU-03 — Consultar proyecto
 
-| Campo | Descripción |
+##### 3.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-03 |
+| **Id Caso de Uso** | `CU-03` (Código histórico: `CUS03`) |
 | **Nombre** | Consultar proyecto |
-| **Tipo** | Secundario, de consulta |
-| **Actor principal** | Analista de Requerimientos / Gestor |
-| **Actores secundarios** | Usuarios autorizados (cualquiera de los 7 roles canónicos con acceso al proyecto) |
-| **Paquete / Módulo** | Gestión de Usuarios y Proyectos |
-| **RF asociados** | RF-02 — Gestión de Proyectos |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
-| **Objetivo** | Visualizar la ficha integral de un proyecto, consultando sus datos generales, equipo asignado, estado de avance, catálogo de ECS asociados y resumen de solicitudes de cambio activas. |
-| **Disparador** | Consulta operativa del actor para verificar el estado de avance o configuración de un proyecto. |
-| **Precondiciones** | El usuario se encuentra autenticado en el sistema y posee permisos de acceso asignados sobre el proyecto a consultar. |
-| **Postcondiciones** | TraceFlow SCM presenta el panel informativo consolidado del proyecto sin alterar su configuración ni sus registros. |
-| **Entradas** | Criterios de búsqueda (denominación del proyecto, cliente o identificador). |
-| **Salidas / Entregables** | Ficha consolidada de consulta de proyecto presentada en pantalla. |
+| **Tipo** | Secundario, de consulta (solo lectura) |
+| **Requisito ID** | `RF-02` — Gestión de Proyectos<br>`RN-04` — Restricción de Bibliotecas Congeladas |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Analista de Requerimientos / Gestor (`PU-02`)<br>**Secundarios:** Usuarios autorizados de los perfiles `PU-01` a `PU-07` asignados al proyecto |
+| **Interacción** | Directorio General de Proyectos y Ficha Integral de Proyecto |
+| **Descripción** | Permite a los usuarios autorizados consultar la ficha consolidada de un proyecto asignado, visualizando sus datos generales, cliente, equipo participante, catálogo de Elementos de Configuración (`ECS`) y resumen de solicitudes de cambio activas, sin alterar la configuración ni permitir acceso a proyectos de otros clientes no asignados. |
+| **Referencias** | `RF-02`, `RN-04`, `CU-02`, `DG-06`, `DG-ACT-03` |
+| **Precondiciones** | 1. El usuario ha iniciado sesión en TraceFlow SCM.<br>2. El usuario tiene asignado al menos un proyecto dentro de su cuenta. |
+| **Postcondiciones** | **Éxito:** Se muestra en pantalla la ficha integral consolidada del proyecto en modo solo lectura.<br>**Error:** Se bloquea la consulta informando restricción de acceso o inexistencia. |
 
-### Flujo Principal
+##### 3.2. Flujo normal de eventos
 
-1. El Analista de Requerimientos / Gestor (o usuario autorizado) selecciona la opción de consulta de proyectos.
-2. TraceFlow SCM presenta el catálogo de proyectos a los cuales el usuario tiene acceso concedido según su perfil.
-3. El actor selecciona el proyecto específico que desea inspeccionar.
-4. TraceFlow SCM valida los permisos de visualización del usuario sobre el proyecto seleccionado según la matriz RBAC.
-5. TraceFlow SCM consolida la información general, el equipo asignado, el inventario de ECS y el resumen de estado de las solicitudes de cambio en curso.
-6. TraceFlow SCM presenta el panel de detalle del proyecto permitiendo la navegación hacia sus artefactos de configuración asociados.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Acceso al directorio filtrado** | |
+| **1.** El usuario selecciona **"Proyectos"** en el menú de navegación. | **2.** El sistema identifica la sesión activa y presenta exclusivamente el listado de proyectos asignados al usuario (`A001` búsqueda/filtrado), aislando cualquier proyecto externo no autorizado. |
+| **Fase 2: Validación y visualización de ficha integral** | |
+| **3.** El usuario selecciona el proyecto que desea inspeccionar. | **4.** El sistema verifica que el proyecto exista (`E002`) y que el usuario posea asignación vigente sobre él (`E001`). |
+| | **5.** El sistema consolida y muestra la **Ficha Integral de Proyecto** con: datos generales y cliente, estado (`Activo` o `Archivado`), equipo responsable, catálogo de `ECS` del proyecto y resumen cuantitativo de `RFC` activas, habilitando accesos de navegación autorizados según el rol en sesión. |
 
-### Flujos Alternativos
+##### 3.3. Flujos alternativos
 
-- **A1 — Búsqueda y filtrado avanzado de proyectos**  
-  - **Origen:** Paso 2 del Flujo Principal.  
-  - **Condición de activación:** El usuario administra múltiples proyectos y requiere filtrar por cliente o estado.  
-  - **Secuencia:**  
-    1. El actor aplica filtros por cliente, rango de fechas o estado.  
-    2. TraceFlow SCM actualiza la lista mostrando únicamente los proyectos coincidentes.  
-  - **Convergencia:** Retorna al Paso 3 del Flujo Principal.
+###### A001: Búsqueda y filtrado del directorio de proyectos
+* **Paso origen:** Paso 2.
+* **Condición de activación:** El usuario participa en varios proyectos y requiere ubicar uno específico.
 
-### Excepciones
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El usuario ingresa criterios de búsqueda (nombre, código o cliente) o filtra por estado del proyecto. | **A001-2.** El sistema actualiza dinámicamente la lista mostrando únicamente los proyectos coincidentes dentro de su cartera asignada. Retorna al paso 3. |
 
-- **E1 — Intento de acceso a proyecto no asignado al usuario**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El usuario intenta acceder a la ficha de un proyecto sobre el cual no cuenta con asignación.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la visualización e informa la restricción de acceso según RBAC.  
-  - **Resultado:** No se despliega información; el usuario permanece en el listado general.
+##### 3.4. Flujos de excepción
 
-### Reglas aplicadas
+###### E001: Intento de acceso a proyecto no asignado
+* **Paso origen:** Paso 4.
+* **Condición de activación:** El usuario intenta consultar directamente un proyecto sobre el cual carece de asignación.
 
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Gobierna el control de acceso y visibilidad de los proyectos del sistema.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** El usuario accede al identificador de un proyecto externo a sus asignaciones. | **E001-2.** El sistema bloquea la visualización, muestra el mensaje de acceso denegado por aislamiento entre proyectos y ofrece retornar al directorio permitido. Fin del caso de uso. |
 
-### Estados afectados
+###### E002: Proyecto inexistente
+* **Paso origen:** Paso 4.
+* **Condición de activación:** El código o identificador consultado no existe en el sistema.
 
-- **Estado inicial:** N/A (Operación de sólo lectura).
-- **Transición:** N/A
-- **Estado final:** N/A
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** El sistema no localiza el proyecto solicitado. | **E002-2.** Muestra el aviso de proyecto no encontrado e invita a volver al directorio de proyectos. Fin del caso de uso. |
 
-### Entregables
+##### 3.5. Reglas de negocio aplicables
+* **`RN-04`:** Garantiza consulta controlada de los artefactos y bibliotecas sin habilitar edición directa fuera del flujo formal de cambios.
 
-- Vista consolidada de la ficha de proyecto y estado del flujo de configuración.
+##### 3.6. Estados afectados
+* **Estado inicial / final:** No aplica (operación de consulta de solo lectura).
 
-### Trazabilidad
-- **RF:** RF-02
-- **RN:** RN-01
-- **Estado(s):** N/A
-- **DG relacionado:** DG-04, DG-05
+##### 3.7. Criterios de aceptación funcionales
+1. El directorio muestra únicamente los proyectos a los que pertenece el usuario autenticado.
+2. La consulta directa de un proyecto no asignado es rechazada explícitamente sin filtrar datos de clientes terceros.
+3. La ficha consolidada presenta información general, catálogo de ECS vinculados y acceso contextual conforme al perfil activo.
+4. *Estado respecto al alcance aprobado:* la consulta y validación de aislamiento por proyecto operan en el servicio del sistema y en el selector global de proyecto; la pantalla visual completa del Directorio y Ficha de Proyecto se encuentra actualmente en vista informativa en espera de su interfaz definitiva.
+
+##### 3.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-03`):**
+![DG-ACT-03: Flujo de Actividades — CU-03](assets/diagramas/render/analisis/DG-ACT-03.svg)
+* **Diagrama de caso de uso (`DG-06`):** [`DG-06: Administración de Usuarios y Proyectos`](assets/diagramas/render/generales/DG-06.svg).
 
 ---
 
-## CU-04 — Registrar Solicitud de Cambio (RFC)
+### Bloque 02 — Registro y evaluación de solicitudes
 
-| Campo | Descripción |
+#### CU-04 — Registrar Solicitud de Cambio (RFC)
+
+##### 4.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-04 |
+| **Id Caso de Uso** | `CU-04` (Código histórico: `CUS04`) |
 | **Nombre** | Registrar Solicitud de Cambio (RFC) |
-| **Tipo** | Primario, operativo |
-| **Actor principal** | Solicitante |
-| **Actores secundarios** | Analista de Requerimientos / Gestor |
-| **Paquete / Módulo** | Registro y Clasificación de Cambios |
-| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC) |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
-| **Objetivo** | Permitir al Solicitante formalizar en el sistema la necesidad de modificación sobre un Elemento de Configuración de Software (ECS) del proyecto. |
-| **Disparador** | El Solicitante identifica un defecto, una necesidad de mejora o una adaptación funcional en el software del proyecto. |
-| **Precondiciones** | 1. El Solicitante cuenta con sesión activa y rol asignado en el proyecto.<br>2. El proyecto se encuentra en estado activo.<br>3. Existe al menos un ECS registrado en el catálogo del proyecto. |
-| **Postcondiciones** | 1. La RFC queda registrada con identificador unívoco (RFC-YYYY-NNNN) en estado oficial **`Registrada`**.<br>2. Se notifica al Analista de Requerimientos / Gestor para la revisión de completitud. |
-| **Entradas** | Título, descripción del cambio, justificación operativa, prioridad propuesta y selección del ECS afectado. |
-| **Salidas / Entregables** | Expediente digital de RFC creado en estado `Registrada` y comprobante de registro con código correlativo formal. |
+| **Tipo** | Primario, operativo (Esencial) |
+| **Requisito ID** | `RF-04` — Registro de Solicitudes de Cambio (RFC)<br>`RN-04` — Restricción de Bibliotecas Congeladas<br>`RN-01` — Aprobación Obligatoria Previa a Modificación e Integración *(marco habilitante del flujo)* |
+| **Versión** | 2.1 (Corrección SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Solicitante (`PU-01`)<br>**Secundario (Receptor de notificación):** Analista de Requerimientos / Gestor (`PU-02`) |
+| **Interacción** | Asistente web guiado de 4 pasos (*Nueva Solicitud RFC*) |
+| **Descripción** | Permite al Solicitante formalizar en TraceFlow SCM una nueva Solicitud de Cambio (`RFC`) asociada a un proyecto asignado y a un Elemento de Configuración (`ECS`) de dicho proyecto, registrando su necesidad, justificación, prioridad y categoría para que quede radicada en estado inicial `REGISTRADA` e ingrese a revisión formal. |
+| **Referencias** | `RF-04`, `RN-04`, `RN-01`, `TB-07` (Estado 1 `Registrada`), `CU-04.1`, `CU-05`, `CU-25`, `DG-07`, `DG-ACT-04` |
+| **Precondiciones** | 1. El usuario ha iniciado sesión en TraceFlow SCM.<br>2. El rol activo en la sesión es **Solicitante (`PU-01`)** (ver `E001`).<br>3. El usuario tiene asignado al menos un proyecto activo con al menos un `ECS` catalogado (ver `E003`). |
+| **Postcondiciones** | **Éxito:**<br>1. Se registra la RFC con código correlativo único (`RFC-AAAA-NNNN`), estado oficial **`REGISTRADA`** y clasificación técnica preliminar **`PENDIENTE`**.<br>2. Queda vinculada al proyecto, al solicitante y al `ECS` afectado, con constancia en la bitácora inmutable de auditoría.<br>3. *(Requisito aprobado pendiente de despacho automático)* Se notifica al Analista de Requerimientos / Gestor (`PU-02`) para su revisión inicial (`CU-05`).<br>4. Se limpia el borrador temporal de la sesión si existía.<br>**Cancelación o fallo (`A003`, `E001..E005`):** No se radica ninguna solicitud ni se altera el catálogo de ECS. |
 
-### Flujo Principal
+##### 4.2. Flujo normal de eventos
 
-1. El Solicitante selecciona la opción de registrar una nueva Solicitud de Cambio (RFC) en el proyecto asignado.
-2. TraceFlow SCM presenta el formulario de captura cargando el catálogo de ECS activos del proyecto.
-3. El Solicitante ingresa el título, descripción de la modificación, justificación operativa, prioridad propuesta y selecciona el ECS afectado.
-4. TraceFlow SCM valida que todos los campos mandatorios contengan información sustantiva y que el ECS seleccionado pertenezca al proyecto activo.
-5. TraceFlow SCM registra formalmente la solicitud asignándole un código correlativo unívoco y estableciendo su estado oficial en **`Registrada`**.
-6. TraceFlow SCM emite el comprobante de recepción al Solicitante y envía una notificación automática al Analista de Requerimientos / Gestor para su revisión de completitud.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Acceso al asistente e Información General** | |
+| **1.** El Solicitante accede a **"Nueva Solicitud RFC"** desde el menú principal o desde la bandeja de solicitudes. | **2.** El sistema verifica que el rol activo en sesión corresponda a **Solicitante (`PU-01`)** (`E001`), carga los proyectos asignados al usuario, previsualiza el código correlativo estimado y presenta el **Paso 1: Información General de la Solicitud** (*Paso 1/4*). Si existe un borrador temporal guardado previamente para el proyecto activo, restaura los datos capturados en pantalla. |
+| **3.** El Solicitante elige el **Proyecto de Software Asignado**, escribe el **Título de la Solicitud de Cambio** (máximo 120 caracteres), selecciona la **Prioridad Propuesta** (*Baja*, *Media*, *Alta* o *Crítica / Urgente*) y la **Categoría de Cambio** (*Correctivo*, *Adaptativo* o *Perfectivo*). Luego pulsa **"Siguiente Paso"** (`A001`, `A003`). | **4.** El sistema valida que exista un proyecto seleccionado y que el título cumpla las reglas de obligatoriedad y longitud mínima (`E002`). Al superar la validación, habilita el **Paso 2: Justificación y Descripción Detallada** (*Paso 2/4*). |
+| **Fase 2: Justificación de negocio y selección del ECS** | |
+| **5.** El Solicitante ingresa la **Descripción Detallada del Requerimiento o Falla**, la **Justificación de Negocio / Valor Agregado** y, de forma opcional, una **Propuesta Técnica Sugerida**. Luego pulsa **"Siguiente Paso"** (`A001`, `A003`). | **6.** El sistema valida la obligatoriedad y longitud mínima de descripción y justificación (`E002`), consulta el catálogo de `ECS` del proyecto seleccionado (`E003`) y muestra el **Paso 3: Elemento de Configuración (ECS) y Evidencias** (*Paso 3/4*), indicando para cada ECS código, nombre, versión vigente, tipo, biblioteca actual y eventual indicador de bloqueo activo. |
+| **7.** El Solicitante selecciona el **ECS Afectado** (`A002` si adjunta documentación técnica o probatoria) y pulsa **"Siguiente Paso"** (`A001`, `A003`). | **8.** El sistema verifica que exista un ECS seleccionado (`E002`) y despliega el **Paso 4: Confirmación y Envío Formal de la Solicitud** (*Paso 4/4*), presentando la ficha resumen consolidada con todos los datos ingresados y el control de confirmación de envío. |
+| **Fase 3: Confirmación, validación integral y radicación formal** | |
+| **9.** El Solicitante verifica el resumen técnico, marca el control de confirmación *(actualmente presentado como Declaración de Veracidad Institucional; ver decisión pendiente en §6.2)* y pulsa **"Enviar Solicitud de Cambio"** (`A001`, `A003`). | **10.** El sistema ejecuta la validación integral en servidor sobre longitudes, proyecto asignado (`E002`), pertenencia y disponibilidad del ECS dentro del mismo proyecto (`E004`) y registra formalmente la solicitud (`E005` ante indisponibilidad de conexión), asignando código correlativo único (`RFC-AAAA-NNNN`), estado inicial **`REGISTRADA`** y clasificación **`PENDIENTE`**. |
+| | **11.** El sistema registra el evento en la bitácora inmutable de auditoría, deriva la notificación al **Analista de Requerimientos / Gestor (`PU-02`)** *(requisito pendiente de automatización en envío)*, elimina el borrador temporal del proyecto y muestra el comprobante **"¡Solicitud de Cambio Registrada Exitosamente!"** con accesos a **Ver Expediente 360°**, **Ir a la Bandeja RFC**, **Registrar Otra** e **Ir al Dashboard**. |
 
-### Flujos Alternativos
+> [!IMPORTANT]
+> **Discrepancia detectada (`DEV-01` / SRS-02) y regla uniforme propuesta para aprobación:**  
+> 1. *Longitudes mínimas:* la interfaz de captura valida actualmente **5** caracteres en título y **15** en descripción y justificación, mientras que el servidor exige **10** caracteres en título y **20** en descripción y justificación (rechazando el envío final si el usuario digitó textos entre esos rangos). **Regla uniforme propuesta:** estandarizar **mínimo 10 y máximo 120 caracteres en título**, y **mínimo 20 caracteres en descripción y justificación** tanto en pantalla como en servidor.  
+> 2. *Campos adicionales y adjuntos:* la captura de **Categoría**, **Propuesta Técnica Sugerida** y **Archivos adjuntos** se ofrece en la interfaz; actualmente el servidor registra los campos principales y los anexos reales en almacenamiento centralizado permanecen pendientes de implementación física.  
+> 3. *Declaración de veracidad:* el formulario exige marcar una casilla de declaración de veracidad antes de enviar; dicha condición **no consta en `RF-04` ni en la narrativa original aprobada**, por lo que queda sometida a ratificación o simplificación del CCB.
 
-- **A1 — Adjuntar documentación técnica o probatoria de respaldo**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Solicitante cuenta con informes de error, actas de cliente o especificaciones complementarias.  
-  - **Secuencia:**  
-    1. El Solicitante adjunta los archivos de sustento a la solicitud.  
-    2. TraceFlow SCM valida el formato y tamaño permitido de los documentos, vinculándolos al expediente de la RFC.  
-  - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
+##### 4.3. Flujos alternativos
 
-- **A2 — Cancelación voluntaria del registro**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Solicitante decide no enviar la solicitud.  
-  - **Secuencia:**  
-    1. El Solicitante selecciona la opción cancelar.  
-    2. TraceFlow SCM solicita confirmación de descarte.  
-    3. El Solicitante confirma el descarte.  
-    4. TraceFlow SCM descarta los datos ingresados sin persistir transacciones.  
-  - **Convergencia:** Finaliza el caso de uso sin generar registros.
+###### A001: Guardar borrador temporal
+* **Paso origen:** Pasos 3, 5, 7 o 9.
+* **Condición de activación:** El Solicitante necesita pausar la captura antes de enviar la solicitud y pulsa **"Guardar Borrador"**.
 
-### Excepciones
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Solicitante pulsa **"Guardar Borrador"** en la cabecera del asistente. | **A001-2.** El sistema conserva temporalmente los datos digitados asociados al proyecto actual dentro de la sesión del navegador y muestra el aviso **"Borrador guardado"**, sin radicar aún la RFC en el servidor. |
 
-- **E1 — Información mandatoria incompleta**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** Omisión de campos requeridos (justificación vacía o ECS no seleccionado).  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea el registro, resalta los campos observados y solicita la corrección al Solicitante.  
-  - **Resultado:** Retorna al Paso 3 del Flujo Principal; no se crea ninguna RFC.
+###### A002: Adjuntar documentación técnica o probatoria de respaldo
+* **Paso origen:** Paso 7 (Paso 3 del asistente).
+* **Condición de activación:** El Solicitante dispone de actas, capturas, bitácoras de error o informes técnicos de respaldo (capacidad contemplada en el requisito aprobado `RF-04`).
 
-- **E2 — ECS seleccionado inactivo o no disponible**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El ECS seleccionado fue dado de baja o archivado en el catálogo.  
-  - **Respuesta del sistema:** TraceFlow SCM informa que el elemento no admite solicitudes y bloquea el guardado.  
-  - **Resultado:** Retorna al Paso 3 del Flujo Principal para seleccionar un ECS válido.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A002-1.** El Solicitante selecciona o ingresa los archivos de sustento técnico y pulsa **"Adjuntar"**. | **A002-2.** El sistema valida los formatos/tamaños permitidos y los vincula al expediente para su visualización en el resumen del Paso 4 y posterior evaluación en `CU-05`. *(Nota de estado vigente: actualmente en pantalla solo se asocian nombres nominales de referencia; el almacenamiento físico real de archivos forma parte del alcance aprobado pendiente de habilitación).* Retorna al paso 7. |
 
-### Reglas aplicadas
+###### A003: Cancelar registro y descartar cambios
+* **Paso origen:** Pasos 3, 5, 7 o 9.
+* **Condición de activación:** El Solicitante decide cancelar la captura pulsando **"Cancelar"**.
 
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna alteración a un ECS se inicie sin el registro formal previo de una RFC en el sistema.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A003-1.** El Solicitante pulsa **"Cancelar"**. | **A003-2.** El sistema muestra el cuadro **"¿Descartar registro de solicitud?"** indicando que los datos ingresados no se registrarán, con los botones **"Continuar editando"** y **"Sí, descartar y salir"**. |
+| **A003-3.** Confirma **"Sí, descartar y salir"** (o **"Continuar editando"**). | **A003-4.** Si confirma el descarte, sale del asistente sin crear ninguna RFC; en caso contrario, cierra el aviso y mantiene los datos en edición. |
 
-### Estados afectados
+##### 4.4. Flujos de excepción
 
-- **Estado inicial:** Ninguno (Creación de nuevo expediente)
-- **Transición:** Registro formal de la solicitud
-- **Estado final:** **`Registrada`** (Estado 1 de TB-07)
+###### E001: Rol activo no autorizado (Segregación de Funciones)
+* **Paso origen:** Paso 2.
+* **Condición de activación:** La sesión actual no tiene activo el perfil **Solicitante (`PU-01`)**.
 
-### Entregables
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** El usuario intenta registrar o remitir una RFC con otro perfil activo. | **E001-2.** El sistema despliega la advertencia **"Restricción de Segregación de Funciones (SoD)"** informando que el registro corresponde exclusivamente al Solicitante (`PU-01`) y mantiene inhabilitado el botón **"Enviar Solicitud de Cambio"** (además de rechazar la petición en el servidor). Fin del caso de uso. |
 
-- Expediente formal de Solicitud de Cambio (RFC) en estado oficial `Registrada`.
+###### E002: Campos obligatorios incompletos o longitud mínima insuficiente
+* **Paso origen:** Pasos 4, 6, 8 o 10.
+* **Condición de activación:** Faltan campos mandatorios, el título excede 120 caracteres, no se cumple la longitud mínima en pantalla o en servidor, no se seleccionó un ECS o falta la confirmación previa al envío.
 
-### Trazabilidad
-- **RF:** RF-04
-- **RN:** RN-01
-- **Estado(s):** Registrada
-- **DG relacionado:** DG-03, DG-04, DG-05, DG-11
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** El Solicitante intenta avanzar o enviar datos que incumplen las reglas de validación. | **E002-2.** El sistema bloquea el avance o radicación, señala el campo observado y muestra un mensaje comprensible con el requisito mínimo incumplido, conservando el resto de la información digitada para corrección. Retorna al paso donde ocurrió la validación. |
+
+###### E003: Proyecto sin Elementos de Configuración (ECS) disponibles
+* **Paso origen:** Paso 6.
+* **Condición de activación:** El proyecto elegido no tiene ningún ECS catalogado.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El Solicitante avanza al Paso 3 tras elegir un proyecto sin ECS activos. | **E003-2.** El sistema informa **"No se encontraron elementos de configuración registrados para este proyecto. Contacte al Administrador SCM."** e impide avanzar al Paso 4 al no poder vincular un ECS afectado. Fin del flujo o regreso al Paso 1 para elegir otro proyecto. |
+
+###### E004: Inconsistencia de integridad entre proyecto y ECS o ECS inactivo
+* **Paso origen:** Paso 10.
+* **Condición de activación:** El ECS indicado no pertenece al proyecto seleccionado, no existe o fue dado de baja/archivado antes de confirmar la radicación.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E004-1.** El servidor detecta discordancia entre el proyecto asignado y el ECS afectado (o indisponibilidad del elemento). | **E004-2.** El sistema rechaza el registro explicando claramente la incompatibilidad proyecto–ECS detectada, sin generar expedientes parciales ni alterar el inventario. El usuario puede regresar al Paso 3 para corregir la selección. |
+
+###### E005: Falla de conectividad o indisponibilidad temporal al enviar
+* **Paso origen:** Paso 10.
+* **Condición de activación:** Interrupción temporal de red o indisponibilidad del servidor al confirmar la radicación.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E005-1.** No se recibe confirmación del servidor tras pulsar **"Enviar Solicitud de Cambio"**. | **E005-2.** El sistema presenta la alerta **"No se pudo procesar la Solicitud de Cambio"** explicando que ocurrió un error de comunicación, conserva íntegramente los datos capturados en pantalla y habilita reintentar el envío o guardar borrador sin duplicar expedientes. |
+
+##### 4.5. Reglas de negocio aplicables
+* **`RN-04` (Restricción de Bibliotecas Congeladas):** Toda modificación sobre un ECS en Biblioteca Maestra exige iniciar un nuevo ciclo formal comenzando por el registro de la RFC.
+* **`RN-01` (Aprobación Obligatoria Previa a Modificación e Integración):** Establece el marco rector que impide alterar el software sin completar las fases posteriores de validación, análisis y orden de cambio originadas desde la RFC.
+
+##### 4.6. Estados afectados
+* **Estado inicial:** Ninguno (alta de expediente nuevo).
+* **Estado resultante:** **`REGISTRADA`** (Estado 1 de `TB-07`), con clasificación técnica **`PENDIENTE`**.
+
+##### 4.7. Criterios de aceptación funcionales
+1. El asistente guía al Solicitante en 4 pasos progresivos, conserva información al retroceder y permite guardar y recuperar borrador temporal por proyecto.
+2. El sistema impide radicar solicitudes a perfiles distintos de `Solicitante (PU-01)` y bloquea asociar un ECS que no pertenezca al mismo proyecto asignado.
+3. Al confirmarse el envío válido, se asigna código correlativo único (`RFC-AAAA-NNNN`), se registra el estado inicial `REGISTRADA`, se emite el registro de auditoría y se presenta el comprobante con accesos al expediente y a la bandeja.
+4. Ante fallos de validación (`E002`, `E004`) o conectividad (`E005`), no se pierde la información digitada ni se crean registros parciales.
+5. **Prevención de solicitudes duplicadas *(Criterio de aceptación pendiente de validación)*:** El sistema deberá alertar o prevenir el registro duplicado de una RFC abierta con el mismo alcance sobre el mismo proyecto y ECS antes de radicarla; criterio pendiente de validación e implementación formal por el equipo y el CCB.
+6. *Brechas registradas respecto al alcance aprobado:* despacho automático de notificación al Gestor (`PU-02`), almacenamiento físico de archivos adjuntos, unificación de longitudes mínimas (10/20) entre interfaz y servidor, y ratificación de la declaración de veracidad.
+
+##### 4.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-04`):**
+![DG-ACT-04: Flujo de Actividades — CU-04](assets/diagramas/render/analisis/DG-ACT-04.svg)
+* **Diagrama de caso de uso (`DG-07`):** [`DG-07: Registro y Evaluación de RFC e Incidencias`](assets/diagramas/render/generales/DG-07.svg).
 
 ---
 
-## CU-04.1 — Subsanar Solicitud de Cambio (RFC)
+#### CU-04.1 — Subsanar Solicitud de Cambio (RFC)
 
-| Campo | Descripción |
+##### 4.1.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-04.1 |
+| **Id Caso de Uso** | `CU-04.1` (Extensión `<<extend>>` de `CU-04`) |
 | **Nombre** | Subsanar Solicitud de Cambio (RFC) |
-| **Tipo** | Secundario, correctivo (`<<extend>>` de CU-04) |
-| **Actor principal** | Solicitante |
-| **Actores secundarios** | Analista de Requerimientos / Gestor |
-| **Paquete / Módulo** | Registro y Clasificación de Cambios |
-| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC) |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración |
-| **Objetivo** | Permitir al Solicitante corregir, completar o aclarar la información y sustentos de una RFC observada en la revisión inicial, reactivando su ciclo de evaluación. |
-| **Disparador** | El Solicitante recibe una notificación de observación formal emitida por el Analista de Requerimientos / Gestor. |
-| **Precondiciones** | La RFC se encuentra en estado oficial **`En Subsanación`** y dentro del plazo reglamentario establecido por el proyecto. |
-| **Postcondiciones** | La RFC queda actualizada con la información requerida y transiciona a estado oficial **`Registrada`** para una nueva verificación formal. |
-| **Entradas** | Pliego de modificaciones, campos corregidos, justificaciones ampliadas y nuevos anexos técnicos. |
-| **Salidas / Entregables** | Expediente de RFC subsanado y comprobante de reingreso formal emitido. |
+| **Tipo** | Secundario, correctivo |
+| **Requisito ID** | `RF-04` — Registro de Solicitudes de Cambio (RFC)<br>`RN-04`, `RN-07` *(desistimiento voluntario / cierre por vencimiento)* |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Solicitante (`PU-01`, autor original del expediente)<br>**Secundario:** Analista de Requerimientos / Gestor (`PU-02`) |
+| **Interacción** | Formulario web de Subsanación de RFC accesado desde el Expediente 360° |
+| **Descripción** | Permite al Solicitante original corregir, ampliar o aclarar la información y evidencias de una solicitud observada por el Gestor en revisión inicial (`EN_SUBSANACION`), reingresándola a estado `REGISTRADA` con notas de descargo, o bien formalizar su desistimiento voluntario (`DESESTIMADA`). |
+| **Referencias** | `RF-04`, `RN-04`, `RN-07`, `TB-07` (Estados `En Subsanación`, `Registrada`, `Desestimada`), `CU-04`, `CU-05`, `DG-07`, `DG-ACT-04.1` |
+| **Precondiciones** | 1. La solicitud existe y pertenece al proyecto activo seleccionado.<br>2. Su estado oficial es **`EN_SUBSANACION`** (`E002`).<br>3. El usuario tiene sesión con perfil activo **`Solicitante (PU-01)`** y es el **solicitante original** de esa RFC (`E001`).<br>4. La subsanación se realiza dentro del plazo reglamentario vigente (`E004`). |
+| **Postcondiciones** | **Éxito:** El expediente queda actualizado con los datos corregidos y notas de descargo, retorna al estado **`REGISTRADA`**, se registra auditoría y se notifica al Gestor (`PU-02`) para nueva revisión (`CU-05`).<br>**Desistimiento (`A001`) o plazo vencido (`E004`):** La solicitud pasa al estado terminal **`DESESTIMADA`**. |
 
-### Flujo Principal
+##### 4.1.2. Flujo normal de eventos
 
-1. El Solicitante selecciona en su bandeja de solicitudes la RFC en estado "En Subsanación".
-2. TraceFlow SCM presenta el formulario de subsanación mostrando los datos de la solicitud y el pliego formal de observaciones registrado por el Analista.
-3. El Solicitante modifica los campos requeridos, amplía la justificación y adjunta los documentos aclaratorios solicitados.
-4. TraceFlow SCM valida que las modificaciones atiendan las observaciones registradas y que no existan campos mandatorios pendientes.
-5. TraceFlow SCM actualiza el expediente de la RFC y transiciona su estado oficial a **`Registrada`**.
-6. TraceFlow SCM emite confirmación de subsanación al Solicitante y envía una notificación automática al Analista de Requerimientos / Gestor para su reevaluación.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Acceso contextual y presentación de observaciones** | |
+| **1.** El Solicitante abre una solicitud en estado `EN_SUBSANACION` desde su bandeja y pulsa el botón **"Subsanar Solicitud"** en el expediente. | **2.** El sistema valida que el expediente pertenezca al proyecto activo, que su estado sea **`EN_SUBSANACION`** (`E002`), que el operador sea **`Solicitante (PU-01)`** y titular original del trámite (`E001`), y que no haya expirado el plazo reglamentario (`E004`). Luego presenta destacado el panel **"Observaciones formuladas por el Gestor"** (texto de observaciones, revisor y fecha) y el formulario precargado en cuatro bloques. |
+| **Fase 2: Corrección de datos, evidencias y notas de descargo** | |
+| **3.** El Solicitante ajusta título, prioridad solicitada o categoría (`A001` si decide desistir), amplía la **Descripción Detallada**, la **Justificación Operativa** y opcionalmente la **Propuesta Técnica Sugerida**; rectifica el **ECS Afectado** si corresponde (`A002` para gestionar archivos adjuntos); e ingresa un resumen aclaratorio en **"Notas de Descargo Formal y Explicación de Cambios"**. Luego pulsa **"Reingresar Solicitud Subsanada"**. | **4.** El sistema verifica que título, descripción, justificación y ECS seleccionado cumplan los criterios obligatorios y pertenezcan al proyecto del trámite (`E003`). |
+| **Fase 3: Reingreso formal y notificación** | |
+| **5.** El sistema procesa el reingreso confirmado. | **6.** El sistema actualiza la solicitud y transiciona su estado oficial de **`EN_SUBSANACION`** a **`REGISTRADA`**, registra la acción en auditoría, remite notificación al **Analista de Requerimientos / Gestor (`PU-02`)** y muestra el diálogo **"Solicitud Reingresada Satisfactoriamente"** con el botón **"Ir al Expediente 360°"**. |
 
-### Flujos Alternativos
+##### 4.1.3. Flujos alternativos
 
-- **A1 — Desistimiento voluntario de la solicitud observada**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Solicitante decide no subsanar la solicitud y retira el pedido.  
-  - **Secuencia:**  
-    1. El Solicitante confirma el desistimiento formal de la RFC.  
-    2. TraceFlow SCM solicita el motivo de desistimiento.  
-    3. TraceFlow SCM transiciona el estado de la RFC a `Desestimada`.  
-  - **Convergencia:** Finaliza el trámite de la solicitud.
+###### A001: Desistimiento voluntario de la solicitud observada
+* **Paso origen:** Paso 3.
+* **Condición de activación:** El Solicitante decide retirar definitivamente la iniciativa y pulsa **"Desistir de la Solicitud (Cierre Voluntario)"**.
 
-### Excepciones
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Solicitante pulsa **"Desistir de la Solicitud (Cierre Voluntario)"**. | **A001-2.** El sistema abre el diálogo **"Confirmar Desistimiento de la Solicitud"** advirtiendo que el cierre como **`DESESTIMADA`** es irrevocable, solicitando la fundamentación obligatoria y una casilla de confirmación. |
+| **A001-3.** El Solicitante ingresa el motivo de desistimiento, marca la casilla de confirmación y pulsa **"Confirmar Desistimiento Definitivo"** (o **"Volver al Formulario"** para continuar editando). | **A001-4.** El sistema valida que el motivo tenga detalle suficiente (mínimo 10 caracteres) y la casilla marcada (`E003`); registra el cierre formal en estado terminal **`DESESTIMADA`**, graba auditoría y redirige al Expediente 360°. |
 
-- **E1 — Vencimiento del plazo reglamentario de subsanación**  
-  - **Origen:** Paso 1 del Flujo Principal.  
-  - **Condición de fallo:** El Solicitante intenta acceder a la subsanación fuera de la ventana de tiempo autorizada.  
-  - **Respuesta del sistema:** TraceFlow SCM bloquea la edición, informa que el plazo expiró y declara la solicitud en estado `Desestimada`.  
-  - **Resultado:** No se admiten cambios; el expediente se archiva como desestimado por abandono.
+###### A002: Incorporar o retirar documentación probatoria de subsanación
+* **Paso origen:** Paso 3.
+* **Condición de activación:** El Solicitante agrega evidencias aclaratorias solicitadas en el pliego de observaciones o retira adjuntos previos.
 
-### Reglas aplicadas
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A002-1.** El Solicitante agrega archivos mediante sugerencias o entrada manual (**"Agregar"**) o elimina alguno existente. | **A002-2.** El sistema actualiza la lista visible de documentos vinculados al expediente subsanado. *(Al igual que en `CU-04`, el almacenamiento físico en repositorio centralizado forma parte del requisito aprobado pendiente de implementación real).* Retorna al paso 3. |
 
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Exige que cualquier avance hacia evaluación técnica cuente con un expediente de solicitud formalmente admitido y sin omisiones.
+##### 4.1.4. Flujos de excepción
 
-### Estados afectados
+###### E001: Proyecto distinto, rol no autorizado o usuario distinto al solicitante original
+* **Paso origen:** Paso 2.
+* **Condición de activación:** La RFC pertenece a otro proyecto no activo en sesión, el rol activo no es `PU-01` o el usuario conectado no es el autor original del expediente.
 
-- **Estado inicial:** **`En Subsanación`** (Estado 2 de TB-07)
-- **Transición:** Subsanación de observaciones formales
-- **Estado final:** **`Registrada`** (Estado 1 de TB-07)
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** El usuario intenta abrir el formulario de subsanación incumpliendo proyecto, rol o titularidad. | **E001-2.** El sistema bloquea la edición explicando la causa (aislamiento de proyecto con opción de conmutar si tiene permiso, acceso reservado al rol Solicitante, o subsanación restringida al solicitante original) y ofrece volver al expediente en solo lectura. Fin del caso de uso. |
 
-### Entregables
+###### E002: Estado incompatible o expediente inexistente
+* **Paso origen:** Paso 2.
+* **Condición de activación:** La solicitud no existe o su estado actual es distinto a `EN_SUBSANACION`.
 
-- Expediente de RFC subsanado en estado oficial `Registrada`.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** Se intenta acceder a subsanación sobre un expediente inexistente o en otro estado. | **E002-2.** El sistema informa que el expediente no existe o que únicamente las solicitudes en **`EN_SUBSANACION`** admiten corrección formal, ofreciendo volver a la bandeja o al expediente. Fin del caso de uso. |
 
-### Trazabilidad
-- **RF:** RF-04
-- **RN:** RN-01
-- **Estado(s):** En Subsanación $
-ightarrow$ Registrada
-- **DG relacionado:** DG-03, DG-05, DG-11
+###### E003: Validación incompleta de campos subsanados o de motivo de desistimiento
+* **Paso origen:** Paso 4 y `A001-4`.
+* **Condición de activación:** Campos mandatorios vacíos, longitudes insuficientes o falta de motivo/confirmación al desistir.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El sistema detecta campos faltantes o longitudes por debajo del mínimo requerido. | **E003-2.** Impide el reingreso o cierre, señala los campos observados y solicita completarlos sin perder lo editado. Retorna al paso 3 o al modal `A001`. |
+
+###### E004: Vencimiento del plazo reglamentario de subsanación
+* **Paso origen:** Paso 2 *(Requisito normativo aprobado pendiente de automatización temporal)*.
+* **Condición de activación:** El Solicitante accede una vez vencido el plazo reglamentario fijado tras la emisión de observaciones.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E004-1.** Se intenta subsanar fuera del plazo reglamentario establecido para el proyecto. | **E004-2.** El sistema bloquea la edición, informa el vencimiento del plazo y declara el cierre formal del expediente en estado terminal **`DESESTIMADA`**. Fin del caso de uso. |
+
+##### 4.1.5. Reglas de negocio aplicables
+* **`RN-04`:** Mantiene la canalización obligatoria por expediente RFC antes de cualquier modificación técnica.
+* **`RN-07`:** Regula el cierre formal anticipado como `DESESTIMADA` ante desistimiento o falta de subsanación.
+
+##### 4.1.6. Estados afectados
+* **Estado inicial:** **`EN_SUBSANACION`** (Estado 2 de `TB-07`).
+* **Estados resultantes:** **`REGISTRADA`** (reingreso normal) o **`DESESTIMADA`** (desistimiento voluntario o vencimiento de plazo).
+
+##### 4.1.7. Criterios de aceptación funcionales
+1. Solo el solicitante original autenticado como `PU-01` dentro del proyecto correspondiente puede editar una RFC en `EN_SUBSANACION`.
+2. El formulario muestra de forma visible el pliego de observaciones del Gestor junto a la información editable y un campo de notas de descargo.
+3. El reingreso exitoso retorna la RFC a `REGISTRADA` y el desistimiento confirmado exige motivo y transiciona de forma irreversible a `DESESTIMADA`.
+4. *Brechas registradas respecto al alcance aprobado:* el flujo completo opera actualmente de forma simulada en la interfaz del prototipo, quedando pendiente su integración definitiva con el servidor, el control automático de caducidad de plazo (`E004`), la homologación de categorías con `CU-04` *(la vista de subsanación lista `EVOLUTIVO` además de `CORRECTIVO`/`ADAPTATIVO`/`PERFECTIVO`)* y la conservación histórica de múltiples ciclos de subsanación.
+
+##### 4.1.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-04.1`):**
+![DG-ACT-04.1: Flujo de Actividades — CU-04.1](assets/diagramas/render/analisis/DG-ACT-04.1.svg)
+* **Diagrama de caso de uso (`DG-07`):** [`DG-07: Registro y Evaluación de RFC e Incidencias`](assets/diagramas/render/generales/DG-07.svg).
 
 ---
 
-## CU-05 — Validar y clasificar la solicitud
+#### CU-05 — Validar y clasificar la solicitud
 
-| Campo | Descripción |
+##### 5.1. Ficha descriptiva
+
+| Atributo | Detalle |
 | :--- | :--- |
-| **Código** | CU-05 |
+| **Id Caso de Uso** | `CU-05` (Código histórico: `CUS05`) |
 | **Nombre** | Validar y clasificar la solicitud |
-| **Tipo** | Primario, operativo |
-| **Actor principal** | Analista de Requerimientos / Gestor |
-| **Actores secundarios** | Solicitante, Arquitecto / Especialista Técnico |
-| **Paquete / Módulo** | Registro y Clasificación de Cambios |
-| **RF asociados** | RF-04 — Registro de Solicitudes de Cambio (RFC)<br>RF-05 — Clasificación y Análisis de Impacto |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-07 — Diferenciación de Resultados Formales de Cierre |
-| **Objetivo** | Efectuar la revisión formal de completitud, consistencia de alcance y procedencia de la RFC registrada, admitiéndola para análisis técnico, devolviéndola para subsanación o desestimándola por improcedencia. |
-| **Disparador** | Recepción de una notificación de nueva RFC registrada o reingresada tras subsanación. |
-| **Precondiciones** | La RFC se encuentra en estado oficial **`Registrada`**. |
-| **Postcondiciones** | La RFC transiciona a: **`Clasificada`** (admitida a análisis técnico), **`En Subsanación`** (observada) o **`Desestimada`** (cierre formal anticipado). |
-| **Entradas** | Expediente de la RFC, catálogo de requerimientos del proyecto, catálogo de ECS y criterios de admisibilidad formal. |
-| **Salidas / Entregables** | Dictamen formal de admisión/categorización preliminar, pliego de observaciones de subsanación o acta de desestimación formal. |
+| **Tipo** | Primario, operativo (Esencial) |
+| **Requisito ID** | `RF-04`, `RF-05`, `RF-14`<br>`RN-01`, `RN-07` |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Analista de Requerimientos / Gestor (`PU-02`)<br>**Secundarios:** Solicitante (`PU-01`), Arquitecto / Especialista Técnico (`PU-03`) |
+| **Interacción** | Panel de Revisión Inicial dentro del Expediente 360° de la RFC |
+| **Descripción** | Permite al Analista de Requerimientos / Gestor efectuar el filtro formal de completitud, coherencia de alcance y procedencia de una RFC en estado `REGISTRADA`, decidiendo entre admitirla hacia análisis técnico (`CLASIFICADA`), observarla para subsanación (`EN_SUBSANACION`) o desestimarla definitivamente por improcedencia o duplicidad (`DESESTIMADA`). |
+| **Referencias** | `RF-04`, `RF-05`, `RF-14`, `RN-01`, `RN-07`, `TB-07`, `CU-04`, `CU-04.1`, `CU-06`, `DG-07`, `DG-ACT-05` |
+| **Precondiciones** | 1. El operador posee sesión activa con el perfil **`Analista de Requerimientos / Gestor (PU-02)`** y tiene asignado el proyecto del expediente (`E001`).<br>2. La RFC se encuentra en estado oficial **`REGISTRADA`** (`E002`). |
+| **Postcondiciones** | **Éxito:** Según el dictamen emitido, la solicitud transiciona a **`CLASIFICADA`** (notificando al Arquitecto para `CU-06`), **`EN_SUBSANACION`** (notificando al Solicitante para `CU-04.1`) o **`DESESTIMADA`** (cierre terminal con notificación al Solicitante), dejando constancia en auditoría. |
 
-### Flujo Principal
+##### 5.2. Flujo normal de eventos
 
-1. El Analista de Requerimientos / Gestor selecciona una RFC en estado "Registrada" desde su bandeja de evaluación inicial.
-2. TraceFlow SCM presenta el expediente de la solicitud incluyendo descripción, justificación, prioridad propuesta, ECS asociado y anexos.
-3. El Analista de Requerimientos / Gestor revisa la completitud de los datos, la coherencia con el alcance del proyecto y la procedencia de la solicitud.
-4. El Analista de Requerimientos / Gestor emite el dictamen de admisión formal asignando la categorización preliminar del requerimiento.
-5. TraceFlow SCM valida la consistencia del dictamen de admisibilidad y actualiza el estado oficial de la RFC a **`Clasificada`**.
-6. TraceFlow SCM notifica al Arquitecto / Especialista Técnico que la RFC ha sido admitida formalmente y queda habilitada para el análisis de impacto técnico.
-
-### Flujos Alternativos
-
-- **A1 — Información incompleta o insuficiente (Observación de RFC)**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** La solicitud carece de justificación clara, no identifica con precisión el comportamiento esperado o faltan anexos críticos.  
-  - **Secuencia:**  
-    1. El Analista de Requerimientos / Gestor redacta el pliego de observaciones indicando los requisitos a subsanar.  
-    2. TraceFlow SCM valida el pliego y actualiza el estado oficial de la RFC a `En Subsanación`.  
-    3. TraceFlow SCM notifica al Solicitante otorgándole el plazo reglamentario para corregir mediante CU-04.1.  
-  - **Convergencia:** Finaliza la revisión inicial quedando a la espera de la subsanación.
-
-- **A2 — Solicitud improcedente, duplicada o fuera del alcance contractual**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** La solicitud replica un cambio ya atendido, contradice los objetivos del proyecto o no es aplicable.  
-  - **Secuencia:**  
-    1. El Analista de Requerimientos / Gestor formula el dictamen de desestimación fundamentando las causales.  
-    2. TraceFlow SCM registra el motivo de improcedencia y transiciona el estado oficial de la RFC a `Desestimada` (estado terminal).  
-    3. TraceFlow SCM notifica el cierre anticipado al Solicitante según RN-07.  
-  - **Convergencia:** Finaliza el trámite de la RFC como estado terminal.
-
-### Excepciones
-
-- **E1 — Expediente con anexos corruptos o ilegibles**  
-  - **Origen:** Paso 2 del Flujo Principal.  
-  - **Condición de fallo:** Los archivos de respaldo adjuntos por el Solicitante no pueden visualizarse o presentan fallas de formato.  
-  - **Respuesta del sistema:** TraceFlow SCM alerta sobre la falla en los documentos adjuntos.  
-  - **Resultado:** El Analista deriva la solicitud al flujo alternativo A1 para requerir la recarga íntegra de anexos.
-
-### Reglas aplicadas
-
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide que una solicitud no admitida formalmente pase a etapas técnicas de ingeniería.
-- **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece el estado `Desestimada` como un resultado de cierre formal anticipado para solicitudes inviables desde el análisis inicial.
-
-### Estados afectados
-
-- **Estado inicial:** **`Registrada`** (Estado 1 de TB-07)
-- **Transición:** Validación formal de admisibilidad y completitud
-- **Estado final:** **`Clasificada`** (Estado 3 de TB-07) / **`En Subsanación`** (Estado 2 de TB-07) / **`Desestimada`** (Estado 11 de TB-07)
-
-### Entregables
-
-- Dictamen formal de admisión preliminar en estado `Clasificada` (o pliego de observaciones / acta de desestimación).
-
-### Trazabilidad
-- **RF:** RF-04, RF-05
-- **RN:** RN-01, RN-07
-- **Estado(s):** Registrada $
-ightarrow$ Clasificada (o En Subsanación / Desestimada)
-- **DG relacionado:** DG-03, DG-04, DG-05, DG-11
-
----
-
-## CU-06 — Realizar análisis de impacto técnico
-
-| Campo | Descripción |
+| **Acción del Actor** | **Respuesta del Sistema** |
 | :--- | :--- |
-| **Código** | CU-06 |
-| **Nombre** | Realizar análisis de impacto técnico |
-| **Tipo** | Primario, analítico |
-| **Actor principal** | Arquitecto / Especialista Técnico |
-| **Actores secundarios** | Analista de Requerimientos / Gestor |
-| **Paquete / Módulo** | Registro y Clasificación de Cambios |
-| **RF asociados** | RF-05 — Clasificación y Análisis de Impacto |
-| **RN asociadas** | RN-01 — Aprobación Obligatoria Previa a Modificación e Integración<br>RN-05 — Evaluación Técnica y Clasificación Obligatoria |
-| **Objetivo** | Evaluar las implicancias técnicas, arquitecturales y operativas del cambio sobre el software, estimando riesgos, dependencias, esfuerzo, tiempo, costo y afectación a la Triple Restricción, para dictaminar formalmente si clasifica como Cambio Menor o Cambio Mayor. |
-| **Disparador** | Notificación de RFC en estado oficial `Clasificada` disponible para análisis técnico. |
-| **Precondiciones** | La RFC se encuentra en estado oficial **`Clasificada`**. |
-| **Postcondiciones** | 1. Se emite y suscribe el Informe Técnico de Impacto.<br>2. La RFC transiciona a estado oficial **`En Evaluación`** habilitando la ruta correspondiente (CU-30 para Cambio Menor o CU-07 para Cambio Mayor). |
-| **Entradas** | Expediente de la RFC clasificada, arquitectura del sistema, mapa de dependencias de ECS, estimación de esfuerzo en horas-hombre y matriz de riesgos técnicos. |
-| **Salidas / Entregables** | Informe Técnico de Impacto formalmente suscrito con dictamen de clasificación (Cambio Menor o Cambio Mayor). |
+| **Fase 1: Recepción e inspección del expediente** | |
+| **1.** El Analista de Requerimientos / Gestor selecciona una solicitud en estado `REGISTRADA` desde la bandeja de RFCs del proyecto. | **2.** El sistema verifica que el perfil activo sea **Gestor (`PU-02`)** con acceso al proyecto (`E001`) y que la RFC esté en estado **`REGISTRADA`** (`E002`). Despliega el **Expediente 360°** con título, descripción, justificación, propuesta sugerida, ECS vinculado, anexos y el panel **"Revisión Inicial y Dictamen de Admisión"** con las tres opciones de resolución (*Opción A: Admitir*, *Opción B: Observar*, *Opción C: Desestimar*). |
+| **3.** El Gestor revisa la completitud formal, consistencia técnica preliminar, eventual duplicidad con trámites previos y legibilidad de anexos (`E004` si existieran evidencias ilegibles o incompletas). | **4.** El sistema mantiene accesibles los antecedentes del expediente y cualquier descargo previo si la solicitud reingresó tras subsanación. |
+| **Fase 2: Emisión del dictamen de admisión** | |
+| **5.** El Gestor elige **Opción A: Admitir RFC** (`A001` para observar, `A002` para desestimar), registra observaciones o confirmación en **"Dictamen Preliminar / Observaciones de Admisión"** y pulsa **"Admitir Solicitud (REGISTRADA → CLASIFICADA)"**. | **6.** El sistema valida que la transición esté permitida (`E002`), actualiza el estado oficial a **`CLASIFICADA`** dejando constancia del revisor y fecha, registra el evento en la bitácora de auditoría, notifica al **Arquitecto / Especialista Técnico (`PU-03`)** que el expediente quedó habilitado para análisis de impacto (`CU-06`) y confirma el cambio en pantalla. |
 
-### Flujo Principal
+##### 5.3. Flujos alternativos
 
-1. El Arquitecto / Especialista Técnico selecciona una RFC en estado "Clasificada" desde su bandeja de análisis de ingeniería.
-2. TraceFlow SCM presenta el expediente de la solicitud y actualiza su estado oficial a **`En Análisis Técnico`**.
-3. El Arquitecto / Especialista Técnico analiza el impacto en la arquitectura de software, dependencias entre ECS, riesgos técnicos, estimando el esfuerzo en horas-hombre, el tiempo de ejecución y el costo proyectado.
-4. El Arquitecto / Especialista Técnico evalúa la afectación sobre la Triple Restricción (alcance, tiempo y costo) y formula el dictamen de clasificación técnica en Cambio Menor o Cambio Mayor.
-5. TraceFlow SCM registra el Informe Técnico de Impacto vinculándolo de forma inmutable al expediente de la RFC conforme a RN-05.
-6. TraceFlow SCM transiciona el estado oficial de la RFC a **`En Evaluación`** y enruta la solicitud hacia la instancia de deliberación que corresponda según la clasificación dictaminada.
+###### A001: Observar la solicitud por información incompleta o insuficiente (`Opción B`)
+* **Paso origen:** Paso 5.
+* **Condición de activación:** La RFC presenta vacíos en justificación, alcance ambiguo, ECS impreciso o carece de evidencias de respaldo necesarias.
 
-### Flujos Alternativos
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Gestor selecciona **Opción B: Observar RFC**, detalla las correcciones exigidas en **"Pliego Formal de Observaciones para Subsanación"** y pulsa **"Emitir Pliego de Observaciones (REGISTRADA → EN_SUBSANACION)"**. | **A001-2.** El sistema valida que el pliego tenga detalle suficiente (mínimo 10 caracteres, `E003`), cambia el estado oficial a **`EN_SUBSANACION`**, guarda autor y fecha de observación, registra auditoría y notifica al Solicitante para ejecutar `CU-04.1`. |
 
-- **A1 — Solicitud de aclaración técnica al Analista o Solicitante**  
-  - **Origen:** Paso 3 del Flujo Principal.  
-  - **Condición de activación:** El Arquitecto identifica ambigüedad técnica sobre el comportamiento esperado del ECS.  
-  - **Secuencia:**  
-    1. El Arquitecto registra una consulta técnica formal asociada a la RFC.  
-    2. TraceFlow SCM notifica al Analista de Requerimientos / Gestor para responder la precisión requerida.  
-    3. El Analista ingresa la aclaración técnica en el sistema.  
-  - **Convergencia:** Retorna al Paso 3 del Flujo Principal para proseguir con el análisis.
+###### A002: Desestimar la solicitud por improcedencia, duplicidad o fuera de alcance (`Opción C`)
+* **Paso origen:** Paso 5.
+* **Condición de activación:** La RFC replica un cambio ya atendido, contradice el alcance contractual o resulta manifiestamente improcedente desde el triaje inicial.
 
-### Excepciones
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A002-1.** El Gestor selecciona **Opción C: Desestimar RFC**, redacta la causa en **"Fundamentación Mandatoria de Desestimación"**, marca la casilla de confirmación de cierre irreversible y pulsa **"Desestimar Definitivamente (REGISTRADA → DESESTIMADA)"**. | **A002-2.** El sistema valida que la justificación cumpla la extensión mínima (10 caracteres) y que la casilla esté marcada (`E003`), transiciona la RFC al estado terminal **`DESESTIMADA`** conforme a `RN-07`, bloquea futuras ediciones, registra auditoría y notifica el cierre anticipado al Solicitante. |
 
-- **E1 — Dictamen de inviabilidad técnica absoluta**  
-  - **Origen:** Paso 4 del Flujo Principal.  
-  - **Condición de fallo:** El Arquitecto dictamina que el cambio es técnica o arquitecturalmente inviable o incompatible con la estabilidad del sistema.  
-  - **Respuesta del sistema:** TraceFlow SCM registra el dictamen de inviabilidad en el Informe Técnico de Impacto.  
-  - **Resultado:** La RFC clasifica como Cambio Mayor con recomendación formal de rechazo para tratamiento colegiado en el CCB (CU-07).
+##### 5.4. Flujos de excepción
 
-### Reglas aplicadas
+###### E001: Perfil distinto a Gestor o proyecto no asignado
+* **Paso origen:** Paso 2.
+* **Condición de activación:** El usuario activo tiene otro rol (`PU-01`, `PU-03`, etc.) o el expediente corresponde a un proyecto distinto/no asignado.
 
-- **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Mandata que ninguna RFC pueda autorizarse sin contar previamente con el Informe Técnico de Impacto que evalúe arquitectura, riesgos y la afectación a la Triple Restricción.
-- **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Garantiza que la clasificación sea el insumo previo y obligatorio para cualquier resolución de cambio.
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** Un operador sin perfil `PU-02` o sin acceso al proyecto abre la RFC en estado `REGISTRADA`. | **E001-2.** El sistema oculta/bloquea las acciones resolutivas mostrando el aviso **"Revisión Inicial Reservada al Gestor"** (o el bloqueo de aislamiento de proyecto). Fin del caso de uso. |
 
-### Estados afectados
+###### E002: Estado incompatible para admisión inicial
+* **Paso origen:** Paso 2 y Paso 6.
+* **Condición de activación:** La solicitud no se encuentra en estado `REGISTRADA` al intentar admitirla, observarla o desestimarla.
 
-- **Estado inicial:** **`Clasificada`** (Estado 3 de TB-07)
-- **Transición:** Elaboración del Informe Técnico de Impacto y clasificación formal
-- **Estado final:** **`En Evaluación`** (Estado 5 de TB-07), habiendo transitado interinamente por **`En Análisis Técnico`** (Estado 4 de TB-07)
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** Se intenta dictaminar una RFC que ya fue admitida, observada o cerrada. | **E002-2.** El sistema rechaza la transición no permitida y muestra el estado vigente del expediente. Fin del caso de uso. |
 
-### Entregables
+###### E003: Observaciones, fundamentación o confirmación insuficientes
+* **Paso origen:** `A001-2` y `A002-2`.
+* **Condición de activación:** El pliego de observaciones o el motivo de desestimación tienen menos de 10 caracteres, o falta marcar la confirmación de desestimación definitiva.
 
-- Informe Técnico de Impacto formalmente suscrito con dictamen vinculante de clasificación técnica (Cambio Menor / Mayor).
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El Gestor pulsa emitir observaciones o desestimar sin completar los requisitos obligatorios. | **E003-2.** El sistema cancela la transición, muestra el mensaje de error específico en pantalla y conserva el texto ingresado para corrección. Retorna a `A001` o `A002`. |
 
-### Trazabilidad
-- **RF:** RF-05
-- **RN:** RN-01, RN-05
-- **Estado(s):** Clasificada $
-ightarrow$ En Análisis Técnico $
-ightarrow$ En Evaluación
-- **DG relacionado:** DG-03, DG-05, DG-11
+###### E004: Anexos ilegibles o inconsistentes
+* **Paso origen:** Paso 3.
+* **Condición de activación:** Las evidencias adjuntas presentan fallas de formato o imposibilitan verificar la solicitud.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E004-1.** Se detecta ilegibilidad o ausencia de respaldo efectivo en los adjuntos del expediente. | **E004-2.** El Gestor deriva el expediente mediante **Opción B (`A001`)** requiriendo la recarga o aclaración formal de los anexos mediante `CU-04.1`. |
+
+##### 5.5. Reglas de negocio aplicables
+* **`RN-01`:** Ninguna solicitud avanza a análisis de ingeniería ni modificación sin superar la admisión inicial formal.
+* **`RN-07`:** Garantiza el cierre diferenciado y justificado como `DESESTIMADA` cuando una solicitud es inviable desde revisión inicial.
+
+##### 5.6. Estados afectados
+* **Estado inicial:** **`REGISTRADA`** (Estado 1 de `TB-07`).
+* **Estados resultantes:** **`CLASIFICADA`** (Estado 3), **`EN_SUBSANACION`** (Estado 2) o **`DESESTIMADA`** (Estado 11 terminal).
+
+##### 5.7. Criterios de aceptación funcionales
+1. Exclusivamente el `Analista de Requerimientos / Gestor (PU-02)` con proyecto asignado puede ejecutar las tres opciones de revisión inicial sobre una RFC en `REGISTRADA`.
+2. Observar o desestimar exige obligatoriamente una explicación mínima de 10 caracteres; la desestimación exige además confirmación expresa de irreversibilidad.
+3. Cada transición actualiza el estado oficial de forma excluyente y queda registrada en auditoría con responsable y fecha.
+4. *Brechas registradas respecto al alcance aprobado:* las operaciones de admisión, observación y desestimación operan actualmente de forma simulada en la interfaz del prototipo y el envío automático de notificaciones al Solicitante/Arquitecto permanece pendiente de integración con el servidor. *(Nota `DOC-03.1`: la conservación de múltiples ciclos de observaciones/subsanación requiere historial dedicado en etapas posteriores).*
+
+##### 5.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-05`):**
+![DG-ACT-05: Flujo de Actividades — CU-05](assets/diagramas/render/analisis/DG-ACT-05.svg)
+* **Diagrama de caso de uso (`DG-07`):** [`DG-07: Registro y Evaluación de RFC e Incidencias`](assets/diagramas/render/generales/DG-07.svg).
 
 ---
 
-## CU-07 — Evaluar Cambio Mayor en CCB
+#### CU-06 — Realizar análisis de impacto técnico
+
+##### 6.1. Ficha descriptiva
+
+| Atributo | Detalle |
+| :--- | :--- |
+| **Id Caso de Uso** | `CU-06` (Código histórico: `CUS06`) |
+| **Nombre** | Realizar análisis de impacto técnico |
+| **Tipo** | Primario, analítico (Esencial) |
+| **Requisito ID** | `RF-05` — Clasificación y Análisis de Impacto<br>`RN-01`, `RN-05` — Evaluación Técnica y Clasificación Obligatoria |
+| **Versión** | 2.0 (Consolidación SRS-02) |
+| **Autor** | C-SharkTeam — Agente 01 (Documentación y Requisitos) |
+| **Actores** | **Principal:** Arquitecto / Especialista Técnico (`PU-03`)<br>**Secundarios:** Analista de Requerimientos / Gestor (`PU-02`), Comité de Control de Cambios (`PU-04`) |
+| **Interacción** | Consola web de Evaluación de Impacto Técnico |
+| **Descripción** | Permite al Arquitecto / Especialista Técnico analizar la viabilidad e implicancias técnicas de una RFC admitida (`CLASIFICADA` / `EN_ANALISIS_TECNICO`), cuantificando la afectación a la Triple Restricción (esfuerzo, costo y cronograma), identificando ECS afectados y dependientes, evaluando riesgos técnicos y plan preliminar de rollback, y emitiendo el **Informe Técnico de Impacto (`TIA`)** que clasifica formalmente el cambio como **Cambio Menor** (`CU-30`) o **Cambio Mayor** (`CU-07`). |
+| **Referencias** | `RF-05`, `RN-01`, `RN-05`, `TB-07` (Estados 3, 4 y 5), `CU-05`, `CU-07`, `CU-30`, `DG-07`, `DG-ACT-06` |
+| **Precondiciones** | 1. El operador posee sesión activa con perfil **`Arquitecto / Especialista Técnico (PU-03)`** y asignación al proyecto de la RFC (`E001`).<br>2. Por Segregación de Funciones, el Arquitecto **no es el solicitante original** de la RFC evaluada (`E001`).<br>3. La RFC se encuentra en estado **`CLASIFICADA`** o **`EN_ANALISIS_TECNICO`** y no cuenta con un Informe Técnico de Impacto previo congelado (`E002`). |
+| **Postcondiciones** | **Éxito:** Se emite de forma inmutable el Informe Técnico de Impacto (`TIA-AAAA-NNNN`) vinculado al expediente, la RFC pasa a estado **`EN_EVALUACION`** con clasificación oficial `CAMBIO_MENOR` o `CAMBIO_MAYOR`, se registra auditoría y se enruta a **Doble Llave (`CU-30`)** o **CCB (`CU-07`)**. |
+
+##### 6.2. Flujo normal de eventos
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **Fase 1: Acceso contextual y validaciones de segregación** | |
+| **1.** El Arquitecto / Especialista Técnico selecciona **"Análisis de Impacto Técnico"** sobre una RFC admitida en estado `CLASIFICADA` o `EN_ANALISIS_TECNICO`. | **2.** El sistema verifica perfil activo **`PU-03`**, pertenencia del proyecto, prohibición de autoevaluación frente al solicitante original (`E001`), estado válido y ausencia de informe previo congelado (`E002`). Luego sitúa el contexto en análisis técnico y presenta los datos de la RFC, las notas de admisión del Gestor y el catálogo completo de `ECS` del proyecto. |
+| **Fase 2: Cuantificación de Triple Restricción, alcance y riesgos** | |
+| **3.** El Arquitecto estima el **Esfuerzo Técnico (Horas-Hombre)**, **Presupuesto Estimado (S/.)** e **Impacto en Cronograma (Días Útiles)** (`A001` si requiere aclaración de alcance previa); selecciona uno o más **ECS afectados y dependientes** del proyecto, redacta el **Resumen y Fundamentación Técnica**, define el **Nivel de Riesgo Global** (*Bajo*, *Medio*, *Alto*), marca o añade los **Riesgos Técnicos Específicos**, y describe el **Plan Preliminar de Rollback / Contingencia**. | **4.** El sistema muestra en pantalla los contadores y preselección del ECS primario de la RFC, manteniendo la coherencia con el catálogo del proyecto. |
+| **Fase 3: Dictamen técnico, congelamiento y enrutamiento** | |
+| **5.** El Arquitecto selecciona la clasificación (**Cambio Menor** o **Cambio Mayor**) y el **Dictamen Técnico Final** (`PROCEDE_MENOR`, `PROCEDE_MAYOR` o `RECHAZO_TECNICO`, ver `E004`), y pulsa **"Firmar y Emitir Informe Técnico (CU-06)"**. | **6.** El sistema valida que el esfuerzo sea mayor a `0`, el costo y días no sean negativos, la fundamentación técnica tenga al menos **15 caracteres** y exista al menos un `ECS` válido del proyecto (`E003`). |
+| | **7.** El sistema genera y congela el **Informe Técnico de Impacto (`TIA-AAAA-NNNN`)**, transiciona la RFC al estado oficial **`EN_EVALUACION`** con la clasificación asignada, registra la acción en auditoría, deriva el expediente hacia **Doble Llave (`CU-30`)** o **CCB (`CU-07`)** y presenta la confirmación **"¡Informe Técnico de Impacto Emitido con Éxito!"**. |
+
+##### 6.3. Flujos alternativos
+
+###### A001: Solicitud de aclaración técnica antes de dictaminar
+* **Paso origen:** Paso 3.
+* **Condición de activación:** El Arquitecto detecta ambigüedad técnica puntual sobre requisitos funcionales o alcance de integración que no impide haber admitido la solicitud.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **A001-1.** El Arquitecto formula una consulta técnica al Gestor / Solicitante para precisar alcance o restricciones operativas. | **A001-2.** El sistema registra la consulta y notifica al Gestor para consignar la aclaración correspondiente *(mecanismo de mensajería interna pendiente de implementación automatizada)*. Una vez precisada, retorna al paso 3. |
+
+##### 6.4. Flujos de excepción
+
+###### E001: Violación de Segregación de Funciones o falta de acceso al proyecto
+* **Paso origen:** Paso 2.
+* **Condición de activación:** El usuario no actúa como `PU-03`, no tiene el proyecto asignado o figura como el solicitante original de la RFC.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E001-1.** El usuario intenta evaluar una solicitud fuera de sus proyectos, sin rol `PU-03` o registrada por él mismo. | **E001-2.** El sistema bloquea el formulario mostrando el aviso normativo correspondiente (**Aislamiento de Proyecto** o **Incompatibilidad Normativa por Segregación de Funciones — RN-05**) e inhabilita el botón de firma. Fin del caso de uso. |
+
+###### E002: Estado incompatible o Informe Técnico ya congelado
+* **Paso origen:** Paso 2.
+* **Condición de activación:** La RFC está en un estado distinto a `CLASIFICADA` / `EN_ANALISIS_TECNICO` o ya posee un informe emitido previamente.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E002-1.** El Arquitecto accede a evaluar una solicitud no admitida o ya dictaminada. | **E002-2.** El sistema informa que el expediente no está disponible para evaluación o que su informe técnico ya fue congelado de manera inmutable, permitiendo consultar el expediente existente. Fin del caso de uso. |
+
+###### E003: Parámetros inválidos o fundamentación técnica incompleta
+* **Paso origen:** Paso 6.
+* **Condición de activación:** Esfuerzo `<= 0`, costo o días negativos, fundamentación menor a 15 caracteres o falta de selección de ECS válido del proyecto.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E003-1.** El Arquitecto intenta firmar el informe con estimaciones inválidas o sustento insuficiente. | **E003-2.** El sistema rechaza el registro, muestra el error específico en pantalla y mantiene los datos capturados para su corrección. Retorna al paso 3. |
+
+###### E004: Dictamen de inviabilidad técnica absoluta (`RECHAZO_TECNICO`)
+* **Paso origen:** Paso 5 y Paso 7.
+* **Condición de activación:** El Arquitecto concluye que la modificación compromete la estabilidad, seguridad o restricciones arquitectónicas del sistema de forma inaceptable.
+
+| **Acción del Actor** | **Respuesta del Sistema** |
+| :--- | :--- |
+| **E004-1.** El Arquitecto emite el dictamen **`INVIABLE TÉCNICAMENTE (RECHAZO_TECNICO)`** manteniendo el análisis de riesgos que lo sustenta. | **E004-2.** El sistema congela el Informe Técnico de Impacto con dicha recomendación y transiciona la RFC a **`EN_EVALUACION`** enrutándola hacia el **Comité de Control de Cambios (`CU-07`)** para formalizar su rechazo colegiado conforme a `RN-07`. |
+
+##### 6.5. Reglas de negocio aplicables
+* **`RN-05` (Evaluación Técnica y Clasificación Obligatoria):** Prohíbe autorizar cualquier RFC sin Informe Técnico de Impacto previo sobre arquitectura, dependencias, riesgos y Triple Restricción, exigiendo segregación frente al solicitante.
+* **`RN-01`:** Supedita la emisión de órdenes y cambios al dictamen clasificatorio resultante.
+
+##### 6.6. Estados afectados
+* **Estado inicial:** **`CLASIFICADA`** (Estado 3) / **`EN_ANALISIS_TECNICO`** (Estado 4 intermedio de `TB-07`).
+* **Estado resultante:** **`EN_EVALUACION`** (Estado 5 de `TB-07`), habilitando `CU-30` (Cambio Menor) o `CU-07` (Cambio Mayor).
+
+##### 6.7. Criterios de aceptación funcionales
+1. Ningún usuario que haya registrado una RFC puede evaluar su propio impacto técnico (`SoD` anti-autoevaluación), ni tampoco un usuario ajeno al proyecto o sin perfil `PU-03`.
+2. Todo informe emitido registra cuantitativamente esfuerzo (`> 0`), costo (`>= 0`), impacto en días (`>= 0`), al menos un ECS afectado, fundamentación técnica (`>= 15` caracteres), riesgos, plan de rollback y clasificación (`Cambio Menor` o `Cambio Mayor`).
+3. Una vez firmado, el Informe Técnico de Impacto queda inmutable y no permite emitir un segundo informe sobre la misma RFC.
+4. La emisión transiciona la RFC a `EN_EVALUACION` sin aprobarla automáticamente ni emitir orden de cambio todavía.
+5. *Brechas registradas respecto al alcance aprobado:* el módulo opera actualmente de forma simulada en la interfaz del prototipo, quedando pendiente su persistencia e imposición de reglas en el servidor, la mensajería de aclaraciones (`A001`) y las notificaciones automáticas hacia CCB/Autoridad Delegada.
+
+##### 6.8. Diagramas correspondientes
+* **Diagrama de actividades (`DG-ACT-06`):**
+![DG-ACT-06: Flujo de Actividades — CU-06](assets/diagramas/render/analisis/DG-ACT-06.svg)
+* **Diagrama de caso de uso (`DG-07`):** [`DG-07: Registro y Evaluación de RFC e Incidencias`](assets/diagramas/render/generales/DG-07.svg).
+
+---
+
+## 5.4. Casos de Uso Pendientes de Reestructuración (`CU-07` a `CU-30`)
+
+> [!NOTE]
+> **Alcance de la entrega SRS-02:** Conforme al plan incremental aprobado, las siguientes **24 narrativas (`CU-07` a `CU-30`)** conservan íntegramente su especificación vigente de línea base y serán normalizadas al nuevo formato de 10 apartados y diagramas `DG-ACT-*` en las siguientes iteraciones tras la revisión de los Bloques 01 y 02.
+
+### CU-07 — Evaluar Cambio Mayor en CCB
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2413,7 +1142,7 @@ ightarrow$ En Evaluación
 | **Entradas** | Expediente de la RFC, Informe Técnico de Impacto, análisis de la Triple Restricción, cuórum de miembros del CCB y votos registrados. |
 | **Salidas / Entregables** | Acta Resolutiva de Sesión del CCB formalizada con registro de votos y dictamen colegiado vinculante. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Comité de Control de Cambios (CCB) accede al expediente de la RFC clasificada como Cambio Mayor en estado "En Evaluación".
 2. TraceFlow SCM presenta el expediente integral, el Informe Técnico de Impacto, la evaluación de la Triple Restricción y la estimación de riesgos.
@@ -2422,7 +1151,7 @@ ightarrow$ En Evaluación
 5. TraceFlow SCM valida el cuórum legal, registra el acta formal de deliberación y actualiza el estado oficial de la RFC a **`Autorizada`**.
 6. TraceFlow SCM notifica formalmente la resolución aprobatoria al Solicitante, al Analista de Requerimientos / Gestor y al Administrador de Configuración / Bibliotecario para la emisión de la orden de cambio.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Dictamen de rechazo colegiado del Cambio Mayor**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2441,7 +1170,7 @@ ightarrow$ En Evaluación
     2. TraceFlow SCM mantiene el estado `En Evaluación` y notifica al Arquitecto los puntos a profundizar.  
   - **Convergencia:** El expediente queda a la espera de la actualización del Informe de Impacto.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Falta de cuórum reglamentario en la votación del CCB**  
   - **Origen:** Paso 5 del Flujo Principal.  
@@ -2449,23 +1178,23 @@ ightarrow$ En Evaluación
   - **Respuesta del sistema:** TraceFlow SCM bloquea la formalización de la votación e indica la falta de cuórum.  
   - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta convocar una nueva sesión válida.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Restringe toda afectación de software sin la debida resolución previa del CCB para Cambios Mayores.
 - **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Asegura que el CCB fundamente su decisión en el Informe Técnico de Impacto previo.
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Garantiza que ante un dictamen desfavorable la RFC transicione formalmente a `Rechazada`.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Evaluación`** (Estado 5 de TB-07)
 - **Transición:** Deliberación y resolución colegiada del CCB
 - **Estado final:** **`Autorizada`** (Estado 6 de TB-07) o **`Rechazada`** (Estado 12 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Acta Resolutiva de Sesión del CCB formalizada con registro de votos y dictamen vinculante en estado `Autorizada` o `Rechazada`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-06
 - **RN:** RN-01, RN-05, RN-07
 - **Estado(s):** En Evaluación $
@@ -2474,7 +1203,7 @@ ightarrow$ Autorizada (o Rechazada)
 
 ---
 
-## CU-08 — Emitir Orden de Cambio (ECN/ECO)
+### CU-08 — Emitir Orden de Cambio (ECN/ECO)
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2493,7 +1222,7 @@ ightarrow$ Autorizada (o Rechazada)
 | **Entradas** | Expediente de la RFC autorizada, desarrollador asignado, cronograma de desarrollo y alcance técnico a intervenir. |
 | **Salidas / Entregables** | Documento formal de Orden de Cambio (ECN/ECO) registrado en el sistema. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. La autoridad competente (CCB para Cambio Mayor o Autoridad Delegada para Cambio Menor) selecciona una RFC en estado "Autorizada".
 2. TraceFlow SCM presenta el formulario de formalización de Orden de Cambio precargando los antecedentes técnicos y la resolución aprobatoria.
@@ -2502,7 +1231,7 @@ ightarrow$ Autorizada (o Rechazada)
 5. TraceFlow SCM expide formalmente la Orden de Cambio (ECN/ECO) con numeración unívoca correlativa y actualiza el estado oficial de la RFC a **`Orden Emitida`**.
 6. TraceFlow SCM notifica formalmente la emisión de la orden al Administrador de Configuración / Bibliotecario y al Ingeniero de Software / Desarrollador para proceder con el Check-Out.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Corrección de datos de asignación de la orden antes de expedir**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -2512,7 +1241,7 @@ ightarrow$ Autorizada (o Rechazada)
     2. TraceFlow SCM actualiza la asignación técnica en el borrador de la orden.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Intento de emisión sobre RFC no autorizada**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2520,21 +1249,21 @@ ightarrow$ Autorizada (o Rechazada)
   - **Respuesta del sistema:** TraceFlow SCM bloquea la generación de la orden e informa la inconsistencia de estado según RN-01.  
   - **Resultado:** No se emite la orden; el flujo se cancela de forma inmediata.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que ningún ECS puede ser extraído ni modificado sin contar con una ECN/ECO debidamente emitida tras la autorización formal del cambio.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`Autorizada`** (Estado 6 de TB-07)
 - **Transición:** Expedición y formalización de la ECN/ECO
 - **Estado final:** **`Orden Emitida`** (Estado 7 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Orden formal de Cambio (ECN/ECO) expedida con código correlativo en estado `Orden Emitida`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-07
 - **RN:** RN-01
 - **Estado(s):** Autorizada $
@@ -2543,7 +1272,7 @@ ightarrow$ Orden Emitida
 
 ---
 
-## CU-09 — Registrar ECS
+### CU-09 — Registrar ECS
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2562,7 +1291,7 @@ ightarrow$ Orden Emitida
 | **Entradas** | Denominación del ECS, clasificación del artefacto (código, documento, esquema BD), descripción funcional, versión inicial, dependencias técnicas y archivo base. |
 | **Salidas / Entregables** | Ficha técnica de ECS registrada en el catálogo con código unívoco y registro de integridad inicial. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Arquitecto / Especialista Técnico selecciona la opción de registrar un nuevo Elemento de Configuración de Software (ECS) en el proyecto activo.
 2. TraceFlow SCM presenta el formulario de catalogación de ECS y la estructura jerárquica de componentes del sistema.
@@ -2571,7 +1300,7 @@ ightarrow$ Orden Emitida
 5. TraceFlow SCM registra formalmente el ECS en el catálogo, genera su código correlativo unívoco y lo deposita en la biblioteca designada bajo control de versiones.
 6. TraceFlow SCM emite confirmación de catalogación y notifica al Administrador de Configuración / Bibliotecario la disponibilidad del nuevo ECS para el flujo de cambios.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Registro de ECS de especificación documental o manual de usuario**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -2580,7 +1309,7 @@ ightarrow$ Orden Emitida
     1. El Arquitecto selecciona la categoría documental y consigna los metadatos de formato y aprobación.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Denominación de ECS duplicada en el proyecto**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2594,23 +1323,23 @@ ightarrow$ Orden Emitida
   - **Respuesta del sistema:** TraceFlow SCM exige corregir la versión según la regla oficial RN-02.  
   - **Resultado:** Retorna al Paso 3 del Flujo Principal para su subsanación.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que todo artefacto sujeto a cambios deba estar formalmente catalogado como ECS.
 - **RN-02 (Identificación Unívoca de Versiones):** Impone el estándar numérico mayor.menor.parche para el versionamiento del artefacto.
 - **RN-04 (Restricción de Bibliotecas Congeladas):** Protege los ECS catalogados prohibiendo su edición directa fuera del flujo de control de cambios.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Catalogación de inventario; no es un expediente de RFC).
 - **Transición:** Incorporación formal de artefacto al repositorio de configuración.
 - **Estado final:** N/A (ECS en estado `Vigente` en biblioteca).
 
-### Entregables
+#### Entregables
 
 - Ficha técnica de ECS catalogada en el inventario del proyecto con identificador unívoco.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-03
 - **RN:** RN-01, RN-02, RN-04
 - **Estado(s):** N/A
@@ -2618,7 +1347,7 @@ ightarrow$ Orden Emitida
 
 ---
 
-## CU-10 — Efectuar Check-Out
+### CU-10 — Efectuar Check-Out
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2637,7 +1366,7 @@ ightarrow$ Orden Emitida
 | **Entradas** | Identificador de ECN/ECO, identificador de ECS y credenciales del Desarrollador asignado. |
 | **Salidas / Entregables** | Copia de trabajo del ECS transferida a la Biblioteca de Trabajo y constancia de Check-Out registrada en auditoría. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona la Orden de Cambio en estado "Orden Emitida" para transferir el artefacto.
 2. TraceFlow SCM presenta los datos de la ECN/ECO, el ECS asociado en la Biblioteca de Soporte y el Desarrollador asignado.
@@ -2646,7 +1375,7 @@ ightarrow$ Orden Emitida
 5. TraceFlow SCM transfiere la copia del ECS a la Biblioteca de Trabajo, aplica el bloqueo de sincronización exclusivo y actualiza el estado oficial de la RFC a **`En Implementación`**.
 6. TraceFlow SCM genera el registro histórico de Check-Out en la bitácora y notifica al Ingeniero de Software / Desarrollador la disponibilidad del artefacto para inicio de actividades técnicas.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Verificación y reintento por retardo en la transferencia de repositorio**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2656,7 +1385,7 @@ ightarrow$ Orden Emitida
     2. El sistema confirma la integridad del archivo de origen.  
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — ECS bloqueado concurrentemente por otra orden de cambio**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2664,22 +1393,22 @@ ightarrow$ Orden Emitida
   - **Respuesta del sistema:** TraceFlow SCM deniega el Check-Out, muestra los datos del usuario que mantiene el bloqueo y registra la colisión en auditoría.  
   - **Resultado:** La operación se detiene sin transferir archivos; la orden permanece en espera de liberación del bloqueo.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide el Check-Out si la solicitud no cuenta con una ECN/ECO formalmente emitida.
 - **RN-06 (Bloqueo de Sincronización Obligatorio):** Exige que el Check-Out active de inmediato el bloqueo exclusivo impidiendo colisiones de edición.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`Orden Emitida`** (Estado 7 de TB-07)
 - **Transición:** Ejecución de Check-Out y asignación a Biblioteca de Trabajo
 - **Estado final:** **`En Implementación`** (Estado 8 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Constancia de Check-Out registrada con copia de trabajo alojada en la Biblioteca de Trabajo.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-08, RF-09
 - **RN:** RN-01, RN-06
 - **Estado(s):** Orden Emitida $
@@ -2688,7 +1417,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-11 — Aplicar bloqueo de sincronización
+### CU-11 — Aplicar bloqueo de sincronización
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2707,7 +1436,7 @@ ightarrow$ En Implementación
 | **Entradas** | Identificador del ECS, identificador de la ECN/ECO y usuario beneficiario del bloqueo. |
 | **Salidas / Entregables** | Registro de bloqueo activo en el catálogo de configuración y marca de exclusividad en el inventario de ECS. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario (o TraceFlow SCM durante el Check-Out) solicita la aplicación del bloqueo de sincronización sobre el ECS.
 2. TraceFlow SCM consulta el estado actual de concurrencia del ECS en el catálogo del proyecto.
@@ -2716,7 +1445,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM actualiza el catálogo impidiendo nuevas operaciones de Check-Out o modificación sobre el ECS por terceros consultores.
 6. TraceFlow SCM confirma la aplicación del bloqueo y asienta la transacción en la bitácora de control de concurrencia.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Consulta de estado de bloqueo previo**  
   - **Origen:** Paso 2 del Flujo Principal.  
@@ -2725,7 +1454,7 @@ ightarrow$ En Implementación
     1. TraceFlow SCM presenta el detalle del bloqueo vigente (usuario, fecha y orden asociada).  
   - **Convergencia:** Concluye la consulta sin modificar el catálogo.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Conflicto de bloqueo por concurrencia simultánea**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -2733,21 +1462,21 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM rechaza la solicitud de bloqueo y notifica la colisión de concurrencia.  
   - **Resultado:** La operación se cancela salvaguardando la integridad del repositorio.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-06 (Bloqueo de Sincronización Obligatorio):** Establece como regla mandatoria que todo ECS transferido a la Biblioteca de Trabajo quede estrictamente bloqueado para evitar sobrescrituras de código o documentos.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** Mantiene el estado del flujo activo (típicamente durante **`Orden Emitida`** / **`En Implementación`**)
 - **Transición:** Aseguramiento de concurrencia por Check-Out
 - **Estado final:** Mantiene el estado activo (**`En Implementación`**)
 
-### Entregables
+#### Entregables
 
 - Asiento de bloqueo de sincronización activo registrado en la bitácora de control de configuración.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-09
 - **RN:** RN-06
 - **Estado(s):** Mantiene En Implementación
@@ -2755,7 +1484,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-12 — Efectuar Check-In
+### CU-12 — Efectuar Check-In
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2774,7 +1503,7 @@ ightarrow$ En Implementación
 | **Entradas** | Copia verificada del ECS, constancia de doble validación (QA + UAT) y metadatos de versión. |
 | **Salidas / Entregables** | Registro formal de Check-In en la Biblioteca Maestra y constancia de liberación de bloqueo de sincronización. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona la RFC con doble validación aprobada para proceder al Check-In.
 2. TraceFlow SCM presenta el expediente técnico consolidando la ECN/ECO, el Certificado Técnico de QA y el Acta de Aceptación UAT.
@@ -2783,7 +1512,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM transfiere e integra el ECS en la Biblioteca Maestra, asigna la nueva versión según estándar oficial (RN-02) y libera el bloqueo de sincronización según RN-06.
 6. TraceFlow SCM registra el asiento histórico de Check-In en la bitácora de auditoría y notifica la integración exitosa al CCB y a los interesados, habilitando la creación y congelamiento de la nueva Línea Base.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Check-In intermedio hacia Biblioteca de Soporte para pruebas**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -2792,7 +1521,7 @@ ightarrow$ En Implementación
     1. El Administrador transfiere el ECS a la Biblioteca de Soporte sin levantar el bloqueo exclusivo de desarrollo.  
   - **Convergencia:** Permite la ejecución de pruebas de integración en CU-16.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Incumplimiento de la regla de doble validación (Falta QA o UAT)**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2806,23 +1535,23 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM alerta sobre alteración no autorizada de integridad y aborta la transferencia.  
   - **Resultado:** Se cancela la operación y se genera una alerta de seguridad en la bitácora de auditoría.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Prohíbe de forma absoluta la integración a la Biblioteca Maestra sin contar concurrentemente con la certificación técnica de QA y el acta formal de UAT.
 - **RN-04 (Restricción de Bibliotecas Congeladas):** Protege la Biblioteca Maestra asegurando que solo ingresen artefactos debidamente aprobados.
 - **RN-06 (Bloqueo de Sincronización Obligatorio):** Dispone la liberación formal del bloqueo únicamente cuando el Check-In ha sido perfeccionado.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
 - **Transición:** Check-In formal a la Biblioteca Maestra con doble conformidad
 - **Estado final:** **`En Aceptación`** (Estado 10 de TB-07, fase final previa a congelación de Línea Base)
 
-### Entregables
+#### Entregables
 
 - Asiento formal de Check-In a la Biblioteca Maestra y constancia de versión actualizada en el repositorio central.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-08, RF-09, RF-10
 - **RN:** RN-01, RN-02, RN-04, RN-06, RN-09
 - **Estado(s):** Mantiene En Aceptación (inmediato anterior a Implementada)
@@ -2830,7 +1559,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-13 — Consultar historial de versiones
+### CU-13 — Consultar historial de versiones
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2849,7 +1578,7 @@ ightarrow$ En Implementación
 | **Entradas** | Identificador del ECS y criterios de filtrado temporal o de versión. |
 | **Salidas / Entregables** | Reporte visual cronológico del historial de versiones y trazabilidad de operaciones Check-In/Check-Out. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona un ECS en el catálogo del proyecto y solicita consultar su historial.
 2. TraceFlow SCM recupera el historial de versiones y la bitácora de transacciones del elemento desde el repositorio de configuración.
@@ -2858,7 +1587,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM presenta la memoria descriptiva de los cambios, las firmas de auditoría y la firma de integridad de la versión seleccionada según RN-03.
 6. TraceFlow SCM habilita la comparación conceptual de diferencias respecto a la versión previa o respecto a la versión activa en la Biblioteca Maestra.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Comparación de diferencias entre dos versiones históricas del ECS**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2868,7 +1597,7 @@ ightarrow$ En Implementación
     2. TraceFlow SCM presenta la vista comparativa de diferencias conceptuales entre ambos estados del artefacto.  
   - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — ECS sin historial de modificaciones (versión inicial sin cambios)**  
   - **Origen:** Paso 2 del Flujo Principal.  
@@ -2876,22 +1605,22 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM informa que el ECS se encuentra en su versión inicial sin transacciones de Check-In adicionales.  
   - **Resultado:** Se muestra únicamente la ficha de creación base.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-02 (Identificación Unívoca de Versiones):** Garantiza que cada hito del historial exhiba una nomenclatura estandarizada.
 - **RN-03 (Trazabilidad de Cambios):** Asegura que cada versión del historial se encuentre inexorablemente vinculada a una ECN/ECO y a un mensaje descriptivo.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Operación de sólo lectura).
 - **Transición:** N/A
 - **Estado final:** N/A
 
-### Entregables
+#### Entregables
 
 - Vista de historial cronológico y trazabilidad de versiones del ECS presentada en pantalla.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-09, RF-16
 - **RN:** RN-02, RN-03
 - **Estado(s):** N/A
@@ -2899,7 +1628,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-14 — Implementar cambio en el ECS
+### CU-14 — Implementar cambio en el ECS
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2918,7 +1647,7 @@ ightarrow$ En Implementación
 | **Entradas** | Copia de trabajo del ECS, especificaciones técnicas de la ECN/ECO y pautas de diseño del proyecto. |
 | **Salidas / Entregables** | Artefacto de software modificado en la Biblioteca de Trabajo con memoria técnica descriptiva del cambio. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Ingeniero de Software / Desarrollador accede a su espacio en la Biblioteca de Trabajo y visualiza la ECN/ECO asignada.
 2. TraceFlow SCM presenta el alcance técnico de la orden, los criterios de aceptación y el ECS desbloqueado exclusivamente para su usuario.
@@ -2927,7 +1656,7 @@ ightarrow$ En Implementación
 5. El Ingeniero de Software / Desarrollador formula la memoria descriptiva de los cambios aplicados detallando los componentes modificados.
 6. TraceFlow SCM consolida la versión de trabajo del ECS dejándola dispuesta para la ejecución de pruebas unitarias locales.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Solicitud de ajuste de alcance técnico durante la implementación**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -2937,7 +1666,7 @@ ightarrow$ En Implementación
     2. El Arquitecto evalúa si la consulta requiere una ampliación formal o se resuelve dentro de los parámetros de la ECN/ECO vigente.  
   - **Convergencia:** Retorna al Paso 3 con la instrucción técnica clarificada.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Pérdida de integridad de la copia de trabajo local**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -2945,22 +1674,22 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM permite reestablecer una copia limpia desde la Biblioteca de Soporte respetando el bloqueo vigente.  
   - **Resultado:** Se reanuda la implementación en el Paso 3 sin vulnerar el repositorio central.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Limita la modificación técnica únicamente a los ECS que cuenten con ECN/ECO formalmente emitida.
 - **RN-03 (Trazabilidad de Cambios):** Exige que cada modificación realizada cuente con una descripción técnica asociada formalmente a la orden de cambio.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Implementación`** (Estado 8 de TB-07)
 - **Transición:** Desarrollo y aplicación técnica del cambio
 - **Estado final:** **`En Implementación`** (Estado 8 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Copia de trabajo del ECS modificada con memoria descriptiva en la Biblioteca de Trabajo.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-07, RF-09
 - **RN:** RN-01, RN-03
 - **Estado(s):** Mantiene En Implementación
@@ -2968,7 +1697,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-15 — Ejecutar pruebas unitarias locales
+### CU-15 — Ejecutar pruebas unitarias locales
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -2987,7 +1716,7 @@ ightarrow$ En Implementación
 | **Entradas** | ECS modificado, suites de pruebas unitarias y datos de prueba locales. |
 | **Salidas / Entregables** | Reporte formal de resultados de pruebas unitarias vinculado al expediente de la ECN/ECO. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Ingeniero de Software / Desarrollador solicita la ejecución del conjunto de pruebas unitarias sobre el ECS modificado.
 2. TraceFlow SCM presenta el entorno de verificación unitaria cargando los casos de prueba asociados al componente intervenido.
@@ -2996,7 +1725,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM registra el reporte de resultados unitarios vinculándolo a la bitácora de la Orden de Cambio.
 6. TraceFlow SCM confirma el éxito de la verificación y habilita la opción de promover el artefacto para pruebas de integración con QA.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Corrección inmediata de fallo unitario menor**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3006,7 +1735,7 @@ ightarrow$ En Implementación
     2. El Desarrollador reinicia la suite de pruebas unitarias.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Fallo persistente en casos de prueba unitarios**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3014,22 +1743,22 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM bloquea la promoción del ECS hacia pruebas de integración.  
   - **Resultado:** El Desarrollador debe continuar la labor de depuración en CU-14; no se permite el paso a QA.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que no se promuevan cambios inestables hacia entornos compartidos de prueba.
 - **RN-03 (Trazabilidad de Cambios):** Garantiza que los resultados de las pruebas queden asentados como evidencia técnica de la orden.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Implementación`** (Estado 8 de TB-07)
 - **Transición:** Verificación unitaria local satisfactoria
 - **Estado final:** **`En Implementación`** (Estado 8 de TB-07, habilitado para entrega a QA)
 
-### Entregables
+#### Entregables
 
 - Reporte formal de pruebas unitarias con dictamen aprobatorio registrado en la ECN/ECO.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-10
 - **RN:** RN-01, RN-03
 - **Estado(s):** Mantiene En Implementación
@@ -3037,7 +1766,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-16 — Ejecutar pruebas de integración
+### CU-16 — Ejecutar pruebas de integración
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3056,7 +1785,7 @@ ightarrow$ En Implementación
 | **Entradas** | Plan de pruebas de integración, casos de prueba del proyecto, ECS desplegado en Biblioteca de Soporte y datos de prueba. |
 | **Salidas / Entregables** | Matriz de ejecución de pruebas de integración con registro de conformidades o fallos identificados. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Equipo de Calidad / Testing selecciona la RFC en estado "En Pruebas" desde su panel de control de calidad.
 2. TraceFlow SCM presenta el expediente de la solicitud, la ECN/ECO, el ECS en la Biblioteca de Soporte y el plan de pruebas de integración asignado.
@@ -3065,7 +1794,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM consolida el informe de ejecución determinando si se alcanzaron los criterios de cobertura y calidad requeridos por el proyecto.
 6. TraceFlow SCM confirma el cierre de la batería de pruebas y presenta el resumen consolidado para emitir la certificación técnica (CU-17) o reportar no conformidad (CU-18).
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Detección de fallas durante la ejecución de integración**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3075,7 +1804,7 @@ ightarrow$ En Implementación
     2. TraceFlow SCM deriva el flujo hacia el caso de uso CU-18 (Reportar no conformidad).  
   - **Convergencia:** Concluye la ejecución con registro de defectos pendientes de corrección.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Inconsistencia en el entorno de despliegue de la Biblioteca de Soporte**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3083,22 +1812,22 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM alerta sobre la anomalía del entorno y preserva el estado de la batería.  
   - **Resultado:** Se coordina el reajuste del ambiente de pruebas sin alterar la trazabilidad del cambio.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Impide promover cambios sin verificación rigurosa en entorno intermedio controlado.
 - **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Constituye el prerrequisito técnico mandatorio que debe completarse antes de cualquier consideración de entrega final.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
 - **Transición:** Ejecución integral de la suite de pruebas de integración
 - **Estado final:** **`En Pruebas`** (Estado 9 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Matriz de resultados de pruebas de integración debidamente suscrita con evidencias técnicas.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-10
 - **RN:** RN-01, RN-09
 - **Estado(s):** Mantiene En Pruebas
@@ -3106,7 +1835,7 @@ ightarrow$ En Implementación
 
 ---
 
-## CU-17 — Certificar conformidad del cambio
+### CU-17 — Certificar conformidad del cambio
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3125,7 +1854,7 @@ ightarrow$ En Implementación
 | **Entradas** | Matriz de pruebas de integración aprobada, métricas de cobertura y dictamen técnico de calidad. |
 | **Salidas / Entregables** | Certificado Técnico de Conformidad de QA registrado formalmente en el sistema. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Equipo de Calidad / Testing selecciona la RFC con pruebas de integración conformes en estado "En Pruebas".
 2. TraceFlow SCM presenta el consolidado de resultados, el informe de cobertura y la ausencia de defectos bloqueantes.
@@ -3134,7 +1863,7 @@ ightarrow$ En Implementación
 5. TraceFlow SCM registra el Certificado Técnico de Conformidad y actualiza el estado oficial de la RFC a **`En Aceptación`**.
 6. TraceFlow SCM notifica formalmente al Solicitante para que proceda con la validación de aceptación funcional (UAT) y al Administrador de Configuración.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Emisión de certificación técnica con observaciones menores no bloqueantes**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3144,7 +1873,7 @@ ightarrow$ En Implementación
     2. TraceFlow SCM registra las notas de conformidad condicionada sin detener el flujo.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Detección tardía de incidencia crítica no resuelta**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3152,22 +1881,22 @@ ightarrow$ En Implementación
   - **Respuesta del sistema:** TraceFlow SCM bloquea la emisión del certificado e indica el defecto no cerrado según RN-09.  
   - **Resultado:** No se emite la certificación técnica; la solicitud permanece en estado `En Pruebas`.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Exige como primer componente obligatorio de la doble validación la Certificación Técnica de Conformidad emitida formalmente por QA.
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ningún cambio avance hacia la integración sin el respaldo explícito de calidad.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
 - **Transición:** Expedición formal de la Certificación Técnica de Conformidad de QA
 - **Estado final:** **`En Aceptación`** (Estado 10 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Certificado Técnico de Conformidad expedido por QA en estado oficial `En Aceptación`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-10
 - **RN:** RN-01, RN-09
 - **Estado(s):** En Pruebas $
@@ -3176,7 +1905,7 @@ ightarrow$ En Aceptación
 
 ---
 
-## CU-18 — Reportar no conformidad
+### CU-18 — Reportar no conformidad
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3195,7 +1924,7 @@ ightarrow$ En Aceptación
 | **Entradas** | Casos de prueba fallidos, evidencias de error, severidad del defecto y pasos para reproducirlo. |
 | **Salidas / Entregables** | Informe formal de No Conformidad registrado con pliego de defectos asociados a la ECN/ECO. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Equipo de Calidad / Testing selecciona la opción de reportar no conformidad sobre la RFC en estado "En Pruebas".
 2. TraceFlow SCM presenta el formulario de registro de defectos precargando los casos de prueba no conformes.
@@ -3204,7 +1933,7 @@ ightarrow$ En Aceptación
 5. TraceFlow SCM registra el Informe de No Conformidad en el expediente de la orden y suspende cualquier trámite de certificación.
 6. TraceFlow SCM notifica formalmente al Ingeniero de Software / Desarrollador asignado para que efectúe las correcciones requeridas en la Biblioteca de Trabajo.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Clasificación del defecto como observación subsanable en línea**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3214,7 +1943,7 @@ ightarrow$ En Aceptación
     2. Se asienta la incidencia sin requerir nuevo empaquetado de software.  
   - **Convergencia:** Retorna a ejecución de pruebas en CU-16.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Agotamiento de ciclos máximos de corrección permitidos**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3222,21 +1951,21 @@ ightarrow$ En Aceptación
   - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad como fallo técnico insubsanable y bloquea nuevos ciclos de desarrollo según RN-08.  
   - **Resultado:** Se cancela la vía de re-testeo y se activa de forma obligatoria el flujo de Rollback (CU-21) y Cancelación (CU-22).
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Gobierna el control de los ciclos de corrección e impone el límite a partir del cual el fallo se considera definitivo requiriendo rollback.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
 - **Transición:** Registro de no conformidad técnica y notificación de re-trabajo
 - **Estado final:** **`En Pruebas`** (Estado 9 de TB-07, con retorno a labores de corrección)
 
-### Entregables
+#### Entregables
 
 - Informe de No Conformidad registrado formalmente con pliego de defectos técnicos.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-10, RF-11
 - **RN:** RN-08
 - **Estado(s):** Mantiene En Pruebas
@@ -3244,7 +1973,7 @@ ightarrow$ En Aceptación
 
 ---
 
-## CU-19 — Reevaluar y re-testear
+### CU-19 — Reevaluar y re-testear
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3263,7 +1992,7 @@ ightarrow$ En Aceptación
 | **Entradas** | Versión corregida del ECS, pliego de defectos previos, casos de prueba focalizados y suite de regresión. |
 | **Salidas / Entregables** | Dictamen de re-testeo registrado en la bitácora de aseguramiento de calidad. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Equipo de Calidad / Testing selecciona la RFC con correcciones aplicadas en estado "En Pruebas".
 2. TraceFlow SCM presenta el pliego de defectos previos y las memorias técnicas de corrección registradas por el Desarrollador.
@@ -3272,7 +2001,7 @@ ightarrow$ En Aceptación
 5. TraceFlow SCM consolida el dictamen de re-testeo aprobatorio y actualiza el expediente técnico del cambio.
 6. TraceFlow SCM deriva el flujo hacia la emisión de la Certificación Técnica de Conformidad (CU-17) y notifica el resultado favorable a los interesados.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Persistencia de defectos en el re-testeo dentro del margen de reintentos**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3282,7 +2011,7 @@ ightarrow$ En Aceptación
     2. TraceFlow SCM actualiza el pliego de defectos en CU-18.  
   - **Convergencia:** Retorna a corrección en la Biblioteca de Trabajo.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Fallo definitivo de re-testeo por agotamiento de instancias**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3290,21 +2019,21 @@ ightarrow$ En Aceptación
   - **Respuesta del sistema:** TraceFlow SCM dictamina formalmente el fallo no subsanado y bloquea cualquier nueva entrega de código según RN-08.  
   - **Resultado:** Se cancela la vía de pruebas y se activa de forma obligatoria la ejecución del Rollback (CU-21) y la Cancelación de la ECN/ECO (CU-22).
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Regula el régimen de re-testeo técnico y la transición vinculante a reversión ante la no superación de las pruebas.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Pruebas`** (Estado 9 de TB-07)
 - **Transición:** Reevaluación técnica de calidad
 - **Estado final:** **`En Aceptación`** (vía CU-17 si aprueba) o inicio de transición terminal a **`Cancelada`** (vía CU-21/CU-22 si falla definitivamente)
 
-### Entregables
+#### Entregables
 
 - Dictamen formal de re-testeo asentado en el expediente de control de calidad.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-11
 - **RN:** RN-08
 - **Estado(s):** En Pruebas $
@@ -3313,7 +2042,7 @@ ightarrow$ En Aceptación (o vía a Cancelada)
 
 ---
 
-## CU-20 — Crear y congelar línea base
+### CU-20 — Crear y congelar línea base
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3332,7 +2061,7 @@ ightarrow$ En Aceptación (o vía a Cancelada)
 | **Entradas** | Catálogo de ECS en Biblioteca Maestra, etiqueta formal de versión y resolución de cierre. |
 | **Salidas / Entregables** | Certificado formal de Línea Base congelada y expediente de RFC cerrado en estado `Implementada`. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario accede al módulo de Líneas Base y selecciona los ECS integrados en la Biblioteca Maestra tras el Check-In.
 2. TraceFlow SCM presenta el inventario de configuración con las versiones integradas y la acreditación de doble conformidad.
@@ -3341,7 +2070,7 @@ ightarrow$ En Aceptación (o vía a Cancelada)
 5. TraceFlow SCM congela la Línea Base bloqueándola contra modificaciones directas, genera la firma de auditoría y transiciona el estado oficial de la RFC a **`Implementada`**.
 6. TraceFlow SCM expide el Certificado formal de Línea Base y notifica el cierre exitoso del cambio al CCB, al Solicitante y a la gerencia del proyecto conforme a RF-14 y RN-07.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Generación de Línea Base intermedia de desarrollo o pruebas**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3351,7 +2080,7 @@ ightarrow$ En Aceptación (o vía a Cancelada)
     2. TraceFlow SCM registra el hito sin cerrar la RFC.  
   - **Convergencia:** Concluye el hito intermedio sin transicionar la RFC a estado terminal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Intento de congelamiento con ECS pendientes de integración en Biblioteca Maestra**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3359,23 +2088,23 @@ ightarrow$ En Aceptación (o vía a Cancelada)
   - **Respuesta del sistema:** TraceFlow SCM cancela el congelamiento e informa la inconsistencia en el catálogo de bibliotecas según RN-04.  
   - **Resultado:** No se crea la Línea Base; se preserva la integridad del repositorio central.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-02 (Identificación Unívoca de Versiones):** Dispone que toda línea base establecida tras un Check-In a la Biblioteca Maestra deba identificarse con el estándar oficial de versionamiento.
 - **RN-04 (Restricción de Bibliotecas Congeladas):** Garantiza que una vez congelada, la Línea Base no pueda alterarse de forma directa.
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece `Implementada` como el único resultado terminal de cierre exitoso del cambio.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
 - **Transición:** Congelamiento de Línea Base y formalización de cierre exitoso
 - **Estado final:** **`Implementada`** (Estado 14 de TB-07, Estado Terminal Exitoso)
 
-### Entregables
+#### Entregables
 
 - Certificado formal de nueva Línea Base congelada y expediente de RFC cerrado en estado `Implementada`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-13, RF-14
 - **RN:** RN-02, RN-04, RN-07, RN-09
 - **Estado(s):** En Aceptación $
@@ -3384,7 +2113,7 @@ ightarrow$ Implementada
 
 ---
 
-## CU-21 — Ejecutar rollback
+### CU-21 — Ejecutar rollback
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3403,7 +2132,7 @@ ightarrow$ Implementada
 | **Entradas** | Identificador de ECN/ECO no superada, copia de respaldo estable de origen y dictamen de reversión. |
 | **Salidas / Entregables** | Constancia formal de Rollback ejecutado en la Biblioteca de Trabajo y asiento de liberación de bloqueo. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona la orden no conforme sujeta a reversión en la Biblioteca de Trabajo.
 2. TraceFlow SCM presenta el historial de versiones del ECS y la versión de origen estable en la Biblioteca de Soporte.
@@ -3412,7 +2141,7 @@ ightarrow$ Implementada
 5. TraceFlow SCM descarta las modificaciones no conformes, restituye el espacio de trabajo a la versión estable previa y libera el bloqueo de sincronización del ECS conforme a RN-06.
 6. TraceFlow SCM asienta el acta de reversión en la bitácora de auditoría y notifica al Desarrollador y al CCB, habilitando la cancelación formal de la orden (CU-22).
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Respaldo de evidencias técnicas previas a la purga de trabajo**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3421,7 +2150,7 @@ ightarrow$ Implementada
     1. TraceFlow SCM empaqueta los archivos de trabajo no conformes en un repositorio de auditoría aislado.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Intento inválido de rollback sobre artefacto integrado en Biblioteca Maestra**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3429,22 +2158,22 @@ ightarrow$ Implementada
   - **Respuesta del sistema:** TraceFlow SCM bloquea categóricamente la acción e informa que un artefacto en Biblioteca Maestra solo puede corregirse mediante un nuevo ciclo formal de RFC según RN-04.  
   - **Resultado:** Se cancela la operación de rollback directo protegiendo el repositorio congelado.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Impone como mandato que ante un fallo técnico no resuelto se restablezca obligatoriamente el ECS en la Biblioteca de Trabajo a su estado previo estable.
 - **RN-06 (Bloqueo de Sincronización Obligatorio):** Regula la liberación formal del bloqueo tras haberse concretado la reversión.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** Mantiene el estado activo previo al cierre (**`En Pruebas`** o **`En Aceptación`**)
 - **Transición:** Reversión técnica y liberación de bloqueo en Biblioteca de Trabajo
 - **Estado final:** Mantiene el estado activo (habilitando la transición inmediata a **`Cancelada`** mediante CU-22)
 
-### Entregables
+#### Entregables
 
 - Constancia formal de Rollback ejecutado y registro de liberación de bloqueo en la Biblioteca de Trabajo.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-12
 - **RN:** RN-06, RN-08
 - **Estado(s):** Mantiene estado (habilita transición a Cancelada)
@@ -3452,7 +2181,7 @@ ightarrow$ Implementada
 
 ---
 
-## CU-22 — Cancelar Orden de Cambio
+### CU-22 — Cancelar Orden de Cambio
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3471,7 +2200,7 @@ ightarrow$ Implementada
 | **Entradas** | Expediente de la ECN/ECO, constancia de rollback ejecutado y sustento formal del motivo de cancelación. |
 | **Salidas / Entregables** | Resolución de Cancelación formal de Orden de Cambio y expediente de RFC cerrado en estado `Cancelada`. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona la Orden de Cambio sujeta a cancelación definitiva.
 2. TraceFlow SCM presenta la constancia de rollback ejecutado en la Biblioteca de Trabajo y el informe de fallos no subsanados.
@@ -3480,7 +2209,7 @@ ightarrow$ Implementada
 5. TraceFlow SCM revoca formalmente la ECN/ECO y actualiza el estado oficial de la RFC a **`Cancelada`** (estado terminal).
 6. TraceFlow SCM emite la Resolución de Cancelación y notifica el cierre formal por fallo no subsanado al Solicitante y al CCB conforme a RF-14 y RN-07.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Registro de lecciones aprendidas técnicas en la cancelación**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3489,7 +2218,7 @@ ightarrow$ Implementada
     1. El Administrador adjunta el informe de análisis de causas raíz al expediente.  
   - **Convergencia:** Retorna al Paso 4 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Intento de cancelación sin constancia de rollback previo**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3497,22 +2226,22 @@ ightarrow$ Implementada
   - **Respuesta del sistema:** TraceFlow SCM bloquea la cancelación e instruye la ejecución obligatoria del rollback según RN-08.  
   - **Resultado:** No se cancela la orden; se deriva al usuario a completar CU-21.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece `Cancelada` como el resultado terminal obligatorio ante fallos técnicos no subsanados en QA o rechazo insubsanable en UAT con reversión ejecutada.
 - **RN-08 (Reversión Obligatoria ante Fallo No Subsanado):** Prohíbe la cancelación formal sin haber restaurado previamente el espacio de trabajo.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Pruebas`** o **`En Aceptación`** (Estados 9 o 10 de TB-07)
 - **Transición:** Cancelación formal de la orden tras reversión técnica
 - **Estado final:** **`Cancelada`** (Estado 13 de TB-07, Estado Terminal de Cierre Fallido)
 
-### Entregables
+#### Entregables
 
 - Resolución formal de Cancelación de Orden de Cambio y expediente de RFC cerrado en estado `Cancelada`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-12, RF-14
 - **RN:** RN-07, RN-08
 - **Estado(s):** En Pruebas / En Aceptación $
@@ -3521,7 +2250,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-23 — Registrar incidencia
+### CU-23 — Registrar incidencia
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3540,7 +2269,7 @@ ightarrow$ Cancelada
 | **Entradas** | Título del problema, módulo o función afectada, descripción detallada del error, pasos para reproducirlo, severidad propuesta y evidencias adjuntas. |
 | **Salidas / Entregables** | Ticket digital de incidencia registrado con identificador correlativo formal y comprobante de reporte emitido. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Solicitante selecciona la opción de registrar un nuevo reporte de incidencia en el módulo de soporte del proyecto.
 2. TraceFlow SCM presenta el formulario de captura de ticket de incidencia.
@@ -3549,7 +2278,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM registra el ticket de soporte asignándole un código correlativo unívoco y estableciendo su estado oficial en "Abierta".
 6. TraceFlow SCM emite el comprobante de recepción al Solicitante y remite una notificación automática al Analista de Requerimientos / Gestor para su evaluación y atención.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Descarte voluntario del registro del ticket**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3559,7 +2288,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM limpia el formulario sin registrar datos.  
   - **Convergencia:** Concluye la interacción sin persistir transacciones.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Omisión de descripción o pasos de reproducción**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3567,21 +2296,21 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM bloquea la creación del ticket e instruye detallar el error.  
   - **Resultado:** Retorna al Paso 3 del Flujo Principal para completar los datos requeridos.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que los tickets de soporte sirvan como insumo de atención, pero no autoricen modificaciones directas sobre el software sin derivar a una RFC.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A en ciclo de RFC (Ciclo de soporte: creación de ticket).
 - **Transición:** Registro formal de ticket de soporte.
 - **Estado final:** N/A en RFC (Ticket de soporte en estado oficial `Abierta`).
 
-### Entregables
+#### Entregables
 
 - Ticket formal de incidencia registrado en estado `Abierta` con código correlativo.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-15
 - **RN:** RN-01
 - **Estado(s):** N/A (Ticket: Abierta)
@@ -3589,7 +2318,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-24 — Consultar estado de ticket
+### CU-24 — Consultar estado de ticket
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3608,7 +2337,7 @@ ightarrow$ Cancelada
 | **Entradas** | Identificador del ticket de incidencia o criterios de búsqueda por rango de fecha o estado. |
 | **Salidas / Entregables** | Ficha de consulta de ticket presentada en pantalla con bitácora de atención y enlace a RFC asociada. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Solicitante accede a la bandeja de tickets de soporte del proyecto asignado.
 2. TraceFlow SCM presenta el listado de tickets registrados por el usuario con sus estados de atención actuales (Abierta, En Análisis, Derivada, Resuelta, Cerrada).
@@ -3617,7 +2346,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM presenta el detalle completo del ticket y, si la incidencia motivó una Solicitud de Cambio, despliega el enlace directo hacia la RFC vinculada.
 6. El Solicitante visualiza la evolución del caso y puede agregar aclaraciones complementarias si el ticket permanece en trámite.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Incorporación de comentarios adicionales al ticket en atención**  
   - **Origen:** Paso 6 del Flujo Principal.  
@@ -3627,7 +2356,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM registra el comentario en la bitácora del ticket y notifica al Analista.  
   - **Convergencia:** Concluye la actualización del ticket.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Ticket de soporte inexistente o perteneciente a otro proyecto no autorizado**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3635,21 +2364,21 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM informa que el ticket no existe o no se tienen privilegios de consulta según RBAC.  
   - **Resultado:** No se despliega información; el usuario retorna a la bandeja general.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura la transparencia y trazabilidad en la atención de solicitudes de los usuarios.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Operación de sólo lectura).
 - **Transición:** N/A
 - **Estado final:** N/A
 
-### Entregables
+#### Entregables
 
 - Panel de estado y trazabilidad del ticket de incidencia presentado en pantalla.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-15
 - **RN:** RN-01
 - **Estado(s):** N/A
@@ -3657,7 +2386,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-25 — Derivar incidencia a RFC
+### CU-25 — Derivar incidencia a RFC
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3676,7 +2405,7 @@ ightarrow$ Cancelada
 | **Entradas** | Ticket de soporte evaluado, dictamen técnico de derivación y selección del ECS preliminarmente afectado. |
 | **Salidas / Entregables** | Asiento formal de derivación registrado en el ticket y expediente de RFC iniciado con vínculo de trazabilidad. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Analista de Requerimientos / Gestor selecciona una incidencia abierta en el panel de soporte y dictamina que su resolución exige modificar el software del proyecto.
 2. TraceFlow SCM presenta la opción de derivación formal hacia el flujo de Solicitudes de Cambio.
@@ -3685,7 +2414,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM ejecuta el registro formal de la RFC conforme al flujo de CU-04, asignándole un código correlativo unívoco y posicionándola en estado oficial **`Registrada`**.
 6. TraceFlow SCM actualiza el estado del ticket de soporte a "Derivada", asienta el vínculo bidireccional entre ambos expedientes y notifica al Solicitante el código de la nueva RFC asignada.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Ajuste de datos pre-cargados antes de formalizar la RFC**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3694,7 +2423,7 @@ ightarrow$ Cancelada
     1. El Analista complementa la descripción y justificación en el formulario pre-cargado.  
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal para proseguir con el registro de CU-04.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Ticket de soporte ya derivado previamente**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3702,21 +2431,21 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM deniega la operación e informa el identificador de la RFC preexistente.  
   - **Resultado:** No se duplica la solicitud; el caso de uso finaliza.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna atención de soporte altere artefactos de software sin ingresar al proceso formal de RFC gobernado por TraceFlow SCM.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** Ticket en estado `Abierta` / RFC: Ninguno (Creación).
 - **Transición:** Derivación formal de soporte hacia control de configuración.
 - **Estado final:** Ticket en estado `Derivada` / RFC en estado oficial **`Registrada`** (Estado 1 de TB-07).
 
-### Entregables
+#### Entregables
 
 - Asiento de derivación en el ticket de soporte y expediente de RFC registrado en estado `Registrada` con vínculo de trazabilidad.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-04, RF-15
 - **RN:** RN-01
 - **Estado(s):** Inicia RFC en Registrada
@@ -3724,7 +2453,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-26 — Validar integridad (checksum)
+### CU-26 — Validar integridad (checksum)
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3743,7 +2472,7 @@ ightarrow$ Cancelada
 | **Entradas** | Identificador del ECS, biblioteca donde reside y firma de comprobación oficial almacenada. |
 | **Salidas / Entregables** | Certificado de validación de integridad del artefacto registrado en la bitácora de seguridad. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario (o TraceFlow SCM durante operaciones de repositorio) solicita validar la integridad del artefacto.
 2. TraceFlow SCM recupera el artefacto desde la biblioteca correspondiente y consulta la firma oficial de integridad almacenada en el catálogo de configuración.
@@ -3752,7 +2481,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM dictamina formalmente la conformidad de integridad del artefacto y registra la estampa temporal y resultado en la bitácora de auditoría.
 6. TraceFlow SCM confirma la integridad del ECS al operador, autorizando la prosecución de las operaciones de Check-In, Check-Out o auditoría.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Verificación integral masiva sobre todos los ECS de una Línea Base**  
   - **Origen:** Paso 1 del Flujo Principal.  
@@ -3762,7 +2491,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM ejecuta la comprobación de integridad secuencial sobre cada ECS componente.  
   - **Convergencia:** Presenta el reporte consolidado de integridad en el Paso 6.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Discrepancia en la validación de integridad (Firma alterada)**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3770,22 +2499,22 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM declara la no conformidad por alteración o corrupción del archivo, bloquea de inmediato su extracción o integración y genera una alerta crítica de seguridad en auditoría.  
   - **Resultado:** La operación en curso se cancela protegiendo el repositorio contra artefactos adulterados según RN-04.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-04 (Restricción de Bibliotecas Congeladas):** Protege la Biblioteca Maestra exigiendo comprobación de integridad ante cualquier lectura o transferencia.
 - **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Impone la verificación de integridad como control técnico previo a la integración definitiva.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Operación de aseguramiento de integridad).
 - **Transición:** Verificación y validación de firma de integridad.
 - **Estado final:** N/A
 
-### Entregables
+#### Entregables
 
 - Dictamen formal de validación de integridad del artefacto registrado en la bitácora de seguridad.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-17
 - **RN:** RN-04, RN-09
 - **Estado(s):** N/A
@@ -3793,7 +2522,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-27 — Auditar acciones del sistema
+### CU-27 — Auditar acciones del sistema
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3812,7 +2541,7 @@ ightarrow$ Cancelada
 | **Entradas** | Criterios de filtrado de auditoría (rango de fechas, usuario responsable, proyecto, tipo de acción crítica o identificador de RFC/ECS). |
 | **Salidas / Entregables** | Reporte visual de auditoría con detalle cronológico de transacciones, estampas de tiempo, usuarios y firmas de seguridad. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Comité de Control de Cambios (CCB) accede al panel de auditoría y trazabilidad del sistema.
 2. TraceFlow SCM presenta las opciones de consulta y filtrado de la bitácora histórica de eventos.
@@ -3821,7 +2550,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM recupera y presenta la secuencia cronológica de transacciones críticas, mostrando autor, rol oficial, estampa de tiempo, acción ejecutada, justificación y los estados anterior y posterior del artefacto.
 6. El Comité de Control de Cambios (CCB) analiza el expediente de auditoría y puede emitir el informe formal de trazabilidad y cumplimiento normativo.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Rastreo específico de la cadena de trazabilidad de una Solicitud de Cambio**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3831,7 +2560,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM presenta la línea de vida completa de la solicitud enlazando la RFC, los informes de impacto, actas, órdenes, operaciones de biblioteca y certificaciones.  
   - **Convergencia:** Retorna al Paso 6 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Intento de acceso a registros de auditoría por usuario sin privilegios**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3839,22 +2568,22 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM bloquea la consulta, registra el intento no autorizado en la bitácora de seguridad y notifica al Administrador.  
   - **Resultado:** No se despliega información confidencial; el acceso queda denegado.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Permite verificar que cada intervención técnica haya contado con la debida resolución aprobatoria previa.
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Asegura que todos los cierres documentados correspondan a uno de los cuatro resultados oficiales.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Operación de inspección y control).
 - **Transición:** N/A
 - **Estado final:** N/A
 
-### Entregables
+#### Entregables
 
 - Informe formal de auditoría y trazabilidad de eventos del sistema presentado en pantalla y disponible para exportación.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-16, RF-17
 - **RN:** RN-01, RN-07
 - **Estado(s):** N/A
@@ -3862,7 +2591,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-28 — Generar reportes de estado
+### CU-28 — Generar reportes de estado
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3881,7 +2610,7 @@ ightarrow$ Cancelada
 | **Entradas** | Tipo de reporte seleccionado (Flujo de Cambios, Inventario de ECS o Actas de Cambios), proyecto a evaluar y parámetros de corte de fecha. |
 | **Salidas / Entregables** | Documento formal de reporte emitido en pantalla y exportable (PDF / formato estructurado). |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Administrador de Configuración / Bibliotecario selecciona la opción de generación de reportes en el panel de control.
 2. TraceFlow SCM presenta el catálogo oficial de reportes respaldados por RF-18: (1) Reporte de Estado del Flujo de Cambios, (2) Reporte de Inventario de ECS y (3) Reporte Consolidado de Actas de Cambios.
@@ -3890,7 +2619,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM genera el reporte estructurado consolidando métricas cuantitativas, tablas de estado, firmas formales de responsabilidad y resúmenes ejecutivos.
 6. TraceFlow SCM presenta el reporte en pantalla y habilita la opción de exportación documental formal para su entrega a la dirección de proyecto o al CCB.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Generación del Reporte de Inventario de ECS**  
   - **Origen:** Paso 3 del Flujo Principal.  
@@ -3908,7 +2637,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM compila las resoluciones aprobatorias, actas de rechazo, ECN/ECO expedidas y actas de aceptación UAT.  
   - **Convergencia:** Retorna al Paso 5 del Flujo Principal.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Inexistencia de transacciones en el periodo o proyecto consultado**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3916,22 +2645,22 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM informa que no existen datos que cumplan los criterios seleccionados.  
   - **Resultado:** No se genera el reporte; se instruye ajustar los parámetros de búsqueda en el Paso 3.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que los reportes reflejen fielmente el estatus de las autorizaciones formales.
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Garantiza que las estadísticas de cierre clasifiquen las solicitudes estrictamente en los cuatro resultados terminales oficiales.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** N/A (Operación de compilación y exportación de información).
 - **Transición:** N/A
 - **Estado final:** N/A
 
-### Entregables
+#### Entregables
 
 - Documento formal de reporte emitido (Estado del Flujo de Cambios, Inventario de ECS o Actas de Cambios) disponible para exportación.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-18
 - **RN:** RN-01, RN-07
 - **Estado(s):** N/A
@@ -3939,7 +2668,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-29 — Validar aceptación del cambio por el usuario (UAT)
+### CU-29 — Validar aceptación del cambio por el usuario (UAT)
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -3958,7 +2687,7 @@ ightarrow$ Cancelada
 | **Entradas** | Entorno de validación desplegado, criterios de aceptación funcionales del usuario y necesidad original documentada en la RFC. |
 | **Salidas / Entregables** | Acta formal de Aceptación del Usuario (UAT) suscrita en el sistema. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. El Solicitante accede a su bandeja de seguimiento y selecciona la RFC en estado "En Aceptación" certificada por QA.
 2. TraceFlow SCM presenta el entorno de pruebas de aceptación del usuario y el resumen de la necesidad funcional original documentada en la RFC.
@@ -3967,7 +2696,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM valida la suscripción del acta, constata la concurrencia de la certificación técnica de QA y anexa el documento al expediente según RN-09.
 6. TraceFlow SCM emite constancia de conformidad al Solicitante y notifica al Administrador de Configuración / Bibliotecario que el cambio cuenta con la doble validación aprobada para efectuar el Check-In definitivo.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Formulación de observaciones funcionales menores de usuario**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3977,7 +2706,7 @@ ightarrow$ Cancelada
     2. El sistema remite las notas a la gestión del proyecto para su programación coordinada.  
   - **Convergencia:** Si no impiden la aceptación, el Solicitante suscribe el acta conforme.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Rechazo funcional de usuario por insatisfacción de la necesidad original**  
   - **Origen:** Paso 4 del Flujo Principal.  
@@ -3985,22 +2714,22 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM registra el Acta de No Aceptación UAT detallando las discrepancias de negocio.  
   - **Resultado:** Si el rechazo es insubsanable, se bloquea el Check-In a Biblioteca Maestra conforme a RN-09 y se activa el flujo de Rollback (CU-21) y Cancelación de la ECN/ECO (CU-22).
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-09 (Doble Validación Previa al Check-In a Biblioteca Maestra):** Establece como requisito indispensable y concurrente el Acta de Aceptación formal del usuario para autorizar la integración definitiva del software.
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Asegura que ninguna funcionalidad ingrese a producción sin la verificación directa del solicitante.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Aceptación`** (Estado 10 de TB-07)
 - **Transición:** Validación de aceptación por el usuario final (UAT)
 - **Estado final:** **`En Aceptación`** (Estado 10 de TB-07, con habilitación de doble conformidad para pase a **`Implementada`** tras CU-12 y CU-20)
 
-### Entregables
+#### Entregables
 
 - Acta formal de Aceptación del Usuario (UAT) debidamente suscrita y anexada al expediente.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-10
 - **RN:** RN-01, RN-09
 - **Estado(s):** Mantiene En Aceptación (habilita transición a Implementada)
@@ -4008,7 +2737,7 @@ ightarrow$ Cancelada
 
 ---
 
-## CU-30 — Autorizar Cambio Menor
+### CU-30 — Autorizar Cambio Menor
 
 | Campo | Descripción |
 | :--- | :--- |
@@ -4027,7 +2756,7 @@ ightarrow$ Cancelada
 | **Entradas** | Expediente de la RFC, Informe Técnico de Impacto de Cambio Menor, visto bueno del Analista y visto bueno del Arquitecto. |
 | **Salidas / Entregables** | Resolución de Autorización Delegada compartida registrada formalmente en el expediente. |
 
-### Flujo Principal
+#### Flujo Principal
 
 1. La Autoridad Operativa Delegada (Analista de Requerimientos y Arquitecto) accede a la RFC clasificada como Cambio Menor en estado "En Evaluación".
 2. TraceFlow SCM presenta el Informe Técnico de Impacto acreditando que el cambio no altera la Triple Restricción (alcance, tiempo y costo).
@@ -4036,7 +2765,7 @@ ightarrow$ Cancelada
 5. TraceFlow SCM valida la concurrencia obligatoria de ambas autorizaciones compartidas y actualiza el estado oficial de la RFC a **`Autorizada`**.
 6. TraceFlow SCM notifica la autorización al Solicitante, al Administrador de Configuración / Bibliotecario y a los evaluadores, habilitando la emisión de la orden formal de cambio.
 
-### Flujos Alternativos
+#### Flujos Alternativos
 
 - **A1 — Rechazo por rebasamiento de límites delegados o impacto no previsto**  
   - **Origen:** Paso 3 o 4 del Flujo Principal.  
@@ -4046,7 +2775,7 @@ ightarrow$ Cancelada
     2. TraceFlow SCM reescala formalmente la RFC reclasificándola a Cambio Mayor para tratamiento por el CCB (CU-07), o transiciona a `Rechazada` si resulta improcedente.  
   - **Convergencia:** Se canaliza por la vía colegiada del CCB o finaliza como rechazo según corresponda.
 
-### Excepciones
+#### Excepciones
 
 - **E1 — Aprobación unilateral incompleta**  
   - **Origen:** Paso 5 del Flujo Principal.  
@@ -4054,23 +2783,23 @@ ightarrow$ Cancelada
   - **Respuesta del sistema:** TraceFlow SCM bloquea la transición a Autorizada e informa que la aprobación requiere autorización compartida obligatoria según RN-01.  
   - **Resultado:** La solicitud permanece en estado `En Evaluación` hasta registrarse la segunda conformidad requerida.
 
-### Reglas aplicadas
+#### Reglas aplicadas
 
 - **RN-01 (Aprobación Obligatoria Previa a Modificación e Integración):** Dispone que los Cambios Menores puedan autorizarse bajo autoridad operativa delegada compartida entre el Analista y el Arquitecto.
 - **RN-05 (Evaluación Técnica y Clasificación Obligatoria):** Exige que la autorización delegada se fundamente estrictamente en el Informe Técnico de Impacto previo.
 - **RN-07 (Diferenciación de Resultados Formales de Cierre):** Establece el cierre formal en `Rechazada` en caso de denegación definitiva.
 
-### Estados afectados
+#### Estados afectados
 
 - **Estado inicial:** **`En Evaluación`** (Estado 5 de TB-07)
 - **Transición:** Resolución conjunta de la Autoridad Operativa Delegada
 - **Estado final:** **`Autorizada`** (Estado 6 de TB-07) o **`Rechazada`** (Estado 12 de TB-07)
 
-### Entregables
+#### Entregables
 
 - Resolución de Autorización Delegada debidamente suscrita de forma compartida en estado `Autorizada`.
 
-### Trazabilidad
+#### Trazabilidad
 - **RF:** RF-05, RF-07
 - **RN:** RN-01, RN-05, RN-07
 - **Estado(s):** En Evaluación $
@@ -4079,2905 +2808,13 @@ ightarrow$ Autorizada (o Rechazada)
 
 ---
 
-## 6.2. Modelo Lógico
-
-
-**Diagrama DG-13: Modelo Lógico de la Arquitectura TraceFlow SCM**
-
-![Diagrama DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM](assets/diagramas/render/generales/DG-13.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-13.*
-
-> [!WARNING]
-> **Aviso de Obsolescencia Metodológica (DOC-025):**
-> Este diagrama ha sido formalmente declarado como **OBSOLETO PARA EL ANÁLISIS** en el SAD de Análisis (`docs/FD04-EPIS-Informe_SAD_Analisis.md`, §13.2) y en la auditoría técnica de la Etapa 02. El modelo introduce decisiones de diseño prematuro (tecnologías específicas de implementación como Node.js, PostgreSQL, Redis y MinIO) que desvirtúan el nivel de abstracción conceptual del SRS. Se conserva en esta revisión exclusivamente como antecedente histórico, quedando sustituido metodológicamente en el SAD por los modelos de análisis puro `DG-SAD-A01`, `DG-SAD-A02` y el Modelo Lógico Canónico `DG-12`.
-
-#### Código PlantUML del Diagrama
-
-```plantuml
-@startuml
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam componentStyle rectangle
-
-title <b>DG-13: Modelo Lógico de la Arquitectura de Software TraceFlow SCM</b>
-
-package "Capa de Presentación (Frontend Web SPA)" {
-    component [Módulo de Autenticación y Perfiles] as UI_AUTH
-    component [Módulo de Gestión de Proyectos] as UI_PROJ
-    component [Módulo de Registro y Control de RFC] as UI_RFC
-    component [Módulo de Operaciones SCM (Check-In/Out)] as UI_SCM
-    component [Módulo de QA y Certificación] as UI_QA
-    component [Módulo de Auditoría y Reportes] as UI_AUDIT
-}
-
-package "Capa de Servicios y Negocio (Backend API REST)" {
-    component [Controlador de Autenticación / RBAC] as CTRL_AUTH
-    component [Controlador de Proyectos] as CTRL_PROJ
-    component [Controlador de Flujo RFC / CCB] as CTRL_RFC
-    component [Motor de Control de Versiones SCM] as SCM_ENGINE
-    component [Gestor de Bloqueos de Concurrencia] as LOCK_MGR
-    component [Servicio de QA y Conformidad] as QA_SRV
-    component [Validador de Integridad SHA-256] as HASH_VAL
-    component [Servicio de Auditoría y Trazabilidad] as AUDIT_SRV
-}
-
-package "Capa de Almacenamiento y Persistencia" {
-    database "Base de Datos Relacional\n(PostgreSQL / TraceFlow DB)" as DB {
-        [Usuarios / Roles]
-        [Proyectos / Clientes]
-        [Metadatos RFC y ECN]
-        [Inventario ECS / Baselines]
-        [Registro de Auditoría]
-    }
-    
-    storage "Almacén de Archivos y Bibliotecas SCM" as STORAGE {
-        folder "Biblioteca de Trabajo (Work)" as LIB_WORK
-        folder "Biblioteca de Soporte (Support)" as LIB_SUPPORT
-        folder "Biblioteca Maestra (Master)" as LIB_MASTER
-    }
-}
-
-UI_AUTH --> CTRL_AUTH : HTTPS / JSON
-UI_PROJ --> CTRL_PROJ : HTTPS / JSON
-UI_RFC --> CTRL_RFC : HTTPS / JSON
-UI_SCM --> SCM_ENGINE : HTTPS / JSON
-UI_QA --> QA_SRV : HTTPS / JSON
-UI_AUDIT --> AUDIT_SRV : HTTPS / JSON
-
-CTRL_RFC --> SCM_ENGINE : Autoriza ECN
-SCM_ENGINE --> LOCK_MGR : Solicita / Libera Lock
-SCM_ENGINE --> HASH_VAL : Calcula y Valida Checksum
-SCM_ENGINE --> QA_SRV : Notifica Check-Out/Check-In
-
-CTRL_AUTH ..> AUDIT_SRV : Audita
-CTRL_PROJ ..> AUDIT_SRV : Audita
-CTRL_RFC ..> AUDIT_SRV : Audita
-SCM_ENGINE ..> AUDIT_SRV : Audita
-
-CTRL_AUTH --> DB
-CTRL_PROJ --> DB
-CTRL_RFC --> DB
-QA_SRV --> DB
-AUDIT_SRV --> DB
-SCM_ENGINE --> DB
-
-SCM_ENGINE --> STORAGE : Transferencia controlada
-LOCK_MGR --> LIB_WORK : Bloqueo de escritura
-HASH_VAL --> STORAGE : Verificación hash
-
-@enduml
-```
-
-
-
-<!-- Página 96 del PDF original -->
-
-
-### 6.2.1. Diagrama de Secuencia
-
-A continuación se presentan los diagramas de secuencia del modelo lógico de TraceFlow SCM a **nivel de análisis conceptual**, correspondientes exactamente a los 31 escenarios de caso de uso detallados en la sección 6.1.3 y catalogados en `TB-11`.
-
-Cada diagrama modela la interacción directa entre el actor funcional canónico y la entidad central conceptual **TraceFlow SCM**, observando correspondencia estricta 1:1 con la numeración de los pasos del Flujo Principal de cada narrativa.
-
----
-
-**Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)**
-
-![Diagrama DG-SEQ-01: Gestionar usuarios y roles (CU-01)](assets/diagramas/render/analisis/DG-SEQ-01.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-01.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-01
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-01: Gestionar usuarios y roles (CU-01)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Usuarios del sistema" as Usuario
-
-Admin -> Sistema: 1. Seleccionar opción de gestión de usuarios y roles
-Sistema --> Admin: 2. Presentar directorio de usuarios y catálogo de roles canónicos
-Admin -> Sistema: 3. Ingresar datos de identidad y seleccionar rol oficial
-Sistema -> Sistema: 4. Validar campos, unicidad de correo y rol oficial (RN-01)
-Sistema -> Sistema: 5. Registrar usuario, asociar permisos RBAC y activar cuenta
-Sistema --> Admin: 6. Confirmar registro exitoso en pantalla
-Sistema --> Usuario: 6. Remitir notificación con credenciales de acceso iniciales
-
-alt A1: Modificación de rol a usuario existente
-  Admin -> Sistema: Solicitar cambio de rol a usuario registrado
-  Sistema -> Sistema: Actualizar privilegios RBAC manteniendo historial
-  Sistema --> Admin: Confirmar actualización de permisos
-else A2: Desactivación lógica de cuenta
-  Admin -> Sistema: Solicitar desactivación de cuenta de usuario
-  Sistema -> Sistema: Bloquear acceso conservando registros históricos
-  Sistema --> Admin: Confirmar desactivación de cuenta
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)**
-
-![Diagrama DG-SEQ-02: Crear y administrar proyectos (CU-02)](assets/diagramas/render/analisis/DG-SEQ-02.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-02.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-02
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-02: Crear y administrar proyectos (CU-02)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-participant "TraceFlow SCM" as Sistema
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-Analista -> Sistema: 1. Seleccionar registrar nuevo proyecto de software
-Sistema --> Analista: 2. Presentar formulario de configuración y directorio de clientes
-Analista -> Sistema: 3. Ingresar datos del proyecto, cliente, objetivos y equipo técnico
-Sistema -> Sistema: 4. Validar unicidad del nombre y coherencia de plazos contractuales
-Sistema -> Sistema: 5. Crear proyecto, aislar datos de cliente e inicializar bibliotecas (RN-01)
-Sistema --> Analista: 6. Confirmar creación de proyecto en pantalla
-Sistema --> Admin: 6. Notificar creación para inicialización del catálogo de ECS
-
-alt A1: Actualización de parámetros de proyecto existente
-  Analista -> Sistema: Modificar fechas, alcance o equipo técnico
-  Sistema -> Sistema: Actualizar registro conservando historial
-  Sistema --> Analista: Confirmar actualización de proyecto
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-03: Consultar proyecto (CU-03)**
-
-![Diagrama DG-SEQ-03: Consultar proyecto (CU-03)](assets/diagramas/render/analisis/DG-SEQ-03.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-03.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-03
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-03: Consultar proyecto (CU-03)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as Actor
-participant "TraceFlow SCM" as Sistema
-
-Actor -> Sistema: 1. Seleccionar opción de consulta de proyectos
-Sistema --> Actor: 2. Presentar catálogo de proyectos accesibles según perfil
-Actor -> Sistema: 3. Seleccionar proyecto específico para inspeccionar
-Sistema -> Sistema: 4. Validar permisos de visualización según matriz RBAC (RN-01)
-Sistema -> Sistema: 5. Consolidar datos generales, equipo, inventario de ECS y estado de RFC
-Sistema --> Actor: 6. Presentar panel de detalle y navegación hacia artefactos
-
-opt A1: Búsqueda y filtrado avanzado
-  Actor -> Sistema: Aplicar filtros por cliente, estado o fecha
-  Sistema --> Actor: Actualizar listado con proyectos coincidentes
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)**
-
-![Diagrama DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)](assets/diagramas/render/analisis/DG-SEQ-04.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-04.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-04
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-04: Registrar Solicitud de Cambio (RFC) (CU-04)</b>
-
-actor "Solicitante" as Solicitante
-participant "TraceFlow SCM" as Sistema
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-
-Solicitante -> Sistema: 1. Seleccionar registrar nueva Solicitud de Cambio (RFC)
-Sistema --> Solicitante: 2. Presentar formulario de captura y catálogo de ECS activos
-Solicitante -> Sistema: 3. Ingresar título, descripción, justificación, prioridad y seleccionar ECS
-Sistema -> Sistema: 4. Validar completitud de campos mandatorios y vigencia de ECS (RN-01)
-Sistema -> Sistema: 5. Registrar RFC asignando código correlativo en estado 'Registrada'
-Sistema --> Solicitante: 6. Emitir comprobante de recepción formal
-Sistema --> Analista: 6. Notificar nueva RFC registrada para revisión de completitud
-
-opt A1: Adjuntar documentación técnica de respaldo
-  Solicitante -> Sistema: Adjuntar archivos de soporte técnico
-  Sistema -> Sistema: Validar formato y tamaño de documentos vinculándolos a la RFC
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-SEQ-04.1 — Subsanar Solicitud de Cambio (RFC) (CU-04.1)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-04.1`).  
-**Figura DG-SEQ-04.1. Especificación DG-SEQ-04.1**
-
-![Figura DG-SEQ-04.1 — Especificación DG-SEQ-04.1](assets/diagramas/render/analisis/DG-SEQ-04.1.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-04.1.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-04.1
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-04.1: Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
-
-actor "Solicitante" as Solicitante
-participant "TraceFlow SCM" as Sistema
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-
-Solicitante -> Sistema: 1. Seleccionar RFC en estado 'En Subsanación'
-Sistema --> Solicitante: 2. Presentar formulario de subsanación y pliego formal de observaciones
-Solicitante -> Sistema: 3. Modificar campos requeridos, ampliar justificación y adjuntar anexos
-Sistema -> Sistema: 4. Validar atención de observaciones y completitud de campos (RN-01)
-Sistema -> Sistema: 5. Actualizar expediente de RFC y transicionar estado oficial a 'Registrada'
-Sistema --> Solicitante: 6. Emitir confirmación de subsanación formal
-Sistema --> Analista: 6. Notificar reingreso de RFC para reevaluación inicial
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)**
-
-![Diagrama DG-SEQ-05: Validar y clasificar la solicitud (CU-05)](assets/diagramas/render/analisis/DG-SEQ-05.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-05.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-05
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-05: Validar y clasificar la solicitud (CU-05)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-participant "TraceFlow SCM" as Sistema
-actor "Arquitecto / Especialista Técnico" as Arquitecto
-actor "Solicitante" as Solicitante
-
-Analista -> Sistema: 1. Seleccionar RFC en estado 'Registrada' desde bandeja de evaluación
-Sistema --> Analista: 2. Presentar expediente de la solicitud, justificación, ECS y anexos
-Analista -> Sistema: 3. Revisar completitud de datos, coherencia de alcance y procedencia
-Analista -> Sistema: 4. Emitir dictamen de admisión formal y categorización preliminar
-Sistema -> Sistema: 5. Validar consistencia de admisibilidad y actualizar estado a 'Clasificada' (RN-01)
-Sistema --> Arquitecto: 6. Notificar RFC admitida habilitada para análisis de impacto técnico
-
-alt A1: Información incompleta o insuficiente (Observación)
-  Analista -> Sistema: Registrar pliego de observaciones formales
-  Sistema -> Sistema: Actualizar estado de RFC a 'En Subsanación'
-  Sistema --> Solicitante: Notificar observaciones y plazo de subsanación
-else A2: Solicitud improcedente, duplicada o fuera de alcance
-  Analista -> Sistema: Formular dictamen de desestimación fundamentado
-  Sistema -> Sistema: Transicionar estado a 'Desestimada' (RN-07)
-  Sistema --> Solicitante: Notificar cierre anticipado de solicitud
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)**
-
-![Diagrama DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)](assets/diagramas/render/analisis/DG-SEQ-06.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-06.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-06
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-06: Realizar análisis de impacto técnico (CU-06)</b>
-
-actor "Arquitecto / Especialista Técnico" as Arquitecto
-participant "TraceFlow SCM" as Sistema
-
-Arquitecto -> Sistema: 1. Seleccionar RFC en estado 'Clasificada' desde bandeja de análisis
-Sistema --> Arquitecto: 2. Presentar expediente y actualizar estado a 'En Análisis Técnico'
-Arquitecto -> Sistema: 3. Analizar arquitectura, dependencias de ECS, riesgos, esfuerzo, tiempo y costo
-Arquitecto -> Sistema: 4. Evaluar Triple Restricción y dictaminar Cambio Menor o Mayor (RN-05)
-Sistema -> Sistema: 5. Registrar Informe Técnico de Impacto vinculándolo al expediente
-Sistema -> Sistema: 6. Transicionar estado a 'En Evaluación' y enrutar a instancia resolutiva
-Sistema --> Arquitecto: 6. Confirmar registro de informe y enrutamiento hacia CCB o Autoridad Delegada
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)**
-
-![Diagrama DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)](assets/diagramas/render/analisis/DG-SEQ-07.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-07.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-07
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-07: Evaluar Cambio Mayor en CCB (CU-07)</b>
-
-actor "Comité de Control de Cambios (CCB)" as CCB
-participant "TraceFlow SCM" as Sistema
-actor "Solicitante" as Solicitante
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-CCB -> Sistema: 1. Acceder al expediente de Cambio Mayor en estado 'En Evaluación'
-Sistema --> CCB: 2. Presentar expediente integral, Informe de Impacto y Triple Restricción
-CCB -> Sistema: 3. Deliberar colegiadamente sobre viabilidad técnica, contractual y económica
-CCB -> Sistema: 4. Registrar votación formal y emitir acta resolutiva aprobatoria (RN-01, RN-05)
-Sistema -> Sistema: 5. Validar cuórum legal, registrar acta formal y actualizar estado a 'Autorizada'
-Sistema --> Solicitante: 6. Notificar formalmente la resolución aprobatoria del CCB
-Sistema --> Admin: 6. Notificar habilitación para emisión de la Orden de Cambio (ECN/ECO)
-
-alt A1: Dictamen de rechazo colegiado del Cambio Mayor
-  CCB -> Sistema: Registrar votación denegatoria y fundamentar causales en acta
-  Sistema -> Sistema: Transicionar estado de RFC a 'Rechazada' (RN-07)
-  Sistema --> Solicitante: Notificar resolución de rechazo formal fundamentado
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)**
-
-![Diagrama DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)](assets/diagramas/render/analisis/DG-SEQ-08.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-08.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-08
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-08: Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
-
-actor "CCB / Autoridad Delegada" as Autoridad
-participant "TraceFlow SCM" as Sistema
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-
-Autoridad -> Sistema: 1. Seleccionar RFC en estado 'Autorizada'
-Sistema --> Autoridad: 2. Presentar formulario de formalización de ECN/ECO con antecedentes
-Autoridad -> Sistema: 3. Ingresar asignación de Desarrollador, plazos máximos y alcance de cambio
-Sistema -> Sistema: 4. Validar autorización formal vigente y rol activo del Desarrollador (RN-01)
-Sistema -> Sistema: 5. Expedir ECN/ECO con código unívoco y actualizar estado a 'Orden Emitida'
-Sistema --> Admin: 6. Notificar formalmente la emisión de orden para proceder con Check-Out
-Sistema --> Dev: 6. Notificar asignación técnica de la Orden de Cambio formal
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-09: Registrar ECS (CU-09)**
-
-![Diagrama DG-SEQ-09: Registrar ECS (CU-09)](assets/diagramas/render/analisis/DG-SEQ-09.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-09.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-09
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-09: Registrar ECS (CU-09)</b>
-
-actor "Arquitecto / Especialista Técnico" as Arquitecto
-participant "TraceFlow SCM" as Sistema
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-Arquitecto -> Sistema: 1. Seleccionar opción de registrar nuevo Elemento de Configuración (ECS)
-Sistema --> Arquitecto: 2. Presentar formulario de catalogación y jerarquía de componentes
-Arquitecto -> Sistema: 3. Ingresar nombre, clasificación, versión inicial, dependencias y archivo base
-Sistema -> Sistema: 4. Validar unicidad de nombre, estándar mayor.menor.parche y suma de integridad (RN-02)
-Sistema -> Sistema: 5. Registrar ECS con código unívoco y depositar en biblioteca designada (RN-04)
-Sistema --> Arquitecto: 6. Emitir confirmación de catalogación formal del nuevo ECS
-Sistema --> Admin: 6. Notificar disponibilidad del nuevo ECS para el flujo de cambios
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)**
-
-![Diagrama DG-SEQ-10: Efectuar Check-Out (CU-10)](assets/diagramas/render/analisis/DG-SEQ-10.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-10.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-10
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-10: Efectuar Check-Out (CU-10)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-
-Admin -> Sistema: 1. Seleccionar Orden de Cambio en estado 'Orden Emitida'
-Sistema --> Admin: 2. Presentar datos de ECN/ECO, ECS en Biblioteca de Soporte y Desarrollador asignado
-Admin -> Sistema: 3. Confirmar operación de Check-Out hacia la Biblioteca de Trabajo
-Sistema -> Sistema: 4. Validar ausencia de bloqueo previo y verificar integridad del ECS (RN-06)
-Sistema -> Sistema: 5. Transferir copia a Biblioteca de Trabajo, aplicar bloqueo y actualizar a 'En Implementación'
-Sistema --> Admin: 6. Registrar asiento histórico de Check-Out en bitácora de auditoría
-Sistema --> Dev: 6. Notificar disponibilidad del artefacto para inicio de actividades técnicas
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)**
-
-![Diagrama DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)](assets/diagramas/render/analisis/DG-SEQ-11.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-11.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-11
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-11: Aplicar bloqueo de sincronización (CU-11)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-
-Admin -> Sistema: 1. Solicitar aplicación de bloqueo de sincronización sobre ECS
-Sistema -> Sistema: 2. Consultar estado actual de concurrencia del ECS en el catálogo
-Sistema -> Sistema: 3. Validar ausencia de bloqueo activo preexistente sobre el ECS (RN-06)
-Sistema -> Sistema: 4. Registrar bloqueo exclusivo asociando Desarrollador, ECN/ECO y estampa temporal
-Sistema -> Sistema: 5. Actualizar catálogo impidiendo nuevas operaciones de Check-Out a terceros
-Sistema --> Admin: 6. Confirmar aplicación de bloqueo y asentar transacción en auditoría
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)**
-
-![Diagrama DG-SEQ-12: Efectuar Check-In (CU-12)](assets/diagramas/render/analisis/DG-SEQ-12.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-12.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-12
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-12: Efectuar Check-In (CU-12)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Comité de Control de Cambios (CCB)" as CCB
-
-Admin -> Sistema: 1. Seleccionar RFC con doble validación aprobada para proceder al Check-In
-Sistema --> Admin: 2. Presentar expediente técnico consolidando ECN/ECO, Certificado QA y Acta UAT
-Admin -> Sistema: 3. Confirmar transferencia formal del ECS hacia la Biblioteca Maestra
-Sistema -> Sistema: 4. Validar Orden Emitida, Certificado QA, Acta UAT, checksum y bloqueo vigente (RN-09)
-Sistema -> Sistema: 5. Integrar ECS en Biblioteca Maestra, asignar nueva versión y liberar bloqueo (RN-02, RN-06)
-Sistema --> Admin: 6. Registrar asiento histórico de Check-In en bitácora de auditoría
-Sistema --> CCB: 6. Notificar integración exitosa habilitando la creación de la nueva Línea Base
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)**
-
-![Diagrama DG-SEQ-13: Consultar historial de versiones (CU-13)](assets/diagramas/render/analisis/DG-SEQ-13.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-13.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-13
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-13: Consultar historial de versiones (CU-13)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-
-Admin -> Sistema: 1. Seleccionar ECS en el catálogo y solicitar consulta de historial
-Sistema -> Sistema: 2. Recuperar historial de versiones y bitácora de transacciones del elemento
-Sistema --> Admin: 3. Presentar lista cronológica de versiones, autor, fecha, ECN/ECO y biblioteca
-Admin -> Sistema: 4. Seleccionar versión específica para inspeccionar detalles
-Sistema --> Admin: 5. Presentar memoria descriptiva, firmas de auditoría e integridad (RN-03)
-Sistema --> Admin: 6. Habilitar comparación conceptual de diferencias entre versiones
-
-opt A1: Comparación de diferencias entre dos versiones históricas
-  Admin -> Sistema: Seleccionar dos versiones y solicitar comparación
-  Sistema --> Admin: Presentar vista comparativa de diferencias conceptuales
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)**
-
-![Diagrama DG-SEQ-14: Implementar cambio en el ECS (CU-14)](assets/diagramas/render/analisis/DG-SEQ-14.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-14.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-14
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-14: Implementar cambio en el ECS (CU-14)</b>
-
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-participant "TraceFlow SCM" as Sistema
-
-Dev -> Sistema: 1. Acceder a Biblioteca de Trabajo y visualizar ECN/ECO asignada
-Sistema --> Dev: 2. Presentar alcance técnico, criterios de aceptación y ECS desbloqueado
-Dev -> Sistema: 3. Realizar modificaciones, adaptaciones o correcciones sobre copia de trabajo
-Sistema -> Sistema: 4. Registrar progreso de cambios vinculándolos a la ECN/ECO (RN-03)
-Dev -> Sistema: 5. Formular memoria descriptiva detallando componentes modificados
-Sistema --> Dev: 6. Consolidar versión de trabajo dejándola dispuesta para pruebas unitarias
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)**
-
-![Diagrama DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)](assets/diagramas/render/analisis/DG-SEQ-15.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-15.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-15
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-15: Ejecutar pruebas unitarias locales (CU-15)</b>
-
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-participant "TraceFlow SCM" as Sistema
-
-Dev -> Sistema: 1. Solicitar ejecución de conjunto de pruebas unitarias sobre ECS modificado
-Sistema --> Dev: 2. Presentar entorno de verificación unitaria y casos de prueba asociados
-Dev -> Sistema: 3. Disparar ejecución de batería de pruebas en Biblioteca de Trabajo
-Sistema -> Sistema: 4. Validar ejecución sin errores y satisfacción de criterios de cobertura (RN-01)
-Sistema -> Sistema: 5. Registrar reporte de resultados unitarios en bitácora de ECN/ECO (RN-03)
-Sistema --> Dev: 6. Confirmar éxito y habilitar opción de promover ECS a pruebas de integración
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)**
-
-![Diagrama DG-SEQ-16: Ejecutar pruebas de integración (CU-16)](assets/diagramas/render/analisis/DG-SEQ-16.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-16.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-16
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-16: Ejecutar pruebas de integración (CU-16)</b>
-
-actor "Equipo de Calidad\n/ Testing" as QA
-participant "TraceFlow SCM" as Sistema
-
-QA -> Sistema: 1. Seleccionar RFC en estado 'En Pruebas' desde panel de control
-Sistema --> QA: 2. Presentar expediente, ECN/ECO, ECS en Biblioteca de Soporte y plan de pruebas
-QA -> Sistema: 3. Ejecutar casos de prueba funcionales, de integración y regresión en Soporte
-Sistema -> Sistema: 4. Registrar resultados de cada caso de prueba (aprobado/fallido) y evidencias
-Sistema -> Sistema: 5. Consolidar informe de ejecución determinando cobertura y criterios de calidad
-Sistema --> QA: 6. Confirmar cierre de batería y presentar resumen para certificar o reportar fallo
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)**
-
-![Diagrama DG-SEQ-17: Certificar conformidad del cambio (CU-17)](assets/diagramas/render/analisis/DG-SEQ-17.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-17.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-17
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-17: Certificar conformidad del cambio (CU-17)</b>
-
-actor "Equipo de Calidad\n/ Testing" as QA
-participant "TraceFlow SCM" as Sistema
-actor "Solicitante" as Solicitante
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-QA -> Sistema: 1. Seleccionar RFC con pruebas de integración conformes en estado 'En Pruebas'
-Sistema --> QA: 2. Presentar consolidado de resultados, informe de cobertura y ausencia de defectos
-QA -> Sistema: 3. Suscribir formalmente el dictamen técnico de Certificación de Conformidad
-Sistema -> Sistema: 4. Validar criterios técnicos de aceptación y ausencia de incidencias (RN-09)
-Sistema -> Sistema: 5. Registrar Certificado Técnico de Conformidad y actualizar estado a 'En Aceptación'
-Sistema --> Solicitante: 6. Notificar formalmente para validación de aceptación funcional (UAT)
-Sistema --> Admin: 6. Notificar avance a fase de aceptación del usuario
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)**
-
-![Diagrama DG-SEQ-18: Reportar no conformidad (CU-18)](assets/diagramas/render/analisis/DG-SEQ-18.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-18.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-18
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-18: Reportar no conformidad (CU-18)</b>
-
-actor "Equipo de Calidad\n/ Testing" as QA
-participant "TraceFlow SCM" as Sistema
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-
-QA -> Sistema: 1. Seleccionar opción de reportar no conformidad sobre RFC en 'En Pruebas'
-Sistema --> QA: 2. Presentar formulario de registro de defectos precargando pruebas fallidas
-QA -> Sistema: 3. Detallar descripción del error, severidad, pasos de reproducción y evidencias
-Sistema -> Sistema: 4. Validar reporte, asentar defecto e incrementar contador de ciclos (RN-08)
-Sistema -> Sistema: 5. Registrar Informe de No Conformidad y suspender trámite de certificación
-Sistema --> Dev: 6. Notificar formalmente para ejecutar correcciones en Biblioteca de Trabajo
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)**
-
-![Diagrama DG-SEQ-19: Reevaluar y re-testear (CU-19)](assets/diagramas/render/analisis/DG-SEQ-19.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-19.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-19
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-19: Reevaluar y re-testear (CU-19)</b>
-
-actor "Equipo de Calidad\n/ Testing" as QA
-participant "TraceFlow SCM" as Sistema
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-
-QA -> Sistema: 1. Seleccionar RFC con correcciones aplicadas en estado 'En Pruebas'
-Sistema --> QA: 2. Presentar pliego de defectos previos y memorias técnicas de corrección
-QA -> Sistema: 3. Reejecutar casos de prueba focalizados y suite de regresión en Soporte
-Sistema -> Sistema: 4. Validar resultados de re-testeo y constatar levantamiento de fallas (RN-08)
-Sistema -> Sistema: 5. Consolidar dictamen de re-testeo aprobatorio y actualizar expediente
-Sistema --> QA: 6. Derivar flujo hacia Certificación Técnica de Conformidad (CU-17)
-Sistema --> Dev: 6. Notificar resultado favorable del re-testeo de calidad
-
-alt E1: Fallo definitivo de re-testeo por agotamiento de instancias
-  Sistema -> Sistema: Declarar fallo técnico insubsanable por límite de ciclos
-  Sistema --> QA: Notificar agotamiento de instancias y bloqueo de re-test
-  Sistema --> Dev: Notificar activación obligatoria de Rollback (CU-21)
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)**
-
-![Diagrama DG-SEQ-20: Crear y congelar línea base (CU-20)](assets/diagramas/render/analisis/DG-SEQ-20.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-20.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-20
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-20: Crear y congelar línea base (CU-20)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Comité de Control de Cambios (CCB)" as CCB
-actor "Solicitante" as Solicitante
-
-Admin -> Sistema: 1. Acceder al módulo de Líneas Base y seleccionar ECS tras Check-In
-Sistema --> Admin: 2. Presentar inventario con versiones integradas y doble conformidad
-Admin -> Sistema: 3. Asignar etiqueta formal de versionamiento y solicitar congelamiento
-Sistema -> Sistema: 4. Validar estándar de versiones y pertenencia a Biblioteca Maestra (RN-02, RN-04)
-Sistema -> Sistema: 5. Congelar Línea Base contra edición, registrar firma y actualizar a 'Implementada'
-Sistema --> Admin: 6. Expedir Certificado formal de nueva Línea Base congelada
-Sistema --> CCB: 6. Notificar cierre exitoso del cambio en estado Implementada (RF-14, RN-07)
-Sistema --> Solicitante: 6. Notificar cierre formal del cambio implementado
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)**
-
-![Diagrama DG-SEQ-21: Ejecutar rollback (CU-21)](assets/diagramas/render/analisis/DG-SEQ-21.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-21.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-21
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-21: Ejecutar rollback (CU-21)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Ingeniero de Software\n/ Desarrollador" as Dev
-actor "Comité de Control de Cambios (CCB)" as CCB
-
-Admin -> Sistema: 1. Seleccionar orden no conforme sujeta a reversión en Biblioteca de Trabajo
-Sistema --> Admin: 2. Presentar historial de versiones del ECS y versión de origen estable en Soporte
-Admin -> Sistema: 3. Confirmar ejecución de reversión (rollback) sobre la copia de trabajo
-Sistema -> Sistema: 4. Validar que ECS no ingresó a Maestra y restringir reversión a Trabajo (RN-08)
-Sistema -> Sistema: 5. Descartar cambios no conformes, restituir copia previa y liberar bloqueo (RN-06)
-Sistema --> Admin: 6. Asentar acta de reversión en auditoría habilitando cancelación (CU-22)
-Sistema --> Dev: 6. Notificar descarte de copia de trabajo y liberación de bloqueo
-Sistema --> CCB: 6. Notificar ejecución de reversión técnica en Biblioteca de Trabajo
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)**
-
-![Diagrama DG-SEQ-22: Cancelar Orden de Cambio (CU-22)](assets/diagramas/render/analisis/DG-SEQ-22.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-22.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-22
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-22: Cancelar Orden de Cambio (CU-22)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Solicitante" as Solicitante
-actor "Comité de Control de Cambios (CCB)" as CCB
-
-Admin -> Sistema: 1. Seleccionar Orden de Cambio sujeta a cancelación definitiva
-Sistema --> Admin: 2. Presentar constancia de rollback ejecutado e informe de fallos no subsanados
-Admin -> Sistema: 3. Registrar fundamentación administrativa y técnica de la cancelación
-Sistema -> Sistema: 4. Validar rollback previo en Biblioteca de Trabajo y bloqueo liberado (RN-08)
-Sistema -> Sistema: 5. Revocar formalmente ECN/ECO y actualizar estado oficial a 'Cancelada'
-Sistema --> Solicitante: 6. Notificar cierre formal por fallo no subsanado (RF-14, RN-07)
-Sistema --> CCB: 6. Notificar resolución formal de cancelación de la orden
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-23: Registrar incidencia (CU-23)**
-
-![Diagrama DG-SEQ-23: Registrar incidencia (CU-23)](assets/diagramas/render/analisis/DG-SEQ-23.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-23.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-23
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-23: Registrar incidencia (CU-23)</b>
-
-actor "Solicitante" as Solicitante
-participant "TraceFlow SCM" as Sistema
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-
-Solicitante -> Sistema: 1. Seleccionar registrar nuevo reporte de incidencia en el proyecto
-Sistema --> Solicitante: 2. Presentar formulario de captura de ticket de incidencia
-Solicitante -> Sistema: 3. Ingresar título, descripción del error, pasos, severidad y anexos
-Sistema -> Sistema: 4. Validar completitud de campos y formatos de archivos autorizados
-Sistema -> Sistema: 5. Registrar ticket de soporte con código correlativo en estado 'Abierta'
-Sistema --> Solicitante: 6. Emitir comprobante de recepción formal de ticket
-Sistema --> Analista: 6. Notificar nuevo ticket de incidencia para evaluación y atención
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)**
-
-![Diagrama DG-SEQ-24: Consultar estado de ticket (CU-24)](assets/diagramas/render/analisis/DG-SEQ-24.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-24.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-24
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-24: Consultar estado de ticket (CU-24)</b>
-
-actor "Solicitante" as Solicitante
-participant "TraceFlow SCM" as Sistema
-
-Solicitante -> Sistema: 1. Acceder a bandeja de tickets de soporte del proyecto asignado
-Sistema --> Solicitante: 2. Presentar listado de tickets registrados con estados de atención
-Solicitante -> Sistema: 3. Seleccionar ticket de incidencia específico para inspeccionar
-Sistema -> Sistema: 4. Recuperar bitácora de seguimiento, comentarios y estado de atención
-Sistema --> Solicitante: 5. Presentar detalle completo y enlace directo hacia la RFC vinculada
-Solicitante -> Sistema: 6. Visualizar evolución del caso y agregar aclaraciones complementarias
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)**
-
-![Diagrama DG-SEQ-25: Derivar incidencia a RFC (CU-25)](assets/diagramas/render/analisis/DG-SEQ-25.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-25.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-25
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-25: Derivar incidencia a RFC (CU-25)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-participant "TraceFlow SCM" as Sistema
-actor "Solicitante" as Solicitante
-
-Analista -> Sistema: 1. Seleccionar incidencia abierta y dictaminar que requiere modificación
-Sistema --> Analista: 2. Presentar opción de derivación formal hacia flujo de Solicitudes de Cambio
-Analista -> Sistema: 3. Confirmar derivación identificando ECS preliminar y fundamentando causal
-Sistema -> Sistema: 4. Validar no derivación previa y pre-poblar datos enlazando a CU-04
-Sistema -> Sistema: 5. Registrar formalmente RFC según flujo CU-04 en estado 'Registrada' (RN-01)
-Sistema -> Sistema: 6. Actualizar ticket a 'Derivada' y asentar vínculo bidireccional
-Sistema --> Solicitante: 6. Notificar código de nueva RFC asignada para seguimiento
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)**
-
-![Diagrama DG-SEQ-26: Validar integridad (checksum) (CU-26)](assets/diagramas/render/analisis/DG-SEQ-26.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-26.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-26
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-26: Validar integridad (checksum) (CU-26)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-
-Admin -> Sistema: 1. Solicitar validar la integridad del artefacto de software
-Sistema -> Sistema: 2. Recuperar artefacto de biblioteca y consultar firma oficial almacenada
-Sistema -> Sistema: 3. Calcular firma de comprobación actual sobre el contenido del artefacto
-Sistema -> Sistema: 4. Validar equivalencia exacta entre firma calculada y firma oficial (RN-04)
-Sistema -> Sistema: 5. Dictaminar conformidad de integridad y asentar estampa en auditoría
-Sistema --> Admin: 6. Confirmar integridad del ECS autorizando prosecución de operaciones (RN-09)
-
-alt E1: Discrepancia en la validación de integridad (Firma alterada)
-  Sistema -> Sistema: Declarar no conformidad por alteración o corrupción
-  Sistema -> Sistema: Bloquear extracción o integración del artefacto corrupto
-  Sistema --> Admin: Alertar riesgo de seguridad y registrar anomalía crítica
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)**
-
-![Diagrama DG-SEQ-27: Auditar acciones del sistema (CU-27)](assets/diagramas/render/analisis/DG-SEQ-27.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-27.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-27
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-27: Auditar acciones del sistema (CU-27)</b>
-
-actor "Comité de Control de Cambios (CCB)" as CCB
-participant "TraceFlow SCM" as Sistema
-
-CCB -> Sistema: 1. Acceder al panel de auditoría y trazabilidad del sistema
-Sistema --> CCB: 2. Presentar opciones de consulta y filtrado de bitácora histórica
-CCB -> Sistema: 3. Definir criterios de inspección por proyecto, rango de fechas, actor u operación
-Sistema -> Sistema: 4. Validar privilegios para visualización de registros confidenciales (RBAC)
-Sistema --> CCB: 5. Presentar secuencia cronológica de transacciones críticas y estados (RN-01)
-CCB -> Sistema: 6. Analizar expediente de auditoría y emitir informe formal de trazabilidad
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)**
-
-![Diagrama DG-SEQ-28: Generar reportes de estado (CU-28)](assets/diagramas/render/analisis/DG-SEQ-28.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-28.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-28
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-28: Generar reportes de estado (CU-28)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-participant "TraceFlow SCM" as Sistema
-actor "Comité de Control de Cambios (CCB)" as CCB
-
-Admin -> Sistema: 1. Seleccionar opción de generación de reportes en panel de control
-Sistema --> Admin: 2. Presentar catálogo oficial de reportes respaldados por RF-18
-Admin -> Sistema: 3. Seleccionar tipo de reporte (Flujo, ECS o Actas) y definir parámetros
-Sistema -> Sistema: 4. Validar parámetros de consulta y compilar información desde registros (RN-01)
-Sistema -> Sistema: 5. Generar reporte estructurado con métricas, estados y firmas (RN-07)
-Sistema --> Admin: 6. Presentar reporte en pantalla y habilitar exportación documental formal
-Sistema --> CCB: 6. Remitir reporte consolidado oficial a dirección de proyecto y CCB
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-SEQ-29 — Validar aceptación del cambio por el usuario (UAT) (CU-29)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-29`).  
-**Figura DG-SEQ-29. Especificación DG-SEQ-29**
-
-![Figura DG-SEQ-29 — Especificación DG-SEQ-29](assets/diagramas/render/analisis/DG-SEQ-29.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-29.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-29
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-29: Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
-
-actor "Solicitante\n(Usuario Final)" as Solicitante
-participant "TraceFlow SCM" as Sistema
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-Solicitante -> Sistema: 1. Acceder a bandeja y seleccionar RFC en 'En Aceptación' certificada por QA
-Sistema --> Solicitante: 2. Presentar entorno de pruebas de aceptación y resumen de necesidad original
-Solicitante -> Sistema: 3. Ejecutar pruebas de aceptación verificando satisfacción de necesidades operativas
-Solicitante -> Sistema: 4. Confirmar que solución satisface requerimientos y suscribir Acta UAT
-Sistema -> Sistema: 5. Validar suscripción de acta, verificar certificación de QA y anexar al expediente (RN-09)
-Sistema --> Solicitante: 6. Emitir constancia formal de conformidad de usuario
-Sistema --> Admin: 6. Notificar cumplimiento de doble validación para Check-In a Maestra
-
-alt E1: Rechazo funcional de usuario por insatisfacción de necesidad original
-  Solicitante -> Sistema: Registrar Acta de No Aceptación UAT detallando discrepancias
-  Sistema -> Sistema: Bloquear Check-In a Biblioteca Maestra (RN-09)
-  Sistema --> Admin: Notificar activación obligatoria de Rollback (CU-21) y Cancelación (CU-22)
-end
-
-@enduml
-```
-
----
-
-**Diagrama DG-SEQ-30: Autorizar Cambio Menor (CU-30)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-SEQ-30 — Autorizar Cambio Menor (CU-30)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-SEQ-30`).  
-**Figura DG-SEQ-30. Especificación DG-SEQ-30**
-
-![Figura DG-SEQ-30 — Especificación DG-SEQ-30](assets/diagramas/render/analisis/DG-SEQ-30.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-SEQ-30.*
-
-#### Código PlantUML del Diagrama (Secuencia de Análisis)
-
-```plantuml
-@startuml DG-SEQ-30
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-SEQ-30: Autorizar Cambio Menor (CU-30)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as Analista
-actor "Arquitecto / Especialista Técnico" as Arquitecto
-participant "TraceFlow SCM" as Sistema
-actor "Solicitante" as Solicitante
-actor "Administrador de Configuración\n/ Bibliotecario" as Admin
-
-Analista -> Sistema: 1. Acceder a RFC de Cambio Menor en estado 'En Evaluación'
-Arquitecto -> Sistema: 1. Acceder a RFC de Cambio Menor en estado 'En Evaluación'
-Sistema --> Analista: 2. Presentar Informe de Impacto acreditando no afectación a Triple Restricción
-Sistema --> Arquitecto: 2. Presentar Informe de Impacto acreditando no afectación a Triple Restricción
-Analista -> Sistema: 3. Revisar viabilidad operativa y emitir visto bueno funcional
-Arquitecto -> Sistema: 4. Validar viabilidad arquitectural y emitir visto bueno técnico
-Sistema -> Sistema: 5. Validar concurrencia de ambas aprobaciones y actualizar estado a 'Autorizada' (RN-01, RN-05)
-Sistema --> Solicitante: 6. Notificar autorización formal de Cambio Menor
-Sistema --> Admin: 6. Notificar habilitación para emisión de ECN/ECO bajo autoridad delegada
-
-alt A1: Rechazo por rebasamiento de límites delegados
-  Analista -> Sistema: Denegar visto bueno delegado fundamentando causal
-  Sistema -> Sistema: Reescalar RFC a Cambio Mayor para CCB (CU-07) o transicionar a 'Rechazada'
-  Sistema --> Solicitante: Notificar reescalamiento o resolución denegatoria
-end
-
-@enduml
-```
-
----
-
-### 6.2.2. Diagrama de Clases (Modelo Conceptual del Dominio)
-
-Nota: Elaboración Propia
-
-**Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)**
-
-![Diagrama DG-12: Modelo Conceptual del Dominio TraceFlow SCM](assets/diagramas/render/analisis/DG-12.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-12.*
-
-#### Descripción Conceptual del Modelo de Dominio
-
-En estricto cumplimiento de `docs/DOCUMENTATION_RULES.md` Sección 8, el Diagrama de Clases en la fase de **ANÁLISIS** formaliza el modelo conceptual del dominio de software a partir de la consolidación de las entidades identificadas en los 31 Diagramas de Análisis de Objetos BCE (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`).
-
-El modelo se abstrae de artefactos físicos de implementación (tipos de datos de lenguaje de programación, firmas de métodos, controladores, servicios, repositorios o tablas relacionales) y representa exclusivamente los conceptos esenciales de gobernanza, configuración, control de cambios, aseguramiento de calidad, incidencias y auditoría.
-
-#### Código PlantUML del Diagrama (Modelo Conceptual de Análisis)
-
-```plantuml
-@startuml DG-12
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam classAttributeIconSize 0
-
-title <b>DG-12: Modelo Conceptual del Dominio TraceFlow SCM (Fase de Análisis)</b>
-
-package "Gobernanza y Seguridad" {
-    class Usuario {
-        codigo
-        nombreCompleto
-        correoElectronico
-        estado
-    }
-    class Rol {
-        nombreRol
-        descripcion
-    }
-    class Permiso {
-        codigoPermiso
-        accionPermitida
-    }
-}
-
-package "Gestión de Proyectos" {
-    class Proyecto {
-        codigoProyecto
-        nombre
-        descripcion
-        estado
-    }
-    class "Plan de Gestión SCM" as PlanGestionSCM {
-        politicaVersionamiento
-        estrategiaRamas
-        criteriosCongelamiento
-    }
-}
-
-package "Gestión de Configuración y Bibliotecas" {
-    class "Elemento de Configuración (ECS)" as ElementoConfiguracion {
-        codigoECS
-        nombre
-        tipoECS
-        estado
-        bibliotecaActual
-    }
-    class "Versión de ECS" as VersionECS {
-        numeroVersion
-        etiqueta
-        checksumSHA256
-        fechaSello
-    }
-    class "Bloqueo de Sincronización" as BloqueoSincronizacion {
-        tipoBloqueo
-        fechaImposicion
-        estado
-    }
-    class "Línea Base" as LineaBase {
-        codigoLineaBase
-        nombreHito
-        tipoLineaBase
-        fechaCongelamiento
-        estado
-    }
-}
-
-package "Control de Cambios (RFC / ECN)" {
-    class "Solicitud de Cambio (RFC)" as SolicitudCambio {
-        codigoRFC
-        titulo
-        descripcionMotivo
-        clasificacion
-        prioridad
-        estado
-    }
-    class "Informe Técnico de Impacto" as InformeImpacto {
-        codigoInforme
-        analisisArquitectura
-        evaluacionDependencias
-        estimacionEsfuerzo
-        estimacionCosto
-        dictamenClasificacion
-    }
-    class "Dictamen de Cambio" as DictamenCambio {
-        tipoAutoridad
-        sentidoResolucion
-        justificacionFundamento
-        fechaResolucion
-    }
-    class "Orden de Cambio (ECN/ECO)" as OrdenCambio {
-        codigoOrden
-        alcanceAutorizado
-        responsableAsignado
-        fechaEmision
-        estado
-    }
-}
-
-package "Aseguramiento de Calidad y Aceptación" {
-    class "Certificación de Conformidad QA" as CertificacionQA {
-        codigoCertificado
-        resultadoPruebas
-        conclusionTecnica
-        fechaEmision
-    }
-    class "Acta de Aceptación UAT" as ActaAceptacionUAT {
-        codigoActa
-        resultadoValidacion
-        observacionesUsuario
-        fechaAceptacion
-    }
-    class "Reporte de No Conformidad" as ReporteNoConformidad {
-        codigoReporte
-        descripcionDefecto
-        severidad
-        estadoSubsanacion
-    }
-}
-
-package "Soporte e Incidencias" {
-    class "Incidencia (Ticket)" as TicketIncidencia {
-        codigoTicket
-        resumen
-        severidad
-        estado
-    }
-}
-
-package "Trazabilidad y Auditoría" {
-    class "Registro de Auditoría" as RegistroAuditoria {
-        codigoEvento
-        tipoOperacion
-        marcaTemporal
-        direccionOrigen
-        estadoIntegridad
-    }
-}
-
-' Relaciones de Gobernanza
-Usuario "1" *-- "1..*" Rol : asignado a >
-Rol "1" *-- "1..*" Permiso : otorga >
-
-' Relaciones de Proyecto
-Proyecto "1" *-- "1" PlanGestionSCM : normado por >
-Proyecto "1" o-- "1..*" Usuario : asigna participantes >
-Proyecto "1" *-- "0..*" ElementoConfiguracion : contiene >
-Proyecto "1" *-- "0..*" SolicitudCambio : ámbito de >
-Proyecto "1" *-- "0..*" LineaBase : define >
-
-' Relaciones de ECS y Bibliotecas
-ElementoConfiguracion "1" *-- "1..*" VersionECS : genera >
-ElementoConfiguracion "1" o-- "0..1" BloqueoSincronizacion : restringido por >
-LineaBase "1" o-- "1..*" VersionECS : consolida >
-
-' Relaciones de Cambio
-SolicitudCambio "1" -- "1..*" ElementoConfiguracion : afecta a >
-SolicitudCambio "1" *-- "0..1" InformeImpacto : fundamentada por >
-SolicitudCambio "1" *-- "0..1" DictamenCambio : resuelta mediante >
-DictamenCambio "1" --> "0..1" OrdenCambio : habilita emisión de >
-OrdenCambio "1" --> "1" SolicitudCambio : amparada en >
-OrdenCambio "1" --> "1..*" ElementoConfiguracion : autoriza modificación de >
-
-' Relaciones de Promoción y Versiones
-VersionECS "1" --> "0..1" OrdenCambio : implementada bajo >
-VersionECS "0..1" --> "0..1" CertificacionQA : avalada técnicamente por >
-VersionECS "0..1" --> "0..1" ActaAceptacionUAT : aceptada por usuario mediante >
-CertificacionQA "0..1" o-- "0..*" ReporteNoConformidad : documenta hallazgos en >
-
-' Relaciones de Incidencias
-TicketIncidencia "1" --> "0..1" SolicitudCambio : escala a >
-TicketIncidencia "1" --> "0..1" ElementoConfiguracion : reporta fallo en >
-
-' Relaciones de Auditoría
-RegistroAuditoria "*" --> "1" Usuario : ejecutado por >
-RegistroAuditoria "*" --> "0..1" Proyecto : contextualizado en >
-RegistroAuditoria "*" --> "0..1" SolicitudCambio : traza ciclo de >
-RegistroAuditoria "*" --> "0..1" VersionECS : sella inmutabilidad de >
-
-@enduml
-```
-
-
----
-
-### 6.2.3. Diagramas de Análisis de Objetos (Patrón BCE)
-
-A continuación se presentan los diagramas de realización conceptual de casos de uso aplicando el patrón **Boundary-Control-Entity (BCE)** (Jacobson, RUP/UML) para los 31 escenarios del sistema TraceFlow SCM (`DG-AO-01` a `DG-AO-30` y `DG-AO-04.1`).
-
-Este modelado formaliza la interacción entre los actores canónicos, las fronteras funcionales (`<<boundary>>`), la coordinación conceptual de reglas y flujos (`<<control>>`) y las entidades puras del dominio de configuración (`<<entity>>`), en estricto cumplimiento de `docs/DOCUMENTATION_RULES.md` Sección 7.
-
-#### Matriz General de Análisis de Objetos (BCE)
-
-| DG-AO | CU | Actor Principal | Boundary Conceptual | Control Conceptual | Entidades Clave del Dominio | RF Asociado | RN Asociada |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DG-AO-01** | CU-01 | Administrador de Configuración / Bibliotecario | Gestión de Usuarios y Roles | Control de Usuarios y Roles | Usuario, Rol, Permiso, Registro de Auditoría | RF-01 | RN-01 |
-| **DG-AO-02** | CU-02 | Analista de Requerimientos / Gestor | Administración de Proyectos | Control de Proyectos | Proyecto, Plan de Gestión SCM, Usuario, Registro de Auditoría | RF-02 | RN-02, RN-04 |
-| **DG-AO-03** | CU-03 | Analista de Requerimientos / Gestor | Consulta de Proyecto | Control de Consulta de Proyectos | Proyecto, Elemento de Configuración (ECS), Línea Base | RF-02 | RN-04 |
-| **DG-AO-04** | CU-04 | Solicitante | Registro de Solicitud de Cambio | Control de Registro de RFC | Solicitud de Cambio (RFC), Proyecto, Elemento de Configuración (ECS) | RF-04 | RN-04 |
-| **DG-AO-04.1** | CU-04.1 | Solicitante | Subsanación de Solicitud de Cambio | Control de Subsanación de RFC | Solicitud de Cambio (RFC), Observación de Solicitud, Historial de Estado RFC | RF-04 | RN-04, RN-07 |
-| **DG-AO-05** | CU-05 | Analista de Requerimientos / Gestor | Validación y Clasificación de RFC | Control de Clasificación de RFC | Solicitud de Cambio (RFC), Clasificación de Cambio, Observación de Solicitud, Notificación de Estado | RF-04, RF-05, RF-14 | RN-05, RN-07 |
-| **DG-AO-06** | CU-06 | Arquitecto / Especialista Técnico | Análisis de Impacto Técnico | Control de Análisis de Impacto | Informe Técnico de Impacto, Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Estimación de Esfuerzo y Costo | RF-05 | RN-05 |
-| **DG-AO-07** | CU-07 | Comité de Control de Cambios (CCB) | Evaluación Colegiada de Cambio Mayor | Control de Evaluación en CCB | Solicitud de Cambio (RFC), Informe Técnico de Impacto, Acta del CCB, Dictamen del CCB | RF-06, RF-14 | RN-01, RN-05, RN-07 |
-| **DG-AO-08** | CU-08 | Comité de Control de Cambios (CCB) | Emisión de Orden de Cambio | Control de Emisión ECN/ECO | Orden de Cambio (ECN/ECO), Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Registro de Auditoría | RF-07 | RN-01, RN-03 |
-| **DG-AO-09** | CU-09 | Arquitecto / Especialista Técnico | Registro de Elemento de Configuración | Control de Registro de ECS | Elemento de Configuración (ECS), Proyecto, Tipo de ECS, Registro de Auditoría | RF-03 | RN-04 |
-| **DG-AO-10** | CU-10 | Administrador de Configuración / Bibliotecario | Operación de Check-Out | Control de Check-Out | Orden de Cambio (ECN/ECO), Elemento de Configuración (ECS), Copia de Trabajo, Bloqueo de Sincronización | RF-08, RF-09 | RN-04, RN-06 |
-| **DG-AO-11** | CU-11 | Administrador de Configuración / Bibliotecario | Gestión de Bloqueos de Sincronización | Control de Bloqueo de Sincronización | Bloqueo de Sincronización, Elemento de Configuración (ECS), Orden de Cambio (ECN/ECO), Registro de Auditoría | RF-09 | RN-06 |
-| **DG-AO-12** | CU-12 | Administrador de Configuración / Bibliotecario | Operación de Check-In | Control de Check-In | Elemento de Configuración (ECS), Nueva Versión de ECS, Certificación de Conformidad QA, Acta de Aceptación UAT, Bloqueo de Sincronización | RF-08, RF-09, RF-10 | RN-01, RN-02, RN-03, RN-04, RN-06, RN-09 |
-| **DG-AO-13** | CU-13 | Administrador de Configuración / Bibliotecario | Consulta de Historial de Versiones | Control de Historial y Trazabilidad | Elemento de Configuración (ECS), Versión de ECS, Orden de Cambio (ECN/ECO), Registro de Auditoría | RF-09, RF-16 | RN-02, RN-03 |
-| **DG-AO-14** | CU-14 | Ingeniero de Software / Desarrollador | Entorno de Implementación de Cambio | Control de Modificación de ECS | Orden de Cambio (ECN/ECO), Copia de Trabajo, Bitácora de Modificación Técnica | RF-07, RF-09 | RN-03, RN-06 |
-| **DG-AO-15** | CU-15 | Ingeniero de Software / Desarrollador | Verificación de Pruebas Unitarias | Control de Pruebas Unitarias | Copia de Trabajo, Caso de Prueba Unitaria, Resultado de Prueba Unitaria | RF-10 | RN-09 |
-| **DG-AO-16** | CU-16 | Equipo de Calidad / Testing | Ejecución de Pruebas de Integración | Control de Pruebas de Integración | Elemento de Configuración (ECS), Batería de Pruebas de Integración, Resultado de Pruebas QA | RF-10 | RN-09 |
-| **DG-AO-17** | CU-17 | Equipo de Calidad / Testing | Certificación de Conformidad QA | Control de Certificación de Calidad | Certificación de Conformidad QA, Resultado de Pruebas QA, Orden de Cambio (ECN/ECO), Elemento de Configuración (ECS) | RF-10 | RN-09 |
-| **DG-AO-18** | CU-18 | Equipo de Calidad / Testing | Reporte de No Conformidad QA | Control de Defectos y No Conformidades | Reporte de No Conformidad, Defecto / Hallazgo Técnico, Orden de Cambio (ECN/ECO), Copia de Trabajo | RF-10 | RN-08, RN-09 |
-| **DG-AO-19** | CU-19 | Equipo de Calidad / Testing | Reevaluación y Re-testeo QA | Control de Ciclo de Re-testeo | Plan de Re-testeo, Reporte de No Conformidad, Registro de Subsanación, Dictamen de Re-evaluación | RF-11 | RN-08, RN-09 |
-| **DG-AO-20** | CU-20 | Administrador de Configuración / Bibliotecario | Gestión de Líneas Base | Control de Línea Base | Línea Base, Proyecto, Versión de ECS, Acta de Congelamiento, Registro de Auditoría | RF-13, RF-14 | RN-02, RN-04, RN-07 |
-| **DG-AO-21** | CU-21 | Administrador de Configuración / Bibliotecario | Operación de Rollback | Control de Reversión en Trabajo | Acta de Reversión (Rollback), Copia de Trabajo, Versión Estable de ECS, Bloqueo de Sincronización | RF-12 | RN-06, RN-08 |
-| **DG-AO-22** | CU-22 | Administrador de Configuración / Bibliotecario | Cancelación de Orden de Cambio | Control de Cancelación Definitiva | Orden de Cambio (ECN/ECO), Acta de Cancelación, Acta de Reversión (Rollback), Notificación de Cierre | RF-12, RF-14 | RN-07, RN-08 |
-| **DG-AO-23** | CU-23 | Solicitante | Registro de Incidencia | Control de Incidencias | Incidencia (Ticket), Proyecto, Elemento de Configuración (ECS), Evidencia de Incidencia | RF-15 | RN-05 |
-| **DG-AO-24** | CU-24 | Solicitante | Consulta de Estado de Ticket | Control de Consulta de Incidencias | Incidencia (Ticket), Historial de Estado de Ticket, Solicitud de Cambio (RFC) | RF-15 | RN-05 |
-| **DG-AO-25** | CU-25 | Analista de Requerimientos / Gestor | Derivación de Incidencia a RFC | Control de Transición Incidencia-RFC | Incidencia (Ticket), Solicitud de Cambio (RFC), Dictamen de Derivación | RF-15 | RN-05 |
-| **DG-AO-26** | CU-26 | Administrador de Configuración / Bibliotecario | Validación de Integridad Criptográfica | Control de Verificación de Integridad | Elemento de Configuración (ECS), Constancia de Integridad Criptográfica, Registro de Auditoría | RF-17 | RN-02, RN-04 |
-| **DG-AO-27** | CU-27 | Comité de Control de Cambios (CCB) | Auditoría y Trazabilidad del Sistema | Control de Auditoría y Cumplimiento | Registro de Auditoría, Pista de Auditoría (Audit Trail), Informe de Auditoría SCM | RF-16, RF-17 | RN-03 |
-| **DG-AO-28** | CU-28 | Administrador de Configuración / Bibliotecario | Generación de Reportes SCM | Control de Reportes de Configuración | Reporte de Estado de Configuración, Proyecto, Línea Base, Solicitud de Cambio (RFC), Orden de Cambio (ECN/ECO) | RF-18 | RN-07 |
-| **DG-AO-29** | CU-29 | Solicitante (Usuario Final) | Validación de Aceptación del Cambio (UAT) | Control de Aceptación por el Usuario | Acta de Aceptación UAT, Solicitud de Cambio (RFC), Elemento de Configuración (ECS), Criterio de Aceptación Funcional | RF-10 | RN-07, RN-09 |
-| **DG-AO-30** | CU-30 | Analista de Requerimientos / Gestor, Arquitecto / Especialista Técnico | Autorización Delegada de Cambio Menor | Control de Autorización de Cambio Menor | Dictamen de Cambio Menor, Solicitud de Cambio (RFC), Informe Técnico de Impacto, Elemento de Configuración (ECS) | RF-05, RF-07 | RN-01, RN-05, RN-07 |
-
----
-
----
-
-**Diagrama DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-01 — Análisis de Objetos — Gestionar usuarios y roles (CU-01)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-01`).  
-**Figura DG-AO-01. Especificación DG-AO-01**
-
-![Figura DG-AO-01 — Especificación DG-AO-01](assets/diagramas/render/analisis/DG-AO-01.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-01.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-01
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-skinparam sequenceMessageAlign center
-
-title <b>DG-AO-01: Análisis de Objetos — Gestionar usuarios y roles (CU-01)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Gestión de Usuarios y Roles" as B
-control "Control de Usuarios y Roles" as C
-
-entity "Usuario" as E_USR
-entity "Rol" as E_ROL
-entity "Permiso" as E_PERM
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "interactúa"
-B --> C : "solicita gestión"
-C --> E_USR : "crea / modifica / inhabilita"
-C --> E_ROL : "asigna / revoca"
-C --> E_AUD : "asienta evento de auditoría"
-E_USR "1" *-- "1..*" E_ROL : "posee"
-E_ROL "1" *-- "1..*" E_PERM : "incluye"
-E_USR --> E_AUD : "registrado en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-02 — Análisis de Objetos — Crear y administrar proyectos (CU-02)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-02`).  
-**Figura DG-AO-02. Especificación DG-AO-02**
-
-![Figura DG-AO-02 — Especificación DG-AO-02](assets/diagramas/render/analisis/DG-AO-02.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-02.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-02
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-02: Análisis de Objetos — Crear y administrar proyectos (CU-02)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-
-boundary "Administración de Proyectos" as B
-control "Control de Proyectos" as C
-
-entity "Proyecto" as E_PROY
-entity "Plan de Gestión SCM" as E_PLAN
-entity "Usuario" as E_USR
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "interactúa"
-B --> C : "solicita creación / ajuste"
-C --> E_PROY : "registra / actualiza"
-C --> E_PLAN : "asocia directrices SCM"
-C --> E_USR : "asigna equipo"
-C --> E_AUD : "asienta trazabilidad"
-E_PROY "1" *-- "1" E_PLAN : "normado por"
-E_PROY "1" o-- "1..*" E_USR : "cuenta con miembros"
-E_PROY --> E_AUD : "registrado en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-03 — Análisis de Objetos — Consultar proyecto (CU-03)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-03`).  
-**Figura DG-AO-03. Especificación DG-AO-03**
-
-![Figura DG-AO-03 — Especificación DG-AO-03](assets/diagramas/render/analisis/DG-AO-03.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-03.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-03
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-03: Análisis de Objetos — Consultar proyecto (CU-03)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-
-boundary "Consulta de Proyecto" as B
-control "Control de Consulta de Proyectos" as C
-
-entity "Proyecto" as E_PROY
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Línea Base" as E_LB
-
-ACT --> B : "consulta estado"
-B --> C : "solicita datos del proyecto"
-C --> E_PROY : "recupera información"
-C --> E_ECS : "obtiene catálogo de ECS"
-C --> E_LB : "obtiene líneas base activas"
-E_PROY "1" o-- "0..*" E_ECS : "contiene"
-E_PROY "1" o-- "0..*" E_LB : "define"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-04 — Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-04`).  
-**Figura DG-AO-04. Especificación DG-AO-04**
-
-![Figura DG-AO-04 — Especificación DG-AO-04](assets/diagramas/render/analisis/DG-AO-04.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-04.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-04
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-04: Análisis de Objetos — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
-
-actor "Solicitante" as ACT
-
-boundary "Registro de Solicitud de Cambio" as B
-control "Control de Registro de RFC" as C
-
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Proyecto" as E_PROY
-entity "Elemento de Configuración (ECS)" as E_ECS
-
-ACT --> B : "ingresa datos del cambio"
-B --> C : "solicita registro formal"
-C --> E_RFC : "crea en estado 'Registrada'"
-C --> E_PROY : "valida pertinencia"
-C --> E_ECS : "asocia ítem afectado"
-E_RFC --> E_PROY : "pertenece a"
-E_RFC --> E_ECS : "afecta a"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-04.1 — Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-04.1`).  
-**Figura DG-AO-04.1. Especificación DG-AO-04.1**
-
-![Figura DG-AO-04.1 — Especificación DG-AO-04.1](assets/diagramas/render/analisis/DG-AO-04.1.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-04.1.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-04.1
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-04.1: Análisis de Objetos — Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
-
-actor "Solicitante" as ACT
-
-boundary "Subsanación de Solicitud de Cambio" as B
-control "Control de Subsanación de RFC" as C
-
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Observación de Solicitud" as E_OBS
-entity "Historial de Estado RFC" as E_HIST
-
-ACT --> B : "ingresa aclaraciones y sustentos"
-B --> C : "solicita subsanación formal"
-C --> E_RFC : "reabre a estado 'Registrada'"
-C --> E_OBS : "marca observaciones subsanadas"
-C --> E_HIST : "registra evento de reingreso"
-E_RFC "1" *-- "1..*" E_OBS : "contiene"
-E_RFC "1" *-- "1..*" E_HIST : "registra evolución"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-05 — Análisis de Objetos — Validar y clasificar la solicitud (CU-05)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-05`).  
-**Figura DG-AO-05. Especificación DG-AO-05**
-
-![Figura DG-AO-05 — Especificación DG-AO-05](assets/diagramas/render/analisis/DG-AO-05.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-05.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-05
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-05: Análisis de Objetos — Validar y clasificar la solicitud (CU-05)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-
-boundary "Validación y Clasificación de RFC" as B
-control "Control de Clasificación de RFC" as C
-
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Clasificación de Cambio" as E_CLAS
-entity "Observación de Solicitud" as E_OBS
-entity "Notificación de Estado" as E_NOTIF
-
-ACT --> B : "evalúa completitud formal"
-B --> C : "solicita triaje y clasificación"
-C --> E_RFC : "actualiza estado ('Aceptada' / 'Observada' / 'Desestimada')"
-C --> E_CLAS : "asigna categoría (Menor / Mayor)"
-C --> E_OBS : "registra omisiones si aplica"
-C --> E_NOTIF : "emite aviso al Solicitante"
-E_RFC "1" *-- "1" E_CLAS : "clasificada mediante"
-E_RFC "1" o-- "0..*" E_OBS : "puede tener"
-E_RFC --> E_NOTIF : "dispara"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-06 — Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-06`).  
-**Figura DG-AO-06. Especificación DG-AO-06**
-
-![Figura DG-AO-06 — Especificación DG-AO-06](assets/diagramas/render/analisis/DG-AO-06.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-06.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-06
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-06: Análisis de Objetos — Realizar análisis de impacto técnico (CU-06)</b>
-
-actor "Arquitecto\n/ Especialista Técnico" as ACT
-
-boundary "Análisis de Impacto Técnico" as B
-control "Control de Análisis de Impacto" as C
-
-entity "Informe Técnico de Impacto" as E_INF
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Estimación de Esfuerzo y Costo" as E_EST
-
-ACT --> B : "ingresa evaluación técnica"
-B --> C : "solicita formalización de impacto"
-C --> E_INF : "emite y firma informe"
-C --> E_RFC : "asocia a RFC y transiciona a 'En Evaluación'"
-C --> E_ECS : "identifica dependencias afectadas"
-C --> E_EST : "calcula esfuerzo, costo y cronograma"
-E_INF --> E_RFC : "fundamenta decisión de"
-E_INF --> E_ECS : "dimensiona impacto sobre"
-E_INF "1" *-- "1" E_EST : "contiene"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-07 — Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-07`).  
-**Figura DG-AO-07. Especificación DG-AO-07**
-
-![Figura DG-AO-07 — Especificación DG-AO-07](assets/diagramas/render/analisis/DG-AO-07.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-07.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-07
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-07: Análisis de Objetos — Evaluar Cambio Mayor en CCB (CU-07)</b>
-
-actor "Comité de Control\nde Cambios (CCB)" as ACT
-
-boundary "Evaluación Colegiada de Cambio Mayor" as B
-control "Control de Evaluación en CCB" as C
-
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Informe Técnico de Impacto" as E_INF
-entity "Acta del CCB" as E_ACTA
-entity "Dictamen del CCB" as E_DICT
-
-ACT --> B : "delibera viabilidad técnica y negocio"
-B --> C : "registra votación y resolución"
-C --> E_ACTA : "confecciona acta de sesión"
-C --> E_DICT : "emite resolución formal"
-C --> E_RFC : "actualiza estado ('Aprobada' / 'Rechazada')"
-E_ACTA "1" *-- "1..*" E_DICT : "registra acuerdos de"
-E_DICT --> E_RFC : "resuelve formalmente"
-E_DICT --> E_INF : "fundamentado en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-08 — Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-08`).  
-**Figura DG-AO-08. Especificación DG-AO-08**
-
-![Figura DG-AO-08 — Especificación DG-AO-08](assets/diagramas/render/analisis/DG-AO-08.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-08.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-08
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-08: Análisis de Objetos — Emitir Orden de Cambio (ECN/ECO) (CU-08)</b>
-
-actor "Comité de Control\nde Cambios (CCB)" as ACT
-
-boundary "Emisión de Orden de Cambio" as B
-control "Control de Emisión ECN/ECO" as C
-
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "solicita formalización de orden"
-B --> C : "instruye emisión ejecutiva"
-C --> E_ECN : "genera orden formal con alcance y responsable"
-C --> E_RFC : "vincula a RFC aprobada"
-C --> E_ECS : "habilita intervención sobre ECS"
-C --> E_AUD : "asienta emisión de orden ejecutiva"
-E_ECN --> E_RFC : "formaliza autorización de"
-E_ECN --> E_ECS : "autoriza modificación de"
-E_ECN --> E_AUD : "registrada en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-09 — Análisis de Objetos — Registrar ECS (CU-09)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-09`).  
-**Figura DG-AO-09. Especificación DG-AO-09**
-
-![Figura DG-AO-09 — Especificación DG-AO-09](assets/diagramas/render/analisis/DG-AO-09.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-09.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-09
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-09: Análisis de Objetos — Registrar ECS (CU-09)</b>
-
-actor "Arquitecto\n/ Especialista Técnico" as ACT
-
-boundary "Registro de Elemento de Configuración" as B
-control "Control de Registro de ECS" as C
-
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Proyecto" as E_PROY
-entity "Tipo de ECS" as E_TIPO
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "ingresa metadatos del ECS"
-B --> C : "solicita alta de ítem"
-C --> E_ECS : "registra con nomenclatura unívoca"
-C --> E_PROY : "asocia al proyecto correspondiente"
-C --> E_TIPO : "asigna categoría (Código, Doc, Test)"
-C --> E_AUD : "asienta registro formal"
-E_ECS --> E_PROY : "pertenece a"
-E_ECS --> E_TIPO : "catalogado como"
-E_ECS --> E_AUD : "registrado en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-10 — Análisis de Objetos — Efectuar Check-Out (CU-10)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-10`).  
-**Figura DG-AO-10. Especificación DG-AO-10**
-
-![Figura DG-AO-10 — Especificación DG-AO-10](assets/diagramas/render/analisis/DG-AO-10.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-10.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-10
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-10: Análisis de Objetos — Efectuar Check-Out (CU-10)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Operación de Check-Out" as B
-control "Control de Check-Out" as C
-
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Copia de Trabajo" as E_COPIA
-entity "Bloqueo de Sincronización" as E_LOCK
-
-ACT --> B : "solicita extracción controlada"
-B --> C : "instruye Check-Out Soporte → Trabajo"
-C --> E_ECN : "verifica validez de orden"
-C --> E_ECS : "obtiene versión autorizada"
-C --> E_COPIA : "genera réplica en Biblioteca de Trabajo"
-C --> E_LOCK : "aplica bloqueo de sincronización"
-E_ECN --> E_ECS : "autoriza extracción de"
-E_ECS "1" *-- "1" E_COPIA : "deriva en"
-E_ECS "1" *-- "1" E_LOCK : "protegido mediante"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-11 — Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-11`).  
-**Figura DG-AO-11. Especificación DG-AO-11**
-
-![Figura DG-AO-11 — Especificación DG-AO-11](assets/diagramas/render/analisis/DG-AO-11.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-11.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-11
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-11: Análisis de Objetos — Aplicar bloqueo de sincronización (CU-11)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Gestión de Bloqueos de Sincronización" as B
-control "Control de Bloqueo de Sincronización" as C
-
-entity "Bloqueo de Sincronización" as E_LOCK
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "solicita restricción de concurrencia"
-B --> C : "aplica política de bloqueo exclusivo"
-C --> E_LOCK : "establece restricción activa"
-C --> E_ECS : "marca ítem protegido contra modificaciones"
-C --> E_ECN : "asocia orden responsable del bloqueo"
-C --> E_AUD : "registra imposición del bloqueo"
-E_LOCK --> E_ECS : "inmoviliza versión de"
-E_LOCK --> E_ECN : "amparado en"
-E_LOCK --> E_AUD : "registrado en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-12 — Análisis de Objetos — Efectuar Check-In (CU-12)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-12`).  
-**Figura DG-AO-12. Especificación DG-AO-12**
-
-![Figura DG-AO-12 — Especificación DG-AO-12](assets/diagramas/render/analisis/DG-AO-12.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-12.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-12
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-12: Análisis de Objetos — Efectuar Check-In (CU-12)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Operación de Check-In" as B
-control "Control de Check-In" as C
-
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Nueva Versión de ECS" as E_VER
-entity "Certificación de Conformidad QA" as E_CERT
-entity "Acta de Aceptación UAT" as E_UAT
-entity "Bloqueo de Sincronización" as E_LOCK
-
-ACT --> B : "solicita promoción formal"
-B --> C : "instruye Check-In Trabajo → Maestra"
-C --> E_CERT : "valida certificación técnica previa"
-C --> E_UAT : "valida aceptación de usuario"
-C --> E_VER : "promueve y sella nueva versión oficial"
-C --> E_LOCK : "libera bloqueo exclusivo"
-E_ECS "1" *-- "1..*" E_VER : "incorpora"
-E_VER --> E_CERT : "avalada por"
-E_VER --> E_UAT : "aprobada mediante"
-E_LOCK --> E_ECS : "liberado tras Check-In"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-13 — Análisis de Objetos — Consultar historial de versiones (CU-13)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-13`).  
-**Figura DG-AO-13. Especificación DG-AO-13**
-
-![Figura DG-AO-13 — Especificación DG-AO-13](assets/diagramas/render/analisis/DG-AO-13.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-13.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-13
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-13: Análisis de Objetos — Consultar historial de versiones (CU-13)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Consulta de Historial de Versiones" as B
-control "Control de Historial y Trazabilidad" as C
-
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Versión de ECS" as E_VER
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "solicita trazabilidad de versiones"
-B --> C : "solicita línea temporal de cambios"
-C --> E_ECS : "recupera identificador del ECS"
-C --> E_VER : "obtiene árbol histórico y etiquetas"
-C --> E_ECN : "relaciona órdenes motivadoras"
-C --> E_AUD : "obtiene registro cronológico"
-E_ECS "1" *-- "1..*" E_VER : "evoluciona mediante"
-E_VER --> E_ECN : "originada por"
-E_VER --> E_AUD : "trazable mediante"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-14 — Análisis de Objetos — Implementar cambio en el ECS (CU-14)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-14`).  
-**Figura DG-AO-14. Especificación DG-AO-14**
-
-![Figura DG-AO-14 — Especificación DG-AO-14](assets/diagramas/render/analisis/DG-AO-14.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-14.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-14
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-14: Análisis de Objetos — Implementar cambio en el ECS (CU-14)</b>
-
-actor "Ingeniero de Software\n/ Desarrollador" as ACT
-
-boundary "Entorno de Implementación de Cambio" as B
-control "Control de Modificación de ECS" as C
-
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Copia de Trabajo" as E_COPIA
-entity "Bitácora de Modificación Técnica" as E_BIT
-
-ACT --> B : "aplica modificaciones al código / doc"
-B --> C : "gestiona trabajo en espacio aislado"
-C --> E_ECN : "verifica alcance autorizado"
-C --> E_COPIA : "modifica ítem en Biblioteca de Trabajo"
-C --> E_BIT : "asienta detalles de intervención técnica"
-E_COPIA --> E_ECN : "amparada en"
-E_COPIA "1" *-- "1" E_BIT : "documentada mediante"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-15 — Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-15`).  
-**Figura DG-AO-15. Especificación DG-AO-15**
-
-![Figura DG-AO-15 — Especificación DG-AO-15](assets/diagramas/render/analisis/DG-AO-15.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-15.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-15
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-15: Análisis de Objetos — Ejecutar pruebas unitarias locales (CU-15)</b>
-
-actor "Ingeniero de Software\n/ Desarrollador" as ACT
-
-boundary "Verificación de Pruebas Unitarias" as B
-control "Control de Pruebas Unitarias" as C
-
-entity "Copia de Trabajo" as E_COPIA
-entity "Caso de Prueba Unitaria" as E_TEST
-entity "Resultado de Prueba Unitaria" as E_RES
-
-ACT --> B : "ejecuta batería local"
-B --> C : "coordina verificación unitaria"
-C --> E_COPIA : "inspecciona copia modificada"
-C --> E_TEST : "ejecuta casos de prueba"
-C --> E_RES : "registra métricas y aserciones"
-E_COPIA "1" o-- "1..*" E_TEST : "validada con"
-E_TEST "1" *-- "1" E_RES : "produce"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-16 — Análisis de Objetos — Ejecutar pruebas de integración (CU-16)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-16`).  
-**Figura DG-AO-16. Especificación DG-AO-16**
-
-![Figura DG-AO-16 — Especificación DG-AO-16](assets/diagramas/render/analisis/DG-AO-16.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-16.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-16
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-16: Análisis de Objetos — Ejecutar pruebas de integración (CU-16)</b>
-
-actor "Equipo de Calidad\n/ Testing" as ACT
-
-boundary "Ejecución de Pruebas de Integración" as B
-control "Control de Pruebas de Integración" as C
-
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Batería de Pruebas de Integración" as E_SUITE
-entity "Resultado de Pruebas QA" as E_RES
-
-ACT --> B : "inicia ciclo de pruebas formales"
-B --> C : "coordina ejecución de integración"
-C --> E_ECS : "obtiene paquete de trabajo"
-C --> E_SUITE : "aplica suite de integración y regresión"
-C --> E_RES : "registra coberturas y fallos"
-E_SUITE --> E_ECS : "evalúa interacción de"
-E_SUITE "1" *-- "1..*" E_RES : "genera"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-17 — Análisis de Objetos — Certificar conformidad del cambio (CU-17)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-17`).  
-**Figura DG-AO-17. Especificación DG-AO-17**
-
-![Figura DG-AO-17 — Especificación DG-AO-17](assets/diagramas/render/analisis/DG-AO-17.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-17.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-17
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-17: Análisis de Objetos — Certificar conformidad del cambio (CU-17)</b>
-
-actor "Equipo de Calidad\n/ Testing" as ACT
-
-boundary "Certificación de Conformidad QA" as B
-control "Control de Certificación de Calidad" as C
-
-entity "Certificación de Conformidad QA" as E_CERT
-entity "Resultado de Pruebas QA" as E_RES
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Elemento de Configuración (ECS)" as E_ECS
-
-ACT --> B : "emite visto bueno formal"
-B --> C : "solicita emisión de certificado"
-C --> E_CERT : "confecciona constancia de pase a Maestra"
-C --> E_RES : "valida ausencia de defectos críticos"
-C --> E_ECN : "acredita cumplimiento del alcance"
-C --> E_ECS : "habilita Check-In oficial"
-E_CERT --> E_RES : "respaldada en"
-E_CERT --> E_ECN : "certifica cumplimiento de"
-E_CERT --> E_ECS : "autoriza promoción de"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-18 — Análisis de Objetos — Reportar no conformidad (CU-18)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-18`).  
-**Figura DG-AO-18. Especificación DG-AO-18**
-
-![Figura DG-AO-18 — Especificación DG-AO-18](assets/diagramas/render/analisis/DG-AO-18.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-18.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-18
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-18: Análisis de Objetos — Reportar no conformidad (CU-18)</b>
-
-actor "Equipo de Calidad\n/ Testing" as ACT
-
-boundary "Reporte de No Conformidad QA" as B
-control "Control de Defectos y No Conformidades" as C
-
-entity "Reporte de No Conformidad" as E_RNC
-entity "Defecto / Hallazgo Técnico" as E_DEF
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Copia de Trabajo" as E_COPIA
-
-ACT --> B : "registra observaciones y fallos"
-B --> C : "solicita emisión de no conformidad"
-C --> E_RNC : "crea informe formal de fallas"
-C --> E_DEF : "cataloga severidad de defectos"
-C --> E_ECN : "asocia a orden en curso"
-C --> E_COPIA : "mantiene copia retenida en Trabajo"
-E_RNC "1" *-- "1..*" E_DEF : "detalla"
-E_RNC --> E_ECN : "bloquea promoción de"
-E_RNC --> E_COPIA : "restringe integración de"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-19 — Análisis de Objetos — Reevaluar y re-testear (CU-19)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-19`).  
-**Figura DG-AO-19. Especificación DG-AO-19**
-
-![Figura DG-AO-19 — Especificación DG-AO-19](assets/diagramas/render/analisis/DG-AO-19.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-19.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-19
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-19: Análisis de Objetos — Reevaluar y re-testear (CU-19)</b>
-
-actor "Equipo de Calidad\n/ Testing" as ACT
-
-boundary "Reevaluación y Re-testeo QA" as B
-control "Control de Ciclo de Re-testeo" as C
-
-entity "Plan de Re-testeo" as E_PLAN
-entity "Reporte de No Conformidad" as E_RNC
-entity "Registro de Subsanación" as E_SUBS
-entity "Dictamen de Re-evaluación" as E_DICT
-
-ACT --> B : "inicia ciclo de reverificación"
-B --> C : "coordina re-testeo de correcciones"
-C --> E_PLAN : "establece casos de prueba enfocados"
-C --> E_RNC : "contrasta hallazgos previos"
-C --> E_SUBS : "inspecciona parches aplicados"
-C --> E_DICT : "emite dictamen (Conforme / Fallo Persistente)"
-E_PLAN --> E_RNC : "valida corrección de"
-E_PLAN --> E_SUBS : "inspecciona evidencias de"
-E_PLAN "1" *-- "1" E_DICT : "concluye en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-20 — Análisis de Objetos — Crear y congelar línea base (CU-20)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-20`).  
-**Figura DG-AO-20. Especificación DG-AO-20**
-
-![Figura DG-AO-20 — Especificación DG-AO-20](assets/diagramas/render/analisis/DG-AO-20.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-20.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-20
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-20: Análisis de Objetos — Crear y congelar línea base (CU-20)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Gestión de Líneas Base" as B
-control "Control de Línea Base" as C
-
-entity "Línea Base" as E_LB
-entity "Proyecto" as E_PROY
-entity "Versión de ECS" as E_VER
-entity "Acta de Congelamiento" as E_ACTA
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "solicita congelamiento formal"
-B --> C : "instruye fijación de línea base"
-C --> E_LB : "crea hito inmutable"
-C --> E_PROY : "asocia al proyecto"
-C --> E_VER : "vincula versiones aprobadas en Maestra"
-C --> E_ACTA : "genera acta formal de congelamiento"
-C --> E_AUD : "registra evento oficial SCM"
-E_LB --> E_PROY : "pertenece a"
-E_LB "1" o-- "1..*" E_VER : "consolida"
-E_LB "1" *-- "1" E_ACTA : "formalizada mediante"
-E_LB --> E_AUD : "registrada en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-21 — Análisis de Objetos — Ejecutar rollback (CU-21)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-21`).  
-**Figura DG-AO-21. Especificación DG-AO-21**
-
-![Figura DG-AO-21 — Especificación DG-AO-21](assets/diagramas/render/analisis/DG-AO-21.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-21.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-21
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-21: Análisis de Objetos — Ejecutar rollback (CU-21)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Operación de Rollback" as B
-control "Control de Reversión en Trabajo" as C
-
-entity "Acta de Reversión (Rollback)" as E_REV
-entity "Copia de Trabajo" as E_COPIA
-entity "Versión Estable de ECS" as E_ESTAB
-entity "Bloqueo de Sincronización" as E_LOCK
-
-ACT --> B : "instruye reversión de cambios no conformes"
-B --> C : "ejecuta protocolo de rollback"
-C --> E_REV : "confecciona acta de descarte técnico"
-C --> E_COPIA : "descarta cambios fallidos en Trabajo"
-C --> E_ESTAB : "restituye estado desde Soporte"
-C --> E_LOCK : "libera bloqueo de sincronización"
-E_REV --> E_COPIA : "ordena purga de"
-E_REV --> E_ESTAB : "restaura versión de"
-E_REV --> E_LOCK : "dispara liberación de"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-22 — Análisis de Objetos — Cancelar Orden de Cambio (CU-22)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-22`).  
-**Figura DG-AO-22. Especificación DG-AO-22**
-
-![Figura DG-AO-22 — Especificación DG-AO-22](assets/diagramas/render/analisis/DG-AO-22.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-22.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-22
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-22: Análisis de Objetos — Cancelar Orden de Cambio (CU-22)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Cancelación de Orden de Cambio" as B
-control "Control de Cancelación Definitiva" as C
-
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-entity "Acta de Cancelación" as E_CANC
-entity "Acta de Reversión (Rollback)" as E_REV
-entity "Notificación de Cierre" as E_NOTIF
-
-ACT --> B : "registra justificación de cierre fallido"
-B --> C : "instruye cancelación formal de orden"
-C --> E_ECN : "revoca orden y transiciona a 'Cancelada'"
-C --> E_CANC : "asienta acta administrativa definitiva"
-C --> E_REV : "verifica ejecución previa de rollback"
-C --> E_NOTIF : "emite aviso de terminación a Solicitante y CCB"
-E_CANC --> E_ECN : "cancela formalmente"
-E_CANC --> E_REV : "fundamentada en"
-E_CANC --> E_NOTIF : "dispara"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-23 — Análisis de Objetos — Registrar incidencia (CU-23)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-23`).  
-**Figura DG-AO-23. Especificación DG-AO-23**
-
-![Figura DG-AO-23 — Especificación DG-AO-23](assets/diagramas/render/analisis/DG-AO-23.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-23.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-23
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-23: Análisis de Objetos — Registrar incidencia (CU-23)</b>
-
-actor "Solicitante" as ACT
-
-boundary "Registro de Incidencia" as B
-control "Control de Incidencias" as C
-
-entity "Incidencia (Ticket)" as E_INC
-entity "Proyecto" as E_PROY
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Evidencia de Incidencia" as E_EVID
-
-ACT --> B : "reporta fallo u observación operativa"
-B --> C : "solicita alta de ticket"
-C --> E_INC : "crea ticket en estado 'Abierto'"
-C --> E_PROY : "asocia al proyecto afectado"
-C --> E_ECS : "vincula módulo con anomalía"
-C --> E_EVID : "adjunta registros y capturas"
-E_INC --> E_PROY : "afecta a"
-E_INC --> E_ECS : "reporta comportamiento de"
-E_INC "1" *-- "0..*" E_EVID : "respaldado con"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-24 — Análisis de Objetos — Consultar estado de ticket (CU-24)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-24`).  
-**Figura DG-AO-24. Especificación DG-AO-24**
-
-![Figura DG-AO-24 — Especificación DG-AO-24](assets/diagramas/render/analisis/DG-AO-24.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-24.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-24
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-24: Análisis de Objetos — Consultar estado de ticket (CU-24)</b>
-
-actor "Solicitante" as ACT
-
-boundary "Consulta de Estado de Ticket" as B
-control "Control de Consulta de Incidencias" as C
-
-entity "Incidencia (Ticket)" as E_INC
-entity "Historial de Estado de Ticket" as E_HIST
-entity "Solicitud de Cambio (RFC)" as E_RFC
-
-ACT --> B : "ingresa código de seguimiento"
-B --> C : "solicita estado del ticket"
-C --> E_INC : "recupera información del incidente"
-C --> E_HIST : "obtiene avances y transiciones"
-C --> E_RFC : "identifica RFC derivada si aplica"
-E_INC "1" *-- "1..*" E_HIST : "contiene evolución de"
-E_INC o-- "0..1" E_RFC : "puede derivar en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-25 — Análisis de Objetos — Derivar incidencia a RFC (CU-25)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-25`).  
-**Figura DG-AO-25. Especificación DG-AO-25**
-
-![Figura DG-AO-25 — Especificación DG-AO-25](assets/diagramas/render/analisis/DG-AO-25.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-25.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-25
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-25: Análisis de Objetos — Derivar incidencia a RFC (CU-25)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as ACT
-
-boundary "Derivación de Incidencia a RFC" as B
-control "Control de Transición Incidencia-RFC" as C
-
-entity "Incidencia (Ticket)" as E_INC
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Dictamen de Derivación" as E_DICT
-
-ACT --> B : "analiza causa raíz y determina necesidad SCM"
-B --> C : "instruye promoción a cambio formal"
-C --> E_INC : "actualiza estado a 'Derivado a RFC'"
-C --> E_RFC : "crea nueva RFC con trazabilidad de origen"
-C --> E_DICT : "asienta justificación técnica del triaje"
-E_DICT --> E_INC : "resuelve tratamiento de"
-E_DICT --> E_RFC : "origina formalmente"
-E_INC --> E_RFC : "trazable hacia"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-26 — Análisis de Objetos — Validar integridad (checksum) (CU-26)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-26`).  
-**Figura DG-AO-26. Especificación DG-AO-26**
-
-![Figura DG-AO-26 — Especificación DG-AO-26](assets/diagramas/render/analisis/DG-AO-26.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-26.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-26
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-26: Análisis de Objetos — Validar integridad (checksum) (CU-26)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Validación de Integridad Criptográfica" as B
-control "Control de Verificación de Integridad" as C
-
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Constancia de Integridad Criptográfica" as E_HASH
-entity "Registro de Auditoría" as E_AUD
-
-ACT --> B : "solicita verificación de hash SHA-256"
-B --> C : "ejecuta cálculo de suma de comprobación"
-C --> E_ECS : "obtiene archivo físico y hash registrado"
-C --> E_HASH : "genera constancia de coincidencia / alteración"
-C --> E_AUD : "registra resultado del control de seguridad"
-E_HASH --> E_ECS : "certifica integridad de"
-E_HASH --> E_AUD : "asentada en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-27 — Análisis de Objetos — Auditar acciones del sistema (CU-27)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-27`).  
-**Figura DG-AO-27. Especificación DG-AO-27**
-
-![Figura DG-AO-27 — Especificación DG-AO-27](assets/diagramas/render/analisis/DG-AO-27.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-27.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-27
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-27: Análisis de Objetos — Auditar acciones del sistema (CU-27)</b>
-
-actor "Comité de Control\nde Cambios (CCB)" as ACT
-
-boundary "Auditoría y Trazabilidad del Sistema" as B
-control "Control de Auditoría y Cumplimiento" as C
-
-entity "Registro de Auditoría" as E_AUD
-entity "Pista de Auditoría (Audit Trail)" as E_TRAIL
-entity "Informe de Auditoría SCM" as E_INF
-
-ACT --> B : "solicita inspección de pistas de auditoría"
-B --> C : "ejecuta consulta de eventos inmutables"
-C --> E_TRAIL : "recupera bitácora cronológica"
-C --> E_AUD : "valida sellos de tiempo y actores"
-C --> E_INF : "emite reporte de cumplimiento normativo"
-E_TRAIL "1" *-- "1..*" E_AUD : "compuesta por"
-E_INF --> E_TRAIL : "consolida y analiza"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-28 — Análisis de Objetos — Generar reportes de estado (CU-28)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-28`).  
-**Figura DG-AO-28. Especificación DG-AO-28**
-
-![Figura DG-AO-28 — Especificación DG-AO-28](assets/diagramas/render/analisis/DG-AO-28.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-28.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-28
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-28: Análisis de Objetos — Generar reportes de estado (CU-28)</b>
-
-actor "Administrador de Configuración\n/ Bibliotecario" as ACT
-
-boundary "Generación de Reportes SCM" as B
-control "Control de Reportes de Configuración" as C
-
-entity "Reporte de Estado de Configuración" as E_REP
-entity "Proyecto" as E_PROY
-entity "Línea Base" as E_LB
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Orden de Cambio (ECN/ECO)" as E_ECN
-
-ACT --> B : "selecciona parámetros e indicadores"
-B --> C : "solicita consolidación ejecutiva"
-C --> E_REP : "confecciona reporte formal"
-C --> E_PROY : "recupera métricas de proyecto"
-C --> E_LB : "incluye estado de líneas base"
-C --> E_RFC : "totaliza estados de RFC"
-C --> E_ECN : "analiza órdenes en ejecución"
-E_REP --> E_PROY : "evalúa avance de"
-E_REP o-- "0..*" E_LB : "consolida"
-E_REP o-- "0..*" E_RFC : "reporta estados de"
-E_REP o-- "0..*" E_ECN : "detalla ejecución de"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-29 — Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-29`).  
-**Figura DG-AO-29. Especificación DG-AO-29**
-
-![Figura DG-AO-29 — Especificación DG-AO-29](assets/diagramas/render/analisis/DG-AO-29.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-29.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-29
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-29: Análisis de Objetos — Validar aceptación del cambio por el usuario (UAT) (CU-29)</b>
-
-actor "Solicitante\n(Usuario Final)" as ACT
-
-boundary "Validación de Aceptación del Cambio (UAT)" as B
-control "Control de Aceptación por el Usuario" as C
-
-entity "Acta de Aceptación UAT" as E_UAT
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Elemento de Configuración (ECS)" as E_ECS
-entity "Criterio de Aceptación Funcional" as E_CRIT
-
-ACT --> B : "ejecuta pruebas de usuario y registra conformidad"
-B --> C : "solicita formalización de aceptación UAT"
-C --> E_UAT : "emite acta ('Aceptada' / 'Rechazada con Observaciones')"
-C --> E_RFC : "asocia dictamen de negocio a la solicitud"
-C --> E_ECS : "avala entrega funcional del ítem"
-C --> E_CRIT : "verifica cumplimiento de expectativas operativas"
-E_UAT --> E_RFC : "certifica aceptación de"
-E_UAT --> E_ECS : "aprueba versión entregada de"
-E_UAT "1" *-- "1..*" E_CRIT : "respaldada en"
-
-@enduml
-```
-
----
-
-**Diagrama DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)**
-
-> [!NOTE]
-> **Figura Pendiente de Renderizado:** DG-AO-30 — Análisis de Objetos — Autorizar Cambio Menor (CU-30)  
-> *Estado:* Especificación PlantUML declarada a continuación y en `docs/DIAGRAMS.md` (`@startuml DG-AO-30`).  
-**Figura DG-AO-30. Especificación DG-AO-30**
-
-![Figura DG-AO-30 — Especificación DG-AO-30](assets/diagramas/render/analisis/DG-AO-30.svg)
-
-*Fuente: Elaboración propia a partir del modelo PlantUML DG-AO-30.*
-
-#### Código PlantUML del Diagrama (Análisis BCE)
-
-```plantuml
-@startuml DG-AO-30
-skinparam shadowing false
-skinparam roundcorner 8
-skinparam defaultFontName Arial
-
-title <b>DG-AO-30: Análisis de Objetos — Autorizar Cambio Menor (CU-30)</b>
-
-actor "Analista de Requerimientos\n/ Gestor" as ACT_ANALISTA
-actor "Arquitecto\n/ Especialista Técnico" as ACT_ARQUITECTO
-
-boundary "Autorización Delegada de Cambio Menor" as B
-control "Control de Autorización de Cambio Menor" as C
-
-entity "Dictamen de Cambio Menor" as E_DICT
-entity "Solicitud de Cambio (RFC)" as E_RFC
-entity "Informe Técnico de Impacto" as E_INF
-entity "Elemento de Configuración (ECS)" as E_ECS
-
-ACT_ANALISTA --> B : "emite visto bueno operativo delegado"
-ACT_ARQUITECTO --> B : "emite visto bueno técnico delegado"
-B --> C : "solicita autorización concurrente delegada"
-C --> E_DICT : "emite dictamen conjunto favorable"
-C --> E_RFC : "transiciona estado oficial a 'Autorizada'"
-C --> E_INF : "verifica no rebasamiento de límites delegados"
-C --> E_ECS : "habilita emisión delegada de ECN/ECO"
-E_DICT --> E_RFC : "autoriza formalmente"
-E_DICT --> E_INF : "amparado en"
-E_DICT --> E_ECS : "habilita intervención sobre"
-
-@enduml
-```
-
-
 ---
-
 
-## 6.3. Matrices de Trazabilidad SCM
+# 6. Trazabilidad Funcional y Estado de Capacidades
 
-En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENTATION_RULES.md, a continuación se presentan las matrices de trazabilidad oficiales del proyecto TraceFlow SCM extraídas de la fuente oficial docs/TABLES.md, garantizando la relación bidireccional entre requerimientos, reglas de negocio, casos de uso y actores responsables:
+## 6.1. Matrices de Trazabilidad Funcional (`TB-12`, `TB-13` y `TB-14`)
 
-# TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso
+### TB-12 — Matriz de Trazabilidad: Requerimientos Funcionales vs Casos de Uso
 
 **Estado:** APROBADO  
 **Fuente:** Derivada de las narrativas explícitas en `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 y actualización TO-BE v2  
@@ -7005,7 +2842,7 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 
 ---
 
-# TB-13 — Matriz de Trazabilidad: Reglas de Negocio vs Casos de Uso
+### TB-13 — Matriz de Trazabilidad: Reglas de Negocio vs Casos de Uso
 
 **Estado:** APROBADO  
 **Fuente:** Derivada de las definiciones de políticas en `FD03-EPIS-Informe_SRS.md`, Sección 5.3 y de los flujos de la Sección 6.1.3 actualizados con TO-BE v2  
@@ -7027,7 +2864,7 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 
 ---
 
-# TB-14 — Matriz General de Trazabilidad SCM
+### TB-14 — Matriz General de Trazabilidad SCM
 
 **Estado:** APROBADO  
 **Fuente:** Consolidada a partir de `TB-03`, `TB-04`, `TB-06`, `TB-09` y `TB-10`  
@@ -7043,80 +2880,47 @@ En cumplimiento del estándar de gobernanza documental definido en docs/DOCUMENT
 | Transparencia y reportería de gestión | RF-18 (Generación de Reportes) | *PENDIENTE DE VALIDACION* (Sin regla de negocio exclusiva para reportes en SRS) | CU-28 | Administrador de Configuración / Bibliotecario |
 
 ---
-## Inconsistencias Detectadas
 
-Las siguientes inconsistencias y discrepancias fueron identificadas durante la extracción minuciosa del documento consolidado `FD03-EPIS-Informe_SRS.md`. A continuación se presenta el estado formal de resolución tras el cierre del SRS de ANÁLISIS:
+## 6.2. Estado funcional de capacidades entregadas frente al alcance aprobado
 
-### 1. Inconsistencia de Contexto en Perfiles de Usuario
-- **Elemento:** Párrafo explicativo posterior a la tabla de perfiles de usuario.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1 (Págs. 30-31).
-- **Descripción:** El texto heredado hacía referencia a conceptos de tutorías universitarias ("mentoreado", "mentor", "servicio tutorial").
-- **Estado de Resolución:** RESUELTA. Subsanado e integrado formalmente mediante la definición de la estricta segregación de funciones entre los 7 roles canónicos de SCM (*Solicitante*, *Analista*, *Arquitecto*, *CCB*, *Administrador*, *Desarrollador*, *QA*).
+Ningún requerimiento (`RF-01`..`RF-18`, `RNF-01`..`RNF-09`), regla de negocio (`RN-01`..`RN-09`) ni caso de uso aprobado (`CU-01`..`CU-30` y `CU-04.1`) ha sido recortado por encontrarse pendiente de programación. Su situación funcional actual se resume para seguimiento del cliente en las siguientes categorías:
 
-### 2. Discrepancia en la Convención de Nomenclatura de Casos de Uso
-- **Elemento:** Identificadores de casos de uso.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3 (Págs. 35-94) y 6.2.1 (Págs. 95-114).
-- **Descripción:** Discrepancia entre la codificación original `CUS01` a `CUS28` y la convención normativa `CU-XX`.
-- **Estado de Resolución:** RESUELTA / COMPATIBILIDAD. Se adoptó `CU-XX` como estándar oficial único (SSOT) en todas las tablas (`TABLES.md`), diagramas (`DIAGRAMS.md`) y narrativas canónicas. La nomenclatura `CUSXX` se mantiene exclusivamente en una columna histórica para trazabilidad con el PDF preliminar.
+| Grupo funcional / Casos de Uso | Estado actual frente al alcance aprobado | Observación funcional para ÉXODO S.A.C. |
+|---|---|---|
+| **Acceso seguro, consulta de proyecto asignado y registro inicial de RFC** (`CU-03`, `CU-04` base y auditoría base `CU-27`) | **Operativo integralmente** | Inicio de sesión por perfil único, aislamiento de proyectos por usuario, registro de nuevas RFCs en estado `REGISTRADA` y registro de bitácora de auditoría operan de extremo a extremo. Pendientes en `CU-04`: almacenamiento físico de adjuntos, notificaciones automáticas, validación contra duplicados, unificación de longitudes mínimas (10/20) y ratificación de declaración de veracidad. |
+| **Administración completa de usuarios y proyectos** (`CU-01` alta/edición/baja y `CU-02` creación/cierre UI) | **Operativo parcialmente** | La estructura de roles (`PU-01`..`PU-07`), aislamiento de proyectos y autenticación están activos; las pantallas administrativas interactivas de alta, edición y archivado permanecen pendientes de habilitación. |
+| **Subsanación, revisión inicial, impacto técnico, Doble Llave y deliberación CCB** (`CU-04.1`, `CU-05`, `CU-06`, `CU-30`, `CU-07`) | **Simulado en prototipo de interfaz** | Flujos interactivos completos validados en pantalla (asistentes, dictámenes, Triple Restricción, Doble Llave y votación CCB); pendientes de integración con el servidor corporativo y despacho real de notificaciones. |
+| **Ejecución de órdenes, bibliotecas SCM, QA, UAT, líneas base, rollback, incidencias y reportes** (`CU-08` a `CU-26`, `CU-28`, `CU-29`) | **Aprobado pendiente de implementación operativa** | Alcance funcional plenamente especificado y con modelo de soporte arquitectónico preparado; pendiente de construcción gradual de pantallas y servicios en las siguientes fases de desarrollo. |
 
-### 3. Omisión del Diagrama de Secuencia para CUS03 (Consultar proyecto)
-- **Elemento:** Diagramas de secuencia del modelo lógico.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.1 (Págs. 97-98).
-- **Descripción:** El documento original saltaba de CUS02 a CUS04, omitiendo el diagrama de interacción de CUS03.
-- **Estado de Resolución:** RESUELTA. Reconstruido formalmente e integrado como `DG-SEQ-03: Secuencia: Consultar proyecto (CU-03)` (1:1 con la narrativa) y `DG-AO-03`.
+### Decisiones funcionales pendientes de aprobación por el responsable / CCB
 
-### 4. Malformación de Sintaxis Markdown en Encabezados de CUS19 y CUS20
-- **Elemento:** Tablas narrativas de CUS19 y CUS20.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 6.1.3.
-- **Descripción:** Metadatos iniciales renderizados como texto corrido antes de los saltos de página.
-- **Estado de Resolución:** RESUELTA. Corregido integralmente durante la reescritura de las 31 narrativas bajo la plantilla normativa única.
+1. **Regla uniforme de longitudes en `CU-04`:** Aprobar la unificación en interfaz y servidor de **10–120 caracteres** para el título y **20 caracteres mínimos** para descripción detallada y justificación de negocio.
+2. **Declaración de veracidad en `CU-04`:** Confirmar si la casilla obligatoria de declaración de veracidad institucional en el Paso 4 se incorpora formalmente a `RF-04` / políticas operativas o se mantiene como confirmación simple de envío.
+3. **Prevención de solicitudes duplicadas en `CU-04`:** Validar el criterio funcional para detectar o bloquear automáticamente duplicados abiertos sobre un mismo proyecto y ECS.
+4. **Homologación de categorías de cambio (`CU-04` vs `CU-04.1`):** Definir si la categoría `EVOLUTIVO` presente en la vista de subsanación se incorpora también al registro inicial o se unifica en `CORRECTIVO`, `ADAPTATIVO` y `PERFECTIVO`.
+5. **Pendientes institucionales vigentes (`DOC-033` y `DOC-034`):** Dictamen del CCB sobre la enmienda híbrida SSOT y homologación de metas de recuperación ante desastres frente a `RNF-09`.
 
-### 5. Autoridad de la Regla de Negocio RN-03 (Trazabilidad de Cambios)
-- **Elemento:** Campo *Autoridad* en la tabla de Reglas de Negocio.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.3 (Pág. 25) y `docs/TABLES.md` (`TB-06`).
-- **Descripción:** Atribuía autoridad exclusiva a `Analista de Requerimientos / Gestor`, omitiendo al `Administrador de Configuración / Bibliotecario` quien ejecuta materialmente el Check-In con asociación a ECN/ECO.
-- **Estado de Resolución:** RESUELTA. Establecida formalmente como **Autoridad Compartida: Administrador de Configuración / Bibliotecario y Analista de Requerimientos / Gestor**, amparada en los casos CU-08, CU-12, CU-14, CU-27 y las responsabilidades delimitadas de PU-02 y PU-05.
+## 6.3. Remisión del modelado técnico al SAD
 
-### 6. Duplicidad Literal entre Viabilidad Social y Viabilidad Ambiental
-- **Elemento:** Secciones de Viabilidad Social y Ambiental.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 3.5 (Págs. 16-17).
-- **Descripción:** Los cuatro numerales de la Viabilidad Ambiental eran una réplica idéntica de la Viabilidad Social.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se formalizaron en la Sección 3.5 cuatro ejes técnicos diferenciados de Viabilidad Ambiental enfocados en la política de Cero Papel, eficiencia energética de infraestructura cloud bajo demanda, reducción de emisiones por teletrabajo/comités remotos y extensión de vida útil del hardware cliente mediante arquitectura SPA (DOC-023).
+Con el fin de mantener este SRS centrado en las necesidades del negocio y la especificación funcional comprensible para el cliente, todos los artefactos técnicos de diseño, modelado interno y persistencia fueron preservados y centralizados en el ámbito arquitectónico:
 
-### 8. Enlaces Relativos a Figuras y Gestión de Diagramas Pendientes
-- **Elemento:** Enlaces a diagramas e imágenes en Markdown (`assets/` vs `../assets/`).
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Secciones 4, 5 y 6.
-- **Descripción:** Se detectaron 41 rutas relativas rotas que apuntaban a `assets/` en vez de `../assets/`, impidiendo la visualización desde la subcarpeta `docs/`, así como 34 diagramas (31 de análisis de objetos BCE y 3 de secuencia) referenciados sin archivos gráficos existentes en el repositorio.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se actualizaron las 41 rutas a archivos existentes hacia `../assets/` (DOC-006), se incorporó la advertencia formal de obsolescencia técnica sobre el modelo `DG-13` (DOC-025), y se reemplazaron los 34 enlaces rotos por avisos normativos estructurados de figura pendiente de renderizado vinculados a sus especificaciones PlantUML canónicas en `docs/DIAGRAMS.md` para su generación en la Etapa 05 (DOC-004 y DOC-005).
+- **Arquitectura lógica, física, seguridad, contratos API y modelo de datos:** [`docs/SAD_FINAL.md`](SAD_FINAL.md) y [`docs/DICCIONARIO_DATOS.md`](DICCIONARIO_DATOS.md).
+- **31 Diagramas de Secuencia de Análisis (`DG-SEQ-01`..`30` y `DG-SEQ-04.1`), 31 Diagramas BCE (`DG-AO-01`..`30` y `DG-AO-04.1`), Modelo de Dominio (`DG-12`) y disposición histórica (`DG-13`):** Preservados en [`docs/SAD_FINAL.md`](SAD_FINAL.md#27-preservación-de-modelos-técnicos-de-análisis-y-diseño-traslado-desde-srs), [`docs/FD04-EPIS-Informe_SAD_Analisis.md`](FD04-EPIS-Informe_SAD_Analisis.md) y [`docs/DIAGRAMS.md`](DIAGRAMS.md).
+- **Secuencias técnicas de diseño, pantallas `SCREEN-01`..`20` y modelos UWE:** [`docs/FD05-EPIS-Informe_SAD_Diseno.md`](FD05-EPIS-Informe_SAD_Diseno.md).
+- **Estado técnico de desarrollo, pruebas y pendientes:** [`docs/ESTADO_DEL_PROYECTO.md`](ESTADO_DEL_PROYECTO.md) y [`docs/MATRIZ_TRAZABILIDAD.md`](MATRIZ_TRAZABILIDAD.md).
 
-### 9. Delimitación Técnica del Alcance: Sistema Objetivo vs. Prototipo Demostrativo
-- **Elemento:** Alcance del sistema y catálogo de pantallas.
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 1.2 y 5.2.
-- **Descripción:** Existía ambigüedad sobre qué componentes y requisitos correspondían a la arquitectura empresarial de producción y cuáles pertenecían al prototipo navegable desarrollado en React.
-- **Estado de Resolución:** RESUELTA EN REVISIÓN v1.1. Se incorporó formalmente la Sección 1.2 delimitando el alcance objetivo vs el prototipo demostrativo (20 pantallas canónicas: 8 interactivas funcionales vía 9 vistas, 12 demostrativas guiadas en `ScreenPlaceholder.tsx` y 2 vistas de sistema), y se agregaron criterios explícitos de verificación de RNF en la Sección 5.2 (DOC-015 y DOC-020).
+---
 
-### 7. Cobertura del Cierre Exitoso en la Matriz RF-14
-- **Elemento:** Requerimiento RF-14 (Cierre Formal del Cambio y Notificaciones).
-- **Ubicación:** `FD03-EPIS-Informe_SRS.md`, Sección 5.1 y 6.1.3.
-- **Descripción:** RF-14 se referenciaba predominantemente en cancelaciones y rechazos, existiendo asimetría con el cierre exitoso.
-- **Estado de Resolución:** RESUELTA. Resuelto formalmente mediante la definición de la máquina de 14 estados del TO-BE v2 y la asignación explícita de RF-14 a los 4 estados terminales en `TB-07`, `TB-12` y los casos de uso CU-05 (Desestimada), CU-07/CU-30 (Rechazada), CU-22 (Cancelada) y CU-20 (Implementada tras aceptación UAT en CU-29).
+# 7. Conclusiones y Referencias Normativas
 
+## 7.1. Conclusiones
 
-# Conclusiones
+1. **Consolidación funcional y gobernanza SCM:** Se formalizó la especificación de requisitos funcionales (`RF-01`..`RF-18`), atributos de calidad (`RNF-01`..`RNF-09`) y reglas de negocio (`RN-01`..`RN-09`) bajo los lineamientos de ISO/IEC/IEEE 29148, IEEE 828 e ISO/IEC 25010, estableciendo una línea base clara para erradicar la informalidad operativa diagnosticada en ÉXODO S.A.C.
+2. **Separación efectiva SRS vs. SAD:** El retiro de código fuente PlantUML, diagramas BCE, secuencias técnicas y referencias internas de infraestructura hacia `SAD_FINAL.md` y `DIAGRAMS.md` permite que el cliente y los usuarios finales comprendan de manera directa el comportamiento funcional del sistema sin perder trazabilidad técnica.
+3. **Estandarización del ciclo de control de cambios y Segregación de Funciones:** La definición de flujos detallados con fases, excepciones y diagramas de actividades (`DG-ACT-01`..`DG-ACT-06`) delimita con precisión las facultades de cada uno de los siete perfiles (`PU-01`..`PU-07`) y garantiza controles contra conflictos de interés en el registro, admisión y evaluación de impacto técnico.
+4. **Control de bibliotecas, doble validación y cumplimiento normativo:** El modelo de tres bibliotecas (Trabajo, Soporte y Maestra), bloqueos exclusivos, doble validación QA + UAT previa al Check-In y respaldo de líneas base con capacidad de reversión protege los activos de software de ÉXODO S.A.C. y sus clientes conforme al Decreto Legislativo N.° 822 y la Ley N.° 29733.
 
-Estructuración Formal del Alcance y Gobernanza SCM: Se consolidó con precisión la especificación de requerimientos funcionales (RF) y no funcionales (RNF) bajo los lineamientos del estándar internacional ISO/IEC/IEEE 29148 e ISO/IEC 25010. Esta delimitación erradica la informalidad y la dispersión operativa previa en ÉXODO S.A.C., proporcionando un marco formal para la administración controlada del ciclo de vida de los Elementos de Configuración de Software (ECS) . Estandarización del Flujo de Control de Cambios y Segregación de Roles: La definición del flujo formal de Solicitudes de Cambio (RFC), desde su registro y clasificación hasta la evaluación técnica y aprobación por el Comité de Control de Cambios (CCB), asegura que ninguna modificación sea integrada de forma arbitraria . La posterior emisión de Órdenes de Cambio (ECN/ECO) y la asignación rigurosa de responsabilidades (Solicitante, Analista, Arquitecto, CCB, Administrador SCM, Desarrollador y QA) garantizan una estricta segregación de funciones . Control de Concurrencia, Gestión de Bibliotecas e Integridad: Se estableció el esquema de tres niveles de bibliotecas (Trabajo, Soporte y Maestra) operado mediante transiciones estrictas de Check-Out y Check-In. La incorporación obligatoria de bloqueos de sincronización elimina definitivamente los incidentes de sobreescritura y pérdida de código causados por modificaciones concurrentes , mientras que el cálculo de sumas de verificación criptográficas (SHA-256) garantiza la inalterabilidad e integridad técnica de los artefactos liberados. Trazabilidad Total, Gestión de Líneas Base y Capacidad de Rollback: El sistema proporciona mecanismos robustos para congelar versiones estables como Líneas Base (baselines) identificadas unívocamente tras la certificación de conformidad de QA. Asimismo, la formalización de protocolos de reversión (rollback) en la Biblioteca de Trabajo permite mitigar oportunamente fallos no subsanados en etapas de prueba antes de comprometer los entornos en producción, reduciendo drásticamente el retrabajo y las fallas operativas. Cumplimiento Normativo y Preparación para el Diseño Lógico: La especificación resguarda los derechos de propiedad intelectual de ÉXODO S.A.C. y de sus clientes
-
-
-<!-- Página 117 del PDF original -->
-
-
-conforme al Decreto Legislativo N° 822 (Ley sobre el Derecho de Autor) y asegura la confidencialidad de la información gestionada en cumplimiento de la Ley N° 29733 . El modelado detallado de los 31 casos de uso (CU-01 a CU-30, incluyendo CU-04.1) con sus respectivos flujos principales, alternativos y de excepción minimiza ambigüedades funcionales, sirviendo de base sólida para las etapas de arquitectura lógica, diseño de persistencia e implementación .
-
-
-<!-- Página 118 del PDF original -->
-
-
-# Bibliografía
+## 7.2. Bibliografía
 
 - Congreso de la República del Perú. (2011). Ley N° 29733: Ley de Protección
 

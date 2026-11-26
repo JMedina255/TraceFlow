@@ -2,10 +2,10 @@
 
 <div align="center">
 
-[![Documento Maestro](https://img.shields.io/badge/Documento-SRS%20V1.0-blue.svg)](docs/FD03-EPIS-Informe_SRS.md)
-[![Estado del Proyecto](https://img.shields.io/badge/Fase-DB--02%20%7C%20INT--01%20Certificado-success.svg)](#7-etapa-actual-del-proyecto)
+[![Documento Maestro](https://img.shields.io/badge/Documento-SRS%20v1.2%20DOC--02-blue.svg)](docs/FD03-EPIS-Informe_SRS.md)
+[![Arquitectura](https://img.shields.io/badge/Arquitectura-SAD%20Final%20DOC--02-indigo.svg)](docs/SAD_FINAL.md)
 [![Backend NestJS](https://img.shields.io/badge/Backend-NestJS%2011%20%7C%20TypeScript-red.svg)](backend/)
-[![Database PostgreSQL](https://img.shields.io/badge/Database-Supabase%20PG%2017.12-blue.svg)](docs/IMPLEMENTACION_BD_SUPABASE.md)
+[![Database PostgreSQL](https://img.shields.io/badge/Database-Supabase%20PG%2017.12-blue.svg)](docs/DICCIONARIO_DATOS.md)
 [![Pruebas E2E](https://img.shields.io/badge/Playwright-18%2F18%20Passed-brightgreen.svg)](docs/evidence/int-01/)
 
 **Plataforma Web Centralizada para el Control de Cambios, Trazabilidad de Artefactos y Gestión de Bibliotecas de Configuración**
@@ -112,23 +112,31 @@ TraceFlow/
 │   └── seed/                    # Semillas estructurales de desarrollo
 ├── scripts/                     # Automatizaciones y runner de certificación E2E Playwright
 ├── docs/                        # Repositorio documental normativo (IEEE 828, ISO 12207)
-│   ├── FD03-EPIS-Informe_SRS.md # SRS v1.1 con 31 Casos de Uso
-│   ├── FD04-EPIS-Informe_SAD_Analisis.md # SAD de Análisis
-│   ├── FD05-EPIS-Informe_SAD_Diseno.md   # SAD de Diseño
-│   ├── IMPLEMENTACION_BD_SUPABASE.md     # Especificación de DB y evidencia de certificación
+│   ├── INDICE_DOCUMENTAL.md     # Navegación centralizada y catálogo oficial
+│   ├── ESTADO_DEL_PROYECTO.md   # Estado real, pendientes e historial compacto de hitos
+│   ├── FD03-EPIS-Informe_SRS.md # SRS Final Candidato (v1.2 DOC-02)
+│   ├── SAD_FINAL.md             # Arquitectura consolidada (Análisis + Diseño)
+│   ├── DICCIONARIO_DATOS.md     # Modelo físico PostgreSQL (21 tablas) y objetivo en español
+│   ├── ESTANDAR_PROGRAMACION.md # Convenciones obligatorias TS, NestJS, React, PostgreSQL y REST
+│   ├── GLOSARIO.md              # Terminología oficial del dominio en español
+│   ├── MATRIZ_NOMENCLATURA.md   # Equivalencias inglés–español por capa
+│   ├── MATRIZ_TRAZABILIDAD.md   # Trazabilidad integral RF/RNF -> CU -> BD -> Pruebas
+│   ├── PLAN_REFACTORIZACION.md  # Plan progresivo REF-01 de normalización al español
 │   ├── adr/                     # Registros de Decisiones Arquitectónicas (ADR-001 a ADR-010)
 │   └── evidence/int-01/         # Evidencias visuales de integración E2E (capturas de pantalla)
 └── README.md                    # Este documento
 ```
 
 ### Índice de Referencia Documental
+- **Índice Documental Centralizado:** [docs/INDICE_DOCUMENTAL.md](docs/INDICE_DOCUMENTAL.md)
+- **Estado Consolidado del Proyecto:** [docs/ESTADO_DEL_PROYECTO.md](docs/ESTADO_DEL_PROYECTO.md)
 - **Documento Maestro SRS:** [docs/FD03-EPIS-Informe_SRS.md](docs/FD03-EPIS-Informe_SRS.md)
-- **Reglas de Gobernanza y Convenciones:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md)
-- **Tablas y Matrices de Trazabilidad:** [docs/TABLES.md](docs/TABLES.md)
-- **Catálogo Centralizado de Diagramas:** [docs/DIAGRAMS.md](docs/DIAGRAMS.md)
-- **Artefactos Visuales:** [assets/](assets/)
-- **Documentación de Fases (FD01 a FD05):** [docs/](docs/)
-- **Prototipo Navegable:** [prototype/](prototype/)
+- **Arquitectura Consolidada (SAD Final):** [docs/SAD_FINAL.md](docs/SAD_FINAL.md)
+- **Diccionario de Datos:** [docs/DICCIONARIO_DATOS.md](docs/DICCIONARIO_DATOS.md)
+- **Estándar de Programación:** [docs/ESTANDAR_PROGRAMACION.md](docs/ESTANDAR_PROGRAMACION.md)
+- **Glosario y Nomenclatura:** [docs/GLOSARIO.md](docs/GLOSARIO.md) | [docs/MATRIZ_NOMENCLATURA.md](docs/MATRIZ_NOMENCLATURA.md)
+- **Trazabilidad y Plan REF-01:** [docs/MATRIZ_TRAZABILIDAD.md](docs/MATRIZ_TRAZABILIDAD.md) | [docs/PLAN_REFACTORIZACION.md](docs/PLAN_REFACTORIZACION.md)
+- **Reglas de Gobernanza, Tablas y Diagramas SSOT:** [docs/DOCUMENTATION_RULES.md](docs/DOCUMENTATION_RULES.md) | [docs/TABLES.md](docs/TABLES.md) | [docs/DIAGRAMS.md](docs/DIAGRAMS.md)
 
 ---
 
@@ -146,16 +154,16 @@ El acceso se realiza mediante correo institucional corporativo y contraseña con
 | **USR-003** | Augusto Joaquin Rivera Muñoz | `arivera@exodo.pe` | **PU-05** (Bibliotecario)| **PU-07** (Calidad/QA) | PRJ-001, PRJ-002, PRJ-003 |
 | **USR-004** | Renzo Fernando Loyola Vilca Choque | `rloyola@exodo.pe` | **PU-04** (CCB) | *(Ninguno)* | PRJ-001, PRJ-002 *(Veto: PRJ-003)* |
 
-* **Aprovisionamiento Seguro de Credenciales:** El sistema no publica contraseñas en texto claro ni secretos en el repositorio. Para evaluaciones locales, las credenciales se administran de forma aislada mediante el procedimiento documentado en [AUTH_IMPLEMENTATION_REPORT.md](docs/refactor/AUTH_IMPLEMENTATION_REPORT.md) o mediante `authService.setLocalPassword()`.
+* **Aprovisionamiento Seguro de Credenciales:** El sistema no publica contraseñas en texto claro ni secretos en el repositorio. Para evaluaciones locales o aprovisionamiento PostgreSQL, utilice el script `backend/src/scripts/provision-users.ts` o consulte [ESTADO_DEL_PROYECTO.md](docs/ESTADO_DEL_PROYECTO.md).
 * **Política de Sesión:** Un solo rol efectivo por sesión activa (`effectiveRoleId`).
 * **Política de Rutas:** Denegación estricta por defecto (**Default-Deny**).
 * **Segregación de Funciones (SoD):** Antiautoevaluación del Solicitante, Doble Llave con dos identidades físicas distintas en cambios menores y veto de `USR-004` sobre `PRJ-003`.
 
-### 6.2. Documentación Técnica de Refactorización
-- **Auditoría y Diagnóstico Consolidado:** [docs/refactor/ENTERPRISE_REFACTOR_AUDIT.md](docs/refactor/ENTERPRISE_REFACTOR_AUDIT.md)
+### 6.2. Documentación Técnica de Referencia RBAC y UX
+- **Identidad y Roles Funcionales:** [docs/refactor/IDENTITY_AND_ROLES.md](docs/refactor/IDENTITY_AND_ROLES.md)
 - **Matriz de Control de Acceso (RBAC & SoD):** [docs/refactor/RBAC_ACCESS_MATRIX.md](docs/refactor/RBAC_ACCESS_MATRIX.md)
-- **Guía de Experiencia de Usuario Empresarial:** [docs/refactor/ENTERPRISE_UX_GUIDELINES.md](docs/refactor/ENTERPRISE_UX_GUIDELINES.md)
-- **Reporte Criptográfico de Autenticación:** [docs/refactor/AUTH_IMPLEMENTATION_REPORT.md](docs/refactor/AUTH_IMPLEMENTATION_REPORT.md)
+- **Matriz de Navegación por Rol:** [docs/refactor/ROLE_NAVIGATION_MATRIX.md](docs/refactor/ROLE_NAVIGATION_MATRIX.md)
+- **Estándar de Programación y UI:** [docs/ESTANDAR_PROGRAMACION.md](docs/ESTANDAR_PROGRAMACION.md)
 
 ### 6.3. Verificación Automatizada y Calidad de Código
 Desde el directorio `prototype/`:

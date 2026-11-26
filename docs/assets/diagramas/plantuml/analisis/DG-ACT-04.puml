@@ -1,0 +1,136 @@
+@startuml DG-ACT-04
+title <b>DG-ACT-04: Flujo de Actividades — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|TraceFlow SCM|
+
+|Solicitante|
+start
+:<color:white><b>FASE 1: Acceso e Información General</b></color>; <<#34495E>>
+:Solicitar registro de nueva RFC\n("Nueva Solicitud RFC");
+
+|TraceFlow SCM|
+if (¿Rol activo en sesión es Solicitante [PU-01]?) then (No)
+    :[E001] Mostrar aviso de Segregación de Funciones\ny deshabilitar envío definitivo;
+    stop
+else (Sí)
+    :Cargar proyectos asignados\ny presentar Asistente Paso 1 de 4;
+endif
+
+if (¿Existe borrador temporal previo para el proyecto?) then (Sí)
+    :Restaurar datos previos en el formulario;
+else (No)
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar proyecto, ingresar título,\nprioridad y categoría del cambio;
+    note left
+      <b>[A001]</b> Guardar borrador temporal
+      <b>[A003]</b> Cancelar -> Confirmar descarte
+    end note
+
+    |TraceFlow SCM|
+    :Validar campos obligatorios del Paso 1;
+repeat while (¿Paso 1 válido?) is (No [E002]: Señalar campo y mostrar error)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 2: Justificación, Alcance y ECS</b></color>; <<#34495E>>
+:Habilitar Paso 2 (Justificación y Alcance);
+
+repeat
+    |Solicitante|
+    :Ingresar descripción detallada,\njustificación de negocio y propuesta opcional;
+    |TraceFlow SCM|
+    :Validar longitud y completitud del Paso 2;
+repeat while (¿Paso 2 válido?) is (No [E002]: Indicar longitud mínima faltante)
+-> Sí;
+
+|TraceFlow SCM|
+:Consultar catálogo de ECS del proyecto;
+if (¿Existen ECS registrados en el proyecto?) then (No)
+    :[E003] Mostrar aviso de catálogo vacío\n(Contactar al Administrador SCM);
+    stop
+else (Sí)
+    :Habilitar Paso 3 (ECS y Evidencias);
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar ECS afectado;
+    if (¿Desea adjuntar sustento?) then (Sí [A002])
+        :Adjuntar documentación técnica o probatoria;
+    else (No)
+    endif
+    |TraceFlow SCM|
+    :Validar selección obligatoria de ECS;
+repeat while (¿ECS seleccionado?) is (No [E002]: Exigir selección de ECS)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Revisión, Confirmación y Radicación</b></color>; <<#34495E>>
+:Presentar Paso 4 con Ficha Resumen Técnica,\ncódigo preliminar y confirmación de envío;
+
+|Solicitante|
+if (¿Desea corregir datos previos?) then (Sí [A001/Navegar])
+    :Regresar a pasos anteriores\no guardar borrador temporal;
+    detach
+else (No)
+endif
+
+:Confirmar envío (declaración de veracidad\nsegún política vigente) y pulsar "Enviar Solicitud de Cambio";
+
+|TraceFlow SCM|
+:Ejecutar validación integral en el servidor;
+if (¿Longitud y formato de datos válidos?) then (No)
+    :[E002] Informar observación de validación\nconservando los datos en pantalla;
+    stop
+else (Sí)
+endif
+
+if (¿El ECS pertenece al proyecto y está disponible?) then (No)
+    :[E004] Rechazar por inconsistencia Proyecto-ECS\no indisponibilidad del elemento;
+    stop
+else (Sí)
+endif
+
+:Intentar radicar RFC con código único\nen estado <b>REGISTRADA</b>;
+
+if (¿Conexión y registro en servidor exitosos?) then (No)
+    :[E005] Informar error de conectividad\nconservando los datos capturados para reintento;
+    stop
+else (Sí)
+    :Registrar evento en bitácora inmutable de auditoría\ny derivar notificación al Gestor (PU-02);
+    :Presentar comprobante de radicación\ny accesos (Expediente 360°, Bandeja, Nueva, Dashboard);
+    stop
+endif
+
+@enduml

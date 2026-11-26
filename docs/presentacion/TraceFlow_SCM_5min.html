@@ -103,104 +103,6 @@
       color: var(--text-muted);
     }
 
-    /* Global Presentation Timer */
-    .timer-container {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      background: rgba(30, 41, 59, 0.7);
-      padding: 0.4rem 1.25rem;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-    .timer-display-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .timer-clock {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      color: var(--cyan-accent);
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-      transition: color 0.3s ease;
-    }
-    .timer-clock.warning {
-      color: var(--amber-accent);
-      text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-    }
-    .timer-clock.overtime {
-      color: var(--rose-accent);
-      text-shadow: 0 0 12px rgba(244, 63, 94, 0.7);
-      animation: pulse-alert 1s infinite alternate;
-    }
-    @keyframes pulse-alert {
-      from { transform: scale(1); }
-      to { transform: scale(1.05); }
-    }
-    .timer-sublabel {
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .timer-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .btn-timer {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 0.35rem 0.65rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      transition: all 0.2s ease;
-    }
-    .btn-timer:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--cyan-accent);
-      color: #fff;
-    }
-    .btn-timer.primary {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--cyan-accent);
-      color: var(--cyan-accent);
-    }
-    .btn-timer.primary:hover {
-      background: var(--cyan-accent);
-      color: #0f172a;
-    }
-
-    /* Progress bar with milestones */
-    .milestones-bar {
-      position: relative;
-      width: 140px;
-      height: 6px;
-      background: #334155;
-      border-radius: 9999px;
-      overflow: hidden;
-    }
-    .milestones-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--cyan-accent), var(--indigo-accent), var(--emerald-accent));
-      border-radius: 9999px;
-      transition: width 1s linear;
-    }
-
     /* Header Navigation & Actions */
     .header-nav {
       display: flex;
@@ -948,31 +850,12 @@
       <div class="brand-titles">
         <div class="brand-title">
           TraceFlow SCM
-          <span class="brand-badge">Demo 5 Min</span>
+          <span class="brand-badge">5 Min</span>
         </div>
         <div class="brand-subtitle">Alineamiento de Requisitos, Arquitectura y Trazabilidad IEEE 828-2012</div>
       </div>
     </div>
 
-    <!-- Presentation Timer -->
-    <div class="timer-container">
-      <div class="timer-display-group">
-        <div class="timer-clock" id="timerClock">00:00</div>
-        <div class="timer-sublabel">Objetivo: 05:00</div>
-      </div>
-      <div class="milestones-bar" title="Progreso del tiempo (Hitos: 1:00 S1, 2:00 S2, 5:00 S3)">
-        <div class="milestones-fill" id="timerBar"></div>
-      </div>
-      <div class="timer-controls">
-        <button class="btn-timer primary" id="btnTimerToggle" title="Iniciar o pausar el cronómetro (Atajo: T)">
-          <span id="timerIcon">▶</span>
-          <span id="timerText">Iniciar</span>
-        </button>
-        <button class="btn-timer" id="btnTimerReset" title="Reiniciar cronómetro a 00:00 (Atajo: R)">
-          ↺
-        </button>
-      </div>
-    </div>
 
     <!-- Header Navigation & Actions -->
     <div class="header-nav">
@@ -1554,8 +1437,6 @@
       <span>Atajos:</span>
       <span class="kbd-shortcut">← / →</span> Diapositivas
       <span class="kbd-shortcut">1, 2, 3</span> Secciones
-      <span class="kbd-shortcut">T</span> Cronómetro
-      <span class="kbd-shortcut">R</span> Reinicio
       <span class="kbd-shortcut">N</span> Notas
       <span class="kbd-shortcut">F</span> Fullscreen
     </div>
@@ -1666,18 +1547,7 @@
       let currentSlide = 1;
       const totalSlides = 3;
       let currentDemoStep = 1;
-      let timerSeconds = 0;
-      let timerInterval = null;
-      let isTimerRunning = false;
-      const targetSeconds = 300; // 5 minutes
-
       // DOM Elements
-      const timerClock = document.getElementById("timerClock");
-      const timerBar = document.getElementById("timerBar");
-      const btnTimerToggle = document.getElementById("btnTimerToggle");
-      const timerIcon = document.getElementById("timerIcon");
-      const timerText = document.getElementById("timerText");
-      const btnTimerReset = document.getElementById("btnTimerReset");
       const btnPrevSlide = document.getElementById("btnPrevSlide");
       const btnNextSlide = document.getElementById("btnNextSlide");
       const notesDrawer = document.getElementById("notesDrawer");
@@ -1772,57 +1642,6 @@
         }
       }
 
-      // Timer Logic
-      function formatTime(sec) {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-      }
-
-      function updateTimerDisplay() {
-        timerClock.textContent = formatTime(timerSeconds);
-        const pct = Math.min(100, (timerSeconds / targetSeconds) * 100);
-        timerBar.style.width = pct + "%";
-
-        // Milestone alerts
-        if (timerSeconds >= targetSeconds) {
-          timerClock.className = "timer-clock overtime";
-        } else if (timerSeconds >= 270) { // 4:30 warning
-          timerClock.className = "timer-clock warning";
-        } else {
-          timerClock.className = "timer-clock";
-        }
-      }
-
-      function toggleTimer() {
-        if (isTimerRunning) {
-          clearInterval(timerInterval);
-          isTimerRunning = false;
-          timerIcon.textContent = "▶";
-          timerText.textContent = "Continuar";
-          btnTimerToggle.classList.remove("primary");
-        } else {
-          timerInterval = setInterval(() => {
-            timerSeconds++;
-            updateTimerDisplay();
-          }, 1000);
-          isTimerRunning = true;
-          timerIcon.textContent = "⏸";
-          timerText.textContent = "Pausa";
-          btnTimerToggle.classList.add("primary");
-        }
-      }
-
-      function resetTimer() {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        timerSeconds = 0;
-        timerIcon.textContent = "▶";
-        timerText.textContent = "Iniciar";
-        btnTimerToggle.classList.add("primary");
-        updateTimerDisplay();
-      }
-
       // Modal Zoom
       function openModal() {
         modalImg.src = previewImg.src;
@@ -1856,9 +1675,6 @@
           setDemoStep(s);
         });
       });
-
-      btnTimerToggle.addEventListener("click", toggleTimer);
-      btnTimerReset.addEventListener("click", resetTimer);
 
       btnNotesToggle.addEventListener("click", () => {
         notesDrawer.classList.toggle("open");
@@ -1903,10 +1719,7 @@
         } else if (e.key.toLowerCase() === "n") {
           notesDrawer.classList.toggle("open");
           btnNotesToggle.classList.toggle("active");
-        } else if (e.key.toLowerCase() === "t") {
-          toggleTimer();
-        } else if (e.key.toLowerCase() === "r") {
-          resetTimer();
+
         } else if (e.key.toLowerCase() === "f") {
           btnFullscreen.click();
         }
@@ -1915,7 +1728,6 @@
       // Initialize
       goToSlide(1);
       setDemoStep(1);
-      updateTimerDisplay();
     })();
   </script>
 </body>

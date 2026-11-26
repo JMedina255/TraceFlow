@@ -1,0 +1,63 @@
+@startuml DG-ACT-03
+title <b>DG-ACT-03: Flujo de Actividades — Consultar proyecto (CU-03)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F4F8|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+|#EBF5FB|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+start
+:<color:white><b>FASE 1: Acceso al Directorio de Proyectos</b></color>; <<#34495E>>
+:Seleccionar opción "Proyectos" en el menú principal;
+
+|TraceFlow SCM|
+:Cargar exclusivamente los proyectos asignados\nal usuario autenticado (aislamiento entre clientes);
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+if (¿Desea filtrar listado? [A001]) then (Sí)
+    :Aplicar filtros por nombre, cliente o estado;
+    |TraceFlow SCM|
+    :Actualizar lista de proyectos coincidentes;
+else (No)
+endif
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+:Seleccionar el proyecto a consultar;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 2: Validación y Consolidación de Ficha</b></color>; <<#34495E>>
+if (¿El proyecto existe?) then (No)
+    :[E002] Informar proyecto no encontrado\ny ofrecer retorno al directorio;
+    stop
+else (Sí)
+endif
+
+if (¿Usuario autorizado para el proyecto?) then (No)
+    :[E001] Bloquear visualización y notificar\nrestricción de aislamiento de proyectos;
+    stop
+else (Sí)
+    :Consolidar datos generales, cliente, equipo,\ncatálogo de ECS y resumen de RFCs activas;
+    :Mostrar Ficha Integral de Proyecto en solo lectura\ncon accesos de navegación autorizados;
+    stop
+endif
+@enduml

@@ -1291,16 +1291,16 @@ Implementada --> [*] : Cierre formal exitoso y trazabilidad total
 
 ---
 
-# DG-12 — Diagrama de Clases del Dominio TraceFlow SCM
+# DG-12-HIST — Diagrama de Clases del Dominio TraceFlow SCM (Histórico)
 
 > [!NOTE]
-> **Nota de Auditoría SCM (Etapa 07 — Hallazgo DOC-030):**
-> Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Comparte el identificador canónico `DG-12` con el *Modelo Conceptual del Dominio* (Fase de Análisis). Las especificaciones de diseño y análisis consumen preferentemente el modelo conceptual (`analisis/DG-12.svg`). Se mantiene bajo revisión técnica y propuesta de reclasificación ante el CCB como `DG-12-HIST` o `DG-CLASS-01`.
+> **Resolución DOC-030 (DOC-03.1):**
+> Este diagrama corresponde a la especificación histórica del **Diagrama de Clases del Dominio** (SRS v1.0, clases con tipos primitivos y métodos operacionales). Queda formalmente reclasificado como **`DG-12-HIST`** para eliminar colisiones de identificación con el *Modelo Conceptual del Dominio de Análisis* (`analisis/DG-12.svg`), que permanece como el único **`DG-12`** canónico.
 
-**ID:** DG-12 | **Tipo:** Clases | **Estado:** APROBADO | **Versión:** 1.0  
+**ID:** DG-12-HIST | **Tipo:** Clases (Histórico) | **Estado:** ARCHIVADO HISTÓRICO | **Versión:** 1.0  
 **RF:** RF-01 a RF-18 | **RN:** RN-01 a RN-09 | **CU:** CU-01 a CU-28 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Sección 6.2.2
 
-![DG-12](assets/diagramas/render/generales/DG-12.svg)
+![DG-12-HIST](assets/diagramas/render/generales/DG-12-HIST.svg)
 
 ```plantuml
 @startuml
@@ -1309,7 +1309,7 @@ skinparam roundcorner 8
 skinparam defaultFontName Arial
 skinparam classAttributeIconSize 0
 
-title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+title <b>DG-12-HIST: Diagrama de Clases del Dominio TraceFlow SCM (Histórico)</b>
 
 class Usuario {
     - id: Long
@@ -4066,8 +4066,8 @@ Todos los diagramas del SRS han sido reconstruidos formalmente con fidelidad té
 ### DG-12 — Modelo Conceptual del Dominio TraceFlow SCM
 
 > [!NOTE]
-> **Nota de Auditoría SCM (Etapa 07 — Consumo Canónico):**
-> Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1). Propuesto formalmente al CCB como único titular canónico del identificador `DG-12`.
+> **Nota de Auditoría SCM (Resolución DOC-030 en DOC-03.1):**
+> Este modelo corresponde al **Modelo Conceptual del Dominio (Fase de Análisis)**, estructurado en 4 paquetes conceptuales y 15 entidades sin métodos de implementación. Es la especificación canónica consumida por los informes SRS (`FD03` §6.1), SAD de Análisis (`FD04` §6.1) y SAD de Diseño (`FD05` §7.1), ratificada como único titular canónico del identificador `DG-12` (el diagrama histórico de clases se conserva como `DG-12-HIST`).
 
 - **ID:** DG-12  
 - **Nombre:** Modelo Conceptual del Dominio TraceFlow SCM  
@@ -7119,5 +7119,1089 @@ package "Generador Paramétrico de Reportes (NAV-27 / CU-28, RF-18)" as ReportZo
 Gov *-- AuditZone
 Gov *-- ReportZone
 
+@enduml
+```
+
+
+---
+
+### DG-ER-ACTUAL — Modelo Relacional Físico Vigente (Supabase traceflow - 21 Tablas)
+
+\\plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide circle
+
+title <b>DG-ER-ACTUAL: Modelo Relacional Físico Vigente (Supabase traceflow - 21 Tablas)</b>
+
+package "Seguridad e Identidad" {
+  entity "app_role" as app_role {
+    * id : INT <<PK>>
+    --
+    * code : VARCHAR(20) <<UQ>>
+    * name : VARCHAR(80)
+  }
+  entity "app_user" as app_user {
+    * id : UUID <<PK>>
+    --
+    * code : VARCHAR(20) <<UQ>>
+    * username : VARCHAR(50) <<UQ>>
+    * email : VARCHAR(120) <<UQ>>
+    * password_hash : VARCHAR(255)
+    * full_name : VARCHAR(120)
+    * status : VARCHAR(20)
+  }
+  entity "user_role_assignment" as user_role_assignment {
+    * user_id : UUID <<PK,FK>>
+    * role_id : INT <<PK,FK>>
+    --
+    * is_primary : BOOLEAN
+  }
+  entity "user_session" as user_session {
+    * id : UUID <<PK>>
+    --
+    * user_id : UUID <<FK>>
+    * active_role_id : INT <<FK>>
+    * session_token_hash : VARCHAR(64) <<UQ>>
+    * expires_at : TIMESTAMPTZ
+  }
+}
+
+package "Proyectos y Activos SCM" {
+  entity "project" as project {
+    * id : UUID <<PK>>
+    --
+    * code : VARCHAR(30) <<UQ>>
+    * project_key : VARCHAR(20) <<UQ>>
+    * name : VARCHAR(150)
+    * status : VARCHAR(20)
+  }
+  entity "user_project_assignment" as user_project_assignment {
+    * user_id : UUID <<PK,FK>>
+    * project_id : UUID <<PK,FK>>
+  }
+  entity "config_item" as config_item {
+    * id : UUID <<PK>>
+    --
+    * project_id : UUID <<FK>>
+    * code : VARCHAR(60)
+    * current_library : VARCHAR(20)
+    * current_version : VARCHAR(20)
+    * is_locked : BOOLEAN
+  }
+  entity "ecs_version" as ecs_version {
+    * id : UUID <<PK>>
+    --
+    * ecs_id : UUID <<FK>>
+    * version_number : VARCHAR(20)
+    * sha256_checksum : VARCHAR(64)
+  }
+  entity "baseline" as baseline {
+    * id : UUID <<PK>>
+    --
+    * project_id : UUID <<FK>>
+    * code : VARCHAR(40) <<UQ>>
+    * version_label : VARCHAR(20)
+    * status : VARCHAR(20)
+  }
+  entity "baseline_item" as baseline_item {
+    * baseline_id : UUID <<PK,FK>>
+    * ecs_version_id : UUID <<PK,FK>>
+  }
+}
+
+package "Control de Cambios y Gobernanza" {
+  entity "change_request" as change_request {
+    * id : UUID <<PK>>
+    --
+    * code : VARCHAR(30) <<UQ>>
+    * project_id : UUID <<FK>>
+    * target_ecs_id : UUID <<FK>>
+    * requested_by : UUID <<FK>>
+    * priority : VARCHAR(20)
+    * classification : VARCHAR(20)
+    * status : VARCHAR(30)
+  }
+  entity "impact_assessment" as impact_assessment {
+    * id : UUID <<PK>>
+    --
+    * rfc_id : UUID <<UQ,FK>>
+    * architect_id : UUID <<FK>>
+    * classification : VARCHAR(20)
+    * technical_risk : VARCHAR(20)
+  }
+  entity "change_authorization" as change_authorization {
+    * id : UUID <<PK>>
+    --
+    * rfc_id : UUID <<FK>>
+    * authorizer_role : VARCHAR(40)
+    * authorizer_user_id : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "ccb_resolution" as ccb_resolution {
+    * id : UUID <<PK>>
+    --
+    * rfc_id : UUID <<FK>>
+    * resolution_code : VARCHAR(50) <<UQ>>
+    * decision : VARCHAR(20)
+  }
+  entity "ccb_vote" as ccb_vote {
+    * id : UUID <<PK>>
+    --
+    * resolution_id : UUID <<FK>>
+    * rfc_id : UUID <<FK>>
+    * voter_user_id : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "change_order" as change_order {
+    * id : UUID <<PK>>
+    --
+    * code : VARCHAR(30) <<UQ>>
+    * rfc_id : UUID <<UQ,FK>>
+    * ecs_id : UUID <<FK>>
+    * issued_by : UUID <<FK>>
+    * assigned_developer_id : UUID <<FK>>
+    * status : VARCHAR(20)
+  }
+}
+
+package "Ejecución, Calidad y Auditoría" {
+  entity "sync_lock" as sync_lock {
+    * id : UUID <<PK>>
+    --
+    * ecs_id : UUID <<FK>>
+    * change_order_id : UUID <<FK>>
+    * locked_by : UUID <<FK>>
+    * status : VARCHAR(20)
+  }
+  entity "qa_certification" as qa_certification {
+    * id : UUID <<PK>>
+    --
+    * change_order_id : UUID <<FK>>
+    * ecs_version_id : UUID <<FK>>
+    * certified_by : UUID <<FK>>
+    * result : VARCHAR(20)
+  }
+  entity "uat_acceptance" as uat_acceptance {
+    * id : UUID <<PK>>
+    --
+    * change_order_id : UUID <<FK>>
+    * ecs_version_id : UUID <<FK>>
+    * accepted_by : UUID <<FK>>
+    * result : VARCHAR(20)
+  }
+  entity "incident_ticket" as incident_ticket {
+    * id : UUID <<PK>>
+    --
+    * code : VARCHAR(30) <<UQ>>
+    * project_id : UUID <<FK>>
+    * reported_by : UUID <<FK>>
+    * derived_rfc_id : UUID <<FK>>
+    * status : VARCHAR(30)
+  }
+  entity "audit_log" as audit_log {
+    * id : UUID <<PK>>
+    --
+    * sequence_number : BIGINT <<UQ>>
+    * actor_user_id : UUID <<FK>>
+    * event_code : VARCHAR(60)
+    * prev_log_hash : VARCHAR(64)
+    * curr_log_hash : VARCHAR(64)
+  }
+}
+
+app_user ||--o{ user_role_assignment
+app_role ||--o{ user_role_assignment
+app_user ||--o{ user_session
+app_role ||--o{ user_session
+app_user ||--o{ user_project_assignment
+project ||--o{ user_project_assignment
+project ||--o{ config_item
+config_item ||--o{ ecs_version
+project ||--o{ baseline
+baseline ||--o{ baseline_item
+ecs_version ||--o{ baseline_item
+project ||--o{ change_request
+config_item ||--o{ change_request
+app_user ||--o{ change_request
+change_request ||--o| impact_assessment
+change_request ||--o{ change_authorization
+change_request ||--o{ ccb_resolution
+ccb_resolution ||--o{ ccb_vote
+change_request ||--o| change_order
+config_item ||--o{ change_order
+config_item ||--o{ sync_lock
+change_order ||--o{ sync_lock
+change_order ||--o{ qa_certification
+change_order ||--o{ uat_acceptance
+project ||--o{ incident_ticket
+change_request ||--o{ incident_ticket
+app_user ||--o{ audit_log
+@enduml
+\
+### DG-ER-OBJETIVO — Modelo Relacional Objetivo en Español (Esquema traceflow - 21 Tablas)
+
+\\plantuml
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide circle
+
+title <b>DG-ER-OBJETIVO: Modelo Relacional Objetivo en Español (Esquema traceflow - 21 Tablas)</b>
+
+package "Seguridad e Identidad" {
+  entity "rol_aplicacion" as rol_aplicacion {
+    * id : INT <<PK>>
+    --
+    * codigo : VARCHAR(20) <<UQ>>
+    * nombre : VARCHAR(80)
+  }
+  entity "usuario" as usuario {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(20) <<UQ>>
+    * nombre_usuario : VARCHAR(50) <<UQ>>
+    * correo : VARCHAR(120) <<UQ>>
+    * hash_contrasena : VARCHAR(255)
+    * nombre_completo : VARCHAR(120)
+    * estado : VARCHAR(20)
+  }
+  entity "asignacion_rol_usuario" as asignacion_rol_usuario {
+    * id_usuario : UUID <<PK,FK>>
+    * id_rol : INT <<PK,FK>>
+    --
+    * es_principal : BOOLEAN
+  }
+  entity "sesion_usuario" as sesion_usuario {
+    * id : UUID <<PK>>
+    --
+    * id_usuario : UUID <<FK>>
+    * id_rol_activo : INT <<FK>>
+    * hash_token_sesion : VARCHAR(64) <<UQ>>
+    * fecha_expiracion : TIMESTAMPTZ
+  }
+}
+
+package "Proyectos y Activos SCM" {
+  entity "proyecto" as proyecto {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * clave_proyecto : VARCHAR(20) <<UQ>>
+    * nombre : VARCHAR(150)
+    * estado : VARCHAR(20)
+  }
+  entity "asignacion_proyecto_usuario" as asignacion_proyecto_usuario {
+    * id_usuario : UUID <<PK,FK>>
+    * id_proyecto : UUID <<PK,FK>>
+  }
+  entity "elemento_configuracion" as elemento_configuracion {
+    * id : UUID <<PK>>
+    --
+    * id_proyecto : UUID <<FK>>
+    * codigo : VARCHAR(60)
+    * biblioteca_actual : VARCHAR(20)
+    * version_actual : VARCHAR(20)
+    * esta_bloqueado : BOOLEAN
+  }
+  entity "version_ecs" as version_ecs {
+    * id : UUID <<PK>>
+    --
+    * id_ecs : UUID <<FK>>
+    * numero_version : VARCHAR(20)
+    * suma_sha256 : VARCHAR(64)
+  }
+  entity "linea_base" as linea_base {
+    * id : UUID <<PK>>
+    --
+    * id_proyecto : UUID <<FK>>
+    * codigo : VARCHAR(40) <<UQ>>
+    * etiqueta_version : VARCHAR(20)
+    * estado : VARCHAR(20)
+  }
+  entity "elemento_linea_base" as elemento_linea_base {
+    * id_linea_base : UUID <<PK,FK>>
+    * id_version_ecs : UUID <<PK,FK>>
+  }
+}
+
+package "Control de Cambios y Gobernanza" {
+  entity "solicitud_cambio" as solicitud_cambio {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_proyecto : UUID <<FK>>
+    * id_ecs_objetivo : UUID <<FK>>
+    * id_solicitante : UUID <<FK>>
+    * prioridad : VARCHAR(20)
+    * clasificacion : VARCHAR(20)
+    * estado : VARCHAR(30)
+  }
+  entity "informe_impacto" as informe_impacto {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<UQ,FK>>
+    * id_arquitecto : UUID <<FK>>
+    * clasificacion : VARCHAR(20)
+    * riesgo_tecnico : VARCHAR(20)
+  }
+  entity "autorizacion_cambio" as autorizacion_cambio {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<FK>>
+    * rol_autorizador : VARCHAR(40)
+    * id_usuario_autorizador : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "resolucion_ccb" as resolucion_ccb {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<FK>>
+    * codigo_resolucion : VARCHAR(50) <<UQ>>
+    * decision : VARCHAR(20)
+  }
+  entity "voto_ccb" as voto_ccb {
+    * id : UUID <<PK>>
+    --
+    * id_resolucion : UUID <<FK>>
+    * id_rfc : UUID <<FK>>
+    * id_usuario_votante : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "orden_cambio" as orden_cambio {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_rfc : UUID <<UQ,FK>>
+    * id_ecs : UUID <<FK>>
+    * emitido_por : UUID <<FK>>
+    * id_desarrollador_asignado : UUID <<FK>>
+    * estado : VARCHAR(20)
+  }
+}
+
+package "Ejecución, Calidad y Auditoría" {
+  entity "bloqueo_sincronizacion" as bloqueo_sincronizacion {
+    * id : UUID <<PK>>
+    --
+    * id_ecs : UUID <<FK>>
+    * id_orden_cambio : UUID <<FK>>
+    * bloqueado_por : UUID <<FK>>
+    * estado : VARCHAR(20)
+  }
+  entity "certificacion_qa" as certificacion_qa {
+    * id : UUID <<PK>>
+    --
+    * id_orden_cambio : UUID <<FK>>
+    * id_version_ecs : UUID <<FK>>
+    * certificado_por : UUID <<FK>>
+    * resultado : VARCHAR(20)
+  }
+  entity "aceptacion_uat" as aceptacion_uat {
+    * id : UUID <<PK>>
+    --
+    * id_orden_cambio : UUID <<FK>>
+    * id_version_ecs : UUID <<FK>>
+    * aceptado_por : UUID <<FK>>
+    * resultado : VARCHAR(20)
+  }
+  entity "incidencia" as incidencia {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_proyecto : UUID <<FK>>
+    * reportado_por : UUID <<FK>>
+    * id_rfc_derivada : UUID <<FK>>
+    * estado : VARCHAR(30)
+  }
+  entity "registro_auditoria" as registro_auditoria {
+    * id : UUID <<PK>>
+    --
+    * numero_secuencia : BIGINT <<UQ>>
+    * id_usuario_actor : UUID <<FK>>
+    * codigo_evento : VARCHAR(60)
+    * hash_log_anterior : VARCHAR(64)
+    * hash_log_actual : VARCHAR(64)
+  }
+}
+
+usuario ||--o{ asignacion_rol_usuario
+rol_aplicacion ||--o{ asignacion_rol_usuario
+usuario ||--o{ sesion_usuario
+rol_aplicacion ||--o{ sesion_usuario
+usuario ||--o{ asignacion_proyecto_usuario
+proyecto ||--o{ asignacion_proyecto_usuario
+proyecto ||--o{ elemento_configuracion
+elemento_configuracion ||--o{ version_ecs
+proyecto ||--o{ linea_base
+linea_base ||--o{ elemento_linea_base
+version_ecs ||--o{ elemento_linea_base
+proyecto ||--o{ solicitud_cambio
+elemento_configuracion ||--o{ solicitud_cambio
+usuario ||--o{ solicitud_cambio
+solicitud_cambio ||--o| informe_impacto
+solicitud_cambio ||--o{ autorizacion_cambio
+solicitud_cambio ||--o{ resolucion_ccb
+resolucion_ccb ||--o{ voto_ccb
+solicitud_cambio ||--o| orden_cambio
+elemento_configuracion ||--o{ orden_cambio
+elemento_configuracion ||--o{ bloqueo_sincronizacion
+orden_cambio ||--o{ bloqueo_sincronizacion
+orden_cambio ||--o{ certificacion_qa
+orden_cambio ||--o{ aceptacion_uat
+proyecto ||--o{ incidencia
+solicitud_cambio ||--o{ incidencia
+usuario ||--o{ registro_auditoria
+@enduml
+\
+
+---
+
+# DG-ACT-01 — Diagrama de Actividades: Gestionar usuarios y roles (CU-01)
+
+**ID:** DG-ACT-01 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-01, RF-01, RN-01 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-01
+
+![DG-ACT-01](assets/diagramas/render/analisis/DG-ACT-01.svg)
+
+```plantuml
+@startuml DG-ACT-01
+title <b>DG-ACT-01: Flujo de Actividades — Gestionar usuarios y roles (CU-01)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#F5EEF8|Administrador de Configuración / Bibliotecario|
+|#EBF5FB|TraceFlow SCM|
+
+|Administrador de Configuración / Bibliotecario|
+start
+:<color:white><b>FASE 1: Acceso y Selección de Operación</b></color>; <<#34495E>>
+:Acceder al módulo de Administración\nde Usuarios y Roles;
+
+|TraceFlow SCM|
+if (¿Rol activo corresponde a Administrador SCM [PU-05]?) then (No)
+    :[E001] Denegar acceso e informar\nrestricción de control de acceso;
+    stop
+else (Sí)
+    :Presentar directorio de cuentas\ny catálogo de los 7 roles oficiales (PU-01..PU-07);
+endif
+
+|Administrador de Configuración / Bibliotecario|
+if (¿Tipo de operación a ejecutar?) then (Alta de usuario)
+    :<color:white><b>FASE 2: Captura y Validación de Identidad</b></color>; <<#34495E>>
+    repeat
+        |Administrador de Configuración / Bibliotecario|
+        :Ingresar código, nombre completo, correo corporativo,\ncredencial inicial, rol(es) y proyectos asignados;
+        |TraceFlow SCM|
+        :Validar obligatoriedad, unicidad de correo/código\ny validez del perfil dentro de PU-01..PU-07;
+    repeat while (¿Datos y rol válidos?) is (No [E002/E003]: Indicar duplicidad o rol inválido)
+    -> Sí;
+    :Registrar cuenta en estado Activo,\nasociar roles/proyectos y registrar evento en bitácora;
+elseif (Modificar rol o proyectos [A001]) then
+    :Seleccionar cuenta existente y ajustar\nperfiles oficiales o proyectos asignados;
+    :Actualizar autorizaciones preservando\nel historial de acciones previas en auditoría;
+else (Desactivar cuenta [A002])
+    :Seleccionar cuenta y confirmar\ndesactivación lógica;
+    :Bloquear acceso futuro manteniendo íntegros\nlos registros históricos y firmas emitidas;
+endif
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Confirmación y Notificación</b></color>; <<#34495E>>
+:Mostrar confirmación en pantalla\ny emitir notificación al usuario afectado;
+stop
+@enduml
+```
+
+---
+
+# DG-ACT-02 — Diagrama de Actividades: Crear y administrar proyectos (CU-02)
+
+**ID:** DG-ACT-02 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-02, RF-02, RN-01, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-02
+
+![DG-ACT-02](assets/diagramas/render/analisis/DG-ACT-02.svg)
+
+```plantuml
+@startuml DG-ACT-02
+title <b>DG-ACT-02: Flujo de Actividades — Crear y administrar proyectos (CU-02)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#EAEDED|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor|
+start
+:<color:white><b>FASE 1: Apertura y Selección de Acción</b></color>; <<#34495E>>
+:Acceder al módulo de Administración de Proyectos;
+
+|TraceFlow SCM|
+if (¿Usuario autenticado con perfil Gestor autorizado?) then (No)
+    :[E001] Denegar operación administrativa\nsegún control de acceso;
+    stop
+else (Sí)
+    :Presentar catálogo de proyectos\ny opciones de creación/edición;
+endif
+
+|Analista de Requerimientos / Gestor|
+if (¿Acción sobre el proyecto?) then (Nuevo proyecto)
+    :<color:white><b>FASE 2: Configuración y Aislamiento</b></color>; <<#34495E>>
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Ingresar código, nombre, cliente de ÉXODO S.A.C.,\ndescripción, fechas contractuales y equipo asignado;
+        |TraceFlow SCM|
+        :Validar unicidad de código/nombre\ny coherencia de plazos contractuales;
+    repeat while (¿Datos del proyecto válidos?) is (No [E002/E003]: Indicar duplicado o fecha inválida)
+    -> Sí;
+    :Crear proyecto con espacio lógico aislado,\nasignar participantes y habilitar las 3 bibliotecas\n(Trabajo, Soporte y Maestra);
+elseif (Actualizar parámetros o equipo [A001]) then
+    :Seleccionar proyecto existente y editar\nparámetros o integrantes asignados;
+    :Validar cambios y actualizar expediente\nconservando historial de auditoría;
+else (Archivar / cerrar proyecto [A002])
+    :Seleccionar proyecto finalizado y confirmar cierre;
+    :Cambiar estado a Archivado conservando\nLíneas Base en modo solo lectura;
+endif
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Confirmación y Aviso</b></color>; <<#34495E>>
+:Registrar evento en auditoría, confirmar en pantalla\ny notificar al Bibliotecario (PU-05) para alta de ECS;
+stop
+@enduml
+```
+
+---
+
+# DG-ACT-03 — Diagrama de Actividades: Consultar proyecto (CU-03)
+
+**ID:** DG-ACT-03 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-03, RF-02, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-03
+
+![DG-ACT-03](assets/diagramas/render/analisis/DG-ACT-03.svg)
+
+```plantuml
+@startuml DG-ACT-03
+title <b>DG-ACT-03: Flujo de Actividades — Consultar proyecto (CU-03)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F4F8|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+|#EBF5FB|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+start
+:<color:white><b>FASE 1: Acceso al Directorio de Proyectos</b></color>; <<#34495E>>
+:Seleccionar opción "Proyectos" en el menú principal;
+
+|TraceFlow SCM|
+:Cargar exclusivamente los proyectos asignados\nal usuario autenticado (aislamiento entre clientes);
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+if (¿Desea filtrar listado? [A001]) then (Sí)
+    :Aplicar filtros por nombre, cliente o estado;
+    |TraceFlow SCM|
+    :Actualizar lista de proyectos coincidentes;
+else (No)
+endif
+
+|Analista de Requerimientos / Gestor (o Usuario Autorizado)|
+:Seleccionar el proyecto a consultar;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 2: Validación y Consolidación de Ficha</b></color>; <<#34495E>>
+if (¿El proyecto existe?) then (No)
+    :[E002] Informar proyecto no encontrado\ny ofrecer retorno al directorio;
+    stop
+else (Sí)
+endif
+
+if (¿Usuario autorizado para el proyecto?) then (No)
+    :[E001] Bloquear visualización y notificar\nrestricción de aislamiento de proyectos;
+    stop
+else (Sí)
+    :Consolidar datos generales, cliente, equipo,\ncatálogo de ECS y resumen de RFCs activas;
+    :Mostrar Ficha Integral de Proyecto en solo lectura\ncon accesos de navegación autorizados;
+    stop
+endif
+@enduml
+```
+
+---
+
+# DG-ACT-04 — Diagrama de Actividades: Registrar Solicitud de Cambio (RFC) (CU-04)
+
+**ID:** DG-ACT-04 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 2.0  
+**Trazabilidad:** CU-04, RF-04, RN-01, RN-04 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-04
+
+![DG-ACT-04](assets/diagramas/render/analisis/DG-ACT-04.svg)
+
+```plantuml
+@startuml DG-ACT-04
+title <b>DG-ACT-04: Flujo de Actividades — Registrar Solicitud de Cambio (RFC) (CU-04)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+    FontSize 10
+}
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|TraceFlow SCM|
+
+|Solicitante|
+start
+:<color:white><b>FASE 1: Acceso e Información General</b></color>; <<#34495E>>
+:Solicitar registro de nueva RFC\n("Nueva Solicitud RFC");
+
+|TraceFlow SCM|
+if (¿Rol activo en sesión es Solicitante [PU-01]?) then (No)
+    :[E001] Mostrar aviso de Segregación de Funciones\ny deshabilitar envío definitivo;
+    stop
+else (Sí)
+    :Cargar proyectos asignados\ny presentar Asistente Paso 1 de 4;
+endif
+
+if (¿Existe borrador temporal previo para el proyecto?) then (Sí)
+    :Restaurar datos previos en el formulario;
+else (No)
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar proyecto, ingresar título,\nprioridad y categoría del cambio;
+    note left
+      <b>[A001]</b> Guardar borrador temporal
+      <b>[A003]</b> Cancelar -> Confirmar descarte
+    end note
+
+    |TraceFlow SCM|
+    :Validar campos obligatorios del Paso 1;
+repeat while (¿Paso 1 válido?) is (No [E002]: Señalar campo y mostrar error)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 2: Justificación, Alcance y ECS</b></color>; <<#34495E>>
+:Habilitar Paso 2 (Justificación y Alcance);
+
+repeat
+    |Solicitante|
+    :Ingresar descripción detallada,\njustificación de negocio y propuesta opcional;
+    |TraceFlow SCM|
+    :Validar longitud y completitud del Paso 2;
+repeat while (¿Paso 2 válido?) is (No [E002]: Indicar longitud mínima faltante)
+-> Sí;
+
+|TraceFlow SCM|
+:Consultar catálogo de ECS del proyecto;
+if (¿Existen ECS registrados en el proyecto?) then (No)
+    :[E003] Mostrar aviso de catálogo vacío\n(Contactar al Administrador SCM);
+    stop
+else (Sí)
+    :Habilitar Paso 3 (ECS y Evidencias);
+endif
+
+repeat
+    |Solicitante|
+    :Seleccionar ECS afectado;
+    if (¿Desea adjuntar sustento?) then (Sí [A002])
+        :Adjuntar documentación técnica o probatoria;
+    else (No)
+    endif
+    |TraceFlow SCM|
+    :Validar selección obligatoria de ECS;
+repeat while (¿ECS seleccionado?) is (No [E002]: Exigir selección de ECS)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Revisión, Confirmación y Radicación</b></color>; <<#34495E>>
+:Presentar Paso 4 con Ficha Resumen Técnica,\ncódigo preliminar y confirmación de envío;
+
+|Solicitante|
+if (¿Desea corregir datos previos?) then (Sí [A001/Navegar])
+    :Regresar a pasos anteriores\no guardar borrador temporal;
+    detach
+else (No)
+endif
+
+:Confirmar envío (declaración de veracidad\nsegún política vigente) y pulsar "Enviar Solicitud de Cambio";
+
+|TraceFlow SCM|
+:Ejecutar validación integral en el servidor;
+if (¿Longitud y formato de datos válidos?) then (No)
+    :[E002] Informar observación de validación\nconservando los datos en pantalla;
+    stop
+else (Sí)
+endif
+
+if (¿El ECS pertenece al proyecto y está disponible?) then (No)
+    :[E004] Rechazar por inconsistencia Proyecto-ECS\no indisponibilidad del elemento;
+    stop
+else (Sí)
+endif
+
+:Intentar radicar RFC con código único\nen estado <b>REGISTRADA</b>;
+
+if (¿Conexión y registro en servidor exitosos?) then (No)
+    :[E005] Informar error de conectividad\nconservando los datos capturados para reintento;
+    stop
+else (Sí)
+    :Registrar evento en bitácora inmutable de auditoría\ny derivar notificación al Gestor (PU-02);
+    :Presentar comprobante de radicación\ny accesos (Expediente 360°, Bandeja, Nueva, Dashboard);
+    stop
+endif
+
+@enduml
+```
+
+---
+
+# DG-ACT-04.1 — Diagrama de Actividades: Subsanar Solicitud de Cambio (RFC) (CU-04.1)
+
+**ID:** DG-ACT-04.1 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-04.1, RF-04, RN-01, RN-04, RN-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-04.1
+
+![DG-ACT-04.1](assets/diagramas/render/analisis/DG-ACT-04.1.svg)
+
+```plantuml
+@startuml DG-ACT-04.1
+title <b>DG-ACT-04.1: Flujo de Actividades — Subsanar Solicitud de Cambio (RFC) (CU-04.1)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F4F8|Solicitante|
+|#EBF5FB|TraceFlow SCM|
+
+|Solicitante|
+start
+:<color:white><b>FASE 1: Acceso y Verificación de Condiciones</b></color>; <<#34495E>>
+:Seleccionar RFC observada en Bandeja o Expediente\ny pulsar "Subsanar Solicitud";
+
+|TraceFlow SCM|
+if (¿RFC existe y pertenece al proyecto activo?) then (No)
+    :[E001] Informar expediente inexistente\no solicitar conmutar al proyecto del trámite;
+    stop
+elseif (¿Estado actual es EN_SUBSANACION?) then (No)
+    :[E002] Indicar que solo solicitudes observadas\nadmiten subsanación;
+    stop
+elseif (¿Usuario es Solicitante [PU-01] y autor original?) then (No)
+    :[E001] Denegar acceso por RBAC / titularidad\n(reservado al solicitante original);
+    stop
+elseif (¿Dentro del plazo reglamentario?) then (No)
+    :[E004] Bloquear edición por plazo expirado\ny declarar cierre en estado <b>DESESTIMADA</b>;
+    stop
+else (Sí)
+    :Mostrar Pliego de Observaciones del Gestor\ny formulario precargado con datos de la RFC;
+endif
+
+|Solicitante|
+:<color:white><b>FASE 2: Corrección de Campos o Desistimiento</b></color>; <<#34495E>>
+if (¿Decide desistir de la solicitud? [A001]) then (Sí)
+    repeat
+        |Solicitante|
+        :Pulsar "Desistir de la Solicitud",\ningresar motivo y marcar confirmación;
+        |TraceFlow SCM|
+        :Validar motivo descriptivo y confirmación;
+    repeat while (¿Motivo y confirmación válidos?) is (No [E003]: Exigir justificación)
+    -> Sí;
+    :Registrar cierre voluntario en estado <b>DESESTIMADA</b>\ny actualizar bitácora de auditoría;
+    stop
+else (No)
+endif
+
+repeat
+    |Solicitante|
+    :Corregir título, prioridad, categoría, descripción,\njustificación, ECS, adjuntos [A002] y notas de descargo;
+    :Pulsar "Reingresar Solicitud Subsanada";
+    |TraceFlow SCM|
+    :Validar campos obligatorios y pertenencia del ECS;
+repeat while (¿Validación satisfactoria?) is (No [E003]: Señalar campos observados)
+-> Sí;
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Reingreso Formal</b></color>; <<#34495E>>
+:Actualizar expediente y transicionar estado:\n<b>EN_SUBSANACION -> REGISTRADA</b>;
+:Registrar auditoría, notificar al Gestor (PU-02)\ny mostrar confirmación de reingreso;
+stop
+@enduml
+```
+
+---
+
+# DG-ACT-05 — Diagrama de Actividades: Validar y clasificar la solicitud (CU-05)
+
+**ID:** DG-ACT-05 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-05, RF-04, RF-05, RF-14, RN-01, RN-07 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-05
+
+![DG-ACT-05](assets/diagramas/render/analisis/DG-ACT-05.svg)
+
+```plantuml
+@startuml DG-ACT-05
+title <b>DG-ACT-05: Flujo de Actividades — Validar y clasificar la solicitud (CU-05)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#EBF5FB|Analista de Requerimientos / Gestor|
+|#EAEDED|TraceFlow SCM|
+
+|Analista de Requerimientos / Gestor|
+start
+:<color:white><b>FASE 1: Recepción y Revisión Formal</b></color>; <<#34495E>>
+:Abrir expediente RFC en estado REGISTRADA;
+
+|TraceFlow SCM|
+if (¿Rol activo es Gestor [PU-02] con proyecto asignado?) then (No)
+    :[E001] Mostrar restricción de revisión\nreservada al Analista de Requerimientos / Gestor;
+    stop
+elseif (¿Estado de la RFC es REGISTRADA?) then (No)
+    :[E002] Informar que la solicitud no está\nen etapa de revisión inicial;
+    stop
+else (Sí)
+    :Presentar Expediente 360° y panel de decisiones\n(Admitir, Observar o Desestimar);
+endif
+
+|Analista de Requerimientos / Gestor|
+:Inspeccionar descripción, justificación, prioridad,\nECS asociado, anexos y eventual duplicidad;
+
+if (¿Anexos legibles y consistentes?) then (No [E004])
+    :Alertar falla o ilegibilidad de anexos\ny derivar a formulación de observaciones;
+else (Sí)
+endif
+
+:<color:white><b>FASE 2: Emisión de Dictamen Inicial</b></color>; <<#34495E>>
+if (¿Decisión de admisibilidad?) then (Opción A: Admitir)
+    :Registrar observaciones o confirmación de admisión\ny pulsar "Admitir Solicitud";
+    |TraceFlow SCM|
+    :Actualizar estado a <b>CLASIFICADA</b>,\nregistrar auditoría y notificar al Arquitecto (PU-03);
+    stop
+elseif (Opción B: Observar [A001]) then
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Redactar pliego de observaciones\ny pulsar "Emitir Pliego de Observaciones";
+        |TraceFlow SCM|
+        :Validar extensión mínima del pliego (10 car.);
+    repeat while (¿Pliego válido?) is (No [E003]: Exigir detalle suficiente)
+    -> Sí;
+    :Transicionar estado a <b>EN_SUBSANACION</b>,\nregistrar auditoría y notificar al Solicitante (CU-04.1);
+    stop
+else (Opción C: Desestimar [A002])
+    repeat
+        |Analista de Requerimientos / Gestor|
+        :Ingresar justificación obligatoria, marcar confirmación\ny pulsar "Desestimar Definitivamente";
+        |TraceFlow SCM|
+        :Validar justificación (>= 10 car.) y casilla de confirmación;
+    repeat while (¿Justificación y confirmación válidas?) is (No [E003]: Exigir fundamentación)
+    -> Sí;
+    :Transicionar estado terminal a <b>DESESTIMADA</b> (RN-07),\nregistrar auditoría y notificar cierre al Solicitante;
+    stop
+endif
+@enduml
+```
+
+---
+
+# DG-ACT-06 — Diagrama de Actividades: Realizar análisis de impacto técnico (CU-06)
+
+**ID:** DG-ACT-06 | **Tipo:** Diagrama de Actividades (Análisis Funcional) | **Estado:** REVISIÓN SRS-02 | **Versión:** 1.0  
+**Trazabilidad:** CU-06, RF-05, RN-01, RN-05 | **Fuente:** `FD03-EPIS-Informe_SRS.md`, Narrativa CU-06
+
+![DG-ACT-06](assets/diagramas/render/analisis/DG-ACT-06.svg)
+
+```plantuml
+@startuml DG-ACT-06
+title <b>DG-ACT-06: Flujo de Actividades — Realizar análisis de impacto técnico (CU-06)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#E8F8F5|Arquitecto / Especialista Técnico|
+|#EBF5FB|TraceFlow SCM|
+
+|Arquitecto / Especialista Técnico|
+start
+:<color:white><b>FASE 1: Acceso y Validación SoD</b></color>; <<#34495E>>
+:Seleccionar evaluación técnica para RFC admitida;
+
+|TraceFlow SCM|
+if (¿Rol activo es Arquitecto [PU-03] con proyecto asignado?) then (No)
+    :[E001] Denegar acceso por perfil o aislamiento;
+    stop
+elseif (¿Usuario es distinto al Solicitante original?) then (No)
+    :[E001] Bloquear por Segregación de Funciones\n(prohibida autoevaluación según RN-05);
+    stop
+elseif (¿Estado válido CLASIFICADA/EN_ANALISIS_TECNICO\ny sin informe previo?) then (No)
+    :[E002] Informar estado incompatible\no informe ya congelado;
+    stop
+else (Sí)
+    :Situar trámite en análisis técnico y presentar\ncontexto RFC, notas de admisión y catálogo ECS;
+endif
+
+|Arquitecto / Especialista Técnico|
+if (¿Requiere aclaración de alcance? [A001]) then (Sí)
+    :Formular consulta técnica al Gestor / Solicitante\ny recibir precisión para continuar evaluación;
+else (No)
+endif
+
+:<color:white><b>FASE 2: Triple Restricción, Riesgos y Clasificación</b></color>; <<#34495E>>
+repeat
+    |Arquitecto / Especialista Técnico|
+    :Estimar esfuerzo (h), costo (S/.) e impacto en días;\nseleccionar ECS afectados/dependientes, fundamentación técnica,\nnivel y lista de riesgos, plan de rollback y dictamen;
+    :Pulsar "Firmar y Emitir Informe Técnico";
+
+    |TraceFlow SCM|
+    :Validar esfuerzo (>0), costo (>=0), días (>=0),\nfundamentación (>=15 car.) y ECS del proyecto;
+repeat while (¿Parámetros del informe válidos?) is (No [E003]: Indicar dato faltante o inválido)
+-> Sí;
+
+:<color:white><b>FASE 3: Congelamiento de Informe y Enrutamiento</b></color>; <<#34495E>>
+:Registrar Informe Técnico de Impacto (TIA) inmutable\ny transicionar estado a <b>EN_EVALUACION</b>;
+
+if (¿Clasificación y dictamen emitidos?) then (Cambio Menor [PROCEDE_MENOR])
+    :Enrutar a Autorización Delegada Doble Llave (CU-30)\n(Gestor + Arquitecto);
+elseif (Cambio Mayor [PROCEDE_MAYOR]) then
+    :Enrutar a Deliberación Colegiada del CCB (CU-07);
+else ([E004] Inviable técnicamente [RECHAZO_TECNICO])
+    :Enrutar a CCB (CU-07) con recomendación\nformal de rechazo técnico;
+endif
+
+:Registrar auditoría, notificar instancia evaluadora\ny mostrar confirmación de emisión exitosa;
+stop
 @enduml
 ```

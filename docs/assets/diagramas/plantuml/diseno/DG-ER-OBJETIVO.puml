@@ -1,0 +1,213 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide circle
+
+title <b>DG-ER-OBJETIVO: Modelo Relacional Objetivo en Español (Esquema traceflow - 21 Tablas)</b>
+
+package "Seguridad e Identidad" {
+  entity "rol_aplicacion" as rol_aplicacion {
+    * id : INT <<PK>>
+    --
+    * codigo : VARCHAR(20) <<UQ>>
+    * nombre : VARCHAR(80)
+  }
+  entity "usuario" as usuario {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(20) <<UQ>>
+    * nombre_usuario : VARCHAR(50) <<UQ>>
+    * correo : VARCHAR(120) <<UQ>>
+    * hash_contrasena : VARCHAR(255)
+    * nombre_completo : VARCHAR(120)
+    * estado : VARCHAR(20)
+  }
+  entity "asignacion_rol_usuario" as asignacion_rol_usuario {
+    * id_usuario : UUID <<PK,FK>>
+    * id_rol : INT <<PK,FK>>
+    --
+    * es_principal : BOOLEAN
+  }
+  entity "sesion_usuario" as sesion_usuario {
+    * id : UUID <<PK>>
+    --
+    * id_usuario : UUID <<FK>>
+    * id_rol_activo : INT <<FK>>
+    * hash_token_sesion : VARCHAR(64) <<UQ>>
+    * fecha_expiracion : TIMESTAMPTZ
+  }
+}
+
+package "Proyectos y Activos SCM" {
+  entity "proyecto" as proyecto {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * clave_proyecto : VARCHAR(20) <<UQ>>
+    * nombre : VARCHAR(150)
+    * estado : VARCHAR(20)
+  }
+  entity "asignacion_proyecto_usuario" as asignacion_proyecto_usuario {
+    * id_usuario : UUID <<PK,FK>>
+    * id_proyecto : UUID <<PK,FK>>
+  }
+  entity "elemento_configuracion" as elemento_configuracion {
+    * id : UUID <<PK>>
+    --
+    * id_proyecto : UUID <<FK>>
+    * codigo : VARCHAR(60)
+    * biblioteca_actual : VARCHAR(20)
+    * version_actual : VARCHAR(20)
+    * esta_bloqueado : BOOLEAN
+  }
+  entity "version_ecs" as version_ecs {
+    * id : UUID <<PK>>
+    --
+    * id_ecs : UUID <<FK>>
+    * numero_version : VARCHAR(20)
+    * suma_sha256 : VARCHAR(64)
+  }
+  entity "linea_base" as linea_base {
+    * id : UUID <<PK>>
+    --
+    * id_proyecto : UUID <<FK>>
+    * codigo : VARCHAR(40) <<UQ>>
+    * etiqueta_version : VARCHAR(20)
+    * estado : VARCHAR(20)
+  }
+  entity "elemento_linea_base" as elemento_linea_base {
+    * id_linea_base : UUID <<PK,FK>>
+    * id_version_ecs : UUID <<PK,FK>>
+  }
+}
+
+package "Control de Cambios y Gobernanza" {
+  entity "solicitud_cambio" as solicitud_cambio {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_proyecto : UUID <<FK>>
+    * id_ecs_objetivo : UUID <<FK>>
+    * id_solicitante : UUID <<FK>>
+    * prioridad : VARCHAR(20)
+    * clasificacion : VARCHAR(20)
+    * estado : VARCHAR(30)
+  }
+  entity "informe_impacto" as informe_impacto {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<UQ,FK>>
+    * id_arquitecto : UUID <<FK>>
+    * clasificacion : VARCHAR(20)
+    * riesgo_tecnico : VARCHAR(20)
+  }
+  entity "autorizacion_cambio" as autorizacion_cambio {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<FK>>
+    * rol_autorizador : VARCHAR(40)
+    * id_usuario_autorizador : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "resolucion_ccb" as resolucion_ccb {
+    * id : UUID <<PK>>
+    --
+    * id_rfc : UUID <<FK>>
+    * codigo_resolucion : VARCHAR(50) <<UQ>>
+    * decision : VARCHAR(20)
+  }
+  entity "voto_ccb" as voto_ccb {
+    * id : UUID <<PK>>
+    --
+    * id_resolucion : UUID <<FK>>
+    * id_rfc : UUID <<FK>>
+    * id_usuario_votante : UUID <<FK>>
+    * decision : VARCHAR(20)
+  }
+  entity "orden_cambio" as orden_cambio {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_rfc : UUID <<UQ,FK>>
+    * id_ecs : UUID <<FK>>
+    * emitido_por : UUID <<FK>>
+    * id_desarrollador_asignado : UUID <<FK>>
+    * estado : VARCHAR(20)
+  }
+}
+
+package "Ejecución, Calidad y Auditoría" {
+  entity "bloqueo_sincronizacion" as bloqueo_sincronizacion {
+    * id : UUID <<PK>>
+    --
+    * id_ecs : UUID <<FK>>
+    * id_orden_cambio : UUID <<FK>>
+    * bloqueado_por : UUID <<FK>>
+    * estado : VARCHAR(20)
+  }
+  entity "certificacion_qa" as certificacion_qa {
+    * id : UUID <<PK>>
+    --
+    * id_orden_cambio : UUID <<FK>>
+    * id_version_ecs : UUID <<FK>>
+    * certificado_por : UUID <<FK>>
+    * resultado : VARCHAR(20)
+  }
+  entity "aceptacion_uat" as aceptacion_uat {
+    * id : UUID <<PK>>
+    --
+    * id_orden_cambio : UUID <<FK>>
+    * id_version_ecs : UUID <<FK>>
+    * aceptado_por : UUID <<FK>>
+    * resultado : VARCHAR(20)
+  }
+  entity "incidencia" as incidencia {
+    * id : UUID <<PK>>
+    --
+    * codigo : VARCHAR(30) <<UQ>>
+    * id_proyecto : UUID <<FK>>
+    * reportado_por : UUID <<FK>>
+    * id_rfc_derivada : UUID <<FK>>
+    * estado : VARCHAR(30)
+  }
+  entity "registro_auditoria" as registro_auditoria {
+    * id : UUID <<PK>>
+    --
+    * numero_secuencia : BIGINT <<UQ>>
+    * id_usuario_actor : UUID <<FK>>
+    * codigo_evento : VARCHAR(60)
+    * hash_log_anterior : VARCHAR(64)
+    * hash_log_actual : VARCHAR(64)
+  }
+}
+
+usuario ||--o{ asignacion_rol_usuario
+rol_aplicacion ||--o{ asignacion_rol_usuario
+usuario ||--o{ sesion_usuario
+rol_aplicacion ||--o{ sesion_usuario
+usuario ||--o{ asignacion_proyecto_usuario
+proyecto ||--o{ asignacion_proyecto_usuario
+proyecto ||--o{ elemento_configuracion
+elemento_configuracion ||--o{ version_ecs
+proyecto ||--o{ linea_base
+linea_base ||--o{ elemento_linea_base
+version_ecs ||--o{ elemento_linea_base
+proyecto ||--o{ solicitud_cambio
+elemento_configuracion ||--o{ solicitud_cambio
+usuario ||--o{ solicitud_cambio
+solicitud_cambio ||--o| informe_impacto
+solicitud_cambio ||--o{ autorizacion_cambio
+solicitud_cambio ||--o{ resolucion_ccb
+resolucion_ccb ||--o{ voto_ccb
+solicitud_cambio ||--o| orden_cambio
+elemento_configuracion ||--o{ orden_cambio
+elemento_configuracion ||--o{ bloqueo_sincronizacion
+orden_cambio ||--o{ bloqueo_sincronizacion
+orden_cambio ||--o{ certificacion_qa
+orden_cambio ||--o{ aceptacion_uat
+proyecto ||--o{ incidencia
+solicitud_cambio ||--o{ incidencia
+usuario ||--o{ registro_auditoria
+@enduml

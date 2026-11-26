@@ -30,11 +30,13 @@ def get_diag_info(diag_id, content):
     raw_title = title_match.group(1).strip() if title_match else diag_id
     clean_title = re.sub(r'^' + re.escape(diag_id) + r'\s*:\s*', '', raw_title)
     
-    if diag_id.startswith('DG-D') or diag_id.startswith('DG-UWE'):
+    if diag_id.startswith('DG-ER-'):
+        doc = 'DICCIONARIO_DATOS / SAD_FINAL'
+    elif diag_id.startswith('DG-D') or diag_id.startswith('DG-UWE'):
         doc = 'FD05'
     elif diag_id in ['DG-SAD-A01', 'DG-SAD-A02']:
         doc = 'FD04'
-    elif diag_id == 'DG-12':
+    elif diag_id in ['DG-12', 'DG-12-HIST']:
         doc = 'FD03 / FD04'
     elif diag_id.startswith('DG-AO'):
         doc = 'FD03 / FD04'
@@ -47,6 +49,12 @@ def get_diag_info(diag_id, content):
         tipo = 'Presentación UWE'
     elif diag_id.startswith('DG-DSEQ'):
         tipo = 'Secuencia Técnica de Diseño'
+    elif diag_id.startswith('DG-ER-ACTUAL'):
+        tipo = 'Modelo Relacional Físico'
+    elif diag_id.startswith('DG-ER-OBJETIVO'):
+        tipo = 'Modelo Relacional Objetivo'
+    elif diag_id.startswith('DG-ACT'):
+        tipo = 'Diagrama de Actividades'
     elif diag_id.startswith('DG-SEQ'):
         tipo = 'Secuencia de Análisis'
     elif diag_id.startswith('DG-AO'):
@@ -67,6 +75,8 @@ def get_diag_info(diag_id, content):
         tipo = 'Contexto Arquitectónico'
     elif diag_id == 'DG-SAD-A02':
         tipo = 'Arquitectura Lógica Conceptual'
+    elif diag_id == 'DG-12-HIST':
+        tipo = 'Diagrama de Clases (Histórico)'
     elif diag_id in ['DG-01', 'DG-02', 'DG-03', 'DG-04', 'DG-05', 'DG-06', 'DG-07', 'DG-08', 'DG-09', 'DG-10', 'DG-11', 'DG-12', 'DG-13']:
         tipo = 'Modelo General / Análisis'
     else:
@@ -142,10 +152,10 @@ def generate_diagram_manifest():
     out.append("")
 
     cat_headers = {
-        'generales': '2. Catálogo Detallado: Modelos Generales (13 Diagramas)',
-        'analisis': '3. Catálogo Detallado: Modelos de Análisis y Casos de Uso (65 Diagramas)',
-        'diseno': '4. Catálogo Detallado: Modelos Arquitectónicos y Secuencias Técnicas de Diseño (15 Diagramas)',
-        'uwe': '5. Catálogo Detallado: Modelos UWE de Navegación y Presentación (21 Diagramas)'
+        'generales': f"2. Catálogo Detallado: Modelos Generales ({len(category_data['generales'])} Diagramas)",
+        'analisis': f"3. Catálogo Detallado: Modelos de Análisis y Casos de Uso ({len(category_data['analisis'])} Diagramas)",
+        'diseno': f"4. Catálogo Detallado: Modelos Arquitectónicos y Secuencias Técnicas de Diseño ({len(category_data['diseno'])} Diagramas)",
+        'uwe': f"5. Catálogo Detallado: Modelos UWE de Navegación y Presentación ({len(category_data['uwe'])} Diagramas)"
     }
 
     for cat in CATEGORIES:

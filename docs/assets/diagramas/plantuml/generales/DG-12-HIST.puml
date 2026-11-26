@@ -4,7 +4,7 @@ skinparam roundcorner 8
 skinparam defaultFontName Arial
 skinparam classAttributeIconSize 0
 
-title <b>DG-12: Diagrama de Clases del Dominio TraceFlow SCM</b>
+title <b>DG-12-HIST: Diagrama de Clases del Dominio TraceFlow SCM (Histórico)</b>
 
 class Usuario {
     - id: Long

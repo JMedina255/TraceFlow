@@ -1,0 +1,64 @@
+@startuml DG-ACT-01
+title <b>DG-ACT-01: Flujo de Actividades — Gestionar usuarios y roles (CU-01)</b>
+
+skinparam ActivityMaxWidth 230
+skinparam ranksep 18
+skinparam nodesep 16
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundCorner 8
+skinparam shadowing false
+skinparam conditionStyle inside
+
+skinparam arrowColor #2C3E50
+skinparam arrowThickness 1.2
+skinparam swimlaneBorderColor #7F8C8D
+skinparam swimlaneBorderThickness 1.2
+
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor #34495E
+    BorderThickness 1.2
+    FontColor #2C3E50
+}
+
+|#F5EEF8|Administrador de Configuración / Bibliotecario|
+|#EBF5FB|TraceFlow SCM|
+
+|Administrador de Configuración / Bibliotecario|
+start
+:<color:white><b>FASE 1: Acceso y Selección de Operación</b></color>; <<#34495E>>
+:Acceder al módulo de Administración\nde Usuarios y Roles;
+
+|TraceFlow SCM|
+if (¿Rol activo corresponde a Administrador SCM [PU-05]?) then (No)
+    :[E001] Denegar acceso e informar\nrestricción de control de acceso;
+    stop
+else (Sí)
+    :Presentar directorio de cuentas\ny catálogo de los 7 roles oficiales (PU-01..PU-07);
+endif
+
+|Administrador de Configuración / Bibliotecario|
+if (¿Tipo de operación a ejecutar?) then (Alta de usuario)
+    :<color:white><b>FASE 2: Captura y Validación de Identidad</b></color>; <<#34495E>>
+    repeat
+        |Administrador de Configuración / Bibliotecario|
+        :Ingresar código, nombre completo, correo corporativo,\ncredencial inicial, rol(es) y proyectos asignados;
+        |TraceFlow SCM|
+        :Validar obligatoriedad, unicidad de correo/código\ny validez del perfil dentro de PU-01..PU-07;
+    repeat while (¿Datos y rol válidos?) is (No [E002/E003]: Indicar duplicidad o rol inválido)
+    -> Sí;
+    :Registrar cuenta en estado Activo,\nasociar roles/proyectos y registrar evento en bitácora;
+elseif (Modificar rol o proyectos [A001]) then
+    :Seleccionar cuenta existente y ajustar\nperfiles oficiales o proyectos asignados;
+    :Actualizar autorizaciones preservando\nel historial de acciones previas en auditoría;
+else (Desactivar cuenta [A002])
+    :Seleccionar cuenta y confirmar\ndesactivación lógica;
+    :Bloquear acceso futuro manteniendo íntegros\nlos registros históricos y firmas emitidas;
+endif
+
+|TraceFlow SCM|
+:<color:white><b>FASE 3: Confirmación y Notificación</b></color>; <<#34495E>>
+:Mostrar confirmación en pantalla\ny emitir notificación al usuario afectado;
+stop
+@enduml

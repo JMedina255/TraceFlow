@@ -89,6 +89,10 @@ La plataforma opera bajo un modelo de Control de Acceso Basado en Roles (**RBAC*
 | **PU-05** | **Administrador de Configuración / Bibliotecario** | Custodio de bibliotecas; ejecuta Check-In/Check-Out, administra bloqueos, congelamientos de Líneas Base y rollbacks. |
 | **PU-06** | **Ingeniero de Software / Desarrollador** | Implementa cambios autorizados en la Biblioteca de Trabajo y ejecuta pruebas unitarias locales. |
 | **PU-07** | **Equipo de Calidad / Testing** | Ejecuta pruebas de integración, valida criterios de aceptación y emite Certificados de Conformidad. |
+| **PU-08** | **Administrador del Sistema** | Gobernanza global: gestiona usuarios, estados, perfiles operativos, invitaciones y autoriza `PU-09`. |
+| **PU-09** | **Jefe de Proyecto** | Autorizado mediante `can_create_projects` para crear proyectos y dirigir su configuración inicial. |
+
+> *Estado operativo actual (`MVP-H01` completo / PostgreSQL 17 local):* consulte la guía viva de continuidad y puesta en marcha en [docs/evidence/mvp-h01/HANDOFF.md](docs/evidence/mvp-h01/HANDOFF.md) y el estado consolidado en [docs/ESTADO_DEL_PROYECTO.md](docs/ESTADO_DEL_PROYECTO.md).
 
 ---
 

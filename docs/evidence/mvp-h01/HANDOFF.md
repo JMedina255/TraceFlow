@@ -613,3 +613,27 @@ Suite ejecutada contra Vite (`http://localhost:5173`), Backend NestJS (`http://l
 ### 19.3 Estado final para cierre y siguiente hito
 - **Matriz `ADM-01`..`ADM-26`:** Cobertura completa entre certificación unitaria/modular (`users-admin.spec.ts`), certificación física PostgreSQL 17 (`real-postgres-mvp-h01-certification.spec.ts`) y certificación E2E real en navegador (`scripts/e2e-mvp-h01-mi04.mjs`), quedando listo para demostración del MVP.
 - **Siguiente hito autorizado únicamente bajo instrucción expresa:** Publicación controlada / documentación final (`MI-05`) o `MVP-H02`.
+
+---
+
+## 20. SESSION-01: Cierre de sesión, publicación en GitHub y portabilidad (2026-11-26)
+
+### 20.1 Punto exacto de continuidad tras traslado
+- **Rama activa y publicada:** `feat/mvp-integral-traceflow` (repositorio `https://github.com/JMedina255/TraceFlow`).
+- **Último hito completado:** `MVP-H01 / MI-04` (estabilización `MI-01`, certificación administrativa `MI-02`, catálogo `DEMO-01`, PostgreSQL 17 local `ENV-03-R`, certificación física `MI-03`, refinamiento UI/UX `<dialog>` + certificación Playwright real `11/11` en `MI-04`).
+- **Siguiente incremento autorizado pendiente:** `MI-05` (documentación formal / cierre final si se solicita) o inicio de `MVP-H02` (UI de proyectos, equipo, metodología, planificación e integración GitHub). **No iniciar `MVP-H02` sin autorización.**
+
+### 20.2 Clasificación estricta del estado actual
+- **Implementado y verificado:**
+  - Módulos backend `AuthModule`, `UsersModule` (`PU-08`), `OrganizationsModule`, `ProjectsModule`, `ProjectPlanningModule`, `GitHubModule` (API/Webhooks/Worker), `RfcsModule`, `AuditModule`.
+  - Base de datos PostgreSQL 17 local: `traceflow_mvp_dev` (12 migraciones aplicadas, 9 roles `PU-01..PU-09`, 4 fundadores `USR-001..USR-004` + 9 cuentas `DEMO-01` `USR-005..USR-013`, 3 proyectos, 6 ECS) y `traceflow_cert` (base descartable certificada `86/86`).
+  - Frontend React SPA en modo API (`VITE_SERVICE_MODE=api`): Login, Dashboard adaptativo (`PU-01..PU-09`), Bandeja/Creación RFC y consola administrativa `PU-08` (`/admin/users` con `<dialog>` accesible, filtros, perfiles, `PU-09`, suspensión/reactivación, invitaciones y organizaciones).
+  - Últimas pruebas verificadas: Backend `lint` + `build` + `15/15` suites (`203/203`) + `test:real-postgres` `5/5` (`86/86`); Frontend `lint` (`0` errores, `0` warnings) + `build` + `9/9` suites; Playwright E2E `11/11` (`scripts/e2e-mvp-h01-mi04.mjs`).
+- **Integración GitHub simulada localmente vs real pendiente:**
+  - En entorno local de desarrollo (`backend/.env`), `ALLOW_MOCK_GITHUB=true` habilita el cliente mock de GitHub únicamente para arranque local sin credenciales activas de GitHub App, manteniendo `DATABASE_MODE=postgres` estricto y prohibición fail-closed de mock en producción. La integración con una GitHub App real (`GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`) queda pendiente de configuración con credenciales institucionales.
+- **Parcial / Pendiente:**
+  - Pantallas aún con respaldo `localStorage` o placeholder en frontend fuera del alcance `MVP-H01` (`CU-02`/`CU-03` proyectos UI, `ECNs`, `ECS`, `QA`, `UAT`, líneas base, incidencias, auditoría y reportes), planificadas para `MVP-H02` y siguientes hitos del plan integral.
+
+### 20.3 Paquete de portabilidad generado (fuera de Git)
+- Directorio local: `C:\Users\HP\Desktop\Proyecto\TraceFlow_Portabilidad_2026-11-26\` (incluye `TraceFlow.bundle`, `traceflow_mvp_dev.dump` verificado con restauración de prueba en `traceflow_restore_test`, `configuracion_privada/`, `restauracion/*.ps1`, `GUIA_RESTAURACION.md`, `ESTADO_ACTUAL.md` y `MANIFEST_SHA256.csv`).
+- Ninguna credencial, contraseña ni dump fue incorporado a Git.

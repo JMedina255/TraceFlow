@@ -568,5 +568,14 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - Frontend (`prototype/`): `npm run lint` (`0` errores, `3` warnings preexistentes en `Topbar.tsx` y `AdminUsersView.tsx`), `npm run build` (`0` errores), `npm test` (**9/9 suites** aprobadas).
 
 ### 17.3 Riesgo / acción administrativa pendiente y veredicto MI-03
-- **Acción OS pendiente (privilegios Administrador Windows):** Ejecutar `Restart-Service postgresql-x64-17` para activar `listen_addresses = '127.0.0.1, ::1'` (ya persistido vía `ALTER SYSTEM` en PostgreSQL, actualmente escuchando en `0.0.0.0:5432`). No bloquea pruebas locales.
-- **Veredicto:** **APTO PARA MI-04**. Quedan pendientes exclusivamente la certificación E2E en navegador (`MI-04`), la publicación controlada de commits locales y `MVP-H02`.
+- **Acción OS cerrada tras reinicio elevado:** El responsable reinició `postgresql-x64-17` con privilegios de Administrador; se verificó servicio `Running`, puerto `5432` escuchando exclusivamente en `127.0.0.1` y `::1`, y conectividad backend real contra `traceflow_mvp_dev` (`127.0.0.1`).
+- **Veredicto:** **APTO PARA MI-04**. Quedan pendientes exclusivamente la certificación E2E y refinamiento administrativo (`MI-04`), la publicación controlada de commits locales y `MVP-H02`.
+
+---
+
+## 18. Confirmación de cierre ENV-03-R e inicio de MI-04 (2026-11-26)
+
+### 18.1 Evidencia verificada de ENV-03-R cerrado
+- Servicio Windows `postgresql-x64-17`: `Running` (`Automatic`).
+- Puerto `5432` en `Get-NetTCPConnection`: escuchando exclusivamente en `127.0.0.1` y `::1` (exposición externa `0.0.0.0` eliminada).
+- Prueba directa de conectividad desde `backend/` (`pg` + `DATABASE_URL` con `traceflow_app`): `{"db":"traceflow_mvp_dev","addr":"127.0.0.1"}`.

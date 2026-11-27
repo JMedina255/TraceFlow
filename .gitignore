@@ -11,6 +11,7 @@ yarn-error.log*
 .env
 .env.*
 !.env.example
+!.env.cert.example
 *.local.md
 *.pem
 *.key

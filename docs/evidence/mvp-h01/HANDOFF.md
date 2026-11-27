@@ -446,3 +446,44 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - **ENV-03:** Preparar PostgreSQL 17.5 local y aplicar migraciones hasta `202611260009`.
 - **MI-03:** Ejecutar `npm run provision:demo` contra la base local `traceflow_mvp_dev` y certificar autenticación, hashes Argon2id independientes, restricciones RBAC/SoD, `can_create_projects = true` para PU-09 y conservación histórica en PostgreSQL físico.
 - **MI-04:** Ejecutar el escenario de demostración completo (login PU-08 -> verificación/revocación/reautorización PU-09 -> login PU-09) en navegador con Playwright (dejando la creación de proyectos/equipos/metodología/GitHub del flujo lista para habilitarse en MVP-H02).
+
+---
+
+## 13. ENV-03 — Instalación y preparación de PostgreSQL local
+
+**Fecha:** 2026-11-26T19:17:00-05:00  
+**Estado:** ⚠️ BLOQUEADO — REQUIERE INTERVENCIÓN DEL RESPONSABLE (Privilegios de Administrador UAC e instalación interactiva de PostgreSQL 17)
+
+### 13.1 Verificación previa ejecutada
+- **Rama y commit:** `feat/mvp-integral-traceflow` en `215cda9` (`ahead 3`, árbol limpio previo).
+- **PostgreSQL existente:** No instalado (`C:\Program Files\PostgreSQL` inexistente, `psql`/`pg_ctl` ausentes).
+- **Servicio Windows `*postgres*`:** Ninguno registrado.
+- **Puerto `5432` en `localhost`:** Cerrado (`TcpTestSucceeded: False`).
+- **Docker:** CLI instalada, daemon Desktop no activo.
+- **Winget:** `v1.29.380` operativo; paquete disponible verificado: `PostgreSQL.PostgreSQL.17` (`17.12-2`).
+- **Privilegios de sesión:** `IsAdmin: False` (sin elevación UAC para instalar servicio Windows ni definir contraseña de `postgres`).
+
+### 13.2 Artefactos y configuraciones preparados (sin secretos en Git)
+- `prototype/.env.local` (excluido por `.gitignore`): configurado con `VITE_SERVICE_MODE=api` y `VITE_API_BASE_URL=http://localhost:3001/api/v1`.
+- `backend/.env` (excluido por `.gitignore`): configurado en modo local `DATABASE_MODE=postgres`, `127.0.0.1:5432/traceflow_mvp_dev`, `DATABASE_SSL=false`, `ALLOW_REMOTE_TEST_DML=false`, `ALLOW_DESTRUCTIVE_DATABASE_RESET=false`, con marcador `<DEFINIR_PASSWORD_APP_LOCAL>` para sustituir tras instalar PostgreSQL.
+- `backend/.env.cert.example` (versionado, sin secretos): plantilla de variables `TEST_DB_*` para `traceflow_cert`.
+- `scripts/env03-init-local-databases.sql` (versionado, sin contraseñas): inicialización no destructiva de `traceflow_mvp_dev`, `traceflow_cert` (UTF-8), rol `traceflow_app` (`NOSUPERUSER NOCREATEDB NOCREATEROLE`) y consultas diagnósticas (`SELECT version()`, `current_database()`, `current_user`, `SHOW server_encoding`, `SHOW listen_addresses`).
+- `docs/evidence/mvp-h01/ENV03_POSTGRES_LOCAL_GUIDE.md`: guía reproducible paso a paso para instalación en Windows 11 y transición a MI-03.
+
+### 13.3 Verificación de aislamiento y TLS
+- `DatabaseService` (`backend/src/database/database.service.ts`) desactiva TLS únicamente para `127.0.0.1`/`localhost` y conserva la validación TLS estricta (`rejectUnauthorized: true`) para hosts remotos/Supabase.
+- `ALLOWED_DISPOSABLE_DATABASES` en `test-isolation.guard.ts` autoriza `traceflow_cert` y excluye `traceflow_mvp_dev`.
+- Ninguna configuración local apunta a Supabase.
+
+### 13.4 Acciones requeridas por el responsable para completar ENV-03
+1. Abrir PowerShell **como Administrador** y ejecutar:
+   `winget install --id PostgreSQL.PostgreSQL.17 --exact`
+   configurando puerto `5432`, `127.0.0.1`, UTF-8 y una contraseña para `postgres` distinta a la contraseña demo de TraceFlow.
+2. Ejecutar `scripts/env03-init-local-databases.sql` como superusuario `postgres` definiendo `TRACEFLOW_LOCAL_APP_PASSWORD` para crear `traceflow_mvp_dev`, `traceflow_cert` y `traceflow_app`.
+3. Reemplazar `<DEFINIR_PASSWORD_APP_LOCAL>` en `backend/.env` con la contraseña local asignada a `traceflow_app`.
+4. Verificar conectividad local (`psql`, `Get-Service *postgres*`, `Test-NetConnection 127.0.0.1 -Port 5432`) y autorizar **MI-03**.
+
+### 13.5 Comandos exactos preparados para MI-03 (pendientes)
+- Certificación física en `traceflow_cert`: `npm run test:real-postgres` (con `TEST_DB_ADMIN_PASSWORD` y `TEST_DB_APP_PASSWORD` definidos en sesión local, tras extender `real-db-helper.ts` con `MVP-H01`).
+- Migraciones sobre `traceflow_mvp_dev`: secuencia `202611250001`..`202611250003` + `202611260001`..`202611260009` (con extensión `pgcrypto` en esquema `extensions`).
+- Aprovisionamiento demo local: `npm run provision:demo` desde `backend/`.

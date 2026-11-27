@@ -487,3 +487,18 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - Certificación física en `traceflow_cert`: `npm run test:real-postgres` (con `TEST_DB_ADMIN_PASSWORD` y `TEST_DB_APP_PASSWORD` definidos en sesión local, tras extender `real-db-helper.ts` con `MVP-H01`).
 - Migraciones sobre `traceflow_mvp_dev`: secuencia `202611250001`..`202611250003` + `202611260001`..`202611260009` (con extensión `pgcrypto` en esquema `extensions`).
 - Aprovisionamiento demo local: `npm run provision:demo` desde `backend/`.
+
+---
+
+## 14. ENV-03-R — Cierre de entorno PostgreSQL 17.12 local
+
+**Fecha:** 2026-11-26T19:30:00-05:00  
+**Estado:** ✅ COMPLETADO (Apto para Bloque B / MI-03)
+
+- **Motor y versión verificados:** PostgreSQL `17.12` (`x86_64-windows`, servicio `postgresql-x64-17` `Running`, puerto `5432` en `127.0.0.1`).
+- **Bases creadas (no destructivo, UTF-8):** `traceflow_mvp_dev` y `traceflow_cert`.
+- **Rol aplicativo:** `traceflow_app` (`NOSUPERUSER NOCREATEDB NOCREATEROLE`, `CONNECT` en ambas bases).
+- **Conectividad autenticada verificada:** `traceflow_app` conectado exitosamente a `traceflow_mvp_dev` y `traceflow_cert` en `127.0.0.1/32:5432`.
+- **Configuración local:** `backend/.env`, `backend/.env.cert` y `prototype/.env.local` completados sin BOM, excluidos por `.gitignore`, con **0** referencias a Supabase.
+- **Aislamiento de red:** Se aplicó `ALTER SYSTEM SET listen_addresses = '127.0.0.1, ::1'` como `postgres`; queda pendiente reiniciar el servicio con privilegios de Administrador (`Restart-Service postgresql-x64-17`) para que el socket abandone `0.0.0.0:5432`.
+- **Protección destructiva:** `traceflow_mvp_dev` excluida de `ALLOWED_DISPOSABLE_DATABASES`.

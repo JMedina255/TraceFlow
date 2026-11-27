@@ -106,3 +106,15 @@ Este documento consolida el estado real de implementación del sistema **TraceFl
 ---
 
 *Estado consolidado de TraceFlow SCM — Etapa DOC-02.4 — C-SharkTeam / ÉXODO S.A.C.*
+
+---
+
+## 5. Actualización de Estado MVP-H01 y Preparación de Traslado (2026-11-26)
+
+- **Rama de desarrollo activa:** `feat/mvp-integral-traceflow` (sin fusión a `master`).
+- **Implementado y verificado (MVP-H01 / MI-01 a MI-04):**
+  - Catálogo de **9 perfiles canónicos** (`PU-01` a `PU-09`), incluyendo Administrador del Sistema (`PU-08`) y Jefe de Proyecto (`PU-09` con `can_create_projects`), migración `202611260009`, gestión administrativa completa (`/api/v1/admin/*`, `/admin/users`), invitaciones pendientes (`EMAIL`/`GITHUB`), organizaciones/membresías y revocación inmediata de sesiones.
+  - Entorno local PostgreSQL `17.12` restringido a `127.0.0.1` y `::1` (`traceflow_mvp_dev` y base descartable `traceflow_cert`), más aprovisionamiento idempotente `DEMO-01` (`USR-005..USR-013` sumados a los 4 fundadores `USR-001..USR-004`).
+  - **Resultados de pruebas vigentes:** Backend (`lint`, `build`, `15/15` suites unitarias `203/203`, `5/5` certificación PostgreSQL real `86/86`), Frontend (`oxlint` `0` errores/`0` warnings, `build`, `9/9` suites), Playwright E2E real administrativo (`11/11` flujos aprobados en `scripts/e2e-mvp-h01-mi04.mjs`).
+- **Configuración GitHub:** Integración y webhooks implementados y certificados en pruebas; en desarrollo local opera con `ALLOW_MOCK_GITHUB=true` únicamente en `.env` local al no existir credenciales activas de GitHub App (`GITHUB_APP_ID`/`GITHUB_APP_PRIVATE_KEY` pendientes de configuración en entorno real).
+- **Pendiente (próximos hitos):** `MVP-H02` (módulos frontend restantes de proyectos, planificación, ECS/SCM y flujos que aún operan con vistas placeholder o almacenamiento local). **Referencia viva de continuidad:** [docs/evidence/mvp-h01/HANDOFF.md](evidence/mvp-h01/HANDOFF.md).

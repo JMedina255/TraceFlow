@@ -40,16 +40,17 @@ export class OrganizationsService {
     const totalCount = await this.orgRepo.count();
 
     if (totalCount === 0) {
-      // Regla Bootstrap (H02-R06): La primera organización requiere explícitamente el rol ACTIVO PU-02 Gestor
-      const isPU02 = user.activeRoleId === 'PU-02';
-      if (!isPU02) {
+      // Regla Bootstrap: La inicialización de la primera organización admite PU-08 (Admin del Sistema) o PU-02 histórico
+      const isAuthorizedBootstrap =
+        user.activeRoleId === 'PU-08' || user.activeRoleId === 'PU-02';
+      if (!isAuthorizedBootstrap) {
         throw new ForbiddenException(
-          'Acceso denegado: La inicialización de la primera organización del sistema requiere el rol activo PU-02 (Gestor de Configuración).'
+          'Acceso denegado: La inicialización de la primera organización del sistema requiere el rol activo PU-08 (Administrador del Sistema) o PU-02.'
         );
       }
     } else {
-      // Regla Organizaciones Subsiguientes: No todos los usuarios PU-02 pueden crear organizaciones.
-      // Debe ser OWNER de una organización existente o contar con autorización administrativa explícita.
+      // Regla Organizaciones Subsiguientes: PU-08 global u OWNER activo de una organización existente
+      const isSystemAdmin = user.activeRoleId === 'PU-08';
       const userOrgs = await this.orgRepo.findOrganizationsForUser(user.id);
       let isOwnerInAny = false;
       for (const org of userOrgs) {
@@ -60,9 +61,9 @@ export class OrganizationsService {
         }
       }
 
-      if (!isOwnerInAny) {
+      if (!isSystemAdmin && !isOwnerInAny) {
         throw new ForbiddenException(
-          'Acceso denegado: Se requiere rol de Propietario (OWNER) u autorización administrativa explícita para crear nuevas organizaciones.'
+          'Acceso denegado: Se requiere rol de Administrador del Sistema (PU-08) o Propietario (OWNER) para crear nuevas organizaciones.'
         );
       }
     }
@@ -141,6 +142,9 @@ export class OrganizationsService {
   async getOrganizationsForUser(
     user: AuthenticatedUser
   ): Promise<OrganizationEntity[]> {
+    if (user.activeRoleId === 'PU-08') {
+      return this.orgRepo.findAll();
+    }
     return this.orgRepo.findOrganizationsForUser(user.id);
   }
 
@@ -155,12 +159,14 @@ export class OrganizationsService {
       );
     }
 
-    // Aislamiento multitenant institucional: El usuario debe ser miembro activo
-    const member = await this.orgRepo.findMember(org.id, user.id);
-    if (!member || member.status !== 'ACTIVE') {
-      throw new ForbiddenException(
-        `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización '${org.code}'.`
-      );
+    if (user.activeRoleId !== 'PU-08') {
+      // Aislamiento multitenant institucional: El usuario debe ser miembro activo
+      const member = await this.orgRepo.findMember(org.id, user.id);
+      if (!member || member.status !== 'ACTIVE') {
+        throw new ForbiddenException(
+          `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización '${org.code}'.`
+        );
+      }
     }
 
     return org;
@@ -186,13 +192,15 @@ export class OrganizationsService {
       );
     }
 
-    // Verificación de privilegios: Solo OWNER o ADMIN de la organización puede incorporar
+    // Verificación de privilegios: PU-08 global u OWNER/ADMIN activo de la organización
+    const isSystemAdmin = user.activeRoleId === 'PU-08';
     const callerMember = await this.orgRepo.findMember(org.id, user.id);
-    if (
-      !callerMember ||
-      callerMember.status !== 'ACTIVE' ||
-      !['OWNER', 'ADMIN'].includes(callerMember.role_in_org)
-    ) {
+    const isOrgAdmin =
+      callerMember &&
+      callerMember.status === 'ACTIVE' &&
+      ['OWNER', 'ADMIN'].includes(callerMember.role_in_org);
+
+    if (!isSystemAdmin && !isOrgAdmin) {
       throw new ForbiddenException(
         'Acceso denegado: Solo los propietarios o administradores de la organización pueden incorporar miembros.'
       );
@@ -267,12 +275,14 @@ export class OrganizationsService {
       throw new NotFoundException(`Organización '${idOrSlug}' no encontrada.`);
     }
 
+    const isSystemAdmin = user.activeRoleId === 'PU-08';
     const callerMember = await this.orgRepo.findMember(org.id, user.id);
-    if (
-      !callerMember ||
-      callerMember.status !== 'ACTIVE' ||
-      !['OWNER', 'ADMIN'].includes(callerMember.role_in_org)
-    ) {
+    const isOrgAdmin =
+      callerMember &&
+      callerMember.status === 'ACTIVE' &&
+      ['OWNER', 'ADMIN'].includes(callerMember.role_in_org);
+
+    if (!isSystemAdmin && !isOrgAdmin) {
       throw new ForbiddenException(
         'Acceso denegado: Solo los propietarios o administradores de la organización pueden modificar el estado de un miembro.'
       );
@@ -292,7 +302,7 @@ export class OrganizationsService {
     }
 
     // Regla de salvaguarda de gobernanza: ADMIN no puede suspender a un OWNER
-    if (callerMember.role_in_org === 'ADMIN' && targetMember.role_in_org === 'OWNER') {
+    if (!isSystemAdmin && callerMember?.role_in_org === 'ADMIN' && targetMember.role_in_org === 'OWNER') {
       throw new ForbiddenException(
         'Acceso denegado: Un administrador no puede suspender ni modificar el estado de un propietario.'
       );

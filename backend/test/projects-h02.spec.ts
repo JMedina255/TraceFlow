@@ -12,8 +12,11 @@ import { DatabaseService } from '../src/database/database.service.js';
 import { OrganizationsRepository } from '../src/modules/organizations/organizations.repository.js';
 import { ProjectsRepository } from '../src/modules/projects/projects.repository.js';
 import { ProjectsService } from '../src/modules/projects/projects.service.js';
+import { ProjectsController } from '../src/modules/projects/projects.controller.js';
+import { RfcsController } from '../src/modules/rfcs/rfcs.controller.js';
 import { AuthRepository } from '../src/modules/auth/auth.repository.js';
 import { AuditService } from '../src/modules/audit/audit.service.js';
+import { ROLES_KEY } from '../src/common/decorators/roles.decorator.js';
 import type { AuthenticatedUser } from '../src/common/types/index.js';
 import { normalizeProjectStatus } from '../src/common/types/index.js';
 import {
@@ -42,6 +45,29 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
     activeRoleId: 'PU-02',
     allowedRoleIds: ['PU-02', 'PU-01'],
     assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
+    canCreateProjects: false,
+  };
+
+  const userProjectManagerExodo: AuthenticatedUser = {
+    ...userOwnerExodo,
+    position: 'Jefe de Proyecto',
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09', 'PU-02', 'PU-01'],
+    canCreateProjects: true,
+  };
+
+  const userSysAdminPU08: AuthenticatedUser = {
+    id: 'a0000001-0000-0000-0000-000000000005',
+    code: 'USR-005',
+    username: 'sysadmin',
+    email: 'admin@exodo.pe',
+    fullName: 'Administrador del Sistema TraceFlow',
+    organization: 'ÉXODO S.A.C.',
+    position: 'Administrador Global de Plataforma',
+    activeRoleId: 'PU-08',
+    allowedRoleIds: ['PU-08'],
+    assignedProjectIds: [],
+    canCreateProjects: false,
   };
 
   const userDevExodo: AuthenticatedUser = {
@@ -64,10 +90,11 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
     email: 'admin@acme.com',
     fullName: 'Administrador Acme Corp',
     organization: 'Acme Corp',
-    position: 'Gerente TI',
-    activeRoleId: 'PU-02',
-    allowedRoleIds: ['PU-02'],
+    position: 'Jefe de Proyecto TI',
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09'],
     assignedProjectIds: [],
+    canCreateProjects: true,
   };
 
   beforeEach(() => {
@@ -80,7 +107,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
   });
 
   describe('TDD-INIT-07: Creación de proyecto en estado BORRADOR (DA-01, DA-02)', () => {
-    it('debe permitir crear un proyecto en BORRADOR asociado a una organización válida', async () => {
+    it('debe permitir crear un proyecto en BORRADOR asociado a una organización válida cuando el usuario opera como PU-09 autorizado', async () => {
       const created = await projectsService.createProject(
         {
           code: 'PRJ-004',
@@ -90,7 +117,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
           clientName: 'Financiera del Norte',
           organizationId: 'ORG-EXODO',
         },
-        userOwnerExodo
+        userProjectManagerExodo
       );
 
       expect(created).toBeDefined();
@@ -106,12 +133,13 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
       expect(auditChain.some((l) => l.eventCode === 'PRJ_CREATED_DRAFT')).toBe(true);
     });
 
-    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el usuario opera con activeRoleId no autorizado aunque tenga PU-02 en roles pasivos', async () => {
-      // Usuario que es MEMBER ordinario en la org, y tiene PU-02 en allowed pero activo PU-06
+    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el usuario opera con activeRoleId no autorizado aunque tenga PU-02 o PU-09 en roles pasivos', async () => {
+      // Usuario que es MEMBER ordinario en la org, y tiene PU-02/PU-09 en allowed pero activo PU-06
       const userMemberRolInactivo: AuthenticatedUser = {
         ...userDevExodo, // rol en org: MEMBER
         activeRoleId: 'PU-06',
-        allowedRoleIds: ['PU-06', 'PU-02'],
+        allowedRoleIds: ['PU-06', 'PU-02', 'PU-09'],
+        canCreateProjects: true,
       };
 
       await expect(
@@ -128,13 +156,15 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
       ).rejects.toThrow(ForbiddenException);
     });
 
-    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el miembro se encuentra suspendido', async () => {
+    it('PRUEBA NEGATIVA (H02-R06): debe rechazar la creación si el miembro se encuentra suspendido incluso como PU-09 autorizado', async () => {
       // Suspender temporalmente a un miembro
       await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'SUSPENDED');
 
       const userSuspendido: AuthenticatedUser = {
         ...userDevExodo,
-        activeRoleId: 'PU-02',
+        activeRoleId: 'PU-09',
+        allowedRoleIds: ['PU-09', 'PU-06'],
+        canCreateProjects: true,
       };
 
       await expect(
@@ -148,7 +178,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
           },
           userSuspendido
         )
-      ).rejects.toThrow(ForbiddenException);
+      ).rejects.toThrow('no es miembro activo');
 
       // Restaurar estado activo
       await orgRepo.updateMemberStatus('c0000001-0000-0000-0000-000000000001', userDevExodo.id, 'ACTIVE');
@@ -164,12 +194,12 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
             clientName: 'Cliente X',
             organizationId: 'ORG-INEXISTENTE',
           },
-          userOwnerExodo
+          userProjectManagerExodo
         )
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('PRUEBA NEGATIVA (DA-06): debe rechazar la creación si el usuario no pertenece a la organización propietaria', async () => {
+    it('PRUEBA NEGATIVA (DA-06): debe rechazar la creación si el usuario PU-09 autorizado no pertenece a la organización propietaria', async () => {
       await expect(
         projectsService.createProject(
           {
@@ -179,9 +209,9 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
             clientName: 'Cliente X',
             organizationId: 'ORG-EXODO',
           },
-          userOrgB // Usuario de otra organización
+          userOrgB // Usuario PU-09 autorizado de otra organización
         )
-      ).rejects.toThrow(ForbiddenException);
+      ).rejects.toThrow('no es miembro activo');
     });
   });
 
@@ -196,7 +226,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
             clientName: 'Cliente',
             organizationId: 'ORG-EXODO',
           },
-          userOwnerExodo
+          userProjectManagerExodo
         )
       ).rejects.toThrow(ConflictException);
     });
@@ -211,7 +241,7 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
             clientName: 'Cliente',
             organizationId: 'ORG-EXODO',
           },
-          userOwnerExodo
+          userProjectManagerExodo
         )
       ).rejects.toThrow(ConflictException);
     });
@@ -227,10 +257,10 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
           clientName: 'Banco Global',
           organizationId: 'ORG-EXODO',
         },
-        userOwnerExodo
+        userProjectManagerExodo
       );
 
-      const assignments = await projectsRepo.findUserProjectAssignments(userOwnerExodo.id);
+      const assignments = await projectsRepo.findUserProjectAssignments(userProjectManagerExodo.id);
       expect(assignments).toContain(created.id);
     });
   });
@@ -347,6 +377,171 @@ describe('INIT-H02: Proyectos en Borrador, Aislamiento y Normalización de Estad
           'HISTORICO_PENDIENTE_GITHUB',
         ]).toContain(p.status);
       }
+    });
+  });
+
+  describe('Políticas de seguridad MVP-H01 (PU-08, PU-09 y conservación de PU-02)', () => {
+    it('PU-09 sin autorización (canCreateProjects false o indefinido) no puede crear proyectos', async () => {
+      const pu09NoAuth: AuthenticatedUser = {
+        ...userOwnerExodo,
+        activeRoleId: 'PU-09',
+        allowedRoleIds: ['PU-09', 'PU-02'],
+        canCreateProjects: false,
+      };
+
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-NO-AUTH',
+            projectKey: 'NO-AUTH',
+            name: 'Proyecto Sin Autorización',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          pu09NoAuth
+        )
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('PU-09 con autorización revocada en AuthRepository no puede crear proyectos', async () => {
+      const liveService = new ProjectsService(db, projectsRepo, orgRepo, auditService, authRepo);
+      const mockUsers = authRepo.getMockUsersRef();
+      mockUsers.push({
+        id: 'a0000001-0000-0000-0000-000000000009',
+        code: 'USR-009',
+        username: 'pm_exodo',
+        email: 'pm@exodo.pe',
+        password_hash: 'hash',
+        full_name: 'Jefe de Proyecto Éxodo',
+        organization: 'ÉXODO S.A.C.',
+        position: 'Jefe de Proyecto',
+        status: 'ACTIVE',
+        primary_role_code: 'PU-09',
+        assigned_role_codes: ['PU-09'],
+        assigned_project_codes: [],
+        can_create_projects: true,
+        github_username: null,
+        github_user_id: null,
+        github_identity_status: 'UNVERIFIED',
+      });
+
+      await orgRepo.addMember({
+        organization_id: 'c0000001-0000-0000-0000-000000000001',
+        user_id: 'a0000001-0000-0000-0000-000000000009',
+        role_in_org: 'MEMBER',
+        status: 'ACTIVE',
+      });
+
+      const sessionPm: AuthenticatedUser = {
+        id: 'a0000001-0000-0000-0000-000000000009',
+        code: 'USR-009',
+        username: 'pm_exodo',
+        email: 'pm@exodo.pe',
+        fullName: 'Jefe de Proyecto Éxodo',
+        organization: 'ÉXODO S.A.C.',
+        position: 'Jefe de Proyecto',
+        activeRoleId: 'PU-09',
+        allowedRoleIds: ['PU-09'],
+        assignedProjectIds: [],
+        canCreateProjects: true,
+      };
+
+      const created = await liveService.createProject(
+        {
+          code: 'PRJ-LIVE-01',
+          projectKey: 'LIVE-01',
+          name: 'Proyecto Con Autorización Vigente',
+          clientName: 'Cliente Live',
+          organizationId: 'ORG-EXODO',
+        },
+        sessionPm
+      );
+      expect(created.code).toBe('PRJ-LIVE-01');
+
+      // Simular revocación administrativa posterior por PU-08 (sesión anterior aún trae canCreateProjects: true)
+      const liveUser = mockUsers.find((u) => u.code === 'USR-009')!;
+      liveUser.can_create_projects = false;
+
+      await expect(
+        liveService.createProject(
+          {
+            code: 'PRJ-REVOKED-01',
+            projectKey: 'REV-01',
+            name: 'Proyecto Con Autorización Revocada',
+            clientName: 'Cliente Live',
+            organizationId: 'ORG-EXODO',
+          },
+          sessionPm
+        )
+      ).rejects.toThrow('no posee autorización vigente');
+    });
+
+    it('PU-02 no puede crear proyectos mediante vías alternativas ni aun siendo OWNER o teniendo canCreateProjects', async () => {
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-PU02-BLOCK',
+            projectKey: 'PU02-BLK',
+            name: 'Proyecto Bloqueado PU-02',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          userOwnerExodo
+        )
+      ).rejects.toThrow('requiere operar con el perfil activo PU-09');
+
+      const pu02ConFlag: AuthenticatedUser = {
+        ...userOwnerExodo,
+        activeRoleId: 'PU-02',
+        allowedRoleIds: ['PU-02', 'PU-09'],
+        canCreateProjects: true,
+      };
+
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-PU02-ALT',
+            projectKey: 'PU02-ALT',
+            name: 'Proyecto Vía Alternativa PU-02',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          pu02ConFlag
+        )
+      ).rejects.toThrow('requiere operar con el perfil activo PU-09');
+
+      // Verificar metadatos del controlador: exclusivamente PU-09
+      const requiredRoles = Reflect.getMetadata(ROLES_KEY, ProjectsController.prototype.createProject);
+      expect(requiredRoles).toEqual(['PU-09']);
+    });
+
+    it('PU-08 no obtiene automáticamente permisos operativos SCM sobre proyectos ni RFCs', async () => {
+      // 1. PU-08 no puede crear proyectos
+      await expect(
+        projectsService.createProject(
+          {
+            code: 'PRJ-ADMIN-BLOCK',
+            projectKey: 'ADM-BLK',
+            name: 'Proyecto Admin Bloqueado',
+            clientName: 'Cliente X',
+            organizationId: 'ORG-EXODO',
+          },
+          userSysAdminPU08
+        )
+      ).rejects.toThrow(ForbiddenException);
+
+      // 2. PU-08 no tiene acceso operativo a proyectos SCM existentes
+      const adminProjects = await projectsService.getProjectsForUser(userSysAdminPU08);
+      expect(adminProjects).toEqual([]);
+
+      await expect(
+        projectsService.getProjectById('PRJ-001', userSysAdminPU08)
+      ).rejects.toThrow(ForbiddenException);
+
+      // 3. PU-08 no tiene rol para crear RFCs (exclusivo PU-01)
+      const rfcCreateRoles = Reflect.getMetadata(ROLES_KEY, RfcsController.prototype.createRfc);
+      expect(rfcCreateRoles).toEqual(['PU-01']);
+      expect(rfcCreateRoles).not.toContain('PU-08');
     });
   });
 });

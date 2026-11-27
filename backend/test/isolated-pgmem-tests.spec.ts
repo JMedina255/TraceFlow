@@ -45,6 +45,35 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
     activeRoleId: 'PU-02',
     allowedRoleIds: ['PU-02', 'PU-01'],
     assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
+    canCreateProjects: false,
+  };
+
+  const userPU09Exodo: AuthenticatedUser = {
+    id: 'a0000001-0000-0000-0000-000000000006',
+    code: 'USR-006',
+    username: 'pm_exodo',
+    email: 'pm@exodo.pe',
+    fullName: 'Jefe de Proyecto Éxodo',
+    organization: 'ÉXODO S.A.C.',
+    position: 'Jefe de Proyecto',
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09'],
+    assignedProjectIds: [],
+    canCreateProjects: true,
+  };
+
+  const userPU08SysAdmin: AuthenticatedUser = {
+    id: 'a0000001-0000-0000-0000-000000000005',
+    code: 'USR-005',
+    username: 'sysadmin',
+    email: 'admin@exodo.pe',
+    fullName: 'Administrador del Sistema TraceFlow',
+    organization: 'ÉXODO S.A.C.',
+    position: 'Administrador Global de Plataforma',
+    activeRoleId: 'PU-08',
+    allowedRoleIds: ['PU-08'],
+    assignedProjectIds: [],
+    canCreateProjects: false,
   };
 
   const userPU06Dev: AuthenticatedUser = {
@@ -174,15 +203,98 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
       );
     `);
 
-    // Inserción de usuarios base en app_user
+    // Inserción de usuarios base en app_user (compatible con columnas MVP-H01)
     await pool.query(`
-      INSERT INTO traceflow.app_user (id, code, username, email, password_hash, full_name, status)
+      ALTER TABLE traceflow.app_user
+        ADD COLUMN IF NOT EXISTS can_create_projects BOOLEAN NOT NULL DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS project_creation_authorized_by UUID REFERENCES traceflow.app_user(id),
+        ADD COLUMN IF NOT EXISTS project_creation_authorized_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS github_username VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS github_user_id BIGINT,
+        ADD COLUMN IF NOT EXISTS github_identity_status VARCHAR(20) NOT NULL DEFAULT 'UNVERIFIED';
+
+      CREATE TABLE IF NOT EXISTS traceflow.app_role (
+        id INT PRIMARY KEY,
+        code VARCHAR(30) UNIQUE NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        description TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS traceflow.user_role_assignment (
+        user_id UUID NOT NULL REFERENCES traceflow.app_user(id),
+        role_id INT NOT NULL REFERENCES traceflow.app_role(id),
+        is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+        status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+        revoked_at TIMESTAMPTZ,
+        revoked_by UUID REFERENCES traceflow.app_user(id),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (user_id, role_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS traceflow.user_session (
+        id UUID PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES traceflow.app_user(id),
+        active_role_id INT NOT NULL REFERENCES traceflow.app_role(id),
+        session_token_hash VARCHAR(64) UNIQUE NOT NULL,
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        is_revoked BOOLEAN NOT NULL DEFAULT FALSE,
+        active_project_id UUID REFERENCES traceflow.project(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS traceflow.user_invitation (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        channel VARCHAR(20) NOT NULL CHECK (channel IN ('EMAIL', 'GITHUB')),
+        email VARCHAR(100),
+        github_username VARCHAR(100),
+        organization_id UUID,
+        project_id UUID REFERENCES traceflow.project(id),
+        intended_role_id INT NOT NULL REFERENCES traceflow.app_role(id),
+        status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'CANCELLED', 'EXPIRED', 'ACCEPTED')),
+        invited_by UUID NOT NULL REFERENCES traceflow.app_user(id),
+        cancelled_by UUID REFERENCES traceflow.app_user(id),
+        cancelled_at TIMESTAMPTZ,
+        accepted_user_id UUID REFERENCES traceflow.app_user(id),
+        accepted_at TIMESTAMPTZ,
+        notes TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ
+      );
+
+      INSERT INTO traceflow.app_role (id, code, name, description)
       VALUES
-        ('a0000001-0000-0000-0000-000000000001', 'USR-001', 'jmedina', 'jmedina@exodo.pe', 'hash1', 'Joan Cristian Medina Quispe', 'ACTIVE'),
-        ('a0000001-0000-0000-0000-000000000002', 'USR-002', 'rantayhua', 'rantayhua@exodo.pe', 'hash2', 'Renzo Antonio Antayhua Mamani', 'ACTIVE'),
-        ('a0000001-0000-0000-0000-000000000003', 'USR-003', 'lquispe', 'lquispe@exodo.pe', 'hash3', 'Librarian Exodo', 'ACTIVE'),
-        ('a0000001-0000-0000-0000-000000000004', 'USR-004', 'rloyola', 'rloyola@exodo.pe', 'hash4', 'Renzo Loyola', 'ACTIVE'),
-        ('a0000001-0000-0000-0000-000000000099', 'USR-099', 'externo', 'externo@terceros.pe', 'hash99', 'Consultor Externo', 'ACTIVE');
+        (1, 'PU-01', 'Solicitante', 'Solicitante de cambios'),
+        (2, 'PU-02', 'Analista / Gestor de Configuración', 'Gestor SCM'),
+        (3, 'PU-03', 'Arquitecto / Especialista Técnico', 'Arquitecto'),
+        (4, 'PU-04', 'Comité de Control de Cambios (CCB)', 'CCB'),
+        (5, 'PU-05', 'Bibliotecario / Administrador SCM', 'Bibliotecario'),
+        (6, 'PU-06', 'Desarrollador / Ingeniero de Software', 'Desarrollador'),
+        (7, 'PU-07', 'Calidad / Equipo de Testing (QA)', 'QA'),
+        (8, 'PU-08', 'Administrador del Sistema', 'Admin del Sistema'),
+        (9, 'PU-09', 'Jefe de Proyecto', 'Jefe de Proyecto')
+      ON CONFLICT (id) DO NOTHING;
+
+      INSERT INTO traceflow.app_user (id, code, username, email, password_hash, full_name, status, can_create_projects)
+      VALUES
+        ('a0000001-0000-0000-0000-000000000001', 'USR-001', 'jmedina', 'jmedina@exodo.pe', 'hash1', 'Joan Cristian Medina Quispe', 'ACTIVE', FALSE),
+        ('a0000001-0000-0000-0000-000000000002', 'USR-002', 'rantayhua', 'rantayhua@exodo.pe', 'hash2', 'Renzo Antonio Antayhua Mamani', 'ACTIVE', FALSE),
+        ('a0000001-0000-0000-0000-000000000003', 'USR-003', 'lquispe', 'lquispe@exodo.pe', 'hash3', 'Librarian Exodo', 'ACTIVE', FALSE),
+        ('a0000001-0000-0000-0000-000000000004', 'USR-004', 'rloyola', 'rloyola@exodo.pe', 'hash4', 'Renzo Loyola', 'ACTIVE', FALSE),
+        ('a0000001-0000-0000-0000-000000000005', 'USR-005', 'sysadmin', 'admin@exodo.pe', 'hash5', 'Administrador del Sistema TraceFlow', 'ACTIVE', FALSE),
+        ('a0000001-0000-0000-0000-000000000006', 'USR-006', 'pm_exodo', 'pm@exodo.pe', 'hash6', 'Jefe de Proyecto Éxodo', 'ACTIVE', TRUE),
+        ('a0000001-0000-0000-0000-000000000099', 'USR-099', 'externo', 'externo@terceros.pe', 'hash99', 'Consultor Externo', 'ACTIVE', TRUE);
+
+      INSERT INTO traceflow.user_role_assignment (user_id, role_id, is_primary, status)
+      VALUES
+        ('a0000001-0000-0000-0000-000000000001', 2, TRUE, 'ACTIVE'),
+        ('a0000001-0000-0000-0000-000000000002', 6, TRUE, 'ACTIVE'),
+        ('a0000001-0000-0000-0000-000000000005', 8, TRUE, 'ACTIVE'),
+        ('a0000001-0000-0000-0000-000000000006', 9, TRUE, 'ACTIVE'),
+        ('a0000001-0000-0000-0000-000000000099', 1, TRUE, 'ACTIVE');
     `);
 
     // Inserción de proyectos históricos
@@ -246,7 +358,8 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
         ('d0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000001', 'OWNER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001'),
         ('d0000001-0000-0000-0000-000000000002', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000002', 'MEMBER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001'),
         ('d0000001-0000-0000-0000-000000000003', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000003', 'MEMBER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001'),
-        ('d0000001-0000-0000-0000-000000000004', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000004', 'MEMBER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001')
+        ('d0000001-0000-0000-0000-000000000004', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000004', 'MEMBER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001'),
+        ('d0000001-0000-0000-0000-000000000006', 'c0000001-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000006', 'MEMBER', 'ACTIVE', NOW(), 'a0000001-0000-0000-0000-000000000001')
       ON CONFLICT (organization_id, user_id) DO NOTHING;
 
       -- Regularización de proyectos históricos (asociar únicamente los no asignados)
@@ -290,13 +403,19 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
     }
   });
 
-  it('Escenario 1 & 2: Migraciones previas e INIT-H02 aplicadas con éxito', async () => {
+  it('Escenario 1 & 2: Migraciones previas, INIT-H02 y catálogo PU-08/PU-09 aplicados con éxito', async () => {
     const orgCount = await pool.query('SELECT COUNT(*)::text as c FROM traceflow.organization');
     const memCount = await pool.query('SELECT COUNT(*)::text as c FROM traceflow.organization_member');
     const prjCount = await pool.query('SELECT COUNT(*)::text as c FROM traceflow.project');
+    const invCount = await pool.query('SELECT COUNT(*)::text as c FROM traceflow.user_invitation');
+    const roles = await authRepo.getRoleCatalog();
     expect(parseInt(orgCount.rows[0].c, 10)).toBeGreaterThanOrEqual(1);
     expect(parseInt(memCount.rows[0].c, 10)).toBeGreaterThanOrEqual(1);
     expect(parseInt(prjCount.rows[0].c, 10)).toBeGreaterThanOrEqual(3);
+    expect(parseInt(invCount.rows[0].c, 10)).toBe(0);
+    expect(roles.map((r) => r.code)).toContain('PU-08');
+    expect(roles.map((r) => r.code)).toContain('PU-09');
+    expect(roles.length).toBe(9);
   });
 
   it('Escenario 3: Semilla institucional regularizada con tax_id nulo y estados históricos', async () => {
@@ -313,7 +432,7 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
     }
   });
 
-  it('Escenario 4 & 5: Creación de proyecto en BORRADOR y asignación atómica con rol traceflow_app', async () => {
+  it('Escenario 4 & 5: Creación de proyecto en BORRADOR y asignación atómica con PU-09 autorizado y rol traceflow_app', async () => {
     const created = await projectsService.createProject(
       {
         code: 'PRJ-CERT-01',
@@ -323,7 +442,7 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
         clientName: 'Cliente Certificado',
         organizationId: 'c0000001-0000-0000-0000-000000000001',
       },
-      userPU02Owner
+      userPU09Exodo
     );
 
     expect(created.code).toBe('PRJ-CERT-01');
@@ -338,14 +457,20 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
     // Escenario 5: Asignación física del creador en user_project_assignment
     const dbAssignment = await pool.query(
       'SELECT * FROM traceflow.user_project_assignment WHERE user_id = $1 AND project_id = $2',
-      [userPU02Owner.id, created.id]
+      [userPU09Exodo.id, created.id]
     );
     expect(dbAssignment.rows.length).toBe(1);
-    expect(dbAssignment.rows[0].assigned_by).toBe(userPU02Owner.id);
+    expect(dbAssignment.rows[0].assigned_by).toBe(userPU09Exodo.id);
   });
 
-  it('Escenario 6: Intentos de acceso y creación no autorizados (no miembro, suspendido, rol inactivo)', async () => {
-    // 6.1 Usuario no miembro
+  it('Escenario 6: Intentos de acceso y creación no autorizados (no miembro, suspendido, rol inactivo, PU-02, PU-08, PU-09 sin autorización)', async () => {
+    // 6.1 Usuario PU-09 no miembro de la organización (DA-06)
+    const userExternoConPU09: AuthenticatedUser = {
+      ...userExterno,
+      activeRoleId: 'PU-09',
+      allowedRoleIds: ['PU-09'],
+      canCreateProjects: true,
+    };
     await expect(
       projectsService.createProject(
         {
@@ -355,15 +480,16 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
           clientName: 'Ext',
           organizationId: 'c0000001-0000-0000-0000-000000000001',
         },
-        userExterno
+        userExternoConPU09
       )
-    ).rejects.toThrow(ForbiddenException);
+    ).rejects.toThrow('no es miembro activo');
 
-    // 6.2 Miembro con activeRoleId no autorizado (H02-R06: PU-02 solo en allowed)
-    const userDevConPU02Pasivo: AuthenticatedUser = {
+    // 6.2 Miembro con activeRoleId no autorizado (H02-R06: PU-02 / PU-09 solo en allowed)
+    const userDevConPU09Pasivo: AuthenticatedUser = {
       ...userPU06Dev,
       activeRoleId: 'PU-06',
-      allowedRoleIds: ['PU-06', 'PU-02'],
+      allowedRoleIds: ['PU-06', 'PU-02', 'PU-09'],
+      canCreateProjects: true,
     };
     await expect(
       projectsService.createProject(
@@ -374,11 +500,11 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
           clientName: 'Ext',
           organizationId: 'c0000001-0000-0000-0000-000000000001',
         },
-        userDevConPU02Pasivo
+        userDevConPU09Pasivo
       )
     ).rejects.toThrow(ForbiddenException);
 
-    // 6.3 Miembro suspendido
+    // 6.3 Miembro suspendido con perfil PU-09 autorizado
     await pool.query(
       "UPDATE traceflow.organization_member SET status = 'SUSPENDED' WHERE user_id = $1 AND organization_id = $2",
       [userPU06Dev.id, 'c0000001-0000-0000-0000-000000000001']
@@ -386,7 +512,9 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
 
     const userSuspendido: AuthenticatedUser = {
       ...userPU06Dev,
-      activeRoleId: 'PU-02',
+      activeRoleId: 'PU-09',
+      allowedRoleIds: ['PU-09', 'PU-06'],
+      canCreateProjects: true,
     };
     await expect(
       projectsService.createProject(
@@ -399,7 +527,54 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
         },
         userSuspendido
       )
+    ).rejects.toThrow('no es miembro activo');
+
+    // 6.4 PU-02 no puede crear proyectos (conservar PU-02 solo como Gestor SCM)
+    await expect(
+      projectsService.createProject(
+        {
+          code: 'PRJ-PU02-01',
+          projectKey: 'PU02-KEY',
+          name: 'Proyecto PU-02 Bloqueado',
+          clientName: 'Ext',
+          organizationId: 'c0000001-0000-0000-0000-000000000001',
+        },
+        userPU02Owner
+      )
+    ).rejects.toThrow('requiere operar con el perfil activo PU-09');
+
+    // 6.5 PU-09 sin autorización canCreateProjects no puede crear proyectos
+    const userPU09SinAuth: AuthenticatedUser = {
+      ...userPU09Exodo,
+      canCreateProjects: false,
+    };
+    await expect(
+      projectsService.createProject(
+        {
+          code: 'PRJ-NOAUTH-01',
+          projectKey: 'NOAUTH-KEY',
+          name: 'Proyecto Sin Autorización',
+          clientName: 'Ext',
+          organizationId: 'c0000001-0000-0000-0000-000000000001',
+        },
+        userPU09SinAuth
+      )
+    ).rejects.toThrow('no está autorizada para crear proyectos');
+
+    // 6.6 PU-08 no adquiere permisos operativos SCM automáticamente
+    await expect(
+      projectsService.createProject(
+        {
+          code: 'PRJ-PU08-01',
+          projectKey: 'PU08-KEY',
+          name: 'Proyecto PU-08 Bloqueado',
+          clientName: 'Ext',
+          organizationId: 'c0000001-0000-0000-0000-000000000001',
+        },
+        userPU08SysAdmin
+      )
     ).rejects.toThrow(ForbiddenException);
+    expect(await projectsService.getProjectsForUser(userPU08SysAdmin)).toEqual([]);
   });
 
   it('Escenario 7: Concurrencia y Aislamiento Multitenant entre Organizaciones', async () => {
@@ -413,10 +588,11 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
       VALUES ('d0000001-0000-0000-0000-000000000099', '${orgAcmeId}', '${userExterno.id}', 'OWNER', 'ACTIVE');
     `);
 
-    const userAcmeOwner: AuthenticatedUser = {
+    const userAcmeProjectManager: AuthenticatedUser = {
       ...userExterno,
-      activeRoleId: 'PU-02',
-      allowedRoleIds: ['PU-02'],
+      activeRoleId: 'PU-09',
+      allowedRoleIds: ['PU-09'],
+      canCreateProjects: true,
     };
 
     const prjAcme = await projectsService.createProject(
@@ -427,10 +603,10 @@ describe('INIT-H02-R / H02-R08: Certificación PostgreSQL Aislada (10 Escenarios
         clientName: 'Acme Global',
         organizationId: orgAcmeId,
       },
-      userAcmeOwner
+      userAcmeProjectManager
     );
 
-    // El usuario de Éxodo consulta proyectos: NO debe ver PRJ-ACM-99
+    // El usuario de Éxodo (PU-02 Gestor SCM) consulta proyectos: NO debe ver PRJ-ACM-99
     const projectsExodo = await projectsService.getProjectsForUser(userPU02Owner);
     expect(projectsExodo.some((p) => p.code === 'PRJ-ACM-99')).toBe(false);
 

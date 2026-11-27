@@ -64,6 +64,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
     assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
   };
 
+  const userJoanPM: AuthenticatedUser = {
+    ...userJoanGestor,
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09', 'PU-02', 'PU-01'],
+    canCreateProjects: true,
+  };
+
   const userRenzoArqui: AuthenticatedUser = {
     id: 'a0000001-0000-0000-0000-000000000002',
     code: 'USR-002',
@@ -113,7 +120,8 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_MODE = 'postgres';
     process.env.DATABASE_SSL = 'false';
-    process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
+    const appPwd = process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!';
+    process.env.TEST_DATABASE_URL = `postgresql://traceflow_app:${encodeURIComponent(appPwd)}@127.0.0.1:5432/traceflow_cert`;
 
     // 2. Reiniciar y migrar base de datos real con las 5 migraciones oficiales (hasta H03)
     const setupResult = await resetAndMigrateRealPostgres({
@@ -388,6 +396,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
   // ==========================================================================
   describe('Bloque 4: Servicios NestJS sobre PostgreSQL Real', () => {
     beforeAll(async () => {
+      // Alinear columnas MVP-H01 de app_user/user_role_assignment requeridas por AuthRepository actual
+      const migMvpH01 = fs.readFileSync(
+        path.resolve(process.cwd(), '../supabase/migrations/202611260009_mvp_roles_pu08_pu09_and_admin.sql'),
+        'utf8'
+      );
+      await adminPool.query(migMvpH01);
+
       // Crear una organización y un proyecto BORRADOR nuevo para pruebas de flujo
       const org = await orgsService.createOrganization(
         { code: 'ORG-FINTECH', slug: 'fintech-solutions', name: 'Fintech Solutions S.A.' },
@@ -409,7 +424,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
           clientName: 'Banco Fintech S.A.',
           organizationId: testOrgId,
         },
-        userJoanGestor
+        userJoanPM
       );
       testProjectId = prj.id;
 
@@ -423,7 +438,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
           clientName: 'Banco Fintech S.A.',
           organizationId: testOrgId,
         },
-        userJoanGestor
+        userJoanPM
       );
       secondProjectId = prj2.id;
 
@@ -739,7 +754,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
           clientName: 'Auditoría TraceFlow',
           organizationId: testOrgId,
         },
-        userJoanGestor
+        userJoanPM
       );
 
       // Intentar guardar lote con 1 integrante válido y 1 inválido (usuario externo no miembro de la org)
@@ -810,6 +825,21 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H03)', 
   // BLOQUE 6: SALVAGUARDAS Y VERIFICACIÓN DEL ROLLBACK DE H03
   // ==========================================================================
   describe('Bloque 6: Salvaguardas y Reversión Limpia de Migración H03', () => {
+    beforeAll(async () => {
+      // Revertir 202611260009 antes de certificar el conteo exacto de tablas del rollback H03 -> H02 (23 tablas)
+      const rbMvpH01 = fs.readFileSync(
+        path.resolve(process.cwd(), '../supabase/migrations/202611260009_mvp_roles_pu08_pu09_and_admin_rollback.sql'),
+        'utf8'
+      );
+      const client = await adminPool.connect();
+      try {
+        await client.query("SET traceflow.allow_force_mvp_h01_rollback = 'true';");
+        await client.query(rbMvpH01);
+      } finally {
+        client.release();
+      }
+    });
+
     const rollbackSqlPath = path.resolve(
       process.cwd(),
       '../supabase/migrations/202611260002_init_h03_team_methodology_planning_rollback.sql'

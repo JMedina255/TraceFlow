@@ -12,6 +12,7 @@ import { RfcEditView } from '../features/rfcs/RfcEditView';
 import { RfcImpactAnalysisView } from '../features/rfcs/RfcImpactAnalysisView';
 import { RfcMinorApprovalView } from '../features/rfcs/RfcMinorApprovalView';
 import { RfcCcbDeliberationView } from '../features/rfcs/RfcCcbDeliberationView';
+import { AdminUsersView } from '../features/admin/AdminUsersView';
 import { ScreenPlaceholder } from '../components/common/ScreenPlaceholder';
 import { NotFoundView } from '../features/notFound/NotFoundView';
 import { ROUTES_METADATA } from './navigation';
@@ -30,8 +31,8 @@ export const AppRouter: React.FC = () => {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardView />} />
 
-            {/* 2. Gestión de Proyectos (PU-02, PU-03, PU-04, PU-05) */}
-            <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-03', 'PU-04', 'PU-05']} moduleName="Gestión de Proyectos" />}>
+            {/* 2. Gestión de Proyectos (PU-02, PU-03, PU-04, PU-05, PU-09) */}
+            <Route element={<RoleGuard allowedRoles={['PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-09']} moduleName="Gestión de Proyectos" />}>
               <Route
                 path="/projects"
                 element={
@@ -211,14 +212,11 @@ export const AppRouter: React.FC = () => {
                   />
                 }
               />
-              <Route
-                path="/admin/users"
-                element={
-                  <ScreenPlaceholder
-                    meta={ROUTES_METADATA['/admin/users']}
-                  />
-                }
-              />
+            </Route>
+
+            {/* Rutas Restringidas: Exclusivo Administrador del Sistema (PU-08) */}
+            <Route element={<RoleGuard allowedRoles={['PU-08']} moduleName="Administración del Sistema" />}>
+              <Route path="/admin/users" element={<AdminUsersView />} />
             </Route>
 
             {/* 6. Soporte e Incidencias (PU-01, PU-02) */}

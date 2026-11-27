@@ -9,9 +9,10 @@
  *   PROVISION_PASSWORD : Password personalizado (si no se especifica, genera contraseñas seguras independientes)
  *   DATABASE_URL       : Cadena de conexión PostgreSQL (si está definida, persiste directamente en BD)
  */
-import { hash } from '@node-rs/argon2';
+import 'dotenv/config';
 import * as crypto from 'node:crypto';
 import pg from 'pg';
+import { hashPasswordArgon2id } from '../common/utils/password.util.js';
 const { Client } = pg;
 
 interface UserSeedConfig {
@@ -76,6 +77,18 @@ const USERS_TO_PROVISION: UserSeedConfig[] = [
     assignedRoleIds: [4],
     assignedProjectCodes: ['PRJ-001', 'PRJ-002'], // Veto estricto PRJ-003
   },
+  {
+    id: 'a0000001-0000-0000-0000-000000000005',
+    code: 'USR-005',
+    username: 'sysadmin',
+    email: 'admin@exodo.pe',
+    fullName: 'Administrador del Sistema TraceFlow',
+    organization: 'ÉXODO S.A.C.',
+    position: 'Administrador Global de Plataforma',
+    primaryRoleId: 8, // PU-08 Administrador del Sistema
+    assignedRoleIds: [8],
+    assignedProjectCodes: [],
+  },
 ];
 
 async function main() {
@@ -93,16 +106,13 @@ async function main() {
 
   for (const user of USERS_TO_PROVISION) {
     // Generar contraseña independiente o usar la proporcionada por variable de entorno
-    const plainPassword = process.env.PROVISION_PASSWORD || crypto.randomBytes(16).toString('base64url');
+    const plainPassword =
+      (user.code === 'USR-005' ? process.env.PROVISION_ADMIN_PASSWORD : undefined) ||
+      process.env.PROVISION_PASSWORD ||
+      crypto.randomBytes(16).toString('base64url');
 
     // Derivación criptográfica con Argon2id y parámetros recomendados OWASP
-    // memoryCost: 65536 (64 MB), timeCost: 3, parallelism: 4
-    const passwordHash = await hash(plainPassword, {
-      memoryCost: 65536,
-      timeCost: 3,
-      outputLen: 32,
-      parallelism: 4,
-    });
+    const passwordHash = await hashPasswordArgon2id(plainPassword);
 
     if (client) {
       // 1. Insertar usuario sin sobreescribir password_hash existente si ya fue aprovisionado

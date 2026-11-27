@@ -35,8 +35,8 @@ export const DashboardView: React.FC = () => {
     userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id)
   );
 
-  // Solicitudes del proyecto activo
-  const projectRfcs = getRfcsByProject(activeProject.id);
+  // Solicitudes del proyecto activo (solo cuando aplica ámbito de proyecto)
+  const projectRfcs = activeProject ? getRfcsByProject(activeProject.id) : [];
 
   // Derivar métricas contextuales según el rol efectivo
   const pendingRfcs = projectRfcs.filter((r) => 
@@ -88,8 +88,8 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu01-4',
             label: 'Línea Base del Proyecto',
-            value: activeProject.activeBaselineVersion || 'v1.0.0',
-            sub: activeProject.name,
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
+            sub: activeProject?.name || 'Sin proyecto seleccionado',
             icon: Boxes,
             color: 'text-upt-secondary',
             bg: 'border-purple-200/80',
@@ -208,8 +208,8 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu04-4',
             label: 'Línea Base Vigente',
-            value: activeProject.activeBaselineVersion || 'v1.0.0',
-            sub: activeProject.name,
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
+            sub: activeProject?.name || 'Sin proyecto seleccionado',
             icon: Boxes,
             color: 'text-upt-secondary',
             bg: 'border-purple-200/80',
@@ -221,7 +221,7 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu05-1',
             label: 'Línea Base Activa',
-            value: activeProject.activeBaselineVersion || 'v1.0.0',
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
             sub: 'Custodia Maestra SCM',
             icon: Boxes,
             color: 'text-upt-bright',
@@ -239,18 +239,18 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu05-3',
             label: 'Registro de Auditoría',
-            value: 'Activo (Demo)',
-            sub: 'Eventos locales demostrativos',
+            value: 'Activo',
+            sub: 'Trazabilidad e inmutabilidad',
             icon: History,
             color: 'text-upt-success',
             bg: 'border-emerald-200/80',
           },
           {
             id: 'm-pu05-4',
-            label: 'Gobernanza de Accesos',
-            value: '7 Perfiles',
-            sub: 'Gestión de usuarios y accesos',
-            icon: Users,
+            label: 'Custodia de Bibliotecas',
+            value: '3 Bibliotecas',
+            sub: 'Desarrollo, Soporte y Maestra',
+            icon: ShieldCheck,
             color: 'text-amber-700',
             bg: 'border-amber-200/80',
           },
@@ -279,7 +279,7 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu06-3',
             label: 'Línea Base del Proyecto',
-            value: activeProject.activeBaselineVersion || 'v1.0.0',
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
             sub: 'Biblioteca de Trabajo',
             icon: Boxes,
             color: 'text-upt-secondary',
@@ -291,6 +291,86 @@ export const DashboardView: React.FC = () => {
             value: String(authorizedProjects.length),
             sub: 'Asignación técnica',
             icon: FolderGit2,
+            color: 'text-amber-700',
+            bg: 'border-amber-200/80',
+          },
+        ];
+
+      case 'PU-08':
+        return [
+          {
+            id: 'm-pu08-1',
+            label: 'Ámbito de Gobernanza',
+            value: 'Global',
+            sub: 'Administración de plataforma',
+            icon: Users,
+            color: 'text-upt-bright',
+            bg: 'border-blue-200/80',
+          },
+          {
+            id: 'm-pu08-2',
+            label: 'Catálogo de Perfiles',
+            value: '9 Perfiles',
+            sub: 'PU-01 a PU-09 canónicos',
+            icon: ShieldCheck,
+            color: 'text-upt-secondary',
+            bg: 'border-purple-200/80',
+          },
+          {
+            id: 'm-pu08-3',
+            label: 'Autorización Jefe de Proyecto',
+            value: 'Activa',
+            sub: 'Control de creación (PU-09)',
+            icon: FolderGit2,
+            color: 'text-upt-success',
+            bg: 'border-emerald-200/80',
+          },
+          {
+            id: 'm-pu08-4',
+            label: 'Seguridad y Auditoría',
+            value: 'Inmutable',
+            sub: 'Trazabilidad administrativa',
+            icon: History,
+            color: 'text-amber-700',
+            bg: 'border-amber-200/80',
+          },
+        ];
+
+      case 'PU-09':
+        return [
+          {
+            id: 'm-pu09-1',
+            label: 'Proyectos Autorizados',
+            value: String(authorizedProjects.length),
+            sub: 'Cartera bajo dirección',
+            icon: FolderGit2,
+            color: 'text-upt-bright',
+            bg: 'border-blue-200/80',
+          },
+          {
+            id: 'm-pu09-2',
+            label: 'Autorización de Creación',
+            value: currentUser?.canCreateProjects ? 'Habilitada' : 'Pendiente',
+            sub: 'Otorgada por PU-08',
+            icon: ShieldCheck,
+            color: 'text-upt-secondary',
+            bg: 'border-purple-200/80',
+          },
+          {
+            id: 'm-pu09-3',
+            label: 'Solicitudes del Proyecto',
+            value: String(projectRfcs.length),
+            sub: `${pendingRfcs.length} en trámite`,
+            icon: GitPullRequest,
+            color: 'text-upt-success',
+            bg: 'border-emerald-200/80',
+          },
+          {
+            id: 'm-pu09-4',
+            label: 'Línea Base Activa',
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
+            sub: activeProject?.name || 'Sin proyecto seleccionado',
+            icon: Boxes,
             color: 'text-amber-700',
             bg: 'border-amber-200/80',
           },
@@ -329,7 +409,7 @@ export const DashboardView: React.FC = () => {
           {
             id: 'm-pu07-4',
             label: 'Línea Base Activa',
-            value: activeProject.activeBaselineVersion || 'v1.0.0',
+            value: activeProject?.activeBaselineVersion || 'v1.0.0',
             sub: 'Biblioteca de Soporte',
             icon: Boxes,
             color: 'text-upt-secondary',
@@ -354,8 +434,21 @@ export const DashboardView: React.FC = () => {
             Bienvenido, {currentUser?.fullName}
           </h1>
           <p className="text-sm text-upt-text-secondary max-w-2xl leading-relaxed">
-            Sesión activa como <strong className="text-upt-secondary font-semibold">{activeRoleDef?.label || currentUser?.roleLabel}</strong> en el proyecto{' '}
-            <strong className="text-upt-primary font-bold">{activeProject.name}</strong> (<span className="font-mono text-xs text-upt-secondary font-bold">{activeProject.code}</span>).
+            {activeRoleId === 'PU-08' ? (
+              <>
+                Sesión activa como <strong className="text-upt-secondary font-semibold">{activeRoleDef?.label || currentUser?.roleLabel}</strong> en el{' '}
+                <strong className="text-upt-primary font-bold">Ámbito Global de Plataforma</strong>.
+              </>
+            ) : (
+              <>
+                Sesión activa como <strong className="text-upt-secondary font-semibold">{activeRoleDef?.label || currentUser?.roleLabel}</strong> en el proyecto{' '}
+                <strong className="text-upt-primary font-bold">{activeProject?.name || 'Sin proyecto seleccionado'}</strong>{' '}
+                {activeProject?.code && (
+                  <>(<span className="font-mono text-xs text-upt-secondary font-bold">{activeProject.code}</span>)</>
+                )}
+                .
+              </>
+            )}
           </p>
         </div>
 
@@ -411,13 +504,35 @@ export const DashboardView: React.FC = () => {
             </Link>
           )}
 
-          <Link
-            to="/rfcs"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-upt-bg text-upt-text-secondary border border-upt-border text-xs font-medium transition-colors shadow-xs cursor-pointer"
-          >
-            <GitPullRequest className="w-4 h-4 text-upt-muted" />
-            <span>Ver Bandeja RFC</span>
-          </Link>
+          {activeRoleId === 'PU-08' && (
+            <Link
+              to="/admin/users"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-medium transition-colors shadow-sm cursor-pointer"
+            >
+              <Users className="w-4 h-4 text-upt-yellow" />
+              <span>Administrar Usuarios y Organizaciones</span>
+            </Link>
+          )}
+
+          {activeRoleId === 'PU-09' && (
+            <Link
+              to="/projects"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-medium transition-colors shadow-sm cursor-pointer"
+            >
+              <FolderGit2 className="w-4 h-4 text-upt-yellow" />
+              <span>Cartera de Proyectos</span>
+            </Link>
+          )}
+
+          {activeRoleId !== 'PU-08' && (
+            <Link
+              to="/rfcs"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-upt-bg text-upt-text-secondary border border-upt-border text-xs font-medium transition-colors shadow-xs cursor-pointer"
+            >
+              <GitPullRequest className="w-4 h-4 text-upt-muted" />
+              <span>Ver Bandeja RFC</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -482,12 +597,13 @@ export const DashboardView: React.FC = () => {
       )}
 
       {/* Listado de Solicitudes de Cambio (RFC) del Proyecto Activo */}
+      {activeRoleId !== 'PU-08' && (
       <section className="bg-upt-surface border border-upt-border rounded-xl p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-upt-border pb-3">
           <div>
             <h2 className="text-base font-bold text-upt-primary tracking-tight flex items-center gap-2">
               <FileCheck2 className="w-4 h-4 text-upt-secondary" />
-              Solicitudes de Cambio en {activeProject.name}
+              Solicitudes de Cambio en {activeProject?.name || 'Proyecto'}
             </h2>
             <p className="text-xs text-upt-muted">
               {activeRoleId === 'PU-01' ? 'Historial de solicitudes en el proyecto' : `Bandeja operacional (${projectRfcs.length} solicitudes registradas).`}
@@ -564,8 +680,10 @@ export const DashboardView: React.FC = () => {
           </div>
         )}
       </section>
+      )}
 
       {/* Proyectos Autorizados para este Usuario (Aislamiento Multitenant) */}
+      {activeRoleId !== 'PU-08' ? (
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -581,7 +699,7 @@ export const DashboardView: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {authorizedProjects.map((proj) => {
-            const isCurrentActive = proj.id === activeProject.id;
+            const isCurrentActive = proj.id === activeProject?.id;
             return (
               <div
                 key={proj.id}
@@ -624,6 +742,26 @@ export const DashboardView: React.FC = () => {
           })}
         </div>
       </section>
+      ) : (
+        <section className="bg-upt-surface border border-upt-border rounded-xl p-6 space-y-3 shadow-xs">
+          <h2 className="text-base font-bold text-upt-primary tracking-tight flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-upt-secondary" />
+            Consola Administrativa del Sistema (PU-08)
+          </h2>
+          <p className="text-xs text-upt-muted leading-relaxed">
+            Como Administrador del Sistema tienes gobierno global sobre el catálogo de cuentas, estados de activación, asignación de perfiles canónicos, autorizaciones para crear proyectos (PU-09), registro de invitaciones pendientes y gestión de organizaciones sin operar flujos SCM operativos.
+          </p>
+          <div>
+            <Link
+              to="/admin/users"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-upt-institutional hover:bg-upt-primary text-white text-xs font-medium transition-colors"
+            >
+              <span>Ir a Administración del Sistema</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

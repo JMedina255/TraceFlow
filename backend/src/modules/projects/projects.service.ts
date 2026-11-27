@@ -5,11 +5,13 @@ import {
   ConflictException,
   BadRequestException,
   Inject,
+  Optional,
   forwardRef,
 } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';
 import { ProjectsRepository, ProjectEntity } from './projects.repository.js';
 import { OrganizationsRepository } from '../organizations/organizations.repository.js';
+import { AuthRepository } from '../auth/auth.repository.js';
 import { AuditService } from '../audit/audit.service.js';
 import type { AuthenticatedUser } from '../../common/types/index.js';
 import { normalizeProjectStatus } from '../../common/types/index.js';
@@ -25,7 +27,10 @@ export class ProjectsService {
     @Inject(forwardRef(() => OrganizationsRepository))
     private readonly orgRepo: OrganizationsRepository,
     @Inject(AuditService)
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
+    @Optional()
+    @Inject(forwardRef(() => AuthRepository))
+    private readonly authRepo?: AuthRepository
   ) {}
 
   async createProject(
@@ -46,22 +51,39 @@ export class ProjectsService {
       );
     }
 
-    // 2. Validar membresía y permisos del usuario en la organización (DA-06, H02-R06)
+    // 2. Política estricta MVP-H01 de creación de proyectos:
+    //    - Perfil efectivo activo PU-09 (Jefe de Proyecto)
+    //    - Autorización vigente can_create_projects = true
+    //    - Membresía activa en la organización propietaria (DA-06)
+    //    Sin rutas de compatibilidad para PU-02 ni OWNER/ADMIN sin autorización PU-09.
+    if (user.activeRoleId !== 'PU-09') {
+      throw new ForbiddenException(
+        `Acceso denegado (MVP-H01): La creación de proyectos requiere operar con el perfil activo PU-09 (Jefe de Proyecto). Rol actual: '${user.activeRoleId}'.`
+      );
+    }
+
+    if (this.authRepo) {
+      const liveUser = await this.authRepo.findById(user.id);
+      if (
+        !liveUser ||
+        liveUser.status !== 'ACTIVE' ||
+        !Boolean(liveUser.can_create_projects) ||
+        !liveUser.assigned_role_codes.includes('PU-09')
+      ) {
+        throw new ForbiddenException(
+          `Acceso denegado (MVP-H01): La cuenta '${user.code}' no posee autorización vigente para crear proyectos (can_create_projects = true y perfil PU-09 activo).`
+        );
+      }
+    } else if (!user.canCreateProjects) {
+      throw new ForbiddenException(
+        `Acceso denegado (MVP-H01): La cuenta '${user.code}' no está autorizada para crear proyectos.`
+      );
+    }
+
     const member = await this.orgRepo.findMember(org.id, user.id);
     if (!member || member.status !== 'ACTIVE') {
       throw new ForbiddenException(
         `Acceso denegado: El usuario '${user.code}' no es miembro activo de la organización '${org.code}' (DA-06).`
-      );
-    }
-
-    // H02-R06: SoD estricta — Solo OWNER/ADMIN de la org o usuario con rol activo PU-02 (no permitido vía allowedRoleIds pasivos)
-    const hasCreationPermission =
-      ['OWNER', 'ADMIN'].includes(member.role_in_org) ||
-      user.activeRoleId === 'PU-02';
-
-    if (!hasCreationPermission) {
-      throw new ForbiddenException(
-        `Acceso denegado: Se requiere rol de Propietario (OWNER), Administrador de la organización o rol activo Gestor PU-02 para registrar proyectos.`
       );
     }
 

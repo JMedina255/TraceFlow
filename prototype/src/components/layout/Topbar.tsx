@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   GitBranch,
@@ -39,20 +39,38 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
   const [showProjectMenu, setShowProjectMenu] = useState(false);
 
   // Filtrar proyectos según los asignados a la cuenta del usuario actual (Aislamiento de acceso)
-  const userAssignedProjectIds = currentUser?.assignedProjectIds || [];
-  const authorizedProjects = projects.filter((p) =>
-    userAssignedProjectIds.length === 0 || userAssignedProjectIds.includes(p.id)
-  );
+  const isSystemAdmin = activeRoleId === 'PU-08';
+  const authorizedProjects = useMemo(() => {
+    if (isSystemAdmin) return [];
+    const assigned = currentUser?.assignedProjectIds || [];
+    return projects.filter((p) =>
+      assigned.length === 0 || assigned.includes(p.id) || assigned.includes(p.code)
+    );
+  }, [isSystemAdmin, projects, currentUser?.assignedProjectIds]);
 
   // Asegurar que el proyecto activo pertenezca a los proyectos autorizados del usuario
   useEffect(() => {
-    if (authorizedProjects.length > 0 && !authorizedProjects.some((p) => p.id === activeProject.id)) {
+    if (!isSystemAdmin && authorizedProjects.length > 0 && activeProject && !authorizedProjects.some((p) => p.id === activeProject.id)) {
       setActiveProject(authorizedProjects[0].id);
     }
-  }, [authorizedProjects, activeProject.id, setActiveProject]);
+  }, [isSystemAdmin, authorizedProjects, activeProject, setActiveProject]);
+
+  // Cerrar menús emergentes de barra superior con Escape
+  useEffect(() => {
+    if (!showNotifications && !showUserMenu && !showProjectMenu) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+        setShowUserMenu(false);
+        setShowProjectMenu(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showNotifications, showUserMenu, showProjectMenu]);
 
   // Derivar notificaciones contextuales del proyecto activo
-  const projectRfcs = getRfcsByProject(activeProject.id);
+  const projectRfcs = !isSystemAdmin && activeProject ? getRfcsByProject(activeProject.id) : [];
   const pendingRfcs = projectRfcs.filter((r) =>
     ['REGISTRADA', 'EN_ANALISIS_TECNICO', 'EN_EVALUACION', 'EN_PRUEBAS'].includes(r.status)
   );
@@ -97,7 +115,13 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Separador */}
         <div className="hidden lg:block h-6 w-px bg-white/20 mx-1" />
 
-        {/* Selector Interactivo de Proyecto Activo (Aislamiento Autorizado) */}
+        {/* Selector Interactivo de Proyecto Activo (o Contexto Global para PU-08) */}
+        {isSystemAdmin ? (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-upt-primary/70 border border-white/15 text-xs text-white">
+            <Shield className="w-3.5 h-3.5 text-upt-yellow shrink-0" />
+            <span className="font-medium">Ámbito Global de Plataforma</span>
+          </div>
+        ) : (
         <div className="relative">
           <button
             onClick={() => setShowProjectMenu(!showProjectMenu)}
@@ -108,11 +132,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
             <div className="hidden sm:block">
               <span className="text-blue-200 text-[11px] mr-1">Proyecto:</span>
               <span className="font-medium text-white truncate max-w-[140px] inline-block align-bottom">
-                {activeProject.name}
+                {activeProject?.name || 'Sin proyecto'}
               </span>
             </div>
             <span className="font-mono text-[10px] text-blue-100 bg-upt-institutional px-1 py-0.5 rounded border border-white/10">
-              {activeProject.code}
+              {activeProject?.code || 'N/A'}
             </span>
             <ChevronDown className="w-3 h-3 text-blue-200" />
           </button>
@@ -128,7 +152,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
               </div>
               <div className="space-y-1">
                 {authorizedProjects.map((proj) => {
-                  const isSelected = proj.id === activeProject.id;
+                  const isSelected = proj.id === activeProject?.id;
                   return (
                     <button
                       key={proj.id}
@@ -161,6 +185,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Lado Derecho: Notificaciones + Perfil de Sesión */}
@@ -229,9 +254,11 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
         {/* Perfil de Usuario y Sesión Activa */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2.5 p-1.5 sm:px-2.5 rounded-lg hover:bg-white/10 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-upt-bright cursor-pointer"
             aria-label="Menú de perfil y sesión de usuario"
+            aria-expanded={showUserMenu}
           >
             <div className="w-8 h-8 rounded-full bg-upt-bright border border-white/30 flex items-center justify-center font-bold text-xs text-white shrink-0">
               {currentUser?.fullName.charAt(0) || 'U'}
@@ -266,10 +293,10 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, isSidebarOpen }
                 </div>
                 <p className="text-xs font-bold text-upt-text mt-1">{currentUser.fullName}</p>
                 <p className="text-[11px] text-upt-muted font-mono">{currentUser.email}</p>
-                {currentUser.cargo && (
+                {(currentUser.cargo || currentUser.position) && (
                   <div className="mt-1 flex items-center gap-1 text-[11px] text-upt-text-secondary">
                     <Briefcase className="w-3 h-3 text-upt-muted shrink-0" />
-                    <span>{currentUser.cargo}</span>
+                    <span>{currentUser.cargo || currentUser.position}</span>
                   </div>
                 )}
               </div>

@@ -15,7 +15,8 @@ interface AuthState {
     email: string,
     password: string,
     requestedRoleId?: CanonicalRoleId
-  ) => Promise<void>;
+  ) => Promise<User>;
+  refreshSession: () => Promise<boolean>;
   logout: () => void;
   // Métodos de compatibilidad para suites de prueba automatizadas
   availableDemoAccounts: UserAccount[];
@@ -24,6 +25,31 @@ interface AuthState {
   switchUser: (userId: string) => void;
   login: (user: User) => void;
 }
+
+const mapApiUserToSession = (apiUser: any, requestedRoleId?: CanonicalRoleId): {
+  user: User;
+  roleId: CanonicalRoleId;
+  role: CanonicalRole;
+} => {
+  const effectiveRole = (requestedRoleId || apiUser.activeRoleId || apiUser.roleId || 'PU-01') as CanonicalRoleId;
+  const roleDef = CANONICAL_ROLES[effectiveRole] || CANONICAL_ROLES['PU-01'];
+  const hydratedUser: User = {
+    ...apiUser,
+    isActive: apiUser.isActive ?? true,
+    assignedRoleIds: apiUser.allowedRoleIds || apiUser.assignedRoleIds || [effectiveRole],
+    primaryRoleId: apiUser.primaryRoleId || effectiveRole,
+    assignedProjectIds: apiUser.assignedProjectIds || [],
+    role: roleDef.role,
+    roleId: effectiveRole,
+    roleLabel: roleDef.label,
+    allowedRoleIds: apiUser.allowedRoleIds || apiUser.assignedRoleIds || [effectiveRole],
+  };
+  return {
+    user: hydratedUser,
+    roleId: effectiveRole,
+    role: roleDef.role,
+  };
+};
 
 const getInitialSession = (): {
   user: User | null;
@@ -34,10 +60,11 @@ const getInitialSession = (): {
   const apiUser = storageService.get<any>('tf_api_user', null);
   const apiRoleId = storageService.get<any>('tf_api_role_id', null);
   if (apiUser) {
+    const mapped = mapApiUserToSession(apiUser, (apiRoleId || apiUser.activeRoleId || apiUser.roleId) as CanonicalRoleId);
     return {
-      user: apiUser,
-      role: apiUser.role || (apiRoleId ? CANONICAL_ROLES[apiRoleId as CanonicalRoleId] : null),
-      roleId: (apiRoleId || apiUser.activeRoleId || apiUser.roleId) as CanonicalRoleId,
+      user: mapped.user,
+      role: mapped.role,
+      roleId: mapped.roleId,
       isAuthenticated: true,
     };
   }
@@ -74,21 +101,19 @@ export const useAuthStore = create<AuthState>((set) => ({
    * Inicio de sesión formal empresarial con correo institucional y contraseña.
    * Valida credenciales mediante traceFlowAdapter (API NestJS o Mock local seguro).
    */
-  loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId) => {
+  loginWithCredentials: async (email: string, password: string, requestedRoleId?: CanonicalRoleId): Promise<User> => {
     if (traceFlowAdapter.isApiMode()) {
-      const user = await traceFlowAdapter.auth.login(email, password, requestedRoleId);
-      const effectiveRole = (requestedRoleId || user.activeRoleId || user.roleId || 'PU-01') as CanonicalRoleId;
-      const roleDef = user.role || CANONICAL_ROLES[effectiveRole];
-      const hydratedUser = { ...user, role: roleDef, roleId: effectiveRole };
-      storageService.set('tf_api_user', hydratedUser);
-      storageService.set('tf_api_role_id', effectiveRole);
+      const apiUser = await traceFlowAdapter.auth.login(email, password, requestedRoleId);
+      const mapped = mapApiUserToSession(apiUser, requestedRoleId);
+      storageService.set('tf_api_user', mapped.user);
+      storageService.set('tf_api_role_id', mapped.roleId);
       set({
-        currentUser: hydratedUser,
-        activeRoleId: effectiveRole,
-        activeRole: roleDef,
+        currentUser: mapped.user,
+        activeRoleId: mapped.roleId,
+        activeRole: mapped.role,
         isAuthenticated: true,
       });
-      return;
+      return mapped.user;
     }
 
     const result = await authService.authenticate(email, password, requestedRoleId);
@@ -98,6 +123,37 @@ export const useAuthStore = create<AuthState>((set) => ({
       activeRole: result.sessionUser.role,
       isAuthenticated: true,
     });
+    return result.sessionUser;
+  },
+
+  refreshSession: async (): Promise<boolean> => {
+    if (!traceFlowAdapter.isApiMode()) {
+      return Boolean(authService.validatePersistedSession());
+    }
+    try {
+      const apiUser = await traceFlowAdapter.auth.getMe();
+      if (!apiUser) {
+        storageService.remove('tf_api_user');
+        storageService.remove('tf_api_role_id');
+        set({ currentUser: null, activeRoleId: null, activeRole: null, isAuthenticated: false });
+        return false;
+      }
+      const mapped = mapApiUserToSession(apiUser);
+      storageService.set('tf_api_user', mapped.user);
+      storageService.set('tf_api_role_id', mapped.roleId);
+      set({
+        currentUser: mapped.user,
+        activeRoleId: mapped.roleId,
+        activeRole: mapped.role,
+        isAuthenticated: true,
+      });
+      return true;
+    } catch {
+      storageService.remove('tf_api_user');
+      storageService.remove('tf_api_role_id');
+      set({ currentUser: null, activeRoleId: null, activeRole: null, isAuthenticated: false });
+      return false;
+    }
   },
 
   /**

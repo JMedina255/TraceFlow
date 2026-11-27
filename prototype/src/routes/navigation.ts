@@ -344,16 +344,16 @@ export const ROUTES_METADATA: Record<string, RouteMeta> = {
   },
   '/admin/users': {
     path: '/admin/users',
-    title: 'Administración de Usuarios y Roles',
-    breadcrumbLabel: 'Usuarios y Roles',
+    title: 'Administración del sistema',
+    breadcrumbLabel: 'Administración del sistema',
     screenId: 'SCREEN-20',
     wireframeId: 'WF-20',
     packageId: 'PKG_GOB',
     packageName: 'Gobernanza y Seguridad',
     governedUseCases: ['CU-01'],
-    canonicalActors: ['Administrador de Configuración / Bibliotecario'],
-    plannedPhase: 'Fase VII (Incidencias, Auditoría y Reportes)',
-    description: 'Gestión de identidades institucionales y asignación de los 7 perfiles de usuario canónicos (PU-01..PU-07).',
+    canonicalActors: ['Administrador del Sistema (PU-08)'],
+    plannedPhase: 'MVP-H01 (Administración del Sistema)',
+    description: 'Gestión de identidades institucionales, invitaciones pendientes y autorización de jefes de proyecto (PU-01..PU-09).',
   },
 };
 
@@ -520,7 +520,7 @@ export const SIDEBAR_NAVIGATION: SidebarSection[] = [
     icon: Shield,
     items: [
       {
-        label: 'Usuarios y roles',
+        label: 'Administración del sistema',
         path: '/admin/users',
         screenId: 'SCREEN-20',
         allowedRoles: ROUTE_PERMISSIONS['/admin/users'],

@@ -140,3 +140,264 @@ export const rfcsApi = {
     });
   },
 };
+
+export interface AdminUserRecord {
+  id: string;
+  code: string;
+  username: string;
+  email: string;
+  fullName: string;
+  organization: string;
+  position: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  primaryRoleCode: string;
+  assignedRoleCodes: string[];
+  assignedProjectCodes: string[];
+  canCreateProjects: boolean;
+  projectCreationAuthorizedBy: string | null;
+  projectCreationAuthorizedAt: string | null;
+  githubUsername: string | null;
+  githubUserId: number | null;
+  githubIdentityStatus: 'UNVERIFIED' | 'DECLARED' | 'VERIFIED';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminUsersSummary {
+  total: number;
+  active: number;
+  suspended: number;
+  inactive: number;
+  authorizedProjectManagers: number;
+}
+
+export interface UserInvitationRecord {
+  id: string;
+  channel: 'EMAIL' | 'GITHUB';
+  email?: string | null;
+  github_username?: string | null;
+  organization_id?: string | null;
+  organization_code?: string | null;
+  organization_name?: string | null;
+  project_id?: string | null;
+  intended_role_id: number;
+  intended_role_code?: string;
+  intended_role_name?: string;
+  status: 'PENDING' | 'CANCELLED' | 'EXPIRED' | 'ACCEPTED';
+  invited_by: string;
+  invited_by_code?: string;
+  invited_by_name?: string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  expires_at?: string | null;
+}
+
+export interface OrganizationRecord {
+  id: string;
+  code: string;
+  name: string;
+  slug: string;
+  legal_name?: string | null;
+  tax_id?: string | null;
+  status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+  created_at: string;
+}
+
+export interface OrganizationMemberRecord {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role_in_org: 'OWNER' | 'ADMIN' | 'MEMBER' | 'AUDITOR';
+  status: 'ACTIVE' | 'SUSPENDED';
+  joined_at: string;
+  user_code?: string;
+  user_full_name?: string;
+  user_email?: string;
+}
+
+export const adminApi = {
+  listUsers: async (params?: {
+    search?: string;
+    status?: string;
+    role?: string;
+    canCreateProjects?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.set('search', params.search);
+    if (params?.status) query.set('status', params.status);
+    if (params?.role) query.set('role', params.role);
+    if (params?.canCreateProjects !== undefined && params.canCreateProjects !== '') {
+      query.set('canCreateProjects', params.canCreateProjects);
+    }
+    const qs = query.toString();
+    return request<{ total: number; summary: AdminUsersSummary; data: AdminUserRecord[] }>(
+      `/admin/users${qs ? `?${qs}` : ''}`,
+      { method: 'GET' }
+    );
+  },
+
+  getUserDetail: async (id: string) => {
+    return request<{ data: AdminUserRecord }>(`/admin/users/${encodeURIComponent(id)}`, {
+      method: 'GET',
+    });
+  },
+
+  createUser: async (dto: {
+    fullName: string;
+    email: string;
+    username?: string;
+    position?: string;
+    organization?: string;
+    organizationId?: string;
+    githubUsername?: string;
+    password: string;
+    status?: string;
+    roleCodes?: string[];
+    primaryRoleCode?: string;
+    authorizeProjectCreation?: boolean;
+  }) => {
+    return request<{ message: string; data: AdminUserRecord }>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+  },
+
+  updateUser: async (
+    id: string,
+    dto: { fullName?: string; position?: string; organization?: string; githubUsername?: string }
+  ) => {
+    return request<{ message: string; data: AdminUserRecord }>(
+      `/admin/users/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(dto),
+      }
+    );
+  },
+
+  updateUserStatus: async (id: string, status: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE', reason?: string) => {
+    return request<{ message: string; data: AdminUserRecord }>(
+      `/admin/users/${encodeURIComponent(id)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ status, reason }),
+      }
+    );
+  },
+
+  updateUserRoles: async (id: string, roleCodes: string[], primaryRoleCode?: string) => {
+    return request<{ message: string; data: AdminUserRecord }>(
+      `/admin/users/${encodeURIComponent(id)}/roles`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ roleCodes, primaryRoleCode }),
+      }
+    );
+  },
+
+  updateProjectCreationAuth: async (id: string, authorized: boolean, reason?: string) => {
+    return request<{ message: string; data: AdminUserRecord }>(
+      `/admin/users/${encodeURIComponent(id)}/project-creation-auth`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ authorized, reason }),
+      }
+    );
+  },
+
+  listInvitations: async (params?: { status?: string; channel?: string; organizationId?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.channel) query.set('channel', params.channel);
+    if (params?.organizationId) query.set('organizationId', params.organizationId);
+    const qs = query.toString();
+    return request<{ total: number; data: UserInvitationRecord[] }>(
+      `/admin/invitations${qs ? `?${qs}` : ''}`,
+      { method: 'GET' }
+    );
+  },
+
+  createInvitation: async (dto: {
+    channel: 'EMAIL' | 'GITHUB';
+    email?: string;
+    githubUsername?: string;
+    intendedRoleCode: string;
+    organizationId?: string;
+    notes?: string;
+  }) => {
+    return request<{ message: string; data: UserInvitationRecord }>('/admin/invitations', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+  },
+
+  updateInvitationStatus: async (
+    id: string,
+    status: 'CANCELLED' | 'EXPIRED',
+    reason?: string
+  ) => {
+    return request<{ message: string; data: UserInvitationRecord }>(
+      `/admin/invitations/${encodeURIComponent(id)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ status, reason }),
+      }
+    );
+  },
+};
+
+export const organizationsApi = {
+  getOrganizations: async () => {
+    return request<{ total: number; data: OrganizationRecord[] }>('/organizations', {
+      method: 'GET',
+    });
+  },
+
+  createOrganization: async (dto: {
+    code: string;
+    name: string;
+    slug: string;
+    legalName?: string;
+    taxId?: string;
+  }) => {
+    return request<{ message: string; data: OrganizationRecord }>('/organizations', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+  },
+
+  getMembers: async (idOrSlug: string) => {
+    return request<{ total: number; data: OrganizationMemberRecord[] }>(
+      `/organizations/${encodeURIComponent(idOrSlug)}/members`,
+      { method: 'GET' }
+    );
+  },
+
+  addMember: async (
+    idOrSlug: string,
+    dto: { userCodeOrEmailOrId: string; roleInOrg?: 'OWNER' | 'ADMIN' | 'MEMBER' | 'AUDITOR' }
+  ) => {
+    return request<{ message: string; data: OrganizationMemberRecord }>(
+      `/organizations/${encodeURIComponent(idOrSlug)}/members`,
+      {
+        method: 'POST',
+        body: JSON.stringify(dto),
+      }
+    );
+  },
+
+  updateMemberStatus: async (
+    idOrSlug: string,
+    userId: string,
+    status: 'ACTIVE' | 'SUSPENDED'
+  ) => {
+    return request<{ message: string; data: OrganizationMemberRecord }>(
+      `/organizations/${encodeURIComponent(idOrSlug)}/members/${encodeURIComponent(userId)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }
+    );
+  },
+};

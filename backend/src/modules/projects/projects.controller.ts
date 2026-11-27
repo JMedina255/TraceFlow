@@ -13,6 +13,8 @@ import {
 import { ProjectsService } from './projects.service.js';
 import { ProjectPlanningService } from './project-planning.service.js';
 import { AuthGuard } from '../../common/guards/auth.guard.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { AuthenticatedUser } from '../../common/types/index.js';
 import { CreateProjectDto } from './dtos/create-project.dto.js';
@@ -36,6 +38,8 @@ export class ProjectsController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('PU-09')
   async createProject(
     @Body() dto: CreateProjectDto,
     @CurrentUser() user: AuthenticatedUser

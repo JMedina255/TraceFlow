@@ -18,8 +18,10 @@ export type SystemAction =
   | 'REGISTRAR_INCIDENCIA'   // PU-01 (CU-23)
   | 'DERIVAR_INCIDENCIA'     // PU-02 (CU-25)
   | 'AUDITAR_SISTEMA'        // PU-04, PU-05 (CU-27)
-  | 'GESTIONAR_PROYECTOS'    // PU-02 (CU-02)
-  | 'GESTIONAR_USUARIOS';    // PU-05 (CU-01)
+  | 'GESTIONAR_PROYECTOS'    // PU-09 (CU-02 / MVP-H02)
+  | 'GESTIONAR_USUARIOS'     // PU-08 (CU-01 / MVP-H01)
+  | 'AUTORIZAR_JEFES_PROYECTO' // PU-08 (MVP-H01)
+  | 'GESTIONAR_ORGANIZACIONES'; // PU-08 (MVP-H01)
 
 /**
  * Matriz de Autorización y Segregación de Funciones (SoD) de Acciones del Sistema
@@ -43,8 +45,10 @@ export const ACTION_PERMISSIONS: Record<SystemAction, CanonicalRoleId[]> = {
   REGISTRAR_INCIDENCIA: ['PU-01'],
   DERIVAR_INCIDENCIA: ['PU-02'],
   AUDITAR_SISTEMA: ['PU-04', 'PU-05'],
-  GESTIONAR_PROYECTOS: ['PU-02'],
-  GESTIONAR_USUARIOS: ['PU-05'],
+  GESTIONAR_PROYECTOS: ['PU-09'],
+  GESTIONAR_USUARIOS: ['PU-08'],
+  AUTORIZAR_JEFES_PROYECTO: ['PU-08'],
+  GESTIONAR_ORGANIZACIONES: ['PU-08'],
 };
 
 /**
@@ -52,12 +56,12 @@ export const ACTION_PERMISSIONS: Record<SystemAction, CanonicalRoleId[]> = {
  * Desacoplada de iconos o componentes visuales de React.
  */
 export const ROUTE_PERMISSIONS: Record<string, CanonicalRoleId[]> = {
-  '/dashboard': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
-  '/projects': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/projects/:projectId': ['PU-02', 'PU-03', 'PU-04', 'PU-05'],
-  '/rfcs': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/dashboard': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07', 'PU-08', 'PU-09'],
+  '/projects': ['PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-09'],
+  '/projects/:projectId': ['PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-09'],
+  '/rfcs': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07', 'PU-09'],
   '/rfcs/new': ['PU-01'], // Exclusivo Solicitante (CU-04)
-  '/rfcs/:rfcId': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'],
+  '/rfcs/:rfcId': ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07', 'PU-09'],
   '/rfcs/:rfcId/edit': ['PU-01'], // Exclusivo Solicitante (CU-04.1)
   '/rfcs/:rfcId/impact-analysis': ['PU-03'], // Exclusivo Arquitecto (CU-06)
   '/rfcs/:rfcId/ccb-deliberation': ['PU-04'], // Exclusivo Comité CCB (CU-07)
@@ -75,5 +79,5 @@ export const ROUTE_PERMISSIONS: Record<string, CanonicalRoleId[]> = {
   '/incidents/:incidentId': ['PU-01', 'PU-02'],
   '/audit': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-27)
   '/reports': ['PU-02', 'PU-04', 'PU-05'], // Gestor, CCB y Bibliotecario (CU-28)
-  '/admin/users': ['PU-05'], // Exclusivo Bibliotecario / Admin SCM (CU-01)
+  '/admin/users': ['PU-08'], // Exclusivo Administrador del Sistema (CU-01 / MVP-H01)
 };

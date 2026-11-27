@@ -73,7 +73,7 @@ assert.ok(allPathsPU02.includes('/ecns'));
 // SoD: El Gestor NO crea solicitudes RFC directamente (atribución de PU-01)
 assert.strictEqual(allPathsPU02.includes('/rfcs/new'), false, 'PU-02 NO debe tener la opción de Nueva RFC en el menú');
 assert.strictEqual(allPathsPU02.includes('/scm/operations'), false, 'PU-02 NO debe tener Operaciones SCM (exclusivo PU-05)');
-assert.strictEqual(allPathsPU02.includes('/admin/users'), false, 'PU-02 NO debe tener Administración de Usuarios (exclusivo PU-05)');
+assert.strictEqual(allPathsPU02.includes('/admin/users'), false, 'PU-02 NO debe tener Administración de Usuarios (exclusivo PU-08)');
 console.log('✅ Menú contextual de Gestor (PU-02) validado: respeta restricciones SoD.\n');
 
 // ============================================================================
@@ -98,33 +98,50 @@ assert.strictEqual(allPathsPU04.includes('/admin/users'), false, 'PU-04 NO debe 
 console.log('✅ Menús contextuales de Arquitecto (PU-03) y CCB (PU-04) validados.\n');
 
 // ============================================================================
-// TEST 4: Gobernanza Exclusiva en Menú de PU-05 (Bibliotecario / Admin SCM)
+// TEST 4: Exclusividad de Bibliotecas en PU-05 y Administración del Sistema en PU-08
 // ============================================================================
-console.log('Test 4: Exclusividad de Gobernanza y Bibliotecas en PU-05 (Bibliotecario)');
+console.log('Test 4: Exclusividad de Operaciones SCM en PU-05 y Gobernanza Global en PU-08');
 const navPU05 = getNavigationForRole('PU-05');
 const allPathsPU05 = navPU05.flatMap((s) => s.items.map((i) => i.path));
 
-// PU-05 es el único custodio de bibliotecas y administración de usuarios
+// PU-05 es el único custodio de bibliotecas y líneas base, ya NO administra usuarios
 assert.ok(allPathsPU05.includes('/scm/operations'), 'PU-05 debe tener Operaciones SCM');
 assert.ok(allPathsPU05.includes('/baselines'), 'PU-05 debe tener Líneas Base y Reversión');
-assert.ok(allPathsPU05.includes('/admin/users'), 'PU-05 debe tener Administración de Usuarios y Roles');
+assert.strictEqual(allPathsPU05.includes('/admin/users'), false, 'PU-05 ya NO debe tener Administración de Usuarios (exclusivo PU-08)');
+
+// PU-08 es el único Administrador del Sistema
+const navPU08 = getNavigationForRole('PU-08');
+const allPathsPU08 = navPU08.flatMap((s) => s.items.map((i) => i.path));
+assert.ok(allPathsPU08.includes('/admin/users'), 'PU-08 debe tener Administración del Sistema (/admin/users)');
+assert.strictEqual(allPathsPU08.includes('/scm/operations'), false, 'PU-08 NO debe operar Operaciones SCM');
+
+// PU-09 (Jefe de Proyecto) tiene Cartera de Proyectos y Dashboard, sin /admin/users ni /scm/operations
+const navPU09 = getNavigationForRole('PU-09');
+const allPathsPU09 = navPU09.flatMap((s) => s.items.map((i) => i.path));
+assert.ok(allPathsPU09.includes('/projects'), 'PU-09 debe tener Directorio de Proyectos');
+assert.strictEqual(allPathsPU09.includes('/admin/users'), false, 'PU-09 NO debe ver Administración de Usuarios');
+assert.strictEqual(allPathsPU09.includes('/scm/operations'), false, 'PU-09 NO debe ver Operaciones SCM');
 
 // Verificar que NINGÚN otro rol tenga /scm/operations o /admin/users
-const otherRoles = ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-06', 'PU-07'];
-for (const role of otherRoles) {
+const nonScmRoles = ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-06', 'PU-07', 'PU-08', 'PU-09'];
+for (const role of nonScmRoles) {
   const otherPaths = getNavigationForRole(role).flatMap((s) => s.items.map((i) => i.path));
   assert.strictEqual(
     otherPaths.includes('/scm/operations'),
     false,
     `El rol ${role} NO debe tener acceso en menú a /scm/operations`
   );
+}
+const nonAdminRoles = ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07', 'PU-09'];
+for (const role of nonAdminRoles) {
+  const otherPaths = getNavigationForRole(role).flatMap((s) => s.items.map((i) => i.path));
   assert.strictEqual(
     otherPaths.includes('/admin/users'),
     false,
     `El rol ${role} NO debe tener acceso en menú a /admin/users`
   );
 }
-console.log('✅ Exclusividad de operaciones SCM y gestión de usuarios en PU-05 verificada.\n');
+console.log('✅ Exclusividad de Operaciones SCM (PU-05) y Administración del Sistema (PU-08) verificada.\n');
 
 // ============================================================================
 // TEST 5: Menú para PU-06 (Desarrollador) y PU-07 (Calidad) — Reglas RN-04 y RN-09
@@ -153,7 +170,7 @@ console.log('✅ Reglas RN-04 y RN-09 validadas en menús de Desarrollador y QA.
 // TEST 6: Coherencia Total entre ROUTE_PERMISSIONS y getNavigationForRole (SSOT)
 // ============================================================================
 console.log('Test 6: Verificación de coherencia SSOT entre navegación y guardas de ruta');
-const allRoles = ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07'];
+const allRoles = ['PU-01', 'PU-02', 'PU-03', 'PU-04', 'PU-05', 'PU-06', 'PU-07', 'PU-08', 'PU-09'];
 
 for (const rId of allRoles) {
   const roleSections = getNavigationForRole(rId);
@@ -208,7 +225,9 @@ assert.strictEqual(isRouteAuthorizedForRole('/rfcs/new', 'PU-01'), true);
 assert.strictEqual(isRouteAuthorizedForRole('/rfcs/new', 'PU-02'), false);
 assert.strictEqual(isRouteAuthorizedForRole('/scm/operations', 'PU-05'), true);
 assert.strictEqual(isRouteAuthorizedForRole('/scm/operations', 'PU-06'), false);
-assert.strictEqual(isRouteAuthorizedForRole('/admin/users', 'PU-05'), true);
+assert.strictEqual(isRouteAuthorizedForRole('/admin/users', 'PU-08'), true);
+assert.strictEqual(isRouteAuthorizedForRole('/admin/users', 'PU-05'), false);
+assert.strictEqual(isRouteAuthorizedForRole('/admin/users', 'PU-09'), false);
 assert.strictEqual(isRouteAuthorizedForRole('/admin/users', 'PU-01'), false);
 assert.strictEqual(isRouteAuthorizedForRole('/ruta-desconocida', null), false);
 console.log('✅ Helper isRouteAuthorizedForRole validado exitosamente.\n');

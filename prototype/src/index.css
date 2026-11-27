@@ -48,4 +48,16 @@
     background-color: var(--upt-bright);
     color: #ffffff;
   }
+
+  dialog:modal {
+    overscroll-behavior: contain;
+    margin: auto;
+  }
+
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+    background-color: rgb(0 0 0 / 0.45);
+    backdrop-filter: blur(2px);
+  }
 }

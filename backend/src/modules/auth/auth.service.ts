@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException, BadRequestException, Logger, Inject } from '@nestjs/common';
 import * as crypto from 'node:crypto';
-import { verify, hash } from '@node-rs/argon2';
+import { hashPasswordArgon2id, verifyPasswordArgon2id } from '../../common/utils/password.util.js';
 import { AuthRepository, UserAccountEntity } from './auth.repository.js';
 import { AuditService } from '../audit/audit.service.js';
 import { loadConfig } from '../../config/configuration.js';
@@ -16,19 +16,12 @@ export class AuthService {
   ) {}
 
   async hashPassword(plainPassword: string): Promise<string> {
-    return hash(plainPassword, {
-      memoryCost: 65536,
-      timeCost: 3,
-      outputLen: 32,
-      parallelism: 4,
-    });
+    return hashPasswordArgon2id(plainPassword);
   }
 
   async verifyPassword(plain: string, storedHash: string): Promise<boolean> {
     try {
-      if (storedHash.startsWith('$argon2')) {
-        return await verify(storedHash, plain);
-      }
+      return await verifyPasswordArgon2id(plain, storedHash);
     } catch (err: any) {
       this.logger.error(`Error verificando hash de contraseña Argon2id: ${err.message}`);
     }

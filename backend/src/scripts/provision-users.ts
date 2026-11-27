@@ -10,9 +10,9 @@
  *   DATABASE_URL       : Cadena de conexión PostgreSQL (si está definida, persiste directamente en BD)
  */
 import 'dotenv/config';
-import { hash } from '@node-rs/argon2';
 import * as crypto from 'node:crypto';
 import pg from 'pg';
+import { hashPasswordArgon2id } from '../common/utils/password.util.js';
 const { Client } = pg;
 
 interface UserSeedConfig {
@@ -112,13 +112,7 @@ async function main() {
       crypto.randomBytes(16).toString('base64url');
 
     // Derivación criptográfica con Argon2id y parámetros recomendados OWASP
-    // memoryCost: 65536 (64 MB), timeCost: 3, parallelism: 4
-    const passwordHash = await hash(plainPassword, {
-      memoryCost: 65536,
-      timeCost: 3,
-      outputLen: 32,
-      parallelism: 4,
-    });
+    const passwordHash = await hashPasswordArgon2id(plainPassword);
 
     if (client) {
       // 1. Insertar usuario sin sobreescribir password_hash existente si ya fue aprovisionado

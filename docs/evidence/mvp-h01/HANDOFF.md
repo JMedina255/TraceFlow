@@ -399,6 +399,50 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 
 ### 11.5 Respaldo y punto de continuidad
 - **Respaldo independiente:** `C:\Users\HP\Desktop\Proyecto\TraceFlow_Backup_MI02\`
-- **Commit local de recuperación:** `test(mvp): certificar seguridad y gestion administrativa (MVP-H01-MI-02)` (sin push ni merge).
+- **Commit local de recuperación:** `test(mvp): certificar seguridad y gestion administrativa (MVP-H01-MI-02)` (`0071f10`, sin push ni merge).
 - **Siguiente actividad concreta:** Preparar entorno PostgreSQL 17.5 local (`ENV-03`) y ejecutar **MI-03** (certificación física PostgreSQL real: `real-db-helper.ts`, migración `202611260009` y suites `real-postgres-*`).
 - **Dictamen:** **APTO para ENV-03 y MI-03.**
+
+---
+
+## 12. DEMO-01 — Aprovisionamiento reproducible de cuentas de evaluación
+
+**Fecha:** 2026-11-26T19:13:00-05:00  
+**Estado:** ✅ IMPLEMENTADO Y VERIFICADO EN MODO MODULAR (Pendiente ejecución física contra PostgreSQL local en ENV-03/MI-03 y E2E en MI-04)
+
+### 12.1 Componentes implementados
+- **Utilidad compartida de hashing:** `backend/src/common/utils/password.util.ts` (`hashPasswordArgon2id`, `verifyPasswordArgon2id`), reutilizada por `AuthService`, `provision-users.ts` y `provision-demo.ts`.
+- **Script reproducible de aprovisionamiento:** `backend/src/scripts/provision-demo.ts` con comando `npm run provision:demo` en `backend/package.json`.
+- **Suite de pruebas automatizadas:** `backend/test/demo-provisioning.spec.ts` (3 pruebas integrales).
+- **Documentación y exclusión Git:**
+  - `.gitignore` actualizado con regla `*.local.md`.
+  - Guía versionada sin contraseñas: `docs/evidence/mvp-h01/DEMO_PROVISIONING_GUIDE.md`.
+  - Guía local privada excluida de Git: `docs/evidence/mvp-h01/DEMO_ACCOUNTS.local.md` (verificada con `git check-ignore`).
+
+### 12.2 Cuentas de demostración definidas (PU-01 a PU-09)
+- `PU-01`: `usuario@exodo.pe` (Solicitante)
+- `PU-02`: `analistarequerimientos@exodo.pe` (Analista de Requerimientos)
+- `PU-03`: `arquitecto@exodo.pe` (Arquitecto de Software)
+- `PU-04`: `ccb@exodo.pe` (Miembro del CCB)
+- `PU-05`: `bibliotecario@exodo.pe` (Bibliotecario SCM)
+- `PU-06`: `desarrollador@exodo.pe` (Desarrollador)
+- `PU-07`: `qa@exodo.pe` (Responsable de Calidad)
+- `PU-08`: `admin@exodo.pe` (Administrador del Sistema — exclusivo administración global, sin proyectos)
+- `PU-09`: `jefeproyecto@exodo.pe` (Jefe de Proyecto — `can_create_projects = true`)
+
+### 12.3 Controles de seguridad y preservación verificados
+- Bloqueo estricto contra `NODE_ENV=production`, Supabase remoto, hosts cloud/externos y bases de sistema (`assertSafeLocalDemoDatabase`).
+- Entrada segura de contraseña por prompt interactivo oculto o variable local `DEMO_PROVISION_PASSWORD` (sin contraseña hardcodeada en código, migraciones ni reportes).
+- Sal Argon2id criptográfica independiente verificada para cada una de las 9 cuentas.
+- Idempotencia comprobada: detecta cuentas existentes sin sobrescribir contraseñas ni perfiles, y conserva intactas `jmedina@exodo.pe`, `rantayhua@exodo.pe`, `arivera@exodo.pe` y `rloyola@exodo.pe`.
+
+### 12.4 Resultados de verificación (Post-DEMO-01)
+- `npx vitest run test/demo-provisioning.spec.ts`: ✅ **3/3 aprobadas**.
+- `npm run lint` / `npm run build` (Backend): ✅ Exit 0, 0 errores.
+- `npm test` (Backend): ✅ **15/15 suites aprobadas, 203/203 pruebas aprobadas**.
+- `npm run lint` / `npm run build` / `npm test` (Frontend): ✅ Exit 0, **9/9 suites aprobadas** (3 warnings previos diferidos a MI-04).
+
+### 12.5 Integración pendiente en ENV-03, MI-03 y MI-04
+- **ENV-03:** Preparar PostgreSQL 17.5 local y aplicar migraciones hasta `202611260009`.
+- **MI-03:** Ejecutar `npm run provision:demo` contra la base local `traceflow_mvp_dev` y certificar autenticación, hashes Argon2id independientes, restricciones RBAC/SoD, `can_create_projects = true` para PU-09 y conservación histórica en PostgreSQL físico.
+- **MI-04:** Ejecutar el escenario de demostración completo (login PU-08 -> verificación/revocación/reautorización PU-09 -> login PU-09) en navegador con Playwright (dejando la creación de proyectos/equipos/metodología/GitHub del flujo lista para habilitarse en MVP-H02).

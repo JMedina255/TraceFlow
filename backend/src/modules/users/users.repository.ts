@@ -628,9 +628,9 @@ export class UsersRepository {
     if (this.db.getDatabaseMode() === 'postgres') {
             await this.getRunner(client).query(
         `UPDATE traceflow.user_invitation
-         SET status = $2,
-             cancelled_by = CASE WHEN $2 = 'CANCELLED' THEN $3 ELSE cancelled_by END,
-             cancelled_at = CASE WHEN $2 = 'CANCELLED' THEN NOW() ELSE cancelled_at END,
+         SET status = $2::varchar,
+             cancelled_by = CASE WHEN $2::varchar = 'CANCELLED' THEN $3::uuid ELSE cancelled_by END,
+             cancelled_at = CASE WHEN $2::varchar = 'CANCELLED' THEN NOW() ELSE cancelled_at END,
              updated_at = NOW()
          WHERE id = $1`,
         [id, status, actorUserId]

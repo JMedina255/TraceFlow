@@ -72,6 +72,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / 
     assignedProjectIds: ['PRJ-001', 'PRJ-002', 'PRJ-003'],
   };
 
+  const userJoanPM: AuthenticatedUser = {
+    ...userJoanGestor,
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09', 'PU-02', 'PU-01'],
+    canCreateProjects: true,
+  };
+
   const userRenzoArqui: AuthenticatedUser = {
     id: 'a0000001-0000-0000-0000-000000000002',
     code: 'USR-002',
@@ -108,7 +115,8 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / 
     process.env.DATABASE_MODE = 'postgres';
     process.env.DATABASE_SSL = 'false';
     process.env.ALLOW_MOCK_GITHUB = 'true';
-    process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
+    const appPwd = process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!';
+    process.env.TEST_DATABASE_URL = `postgresql://traceflow_app:${encodeURIComponent(appPwd)}@127.0.0.1:5432/traceflow_cert`;
 
     // 2. Reiniciar y migrar base de datos real con las 7 migraciones oficiales (hasta H04A-R)
     const setupResult = await resetAndMigrateRealPostgres({
@@ -314,11 +322,11 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / 
     it('CERT-H04A-06: DELETE debe estar estrictamente prohibido para traceflow_app en github_integration y organization_github_installation', async () => {
       await expect(
         appPool.query("DELETE FROM traceflow.github_integration WHERE repo_name = 'dummy_check'")
-      ).rejects.toThrow(/permission denied for table github_integration/i);
+      ).rejects.toThrow(/(permission denied for table|permiso denegado a la tabla) github_integration/i);
 
       await expect(
         appPool.query("DELETE FROM traceflow.organization_github_installation WHERE account_login = 'dummy_check'")
-      ).rejects.toThrow(/permission denied for table organization_github_installation/i);
+      ).rejects.toThrow(/(permission denied for table|permiso denegado a la tabla) organization_github_installation/i);
     });
   });
 
@@ -349,7 +357,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / 
           clientName: 'ÉXODO Certificaciones',
           organizationId: testOrgId,
         },
-        userJoanGestor
+        userJoanPM
       );
       testProjectId = project.id;
 
@@ -363,7 +371,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04A / 
           clientName: 'ÉXODO Certificaciones',
           organizationId: testOrgId,
         },
-        userJoanGestor
+        userJoanPM
       );
       secondProjectId = secondPrj.id;
     });

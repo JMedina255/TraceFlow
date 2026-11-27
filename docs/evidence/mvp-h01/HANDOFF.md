@@ -502,3 +502,36 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - **Configuración local:** `backend/.env`, `backend/.env.cert` y `prototype/.env.local` completados sin BOM, excluidos por `.gitignore`, con **0** referencias a Supabase.
 - **Aislamiento de red:** Se aplicó `ALTER SYSTEM SET listen_addresses = '127.0.0.1, ::1'` como `postgres`; queda pendiente reiniciar el servicio con privilegios de Administrador (`Restart-Service postgresql-x64-17`) para que el socket abandone `0.0.0.0:5432`.
 - **Protección destructiva:** `traceflow_mvp_dev` excluida de `ALLOWED_DISPOSABLE_DATABASES`.
+
+---
+
+## 15. MI-03A / MI-03B — Certificación de Migraciones y Física Administrativa en PostgreSQL 17.12
+
+**Fecha:** 2026-11-26T19:37:00-05:00  
+**Estado:** ✅ COMPLETADO Y VERIFICADO SOBRE `traceflow_cert` (86/86 pruebas físicas aprobadas)
+
+### 15.1 Archivos actualizados / creados en MI-03A y MI-03B
+- `backend/test/real-postgres-mvp-h01-certification.spec.ts` (nuevo — 9 pruebas físicas MI-03A/MI-03B)
+- `backend/test/helpers/real-db-helper.ts` (soporte `targetMigration: 'MVP-H01'` hasta `202611260009`)
+- `backend/test/scripts/run-real-postgres.ts` (carga automática de `.env.cert` + inclusión de `real-postgres-mvp-h01-certification.spec.ts`)
+- `backend/test/real-postgres-certification.spec.ts`, `real-postgres-h03-certification.spec.ts`, `real-postgres-h04a-certification.spec.ts`, `real-postgres-h04b-certification.spec.ts` (adaptación a `PU-09`, `TEST_DB_APP_PASSWORD` y mensajes PostgreSQL en español/inglés)
+- `backend/vitest.config.ts` (aislamiento de `real-postgres-mvp-h01-certification.spec.ts` en `npm test` estándar)
+- `backend/src/modules/users/users.repository.ts` (cast explícito `$2::varchar` y `$3::uuid` en `updateInvitationStatus`)
+- `backend/src/modules/users/users.service.ts` (`eventCode` `USER_PRJ_CREATION_AUTHORIZED` / `USER_PRJ_CREATION_REVOKED` <= `VARCHAR(30)`)
+- `backend/test/users-admin.spec.ts` (actualización de nombres de `eventCode`)
+
+### 15.2 Defectos reales de MVP-H01 descubiertos y corregidos durante certificación física
+1. **`UsersRepository.updateInvitationStatus` (`users.repository.ts:629`):** PostgreSQL 17 rechazaba con *"para el parámetro $2 se dedujeron tipos de dato inconsistentes"* por reutilización de `$2` en `SET status = $2` y `CASE WHEN $2 = 'CANCELLED'`. Corregido con cast explícito `$2::varchar` y `$3::uuid`.
+2. **`UsersService.updateProjectCreationAuth` (`users.service.ts:608`):** `'USER_PROJECT_CREATION_AUTHORIZED'` (32 caracteres) desbordaba `traceflow.audit_log.event_code VARCHAR(30)`. Corregido a `'USER_PRJ_CREATION_AUTHORIZED'` (28 chars) y `'USER_PRJ_CREATION_REVOKED'` (25 chars).
+
+### 15.3 Resultados de certificación PostgreSQL 17.12 (`npm run test:real-postgres` sobre `traceflow_cert`)
+- `real-postgres-mvp-h01-certification.spec.ts`: ✅ **9/9 aprobadas** (12 migraciones, `pgcrypto` en `extensions`, `PU-01..PU-09`, triggers, índices parciales, `traceflow_app` sin `DELETE`, rollback + reaplicación de `202611260009`, CRUD usuarios, revocación de sesiones, concurrencia `PU-09`, protección último admin `FOR UPDATE`, invitaciones + triggers, `append_audit_log` + rollback real).
+- `real-postgres-certification.spec.ts` (H02): ✅ **18/18 aprobadas**
+- `real-postgres-h03-certification.spec.ts` (H03): ✅ **20/20 aprobadas**
+- `real-postgres-h04a-certification.spec.ts` (H04A): ✅ **19/19 aprobadas**
+- `real-postgres-h04b-certification.spec.ts` (H04B): ✅ **20/20 aprobadas**
+- **Total certificación física:** ✅ **5/5 suites aprobadas, 86/86 pruebas aprobadas** (`ALLOW_REMOTE_TEST_DML=false`).
+
+### 15.4 Actualización de matriz ADM-01 a ADM-26 (Certificación física PostgreSQL)
+- **Certificados en PostgreSQL 17 real (`traceflow_cert`):** `ADM-01`, `ADM-04`, `ADM-05`, `ADM-06`, `ADM-07`, `ADM-08`, `ADM-09`, `ADM-10`, `ADM-11`, `ADM-12`, `ADM-13`, `ADM-14` (concurrencia real), `ADM-15` (`FOR UPDATE`), `ADM-16`, `ADM-17`, `ADM-18` (índice parcial único + trigger), `ADM-19`, `ADM-20` (trigger `enforce_invitation_security`), `ADM-21`, `ADM-22`, `ADM-23` (`append_audit_log` + rollback transaccional), `ADM-24` (`user_role_assignment.status = 'REVOKED'` + `user_session`), `ADM-25` (trigger `PU-08` en invitaciones).
+- **Certificados en integración modular HTTP (`users-admin.spec.ts`) y pendientes de UI E2E (MI-04):** `ADM-02`, `ADM-03`, `ADM-26` (guardas HTTP `AuthGuard` / `RolesGuard`), más los flujos visuales React en navegador (`MI-04`).

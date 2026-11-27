@@ -885,8 +885,8 @@ describe('MVP-H01 / MI-02: Administración de Usuarios, Autorizaciones PU-08/PU-
       expect(eventCodes).toContain('USER_CREATED');
       expect(eventCodes).toContain('USER_UPDATED');
       expect(eventCodes).toContain('USER_ROLES_UPDATED');
-      expect(eventCodes).toContain('USER_PROJECT_CREATION_AUTHORIZED');
-      expect(eventCodes).toContain('USER_PROJECT_CREATION_REVOKED');
+      expect(eventCodes).toContain('USER_PRJ_CREATION_AUTHORIZED');
+      expect(eventCodes).toContain('USER_PRJ_CREATION_REVOKED');
       expect(eventCodes).toContain('USER_SUSPENDED');
       expect(eventCodes).toContain('USER_REACTIVATED');
       expect(eventCodes).toContain('USER_INVITATION_CREATED');

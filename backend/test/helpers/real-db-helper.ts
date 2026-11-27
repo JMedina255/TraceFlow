@@ -18,7 +18,7 @@ export interface RealDbSetupOptions {
   appPassword?: string;
   database?: string;
   allowDestructiveReset?: boolean;
-  targetMigration?: 'H02' | 'H03' | 'H04A' | 'H04A-R' | 'H04B-PRE' | 'H04B' | 'H04B-R' | 'H04B-C';
+  targetMigration?: 'H02' | 'H03' | 'H04A' | 'H04A-R' | 'H04B-PRE' | 'H04B' | 'H04B-R' | 'H04B-C' | 'MVP-H01';
 }
 
 export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
@@ -30,7 +30,7 @@ export const DEFAULT_REAL_DB_OPTIONS: Required<RealDbSetupOptions> = {
   appPassword: process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!',
   database: process.env.TEST_DB_NAME || 'traceflow_cert',
   allowDestructiveReset: process.env.ALLOW_DESTRUCTIVE_DATABASE_RESET === 'true',
-  targetMigration: 'H04B-C',
+  targetMigration: 'MVP-H01',
 };
 
 export async function resetAndMigrateRealPostgres(
@@ -299,6 +299,13 @@ export async function resetAndMigrateRealPostgres(
       const migH04BC = fs.readFileSync(path.join(migrationsDir, '202611260008_init_h04b_c_governance_and_leases.sql'), 'utf8');
       await adminDbClient.query(migH04BC);
       appliedMigrations.push('202611260008_init_h04b_c_governance_and_leases.sql');
+    }
+
+    // Paso 13: Migración MVP-H01 (roles PU-08/PU-09, can_create_projects, revocación lógica e invitaciones)
+    if (opts.targetMigration === 'MVP-H01') {
+      const migMvpH01 = fs.readFileSync(path.join(migrationsDir, '202611260009_mvp_roles_pu08_pu09_and_admin.sql'), 'utf8');
+      await adminDbClient.query(migMvpH01);
+      appliedMigrations.push('202611260009_mvp_roles_pu08_pu09_and_admin.sql');
     }
   } finally {
     await adminDbClient.end();

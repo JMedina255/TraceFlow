@@ -605,8 +605,8 @@ export class UsersService {
       await this.auditService.logEvent(
         {
           eventCode: dto.authorized
-            ? 'USER_PROJECT_CREATION_AUTHORIZED'
-            : 'USER_PROJECT_CREATION_REVOKED',
+            ? 'USER_PRJ_CREATION_AUTHORIZED'
+            : 'USER_PRJ_CREATION_REVOKED',
           actorUserId: caller.id,
           actorRole: caller.activeRoleId,
           operation: dto.authorized

@@ -74,8 +74,9 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
     process.env.DATABASE_SSL = 'false';
     process.env.ALLOW_MOCK_GITHUB = 'true';
     process.env.GITHUB_WEBHOOK_SECRET = testSecret;
+    const appPwd = process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!';
     process.env.TEST_DATABASE_URL =
-      'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
+      `postgresql://traceflow_app:${encodeURIComponent(appPwd)}@127.0.0.1:5432/traceflow_cert`;
 
     // 1. Reiniciar y migrar base de datos real con las 11 migraciones oficiales (hasta H04B-C)
     const setupResult = await resetAndMigrateRealPostgres({
@@ -300,13 +301,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H04B / 
       // DELETE estrictamente revocado
       await expect(
         appPool.query(`DELETE FROM traceflow.github_event WHERE delivery_id = $1`, [testDeliveryId])
-      ).rejects.toThrow(/permission denied for table github_event/i);
+      ).rejects.toThrow(/(permission denied for table|permiso denegado a la tabla) github_event/i);
     });
 
     it('CERT-H04B-07: traceflow_app debe tener REVOKE DELETE en config_item_path_history', async () => {
       await expect(
         appPool.query(`DELETE FROM traceflow.config_item_path_history WHERE id = gen_random_uuid()`)
-      ).rejects.toThrow(/permission denied for table config_item_path_history/i);
+      ).rejects.toThrow(/(permission denied for table|permiso denegado a la tabla) config_item_path_history/i);
     });
   });
 

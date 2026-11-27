@@ -74,6 +74,13 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
     activeRoleId: 'PU-01', // Solicitante
   };
 
+  const userJoanPM: AuthenticatedUser = {
+    ...userJoanGestor,
+    activeRoleId: 'PU-09',
+    allowedRoleIds: ['PU-09', 'PU-02', 'PU-01'],
+    canCreateProjects: true,
+  };
+
   const userRenzoArqui: AuthenticatedUser = {
     id: 'a0000001-0000-0000-0000-000000000002',
     code: 'USR-002',
@@ -105,7 +112,8 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_MODE = 'postgres';
     process.env.DATABASE_SSL = 'false';
-    process.env.TEST_DATABASE_URL = 'postgresql://traceflow_app:TestAppPassword123!@127.0.0.1:5432/traceflow_cert';
+    const appPwd = process.env.TEST_DB_APP_PASSWORD || 'TestAppPassword123!';
+    process.env.TEST_DATABASE_URL = `postgresql://traceflow_app:${encodeURIComponent(appPwd)}@127.0.0.1:5432/traceflow_cert`;
 
     // 2. Ejecutar reinicio y migraciones reales completas en orden con autorización explícita (H02)
     const setupResult = await resetAndMigrateRealPostgres({
@@ -259,6 +267,15 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
   // BLOQUE 3: CREACIÓN DE ORGANIZACIÓN, PROYECTO Y ASIGNACIÓN ATÓMICA
   // ==========================================================================
   describe('Bloque 3: Operaciones Compuestas y Transacciones Atómicas (H02-R03)', () => {
+    beforeAll(async () => {
+      // Alinear columnas MVP-H01 de app_user/user_role_assignment requeridas por AuthRepository actual
+      const migMvpH01 = fs.readFileSync(
+        path.resolve(process.cwd(), '../supabase/migrations/202611260009_mvp_roles_pu08_pu09_and_admin.sql'),
+        'utf8'
+      );
+      await adminPool.query(migMvpH01);
+    });
+
     it('V-07: OrganizationsService debe crear una nueva organización incorporando al creador como OWNER y registrando auditoría real', async () => {
       const newOrg = await orgsService.createOrganization(
         {
@@ -309,7 +326,7 @@ describe('TraceFlow SCM — Certificación Oficial PostgreSQL Real (INIT-H02-V)'
           clientName: 'Banco Regional del Sur',
           organizationId: org!.id,
         },
-        userJoanGestor
+        userJoanPM
       );
 
       expect(newPrj.id).toBeDefined();

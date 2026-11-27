@@ -25,6 +25,7 @@ export default defineConfig({
             'test/real-postgres-h03-certification.spec.ts',
             'test/real-postgres-h04a-certification.spec.ts',
             'test/real-postgres-h04b-certification.spec.ts',
+            'test/real-postgres-mvp-h01-certification.spec.ts',
           ]
         : []),
       // Aislamiento de pruebas remotas de Supabase: Excluidas por defecto de npm test

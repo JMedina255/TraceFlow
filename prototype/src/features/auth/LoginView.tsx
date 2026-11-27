@@ -223,14 +223,14 @@ export const LoginView: React.FC = () => {
             </div>
 
             {errorMessage && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-start gap-2.5 animate-in fade-in">
+              <div role="alert" className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-start gap-2.5 animate-in fade-in">
                 <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                 <div className="leading-relaxed font-medium">{errorMessage}</div>
               </div>
             )}
 
             {passwordSetSuccess && (
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5 animate-in fade-in">
+              <div role="status" aria-live="polite" className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5 animate-in fade-in">
                 <Shield className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <div className="leading-relaxed font-medium">{passwordSetSuccess}</div>
               </div>
@@ -238,13 +238,19 @@ export const LoginView: React.FC = () => {
 
             {/* Campo: Correo Institucional */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-upt-text flex items-center gap-1.5">
+              <label htmlFor="login-email" className="text-xs font-bold text-upt-text flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-upt-bright" />
                 <span>Correo Institucional</span>
               </label>
               <input
+                id="login-email"
+                name="email"
                 type="email"
                 required
+                autoComplete="username"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -257,14 +263,17 @@ export const LoginView: React.FC = () => {
 
             {/* Campo: Contraseña */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-upt-text flex items-center gap-1.5">
+              <label htmlFor="login-password" className="text-xs font-bold text-upt-text flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-upt-bright" />
                 <span>Contraseña</span>
               </label>
               <div className="relative">
                 <input
+                  id="login-password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
@@ -273,7 +282,8 @@ export const LoginView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-upt-muted hover:text-upt-text transition-colors p-1"
+                  aria-pressed={showPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-upt-muted hover:text-upt-text transition-colors p-1 cursor-pointer"
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -391,6 +401,7 @@ export const LoginView: React.FC = () => {
               </p>
               <ul className="space-y-1 font-mono text-[10px] bg-white p-2.5 rounded-lg border border-upt-border">
                 <li>• <strong>admin@exodo.pe</strong> — Administrador del Sistema (PU-08)</li>
+                <li>• <strong>jefeproyecto@exodo.pe</strong> — Jefe de Proyecto autorizado (PU-09)</li>
                 <li>• <strong>jmedina@exodo.pe</strong> — Director de Calidad (PU-02 / PU-01)</li>
                 <li>• <strong>rantayhua@exodo.pe</strong> — Arquitecto Principal (PU-03 / PU-06)</li>
                 <li>• <strong>arivera@exodo.pe</strong> — Jefe de SCM (PU-05 / PU-07)</li>

@@ -579,3 +579,37 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - Servicio Windows `postgresql-x64-17`: `Running` (`Automatic`).
 - Puerto `5432` en `Get-NetTCPConnection`: escuchando exclusivamente en `127.0.0.1` y `::1` (exposición externa `0.0.0.0` eliminada).
 - Prueba directa de conectividad desde `backend/` (`pg` + `DATABASE_URL` con `traceflow_app`): `{"db":"traceflow_mvp_dev","addr":"127.0.0.1"}`.
+
+---
+
+## 19. MI-04: Refinamiento de interfaz administrativa y certificación E2E real (2026-11-26)
+
+### 19.1 Refinamientos UI/UX y accesibilidad implementados en `prototype/`
+- **`prototype/src/components/common/AdminModal.tsx` y `prototype/src/index.css`:** Se reemplazaron los overlays manuales de `AdminUsersView.tsx` por un componente único basado en `<dialog>` nativo (`showModal()`, top layer, `::backdrop`, `overscroll-behavior: contain`, cierre por `Escape`, `closedby`, `aria-labelledby`, foco explícito post-apertura mediante `[data-autofocus="true"]` en acciones seguras como `Cancelar` ante operaciones destructivas).
+- **`prototype/src/features/admin/AdminUsersView.tsx`:**
+  - Alertas `role="alert"` renderizadas **dentro** del diálogo activo (`modalError`), evitando que errores de validación o `409/400` del backend quedaran ocultos tras el backdrop.
+  - Conmutadores accesibles (`aria-pressed`) de visibilidad de contraseña y `autoComplete="new-password"` en el alta de usuarios.
+  - Barra `<search>` con botón `Limpiar filtros`, `role="tablist"` / `role="tab"` con `aria-selected`, `<caption className="sr-only">`, `scope="col"`, `whitespace-nowrap` en código/correo/estado y `aria-label` explícitos en botones de acción.
+  - Eliminación de efectos sincrónicos (`react(set-state-in-effect)`) con debounce en búsqueda (`180ms`) y limpieza segura de efectos.
+- **`prototype/src/components/layout/AppLayout.tsx` y `Topbar.tsx`:** Fijado contenedor `h-screen overflow-hidden` con `min-h-0` en el área flex para impedir que `Topbar` (`sticky top-0`) flote o tape encabezados al desplazarse por tablas largas; memoización de `authorizedProjects` (`useMemo`, eliminando el warning de `exhaustive-deps`); exposición real de `currentUser.cargo || currentUser.position`, `aria-expanded` y cierre con `Escape` en menús superiores.
+- **`prototype/src/features/auth/LoginView.tsx`:** Asociación explícita `htmlFor`/`id`, `autoComplete`, `aria-pressed` y adición de `jefeproyecto@exodo.pe` (PU-09) al panel informativo sin exponer credenciales.
+
+### 19.2 Certificación E2E real en Chromium (`scripts/e2e-mvp-h01-mi04.mjs`)
+Suite ejecutada contra Vite (`http://localhost:5173`), Backend NestJS (`http://localhost:3001/api/v1`) y PostgreSQL 17 real (`traceflow_mvp_dev`) con **11/11 flujos aprobados**, `pageErrors=0`, `consoleErrors=0` y `server5xx=0`:
+- `E2E-01`: Login `PU-08` (`admin@exodo.pe`) y redirección directa a `/admin/users`.
+- `E2E-02`: Filtro por perfil (`PU-09`) y restablecimiento con `Limpiar filtros`.
+- `E2E-03`: Modal nativo `<dialog>` Detalle de Cuenta (`USR-013`) y cierre por teclado (`Escape`).
+- `E2E-04`: Error de confirmación de contraseña visible dentro del modal y creación persistente en PostgreSQL tras recarga.
+- `E2E-05`: Edición básica y gestión de perfiles operativos (`PU-07`).
+- `E2E-06`: Autorización y revocación atómica de `PU-09` (`can_create_projects`).
+- `E2E-07`: Foco seguro en `Cancelar` al confirmar suspensión, revocación inmediata de sesión en contexto separado (`/rfcs` -> `/login`) y rechazo de nuevo login mientras está `SUSPENDED`, seguido de reactivación.
+- `E2E-08`: Invitaciones pendientes por canales `EMAIL` y `GITHUB` (sin correo requerido) y cancelación lógica (`CANCELLED`).
+- `E2E-09`: Creación de organización e incorporación de miembro en `Organizaciones y Membresías`.
+- `E2E-10`: Dashboard `PU-09` (`jefeproyecto@exodo.pe`, autorización `Habilitada`) y bloqueo RBAC (`AccessDeniedView`) en `/admin/users` para `PU-09` y `PU-01` (`usuario@exodo.pe`).
+- `E2E-11`: Menú de perfil (`Administrador del Sistema`), cierre de sesión y estabilidad total sin errores JS ni HTTP `5xx`.
+- Evidencia visual capturada e inspeccionada en `docs/evidence/mvp-h01/screenshots/` (8 capturas verificadas libres de secretos).
+- Nota sobre datos dev: por inmutabilidad estricta `append-only` de `traceflow.audit_log` (`ADR-008 / trg_audit_log_immutable`), los usuarios sintéticos `mi04.e2e.*` que generaron eventos de login permanecen deshabilitados (`status='SUSPENDED'`, `can_create_projects=FALSE`), preservando intactas las `13` cuentas activas (`USR-001..USR-013`), `1` `PU-09` activo (`USR-013`) y `ORG-EXODO`.
+
+### 19.3 Estado final para cierre y siguiente hito
+- **Matriz `ADM-01`..`ADM-26`:** Cobertura completa entre certificación unitaria/modular (`users-admin.spec.ts`), certificación física PostgreSQL 17 (`real-postgres-mvp-h01-certification.spec.ts`) y certificación E2E real en navegador (`scripts/e2e-mvp-h01-mi04.mjs`), quedando listo para demostración del MVP.
+- **Siguiente hito autorizado únicamente bajo instrucción expresa:** Publicación controlada / documentación final (`MI-05`) o `MVP-H02`.

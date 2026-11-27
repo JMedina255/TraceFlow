@@ -9,7 +9,7 @@ export const AppLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-upt-bg text-upt-text flex flex-col font-sans antialiased">
+    <div className="h-screen overflow-hidden bg-upt-bg text-upt-text flex flex-col font-sans antialiased">
       {/* Topbar Persistente */}
       <Topbar
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -17,7 +17,7 @@ export const AppLayout: React.FC = () => {
       />
 
       {/* Contenedor Principal: Sidebar + Área de Contenido */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Backdrop para dispositivos móviles */}
         {isSidebarOpen && (
           <div

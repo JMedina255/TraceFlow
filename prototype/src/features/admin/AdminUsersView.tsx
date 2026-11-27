@@ -12,6 +12,7 @@ import {
   GitBranch,
   Building2,
   Eye,
+  EyeOff,
   Edit3,
   KeyRound,
   AlertCircle,
@@ -21,6 +22,7 @@ import {
   Ban,
   RefreshCw,
 } from 'lucide-react';
+import { AdminModal } from '../../components/common/AdminModal';
 import { traceFlowAdapter } from '../../services/api/apiAdapter';
 import type {
   AdminUserRecord,
@@ -80,9 +82,12 @@ export const AdminUsersView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   // Modales de Usuarios
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showNewConfirmPassword, setShowNewConfirmPassword] = useState(false);
   const [detailUser, setDetailUser] = useState<AdminUserRecord | null>(null);
   const [editUser, setEditUser] = useState<AdminUserRecord | null>(null);
   const [rolesUser, setRolesUser] = useState<AdminUserRecord | null>(null);
@@ -189,16 +194,72 @@ export const AdminUsersView: React.FC = () => {
   }, [isApiMode]);
 
   useEffect(() => {
-    loadUsers();
-    loadInvitations();
-    loadOrganizations();
-  }, [loadUsers, loadInvitations, loadOrganizations]);
+    if (!isApiMode) return;
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await traceFlowAdapter.admin.listUsers({
+          search: searchTerm || undefined,
+          status: statusFilter || undefined,
+          role: roleFilter || undefined,
+          canCreateProjects: authFilter || undefined,
+        });
+        if (!active) return;
+        setUsers(res.data);
+        setSummary(res.summary);
+      } catch (err: unknown) {
+        if (!active) return;
+        setErrorMsg(err instanceof Error ? err.message : 'No se pudieron cargar los usuarios.');
+      }
+    }, searchTerm ? 180 : 0);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [isApiMode, searchTerm, statusFilter, roleFilter, authFilter]);
 
   useEffect(() => {
-    if (selectedOrgCode) {
-      loadOrgMembers(selectedOrgCode);
-    }
-  }, [selectedOrgCode, loadOrgMembers]);
+    if (!isApiMode) return;
+    let active = true;
+    Promise.all([
+      traceFlowAdapter.admin.listInvitations(),
+      traceFlowAdapter.organizations.getOrganizations(),
+    ])
+      .then(([invRes, orgRes]) => {
+        if (!active) return;
+        setInvitations(invRes.data);
+        setOrganizations(orgRes.data);
+        if (orgRes.data.length > 0) {
+          setSelectedOrgCode((prev) => prev || orgRes.data[0].code);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setErrorMsg(err instanceof Error ? err.message : 'No se pudo cargar el catálogo administrativo.');
+      });
+    return () => {
+      active = false;
+    };
+  }, [isApiMode]);
+
+  useEffect(() => {
+    if (!isApiMode || !selectedOrgCode) return;
+    let active = true;
+    traceFlowAdapter.organizations
+      .getMembers(selectedOrgCode)
+      .then((res) => {
+        if (active) setOrgMembers(res.data);
+      })
+      .catch((err: unknown) => {
+        if (active) {
+          setErrorMsg(err instanceof Error ? err.message : 'No se pudieron cargar los miembros de la organización.');
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [isApiMode, selectedOrgCode]);
 
   const resetCreateForm = () => {
     setNewFullName('');
@@ -209,22 +270,26 @@ export const AdminUsersView: React.FC = () => {
     setNewGithub('');
     setNewPassword('');
     setNewConfirmPassword('');
+    setShowNewPassword(false);
+    setShowNewConfirmPassword(false);
     setNewStatus('ACTIVE');
     setNewRoles(['PU-01']);
     setNewAuthorizePm(false);
+    setModalError(null);
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    setModalError(null);
     setErrorMsg(null);
     setSuccessMsg(null);
 
     if (newPassword !== newConfirmPassword) {
-      setErrorMsg('La contraseña inicial y su confirmación no coinciden.');
+      setModalError('La contraseña inicial y su confirmación no coinciden.');
       return;
     }
     if (newPassword.length < 8) {
-      setErrorMsg('La contraseña inicial debe tener al menos 8 caracteres.');
+      setModalError('La contraseña inicial debe tener al menos 8 caracteres.');
       return;
     }
 
@@ -248,13 +313,14 @@ export const AdminUsersView: React.FC = () => {
       await loadUsers();
       if (selectedOrgCode) await loadOrgMembers(selectedOrgCode);
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Error al registrar el usuario.');
+      setModalError(err instanceof Error ? err.message : 'Error al registrar el usuario.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const openEditModal = (u: AdminUserRecord) => {
+    setModalError(null);
     setEditUser(u);
     setEditFullName(u.fullName);
     setEditPosition(u.position || '');
@@ -266,6 +332,7 @@ export const AdminUsersView: React.FC = () => {
     e.preventDefault();
     if (!editUser) return;
     setSubmitting(true);
+    setModalError(null);
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
@@ -279,13 +346,14 @@ export const AdminUsersView: React.FC = () => {
       setSuccessMsg(`Información de ${editUser.code} actualizada correctamente.`);
       await loadUsers();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Error al actualizar el usuario.');
+      setModalError(err instanceof Error ? err.message : 'Error al actualizar el usuario.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const openRolesModal = (u: AdminUserRecord) => {
+    setModalError(null);
     setRolesUser(u);
     const currentOp = (u.assignedRoleCodes || []).filter((r): r is CanonicalRoleId =>
       OPERATIONAL_ROLES.includes(r as CanonicalRoleId)
@@ -297,10 +365,11 @@ export const AdminUsersView: React.FC = () => {
     e.preventDefault();
     if (!rolesUser) return;
     if (selectedOperationalRoles.length === 0) {
-      setErrorMsg('Debe seleccionar al menos un perfil operativo (PU-01 a PU-07).');
+      setModalError('Debe seleccionar al menos un perfil operativo (PU-01 a PU-07).');
       return;
     }
     setSubmitting(true);
+    setModalError(null);
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
@@ -309,13 +378,14 @@ export const AdminUsersView: React.FC = () => {
       setSuccessMsg(`Perfiles operativos de ${rolesUser.code} actualizados y auditados.`);
       await loadUsers();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Error al actualizar perfiles.');
+      setModalError(err instanceof Error ? err.message : 'Error al actualizar perfiles.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const requestStatusChange = (u: AdminUserRecord, nextStatus: 'ACTIVE' | 'SUSPENDED') => {
+    setModalError(null);
     setConfirmAction({
       title: nextStatus === 'SUSPENDED' ? `Suspender cuenta ${u.code}` : `Reactivar cuenta ${u.code}`,
       description:
@@ -337,6 +407,7 @@ export const AdminUsersView: React.FC = () => {
   };
 
   const requestProjectAuthChange = (u: AdminUserRecord, authorize: boolean) => {
+    setModalError(null);
     setConfirmAction({
       title: authorize
         ? `Autorizar como Jefe de Proyecto (PU-09)`
@@ -520,24 +591,24 @@ export const AdminUsersView: React.FC = () => {
 
       {/* Banners de Retroalimentación */}
       {errorMsg && (
-        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between gap-3">
+        <div role="alert" className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-medium">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{errorMsg}</span>
           </div>
-          <button onClick={() => setErrorMsg(null)} className="text-red-500 hover:text-red-700 cursor-pointer">
+          <button type="button" onClick={() => setErrorMsg(null)} aria-label="Cerrar mensaje de error" className="text-red-500 hover:text-red-700 cursor-pointer p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between gap-3">
+        <div role="status" aria-live="polite" className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-medium">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{successMsg}</span>
           </div>
-          <button onClick={() => setSuccessMsg(null)} className="text-emerald-600 hover:text-emerald-800 cursor-pointer">
+          <button type="button" onClick={() => setSuccessMsg(null)} aria-label="Cerrar aviso" className="text-emerald-600 hover:text-emerald-800 cursor-pointer p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -580,9 +651,11 @@ export const AdminUsersView: React.FC = () => {
       </div>
 
       {/* Pestañas del Módulo */}
-      <div className="flex flex-wrap gap-2 border-b border-upt-border pb-2">
+      <div role="tablist" aria-label="Secciones administrativas" className="flex flex-wrap gap-2 border-b border-upt-border pb-2">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'users'}
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${
             activeTab === 'users'
@@ -595,6 +668,8 @@ export const AdminUsersView: React.FC = () => {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'invitations'}
           onClick={() => setActiveTab('invitations')}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${
             activeTab === 'invitations'
@@ -607,6 +682,8 @@ export const AdminUsersView: React.FC = () => {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'organizations'}
           onClick={() => setActiveTab('organizations')}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${
             activeTab === 'organizations'
@@ -623,52 +700,81 @@ export const AdminUsersView: React.FC = () => {
       {activeTab === 'users' && (
         <div className="space-y-4">
           {/* Herramientas de Consulta */}
-          <div className="bg-upt-surface border border-upt-border rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-upt-muted absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar nombre, correo o GitHub..."
-                className="w-full pl-9 pr-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
-              />
+          <search aria-label="Filtros de cuentas administrativas">
+            <div className="bg-upt-surface border border-upt-border rounded-xl p-4 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-upt-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    id="admin-users-search"
+                    type="search"
+                    aria-label="Buscar usuarios por nombre, correo o GitHub"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar nombre, correo o GitHub..."
+                    className="w-full pl-9 pr-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
+                  />
+                </div>
+                <select
+                  id="admin-users-status-filter"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  aria-label="Filtrar por estado"
+                  className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="ACTIVE">Activos</option>
+                  <option value="SUSPENDED">Suspendidos</option>
+                  <option value="INACTIVE">Inactivos</option>
+                </select>
+                <select
+                  id="admin-users-role-filter"
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  aria-label="Filtrar por perfil"
+                  className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
+                >
+                  <option value="">Todos los perfiles</option>
+                  {(Object.keys(CANONICAL_ROLES) as CanonicalRoleId[]).map((r) => (
+                    <option key={r} value={r}>
+                      {r} — {CANONICAL_ROLES[r].label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  id="admin-users-auth-filter"
+                  value={authFilter}
+                  onChange={(e) => setAuthFilter(e.target.value)}
+                  aria-label="Filtrar por autorización para crear proyectos"
+                  className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
+                >
+                  <option value="">Autorización de proyectos (Todas)</option>
+                  <option value="true">Autorizados (Jefe de Proyecto)</option>
+                  <option value="false">Sin autorización de proyectos</option>
+                </select>
+              </div>
+              {(searchTerm || statusFilter || roleFilter || authFilter) && (
+                <div className="flex items-center justify-between text-[11px] text-upt-muted pt-1 border-t border-upt-border/60">
+                  <span>Mostrando {users.length} resultados filtrados</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('');
+                      setRoleFilter('');
+                      setAuthFilter('');
+                    }}
+                    className="text-upt-primary hover:underline font-semibold cursor-pointer"
+                  >
+                    Limpiar filtros
+                  </button>
+                </div>
+              )}
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              aria-label="Filtrar por estado"
-              className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
-            >
-              <option value="">Todos los estados</option>
-              <option value="ACTIVE">Activos</option>
-              <option value="SUSPENDED">Suspendidos</option>
-              <option value="INACTIVE">Inactivos</option>
-            </select>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              aria-label="Filtrar por perfil"
-              className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
-            >
-              <option value="">Todos los perfiles</option>
-              {(Object.keys(CANONICAL_ROLES) as CanonicalRoleId[]).map((r) => (
-                <option key={r} value={r}>
-                  {r} — {CANONICAL_ROLES[r].label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={authFilter}
-              onChange={(e) => setAuthFilter(e.target.value)}
-              aria-label="Filtrar por autorización para crear proyectos"
-              className="px-3 py-2 rounded-lg bg-upt-bg border border-upt-border text-xs focus:outline-none focus:ring-2 focus:ring-upt-bright"
-            >
-              <option value="">Autorización de proyectos (Todas)</option>
-              <option value="true">Autorizados (Jefe de Proyecto)</option>
-              <option value="false">Sin autorización de proyectos</option>
-            </select>
-          </div>
+          </search>
 
           {/* Tabla de Usuarios */}
           <div className="bg-upt-surface border border-upt-border rounded-xl overflow-hidden shadow-xs">
@@ -678,22 +784,39 @@ export const AdminUsersView: React.FC = () => {
                 <span>Consultando cuentas en PostgreSQL...</span>
               </div>
             ) : users.length === 0 ? (
-              <div className="p-10 text-center text-xs text-upt-muted">
-                No se encontraron usuarios con los criterios aplicados.
+              <div className="p-10 text-center text-xs text-upt-muted space-y-2">
+                <p>No se encontraron usuarios con los criterios aplicados.</p>
+                {(searchTerm || statusFilter || roleFilter || authFilter) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('');
+                      setRoleFilter('');
+                      setAuthFilter('');
+                    }}
+                    className="px-3 py-1.5 rounded-lg border border-upt-border bg-upt-bg text-upt-primary font-semibold cursor-pointer"
+                  >
+                    Restablecer filtros
+                  </button>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
+                  <caption className="sr-only">
+                    Catálogo institucional de cuentas, perfiles asignados y autorización de Jefes de Proyecto (PU-09)
+                  </caption>
                   <thead>
                     <tr className="bg-upt-bg border-b border-upt-border text-[11px] uppercase tracking-wider text-upt-text-secondary">
-                      <th className="py-3 px-4 font-bold">Código</th>
-                      <th className="py-3 px-4 font-bold">Nombre completo</th>
-                      <th className="py-3 px-4 font-bold">Correo institucional</th>
-                      <th className="py-3 px-4 font-bold">Usuario GitHub</th>
-                      <th className="py-3 px-4 font-bold">Perfiles</th>
-                      <th className="py-3 px-4 font-bold">Estado</th>
-                      <th className="py-3 px-4 font-bold">Autorización Jefe de Proyecto</th>
-                      <th className="py-3 px-4 font-bold text-right">Acciones</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Código</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Nombre completo</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Correo institucional</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Usuario GitHub</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Perfiles</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Estado</th>
+                      <th scope="col" className="py-3 px-4 font-bold">Autorización Jefe de Proyecto</th>
+                      <th scope="col" className="py-3 px-4 font-bold text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-upt-border/70">
@@ -702,13 +825,13 @@ export const AdminUsersView: React.FC = () => {
                       const isSysAdmin = u.assignedRoleCodes.includes('PU-08');
                       return (
                         <tr key={u.id} className="hover:bg-upt-bg/60 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-upt-primary">{u.code}</td>
+                          <td className="py-3 px-4 font-mono font-bold text-upt-primary whitespace-nowrap">{u.code}</td>
                           <td className="py-3 px-4">
                             <div className="font-semibold text-upt-text">{u.fullName}</div>
                             <div className="text-[11px] text-upt-muted">{u.position || u.organization}</div>
                           </td>
-                          <td className="py-3 px-4 font-mono text-[11px]">{u.email}</td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 font-mono text-[11px] whitespace-nowrap">{u.email}</td>
+                          <td className="py-3 px-4 whitespace-nowrap">
                             {u.githubUsername ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-[11px] border border-slate-200">
                                 <GitBranch className="w-3 h-3" />
@@ -765,7 +888,8 @@ export const AdminUsersView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setDetailUser(u)}
-                                title="Ver detalle"
+                                title={`Ver detalle de ${u.code}`}
+                                aria-label={`Ver detalle de ${u.code}`}
                                 className="p-1.5 rounded-lg border border-upt-border hover:bg-upt-bg text-upt-text-secondary cursor-pointer"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -773,7 +897,8 @@ export const AdminUsersView: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => openEditModal(u)}
-                                title="Editar usuario"
+                                title={`Editar usuario ${u.code}`}
+                                aria-label={`Editar usuario ${u.code}`}
                                 className="p-1.5 rounded-lg border border-upt-border hover:bg-upt-bg text-upt-text-secondary cursor-pointer"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -782,7 +907,8 @@ export const AdminUsersView: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => openRolesModal(u)}
-                                  title="Gestionar perfiles"
+                                  title={`Gestionar perfiles de ${u.code}`}
+                                  aria-label={`Gestionar perfiles de ${u.code}`}
                                   className="p-1.5 rounded-lg border border-upt-border hover:bg-upt-bg text-upt-primary cursor-pointer"
                                 >
                                   <KeyRound className="w-3.5 h-3.5" />
@@ -852,10 +978,11 @@ export const AdminUsersView: React.FC = () => {
 
             <form onSubmit={handleCreateInvitation} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-bold text-upt-text">Canal</label>
-                <div className="grid grid-cols-2 gap-2">
+                <span className="font-bold text-upt-text block">Canal</span>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-label="Canal de invitación">
                   <button
                     type="button"
+                    aria-pressed={invChannel === 'EMAIL'}
                     onClick={() => setInvChannel('EMAIL')}
                     className={`py-2 px-3 rounded-lg border text-xs font-semibold cursor-pointer ${
                       invChannel === 'EMAIL'
@@ -867,6 +994,7 @@ export const AdminUsersView: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={invChannel === 'GITHUB'}
                     onClick={() => setInvChannel('GITHUB')}
                     className={`py-2 px-3 rounded-lg border text-xs font-semibold cursor-pointer ${
                       invChannel === 'GITHUB'
@@ -881,10 +1009,15 @@ export const AdminUsersView: React.FC = () => {
 
               {invChannel === 'EMAIL' ? (
                 <div className="space-y-1">
-                  <label className="font-bold text-upt-text">Correo electrónico destinatario *</label>
+                  <label htmlFor="inv-email" className="font-bold text-upt-text block">Correo electrónico destinatario *</label>
                   <input
+                    id="inv-email"
+                    name="invEmail"
                     type="email"
                     required
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
                     value={invEmail}
                     onChange={(e) => setInvEmail(e.target.value)}
                     placeholder="colaborador@exodo.pe"
@@ -893,10 +1026,15 @@ export const AdminUsersView: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <label className="font-bold text-upt-text">Usuario GitHub destinatario *</label>
+                  <label htmlFor="inv-github" className="font-bold text-upt-text block">Usuario GitHub destinatario *</label>
                   <input
+                    id="inv-github"
+                    name="invGithub"
                     type="text"
                     required
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
                     value={invGithub}
                     onChange={(e) => setInvGithub(e.target.value)}
                     placeholder="octocat-dev"
@@ -909,8 +1047,10 @@ export const AdminUsersView: React.FC = () => {
               )}
 
               <div className="space-y-1">
-                <label className="font-bold text-upt-text">Perfil propuesto</label>
+                <label htmlFor="inv-role" className="font-bold text-upt-text block">Perfil propuesto</label>
                 <select
+                  id="inv-role"
+                  name="invRole"
                   value={invRole}
                   onChange={(e) => setInvRole(e.target.value as CanonicalRoleId)}
                   className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border focus:outline-none focus:ring-2 focus:ring-upt-bright"
@@ -924,8 +1064,10 @@ export const AdminUsersView: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-upt-text">Organización (opcional)</label>
+                <label htmlFor="inv-org" className="font-bold text-upt-text block">Organización (opcional)</label>
                 <select
+                  id="inv-org"
+                  name="invOrg"
                   value={invOrgId}
                   onChange={(e) => setInvOrgId(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border focus:outline-none focus:ring-2 focus:ring-upt-bright"
@@ -940,8 +1082,10 @@ export const AdminUsersView: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-upt-text">Notas administrativas</label>
+                <label htmlFor="inv-notes" className="font-bold text-upt-text block">Notas administrativas</label>
                 <textarea
+                  id="inv-notes"
+                  name="invNotes"
                   rows={2}
                   value={invNotes}
                   onChange={(e) => setInvNotes(e.target.value)}
@@ -974,14 +1118,15 @@ export const AdminUsersView: React.FC = () => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
+                  <caption className="sr-only">Historial de invitaciones pendientes y canceladas</caption>
                   <thead>
                     <tr className="bg-upt-bg border-b border-upt-border text-[11px] uppercase text-upt-text-secondary">
-                      <th className="py-2.5 px-4 font-bold">Canal</th>
-                      <th className="py-2.5 px-4 font-bold">Destinatario</th>
-                      <th className="py-2.5 px-4 font-bold">Perfil</th>
-                      <th className="py-2.5 px-4 font-bold">Organización</th>
-                      <th className="py-2.5 px-4 font-bold">Estado</th>
-                      <th className="py-2.5 px-4 font-bold text-right">Acciones</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold">Canal</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold">Destinatario</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold">Perfil</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold">Organización</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold">Estado</th>
+                      <th scope="col" className="py-2.5 px-4 font-bold text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-upt-border/70">
@@ -1042,6 +1187,7 @@ export const AdminUsersView: React.FC = () => {
               <h2 className="text-sm font-bold text-upt-primary">Organizaciones</h2>
               <button
                 type="button"
+                aria-expanded={showNewOrgForm}
                 onClick={() => setShowNewOrgForm(!showNewOrgForm)}
                 className="px-2.5 py-1 rounded-lg bg-upt-institutional text-white text-[11px] font-bold cursor-pointer"
               >
@@ -1053,7 +1199,11 @@ export const AdminUsersView: React.FC = () => {
               <form onSubmit={handleCreateOrganization} className="space-y-2.5 p-3 rounded-xl bg-upt-bg border border-upt-border text-xs">
                 <input
                   type="text"
+                  aria-label="Código de organización"
                   required
+                  autoCorrect="off"
+                  autoCapitalize="characters"
+                  spellCheck={false}
                   value={orgCode}
                   onChange={(e) => setOrgCode(e.target.value)}
                   placeholder="Código ej. ORG-CLIENTE"
@@ -1061,6 +1211,7 @@ export const AdminUsersView: React.FC = () => {
                 />
                 <input
                   type="text"
+                  aria-label="Nombre comercial de organización"
                   required
                   value={orgName}
                   onChange={(e) => setOrgName(e.target.value)}
@@ -1069,7 +1220,11 @@ export const AdminUsersView: React.FC = () => {
                 />
                 <input
                   type="text"
+                  aria-label="Slug de organización"
                   required
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   value={orgSlug}
                   onChange={(e) => setOrgSlug(e.target.value)}
                   placeholder="slug-url"
@@ -1077,6 +1232,7 @@ export const AdminUsersView: React.FC = () => {
                 />
                 <input
                   type="text"
+                  aria-label="Razón social"
                   value={orgLegalName}
                   onChange={(e) => setOrgLegalName(e.target.value)}
                   placeholder="Razón social (opcional)"
@@ -1126,18 +1282,23 @@ export const AdminUsersView: React.FC = () => {
                   Aislamiento institucional DA-06: solo usuarios registrados pueden vincularse.
                 </p>
               </div>
-              <form onSubmit={handleAddOrgMember} className="flex gap-2 text-xs">
+              <form onSubmit={handleAddOrgMember} className="flex flex-wrap gap-2 text-xs">
                 <input
                   type="text"
+                  aria-label="Código o correo del miembro a incorporar"
                   required
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   value={newMemberLookup}
                   onChange={(e) => setNewMemberLookup(e.target.value)}
                   placeholder="USR-005 o correo..."
                   className="px-3 py-1.5 rounded-lg bg-upt-bg border border-upt-border"
                 />
                 <select
+                  aria-label="Rol dentro de la organización"
                   value={newMemberRole}
-                  onChange={(e) => setNewMemberRole(e.target.value as any)}
+                  onChange={(e) => setNewMemberRole(e.target.value as 'MEMBER' | 'ADMIN' | 'AUDITOR' | 'OWNER')}
                   className="px-2 py-1.5 rounded-lg bg-upt-bg border border-upt-border"
                 >
                   <option value="MEMBER">MEMBER</option>
@@ -1157,13 +1318,14 @@ export const AdminUsersView: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
+                <caption className="sr-only">Miembros vinculados a la organización seleccionada</caption>
                 <thead>
                   <tr className="bg-upt-bg border-b border-upt-border text-[11px] uppercase text-upt-text-secondary">
-                    <th className="py-2 px-3 font-bold">Usuario</th>
-                    <th className="py-2 px-3 font-bold">Correo</th>
-                    <th className="py-2 px-3 font-bold">Rol Org</th>
-                    <th className="py-2 px-3 font-bold">Estado</th>
-                    <th className="py-2 px-3 font-bold text-right">Acción</th>
+                    <th scope="col" className="py-2 px-3 font-bold">Usuario</th>
+                    <th scope="col" className="py-2 px-3 font-bold">Correo</th>
+                    <th scope="col" className="py-2 px-3 font-bold">Rol Org</th>
+                    <th scope="col" className="py-2 px-3 font-bold">Estado</th>
+                    <th scope="col" className="py-2 px-3 font-bold text-right">Acción</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-upt-border/70">
@@ -1204,214 +1366,264 @@ export const AdminUsersView: React.FC = () => {
       )}
 
       {/* MODAL NUEVO USUARIO */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-upt-border pb-3">
-              <div>
-                <h2 className="text-base font-bold text-upt-primary">Registrar nuevo usuario</h2>
-                <p className="text-[11px] text-upt-muted">
-                  Aprovisionamiento seguro con hash Argon2id. El perfil PU-08 no se asigna desde este formulario.
-                </p>
-              </div>
-              <button onClick={() => setShowCreateModal(false)} className="text-upt-muted hover:text-upt-text cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+      <AdminModal
+        open={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false);
+          setModalError(null);
+        }}
+        title="Registrar nuevo usuario"
+        subtitle="Aprovisionamiento seguro con hash Argon2id. El perfil PU-08 no se asigna desde este formulario."
+        maxWidthClass="max-w-2xl"
+        error={modalError}
+      >
+        <form onSubmit={handleCreateUser} className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label htmlFor="new-full-name" className="font-bold block">Nombres y apellidos *</label>
+              <input
+                id="new-full-name"
+                name="fullName"
+                type="text"
+                required
+                autoFocus
+                autoComplete="name"
+                value={newFullName}
+                onChange={(e) => setNewFullName(e.target.value)}
+                placeholder="María Elena Torres"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
             </div>
-
-            <form onSubmit={handleCreateUser} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-bold">Nombres y apellidos *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newFullName}
-                    onChange={(e) => setNewFullName(e.target.value)}
-                    placeholder="María Elena Torres"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Correo electrónico *</label>
-                  <input
-                    type="email"
-                    required
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="mtorres@exodo.pe"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Nombre de usuario</label>
-                  <input
-                    type="text"
-                    value={newUsername}
-                    onChange={(e) => setNewUsername(e.target.value)}
-                    placeholder="mtorres (opcional)"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Cargo institucional</label>
-                  <input
-                    type="text"
-                    value={newPosition}
-                    onChange={(e) => setNewPosition(e.target.value)}
-                    placeholder="Líder Técnico"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Organización</label>
-                  <select
-                    value={newOrgId}
-                    onChange={(e) => setNewOrgId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  >
-                    <option value="">Sin vinculación organizacional automática</option>
-                    {organizations.map((org) => (
-                      <option key={org.id} value={org.id}>
-                        {org.code} — {org.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Cuenta GitHub opcional (referencia manual)</label>
-                  <input
-                    type="text"
-                    value={newGithub}
-                    onChange={(e) => setNewGithub(e.target.value)}
-                    placeholder="mtorres-dev"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Contraseña inicial temporal *</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={8}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mínimo 8 caracteres"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold">Confirmar contraseña *</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={8}
-                    value={newConfirmPassword}
-                    onChange={(e) => setNewConfirmPassword(e.target.value)}
-                    placeholder="Repita la contraseña"
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
-                <div className="space-y-1">
-                  <label className="font-bold">Estado inicial</label>
-                  <select
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value as 'ACTIVE' | 'INACTIVE')}
-                    className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                  >
-                    <option value="ACTIVE">ACTIVE (Activo)</option>
-                    <option value="INACTIVE">INACTIVE (Inactivo)</option>
-                  </select>
-                </div>
-                <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 flex items-start gap-2 mt-4">
-                  <input
-                    id="chk-create-pm"
-                    type="checkbox"
-                    checked={newAuthorizePm}
-                    onChange={(e) => setNewAuthorizePm(e.target.checked)}
-                    className="mt-0.5"
-                  />
-                  <label htmlFor="chk-create-pm" className="cursor-pointer">
-                    <span className="font-bold text-upt-primary block">Autorizar para crear proyectos (PU-09)</span>
-                    <span className="text-[10px] text-upt-muted">
-                      Habilita can_create_projects y asigna PU-09 de forma atómica.
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-bold">Perfiles operativos iniciales (PU-01 a PU-07)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {OPERATIONAL_ROLES.map((r) => {
-                    const checked = newRoles.includes(r);
-                    return (
-                      <label
-                        key={r}
-                        className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer ${
-                          checked ? 'bg-blue-50 border-upt-bright' : 'bg-upt-bg border-upt-border'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setNewRoles((prev) => [...prev, r]);
-                            } else {
-                              setNewRoles((prev) => prev.filter((item) => item !== r));
-                            }
-                          }}
-                        />
-                        <span className="text-[11px] font-medium">
-                          <strong>{r}</strong> · {CANONICAL_ROLES[r].label.split('/')[0]}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <p className="text-[10px] text-upt-muted bg-amber-50 border border-amber-200 p-2.5 rounded-lg">
-                Aviso: La contraseña temporal se almacena cifrada con Argon2id y no volverá a mostrarse después del registro. En esta versión MVP el cambio obligatorio en el primer ingreso queda documentado como mejora evolutiva.
-              </p>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-upt-border">
+            <div className="space-y-1">
+              <label htmlFor="new-email" className="font-bold block">Correo electrónico *</label>
+              <input
+                id="new-email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="mtorres@exodo.pe"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-username" className="font-bold block">Nombre de usuario</label>
+              <input
+                id="new-username"
+                name="username"
+                type="text"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                placeholder="mtorres (opcional)"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-position" className="font-bold block">Cargo institucional</label>
+              <input
+                id="new-position"
+                name="position"
+                type="text"
+                value={newPosition}
+                onChange={(e) => setNewPosition(e.target.value)}
+                placeholder="Líder Técnico"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-org-id" className="font-bold block">Organización</label>
+              <select
+                id="new-org-id"
+                name="organizationId"
+                value={newOrgId}
+                onChange={(e) => setNewOrgId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              >
+                <option value="">Sin vinculación organizacional automática</option>
+                {organizations.map((org) => (
+                  <option key={org.id} value={org.id}>
+                    {org.code} — {org.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-github" className="font-bold block">Cuenta GitHub opcional (referencia manual)</label>
+              <input
+                id="new-github"
+                name="githubUsername"
+                type="text"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                value={newGithub}
+                onChange={(e) => setNewGithub(e.target.value)}
+                placeholder="mtorres-dev"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-password" className="font-bold block">Contraseña inicial temporal *</label>
+              <div className="relative">
+                <input
+                  id="new-password"
+                  name="password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mínimo 8 caracteres"
+                  className="w-full pl-3 pr-9 py-2 rounded-lg bg-upt-bg border border-upt-border"
+                />
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl border border-upt-border text-xs font-semibold cursor-pointer"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  aria-pressed={showNewPassword}
+                  aria-label={showNewPassword ? 'Ocultar contraseña inicial' : 'Mostrar contraseña inicial'}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-upt-muted hover:text-upt-text cursor-pointer p-0.5"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-bold cursor-pointer"
-                >
-                  {submitting ? 'Guardando...' : 'Registrar usuario'}
+                  {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
-            </form>
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="new-confirm-password" className="font-bold block">Confirmar contraseña *</label>
+              <div className="relative">
+                <input
+                  id="new-confirm-password"
+                  name="confirmPassword"
+                  type={showNewConfirmPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={newConfirmPassword}
+                  onChange={(e) => setNewConfirmPassword(e.target.value)}
+                  placeholder="Repita la contraseña"
+                  className="w-full pl-3 pr-9 py-2 rounded-lg bg-upt-bg border border-upt-border"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewConfirmPassword(!showNewConfirmPassword)}
+                  aria-pressed={showNewConfirmPassword}
+                  aria-label={showNewConfirmPassword ? 'Ocultar confirmación' : 'Mostrar confirmación'}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-upt-muted hover:text-upt-text cursor-pointer p-0.5"
+                >
+                  {showNewConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+            <div className="space-y-1">
+              <label htmlFor="new-status" className="font-bold block">Estado inicial</label>
+              <select
+                id="new-status"
+                name="status"
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value as 'ACTIVE' | 'INACTIVE')}
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              >
+                <option value="ACTIVE">ACTIVE (Activo)</option>
+                <option value="INACTIVE">INACTIVE (Inactivo)</option>
+              </select>
+            </div>
+            <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 flex items-start gap-2 mt-4">
+              <input
+                id="chk-create-pm"
+                name="authorizeProjectCreation"
+                type="checkbox"
+                checked={newAuthorizePm}
+                onChange={(e) => setNewAuthorizePm(e.target.checked)}
+                className="mt-0.5"
+              />
+              <label htmlFor="chk-create-pm" className="cursor-pointer">
+                <span className="font-bold text-upt-primary block">Autorizar para crear proyectos (PU-09)</span>
+                <span className="text-[10px] text-upt-muted">
+                  Habilita can_create_projects y asigna PU-09 de forma atómica.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <fieldset className="space-y-1.5">
+            <legend className="font-bold">Perfiles operativos iniciales (PU-01 a PU-07)</legend>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {OPERATIONAL_ROLES.map((r) => {
+                const checked = newRoles.includes(r);
+                return (
+                  <label
+                    key={r}
+                    className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer ${
+                      checked ? 'bg-blue-50 border-upt-bright' : 'bg-upt-bg border-upt-border'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setNewRoles((prev) => [...prev, r]);
+                        } else {
+                          setNewRoles((prev) => prev.filter((item) => item !== r));
+                        }
+                      }}
+                    />
+                    <span className="text-[11px] font-medium">
+                      <strong>{r}</strong> · {CANONICAL_ROLES[r].label.split('/')[0]}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <p className="text-[10px] text-upt-muted bg-amber-50 border border-amber-200 p-2.5 rounded-lg">
+            Aviso: La contraseña temporal se almacena cifrada con Argon2id y no volverá a mostrarse después del registro. En esta versión MVP el cambio obligatorio en el primer ingreso queda documentado como mejora evolutiva.
+          </p>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-upt-border">
+            <button
+              type="button"
+              onClick={() => {
+                setShowCreateModal(false);
+                setModalError(null);
+              }}
+              className="px-4 py-2 rounded-xl border border-upt-border text-xs font-semibold cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-4 py-2 rounded-xl bg-upt-institutional hover:bg-upt-primary text-white text-xs font-bold cursor-pointer disabled:opacity-60"
+            >
+              {submitting ? 'Guardando...' : 'Registrar usuario'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
 
       {/* MODAL DETALLE DE USUARIO */}
-      {detailUser && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl text-xs">
-            <div className="flex items-center justify-between border-b border-upt-border pb-3">
-              <h3 className="text-base font-bold text-upt-primary">
-                Detalle de Cuenta · {detailUser.code}
-              </h3>
-              <button onClick={() => setDetailUser(null)} className="text-upt-muted hover:text-upt-text cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <AdminModal
+        open={Boolean(detailUser)}
+        onClose={() => setDetailUser(null)}
+        title={detailUser ? `Detalle de Cuenta · ${detailUser.code}` : 'Detalle de Cuenta'}
+        maxWidthClass="max-w-lg"
+        closedBy="any"
+      >
+        {detailUser && (
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div><span className="text-upt-muted block">Nombre completo</span><strong>{detailUser.fullName}</strong></div>
               <div><span className="text-upt-muted block">Usuario</span><strong className="font-mono">{detailUser.username}</strong></div>
@@ -1438,132 +1650,190 @@ export const AdminUsersView: React.FC = () => {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL EDITAR USUARIO */}
-      {editUser && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl text-xs">
-            <div className="flex items-center justify-between border-b border-upt-border pb-3">
-              <h3 className="text-base font-bold text-upt-primary">Editar usuario · {editUser.code}</h3>
-              <button onClick={() => setEditUser(null)} className="text-upt-muted hover:text-upt-text cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleUpdateUser} className="space-y-3">
-              <div className="space-y-1">
-                <label className="font-bold">Nombres y apellidos</label>
-                <input
-                  type="text"
-                  required
-                  value={editFullName}
-                  onChange={(e) => setEditFullName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="font-bold">Cargo institucional</label>
-                <input
-                  type="text"
-                  value={editPosition}
-                  onChange={(e) => setEditPosition(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="font-bold">Organización</label>
-                <input
-                  type="text"
-                  value={editOrganization}
-                  onChange={(e) => setEditOrganization(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="font-bold">Usuario GitHub opcional (referencia manual)</label>
-                <input
-                  type="text"
-                  value={editGithub}
-                  onChange={(e) => setEditGithub(e.target.value)}
-                  placeholder="Sin @ inicial"
-                  className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setEditUser(null)} className="px-3 py-2 rounded-lg border border-upt-border cursor-pointer">
-                  Cancelar
-                </button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 rounded-lg bg-upt-institutional text-white font-bold cursor-pointer">
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL GESTIONAR PERFILES */}
-      {rolesUser && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl text-xs">
-            <div className="flex items-center justify-between border-b border-upt-border pb-3">
-              <h3 className="text-base font-bold text-upt-primary">Perfiles operativos · {rolesUser.code}</h3>
-              <button onClick={() => setRolesUser(null)} className="text-upt-muted hover:text-upt-text cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <p className="text-[11px] text-upt-muted">
-              Seleccione los perfiles SCM permitidos (PU-01 a PU-07). La autorización de Jefe de Proyecto (PU-09) se gestiona mediante la acción dedicada en la tabla.
-            </p>
-            <form onSubmit={handleSaveRoles} className="space-y-3">
-              <div className="space-y-1.5">
-                {OPERATIONAL_ROLES.map((r) => {
-                  const checked = selectedOperationalRoles.includes(r);
-                  return (
-                    <label key={r} className="flex items-center gap-2 p-2 rounded-lg border border-upt-border bg-upt-bg cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedOperationalRoles((prev) => [...prev, r]);
-                          } else {
-                            setSelectedOperationalRoles((prev) => prev.filter((x) => x !== r));
-                          }
-                        }}
-                      />
-                      <span>
-                        <strong className="font-mono">{r}</strong> — {CANONICAL_ROLES[r].label}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setRolesUser(null)} className="px-3 py-2 rounded-lg border border-upt-border cursor-pointer">
-                  Cancelar
-                </button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 rounded-lg bg-upt-institutional text-white font-bold cursor-pointer">
-                  Guardar perfiles
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DE CONFIRMACIÓN DE OPERACIÓN CRÍTICA */}
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-upt-surface border border-upt-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl text-xs">
-            <h3 className="text-base font-bold text-upt-primary">{confirmAction.title}</h3>
-            <p className="text-upt-text-secondary leading-relaxed">{confirmAction.description}</p>
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end pt-2 border-t border-upt-border">
               <button
                 type="button"
-                onClick={() => setConfirmAction(null)}
+                autoFocus
+                onClick={() => setDetailUser(null)}
+                className="px-4 py-2 rounded-xl border border-upt-border text-xs font-semibold cursor-pointer hover:bg-upt-bg"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+      </AdminModal>
+
+      {/* MODAL EDITAR USUARIO */}
+      <AdminModal
+        open={Boolean(editUser)}
+        onClose={() => {
+          setEditUser(null);
+          setModalError(null);
+        }}
+        title={editUser ? `Editar usuario · ${editUser.code}` : 'Editar usuario'}
+        maxWidthClass="max-w-md"
+        error={modalError}
+      >
+        {editUser && (
+          <form onSubmit={handleUpdateUser} className="space-y-3">
+            <div className="space-y-1">
+              <label htmlFor="edit-full-name" className="font-bold block">Nombres y apellidos</label>
+              <input
+                id="edit-full-name"
+                name="fullName"
+                type="text"
+                required
+                autoFocus
+                value={editFullName}
+                onChange={(e) => setEditFullName(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="edit-position" className="font-bold block">Cargo institucional</label>
+              <input
+                id="edit-position"
+                name="position"
+                type="text"
+                value={editPosition}
+                onChange={(e) => setEditPosition(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="edit-organization" className="font-bold block">Organización</label>
+              <input
+                id="edit-organization"
+                name="organization"
+                type="text"
+                value={editOrganization}
+                onChange={(e) => setEditOrganization(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="edit-github" className="font-bold block">Usuario GitHub opcional (referencia manual)</label>
+              <input
+                id="edit-github"
+                name="githubUsername"
+                type="text"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                value={editGithub}
+                onChange={(e) => setEditGithub(e.target.value)}
+                placeholder="Sin @ inicial"
+                className="w-full px-3 py-2 rounded-lg bg-upt-bg border border-upt-border"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-upt-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditUser(null);
+                  setModalError(null);
+                }}
+                className="px-3 py-2 rounded-lg border border-upt-border cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-4 py-2 rounded-lg bg-upt-institutional text-white font-bold cursor-pointer disabled:opacity-60"
+              >
+                {submitting ? 'Guardando...' : 'Guardar cambios'}
+              </button>
+            </div>
+          </form>
+        )}
+      </AdminModal>
+
+      {/* MODAL GESTIONAR PERFILES */}
+      <AdminModal
+        open={Boolean(rolesUser)}
+        onClose={() => {
+          setRolesUser(null);
+          setModalError(null);
+        }}
+        title={rolesUser ? `Perfiles operativos · ${rolesUser.code}` : 'Perfiles operativos'}
+        subtitle="Seleccione los perfiles SCM permitidos (PU-01 a PU-07). La autorización de Jefe de Proyecto (PU-09) se gestiona mediante la acción dedicada en la tabla."
+        maxWidthClass="max-w-md"
+        error={modalError}
+      >
+        {rolesUser && (
+          <form onSubmit={handleSaveRoles} className="space-y-3">
+            <fieldset className="space-y-1.5">
+              <legend className="sr-only">Perfiles operativos permitidos</legend>
+              {OPERATIONAL_ROLES.map((r) => {
+                const checked = selectedOperationalRoles.includes(r);
+                return (
+                  <label key={r} className="flex items-center gap-2 p-2 rounded-lg border border-upt-border bg-upt-bg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOperationalRoles((prev) => [...prev, r]);
+                        } else {
+                          setSelectedOperationalRoles((prev) => prev.filter((x) => x !== r));
+                        }
+                      }}
+                    />
+                    <span>
+                      <strong className="font-mono">{r}</strong> — {CANONICAL_ROLES[r].label}
+                    </span>
+                  </label>
+                );
+              })}
+            </fieldset>
+            <div className="flex justify-end gap-2 pt-2 border-t border-upt-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setRolesUser(null);
+                  setModalError(null);
+                }}
+                className="px-3 py-2 rounded-lg border border-upt-border cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-4 py-2 rounded-lg bg-upt-institutional text-white font-bold cursor-pointer disabled:opacity-60"
+              >
+                {submitting ? 'Guardando...' : 'Guardar perfiles'}
+              </button>
+            </div>
+          </form>
+        )}
+      </AdminModal>
+
+      {/* MODAL DE CONFIRMACIÓN DE OPERACIÓN CRÍTICA */}
+      <AdminModal
+        open={Boolean(confirmAction)}
+        onClose={() => {
+          setConfirmAction(null);
+          setModalError(null);
+        }}
+        title={confirmAction?.title || 'Confirmar operación'}
+        maxWidthClass="max-w-md"
+        error={modalError}
+      >
+        {confirmAction && (
+          <div className="space-y-4">
+            <p className="text-upt-text-secondary leading-relaxed">{confirmAction.description}</p>
+            <div className="flex justify-end gap-2 pt-2 border-t border-upt-border">
+              <button
+                type="button"
+                autoFocus={confirmAction.tone === 'danger'}
+                data-autofocus={confirmAction.tone === 'danger' ? 'true' : undefined}
+                onClick={() => {
+                  setConfirmAction(null);
+                  setModalError(null);
+                }}
                 className="px-4 py-2 rounded-xl border border-upt-border font-semibold cursor-pointer"
               >
                 Cancelar
@@ -1573,30 +1843,30 @@ export const AdminUsersView: React.FC = () => {
                 disabled={submitting}
                 onClick={async () => {
                   setSubmitting(true);
+                  setModalError(null);
                   setErrorMsg(null);
                   setSuccessMsg(null);
                   try {
                     await confirmAction.onConfirm();
                     setConfirmAction(null);
                   } catch (err: unknown) {
-                    setErrorMsg(err instanceof Error ? err.message : 'Error ejecutando la operación.');
-                    setConfirmAction(null);
+                    setModalError(err instanceof Error ? err.message : 'Error ejecutando la operación.');
                   } finally {
                     setSubmitting(false);
                   }
                 }}
-                className={`px-4 py-2 rounded-xl text-white font-bold cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-white font-bold cursor-pointer disabled:opacity-60 ${
                   confirmAction.tone === 'danger'
                     ? 'bg-red-600 hover:bg-red-700'
                     : 'bg-upt-institutional hover:bg-upt-primary'
                 }`}
               >
-                {confirmAction.confirmLabel}
+                {submitting ? 'Procesando...' : confirmAction.confirmLabel}
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </AdminModal>
     </div>
   );
 };

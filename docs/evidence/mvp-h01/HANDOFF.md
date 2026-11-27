@@ -548,3 +548,25 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 - Ejecución 1 (`npm run provision:demo`): `[CREATED]` para las **9 cuentas institucionales** (`PU-08` `USR-005` `admin@exodo.pe` .. `PU-09` `USR-013` `jefeproyecto@exodo.pe` con `canCreateProjects=true`).
 - Ejecución 2 (idempotencia): `[SKIPPED_EXISTING]` para las **9 cuentas**, sin duplicados ni mutación destructiva.
 - Verificación física contra PostgreSQL 17 real: **9/9** cuentas autenticadas con contraseña real de evaluación, **9 hashes Argon2id distintos**, **0 duplicados**, **4 fundadores preservados** y **12 miembros activos en `ORG-EXODO`** (ningún secreto expuesto ni persistido en Git).
+
+---
+
+## 17. Bloque E (MI-03): Verificación operativa live y cierre hacia MI-04 (2026-11-26)
+
+### 17.1 Prueba operativa HTTP (`backend` + `prototype` contra `traceflow_mvp_dev`)
+- Backend NestJS (`npm run start:dev` en puerto `3001`) y frontend Vite (`npm run dev` en puerto `5173`, `VITE_SERVICE_MODE=api`) levantaron y conectaron contra PostgreSQL 17 local (`traceflow_mvp_dev`).
+- Nota operativa local: `backend/.env` conserva `DATABASE_MODE=postgres` estricto e incorpora únicamente `ALLOW_MOCK_GITHUB=true` (local, excluido de Git) para arrancar sin credenciales activas de GitHub App.
+- Comprobaciones HTTP en vivo ejecutadas y aprobadas:
+  - `GET http://localhost:3001/api/v1/health` -> `200 OK`, `status="ok"`, `database="connected"`, `mode="postgres"`, `engine="PostgreSQL (Supabase)"`.
+  - `GET http://localhost:5173` -> `200 OK` (SPA cargada con `#root`).
+  - `POST http://localhost:3001/api/v1/auth/login` -> `200 OK` autenticado en PostgreSQL real para `PU-08` (`admin@exodo.pe`) y `PU-09` (`jefeproyecto@exodo.pe`, `canCreateProjects=true`).
+  - `GET http://localhost:3001/api/v1/admin/users` -> `200 OK` (`13` usuarios totales: `USR-001..USR-004` + `USR-005..USR-013`) con sesión `PU-08`; `403 Forbidden` con `PU-09`; `401 Unauthorized` sin sesión.
+- Ambos servidores dev fueron detenidos al concluir la verificación y los puertos `3001` y `5173` quedaron liberados.
+
+### 17.2 Regresión final tras ajustes de cierre
+- Backend (`backend/`): `npm run lint` (`0` errores), `npm run build` (`0` errores), `npm test` (**15/15 suites, 203/203 pruebas** aprobadas), `npm run test:real-postgres` (**5/5 suites, 86/86 pruebas** aprobadas en PostgreSQL 17 real).
+- Frontend (`prototype/`): `npm run lint` (`0` errores, `3` warnings preexistentes en `Topbar.tsx` y `AdminUsersView.tsx`), `npm run build` (`0` errores), `npm test` (**9/9 suites** aprobadas).
+
+### 17.3 Riesgo / acción administrativa pendiente y veredicto MI-03
+- **Acción OS pendiente (privilegios Administrador Windows):** Ejecutar `Restart-Service postgresql-x64-17` para activar `listen_addresses = '127.0.0.1, ::1'` (ya persistido vía `ALTER SYSTEM` en PostgreSQL, actualmente escuchando en `0.0.0.0:5432`). No bloquea pruebas locales.
+- **Veredicto:** **APTO PARA MI-04**. Quedan pendientes exclusivamente la certificación E2E en navegador (`MI-04`), la publicación controlada de commits locales y `MVP-H02`.

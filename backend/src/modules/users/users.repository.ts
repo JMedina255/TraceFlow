@@ -396,8 +396,9 @@ export class UsersRepository {
     const mock = this.authRepo.getMockUsersRef().find((u) => u.id === userId);
     if (mock) {
       mock.assigned_role_codes = mock.assigned_role_codes.filter((c) => c !== roleCode);
-      if (mock.primary_role_code === roleCode && mock.assigned_role_codes.length > 0) {
-        mock.primary_role_code = mock.assigned_role_codes[0];
+      if (mock.primary_role_code === roleCode) {
+        mock.primary_role_code =
+          mock.assigned_role_codes.length > 0 ? mock.assigned_role_codes[0] : 'PU-01';
       }
       mock.updated_at = new Date().toISOString();
     }

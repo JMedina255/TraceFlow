@@ -326,5 +326,79 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 
 ### 10.5 Respaldo y punto de recuperación local
 - **Respaldo actualizado:** `C:\Users\HP\Desktop\Proyecto\TraceFlow_Backup_MI01\` (tracked diff + untracked + manifest SHA-256, sin secretos ni dependencias).
-- **Commit local de recuperación:** `chore(mvp): preservar avance administrativo y estabilizar regresiones (MVP-H01-MI-01)` (sin push ni merge).
+- **Commit local de recuperación:** `chore(mvp): preservar avance administrativo y estabilizar regresiones (MVP-H01-MI-01)` (`5a922fd`, sin push ni merge).
 - **Dictamen:** **APTO para MI-02.**
+
+---
+
+## 11. MI-02 — Certificación funcional y de seguridad administrativa
+
+**Fecha:** 2026-11-26T19:04:00-05:00  
+**Estado:** ✅ COMPLETADO Y VERIFICADO (Bloques A, B, C, D y E aprobados)
+
+### 11.1 Último bloque completado y archivos modificados
+- **Bloques completados:** Bloque A (Autenticación y autorización), Bloque B (Gestión de usuarios), Bloque C (Autorización PU-09 y revocación de sesiones), Bloque D (Invitaciones), Bloque E (Auditoría administrativa y rollback transaccional).
+- **Archivos modificados/creados en MI-02:**
+  - `backend/test/users-admin.spec.ts` (nuevo — 19 pruebas automatizadas)
+  - `backend/src/modules/users/users.service.ts` (defensa en profundidad en `createUser` para validar `fullName`, `email`, `password` y coherencia de `primaryRoleCode: 'PU-09'`)
+  - `backend/src/modules/users/users.repository.ts` (coherencia de `primary_role_code` en modo mock al revocar el último rol asignado)
+  - `docs/evidence/mvp-h01/HANDOFF.md`
+
+### 11.2 Defectos detectados y corregidos
+1. **Validación de `primaryRoleCode: 'PU-09'` y campos obligatorios en `UsersService.createUser` (`users.service.ts`):**
+   - *Causa:* Si `dto.primaryRoleCode === 'PU-09'` sin `authorizeProjectCreation: true`, la validación previa omitía el rechazo; además la validación de formato/longitud dependía únicamente de `ValidationPipe` con metadata `tsc`.
+   - *Corrección:* Se incluyó `dto.primaryRoleCode === 'PU-09'` en la validación de coherencia y validación defensiva de `fullName` (>= 3), `email` y `password` (>= 8).
+   - *Prueba:* `ADM-04` en `backend/test/users-admin.spec.ts`.
+2. **Coherencia de `primary_role_code` tras revocación en `UsersRepository.revokeUserRole` (`users.repository.ts`):**
+   - *Causa:* En modo mock, al revocar `PU-09` de un usuario que solo tenía `PU-09`, `primary_role_code` permanecía como `'PU-09'` aunque `assigned_role_codes` quedaba vacío `[]` (a diferencia del `COALESCE(..., 'PU-01')` en PostgreSQL).
+   - *Corrección:* Se actualizó `primary_role_code` a `'PU-01'` cuando `assigned_role_codes` queda vacío.
+   - *Prueba:* `ADM-14 y ADM-24` en `backend/test/users-admin.spec.ts`.
+
+### 11.3 Matriz de certificación ADM-01 a ADM-26
+
+| ID | Caso | Evidencia / Prueba | Nivel verificado en MI-02 | Resultado | Pendiente (MI-03 / MI-04) |
+|---|---|---|---|---|---|
+| ADM-01 | Inicio de sesión PU-08 | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP | ✅ APROBADA | Login E2E navegador (MI-04) |
+| ADM-02 | Acceso admin desde PU-05 | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP (`RolesGuard`) | ✅ APROBADA | — |
+| ADM-03 | Acceso admin desde PU-09 | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP (`RolesGuard`) | ✅ APROBADA | — |
+| ADM-04 | Registro de usuario válido | `users-admin.spec.ts` (Bloque B) + `ValidationPipe` | Integración modular HTTP + DTO pipe | ✅ APROBADA | Persistencia física PG (MI-03) + UI (MI-04) |
+| ADM-05 | Correo electrónico duplicado | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP | ✅ APROBADA | Constraint `UNIQUE` PG (MI-03) |
+| ADM-06 | Edición de información básica | `users-admin.spec.ts` (Bloque B) + `ValidationPipe` | Integración modular HTTP + DTO pipe | ✅ APROBADA | Persistencia física PG (MI-03) + UI (MI-04) |
+| ADM-07 | Suspensión de usuario | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP | ✅ APROBADA | Persistencia física PG (MI-03) + UI (MI-04) |
+| ADM-08 | Sesión anterior tras suspensión | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP (`AuthGuard`) | ✅ APROBADA | Sesión física PG (MI-03) + navegador (MI-04) |
+| ADM-09 | Reactivación de usuario | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP | ✅ APROBADA | Flujo PG/UI (MI-03/MI-04) |
+| ADM-10 | Autorizar jefe de proyecto (PU-09) | `users-admin.spec.ts` (Bloque C) + `projects-h02.spec.ts` | Integración modular HTTP | ✅ APROBADA | Persistencia física PG (MI-03) + UI (MI-04) |
+| ADM-11 | Revocar autorización PU-09 | `users-admin.spec.ts` (Bloque C) + `projects-h02.spec.ts` | Integración modular HTTP | ✅ APROBADA | Revocación física PG (MI-03) |
+| ADM-12 | Usuario no autorizado crea proyecto | `users-admin.spec.ts` (Bloque C) + `projects-h02.spec.ts` + `isolated-pgmem-tests.spec.ts` | Integración modular HTTP + pg-mem | ✅ APROBADA | PostgreSQL real (MI-03) |
+| ADM-13 | PU-02 intenta crear proyecto / PU-08 sin SCM | `users-admin.spec.ts` (Bloque C) + `projects-h02.spec.ts` + `isolated-pgmem-tests.spec.ts` | Integración modular HTTP + pg-mem | ✅ APROBADA | PostgreSQL real (MI-03) |
+| ADM-14 | Autorización repetida/concurrente | `users-admin.spec.ts` (Bloque C) | Integración modular HTTP (`Promise.all`) | ✅ APROBADA | Concurrencia real `FOR UPDATE` en PG (MI-03) |
+| ADM-15 | Suspensión del último admin activo | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP + Unitaria servicio | ✅ APROBADA | Concurrencia real `FOR UPDATE` en PG (MI-03) |
+| ADM-16 | Invitación por correo electrónico | `users-admin.spec.ts` (Bloque D) | Integración modular HTTP | ✅ APROBADA | Tabla/índices PG (MI-03) + UI (MI-04) |
+| ADM-17 | Invitación por GitHub sin correo | `users-admin.spec.ts` (Bloque D) | Integración modular HTTP | ✅ APROBADA | Constraint CHECK PG (MI-03) + UI (MI-04) |
+| ADM-18 | Invitación inválida o duplicada | `users-admin.spec.ts` (Bloque D) | Integración modular HTTP | ✅ APROBADA | Índices parciales únicos y trigger `PU-08` PG (MI-03) |
+| ADM-19 | Cancelación de invitación | `users-admin.spec.ts` (Bloque D) | Integración modular HTTP | ✅ APROBADA | Persistencia PG (MI-03) + UI (MI-04) |
+| ADM-20 | Aceptación externa sin identidad | `users-admin.spec.ts` (Bloque D) | Integración modular HTTP | ✅ APROBADA | Trigger `enforce_invitation_security` PG (MI-03) |
+| ADM-21 | Usuario creado vía API inicia sesión | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP (Argon2id) | ✅ APROBADA | Flujo completo E2E navegador (MI-04) |
+| ADM-22 | Respuesta administrativa sin secretos | `users-admin.spec.ts` (Bloque B) | Integración modular HTTP | ✅ APROBADA | — |
+| ADM-23 | Auditoría administrativa y rollback | `users-admin.spec.ts` (Bloque E) | Integración modular HTTP + pg-mem transaccional | ✅ APROBADA | `append_audit_log` PG físico (MI-03) |
+| ADM-24 | Revocación lógica de perfil activo | `users-admin.spec.ts` (Bloque C) | Integración modular HTTP | ✅ APROBADA | `user_role_assignment` PG (MI-03) |
+| ADM-25 | Escalamiento indebido a PU-08 | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP | ✅ APROBADA | Trigger/roles PG (MI-03) |
+| ADM-26 | Operación administrativa sin sesión | `users-admin.spec.ts` (Bloque A) | Integración modular HTTP (`AuthGuard`) | ✅ APROBADA | Navegador sin sesión E2E (MI-04) |
+
+### 11.4 Resultados de verificación (Post-MI-02)
+- **Backend:**
+  - `npx vitest run test/users-admin.spec.ts`: ✅ **19/19 aprobadas**
+  - `npx vitest run test/auth.spec.ts test/projects-h02.spec.ts test/isolated-pgmem-tests.spec.ts`: ✅ **31/31 aprobadas**
+  - `npm run lint` (`tsc --noEmit`): ✅ Exit 0, 0 errores.
+  - `npm run build` (`tsc -p tsconfig.build.json`): ✅ Exit 0, 0 errores.
+  - `npm test` (`vitest run`): ✅ **14/14 suites aprobadas, 200/200 pruebas aprobadas** (181 anteriores + 19 nuevas).
+- **Frontend (`prototype/`):**
+  - `npm run lint` (`oxlint`): ✅ Exit 0, 0 errores, 3 advertencias previas de React Hooks (`Topbar.tsx:55`, `AdminUsersView.tsx:192`, `AdminUsersView.tsx:199`), diferidas a MI-04.
+  - `npm run build` (`tsc -b && vite build`): ✅ Exit 0.
+  - `npm test`: ✅ **9/9 suites aprobadas** (**97** encabezados `Test N` / **470** aserciones `assert.*`; la cifra previa de "109" era una estimación acumulada antigua).
+
+### 11.5 Respaldo y punto de continuidad
+- **Respaldo independiente:** `C:\Users\HP\Desktop\Proyecto\TraceFlow_Backup_MI02\`
+- **Commit local de recuperación:** `test(mvp): certificar seguridad y gestion administrativa (MVP-H01-MI-02)` (sin push ni merge).
+- **Siguiente actividad concreta:** Preparar entorno PostgreSQL 17.5 local (`ENV-03`) y ejecutar **MI-03** (certificación física PostgreSQL real: `real-db-helper.ts`, migración `202611260009` y suites `real-postgres-*`).
+- **Dictamen:** **APTO para ENV-03 y MI-03.**

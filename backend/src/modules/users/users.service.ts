@@ -131,6 +131,16 @@ export class UsersService {
     ipAddress?: string,
     userAgent?: string
   ): Promise<SanitizedUserDto> {
+    if (!dto.fullName || dto.fullName.trim().length < 3) {
+      throw new BadRequestException('El nombre completo debe tener al menos 3 caracteres.');
+    }
+    if (!dto.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dto.email.trim())) {
+      throw new BadRequestException('Debe ingresar un correo institucional válido.');
+    }
+    if (!dto.password || dto.password.length < 8) {
+      throw new BadRequestException('La contraseña inicial debe tener al menos 8 caracteres.');
+    }
+
     const normalizedEmail = dto.email.trim().toLowerCase();
     const rawUsername = dto.username?.trim() || normalizedEmail.split('@')[0].replace(/[^a-zA-Z0-9._-]/g, '_');
     const normalizedUsername = rawUsername.toLowerCase();
@@ -146,7 +156,7 @@ export class UsersService {
       );
     }
 
-    if (requestedRoles.includes('PU-09') && !dto.authorizeProjectCreation) {
+    if ((requestedRoles.includes('PU-09') || dto.primaryRoleCode === 'PU-09') && !dto.authorizeProjectCreation) {
       throw new BadRequestException(
         'El perfil PU-09 (Jefe de Proyecto) se habilita exclusivamente mediante la autorización de creación de proyectos.'
       );

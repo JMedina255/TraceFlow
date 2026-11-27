@@ -535,3 +535,16 @@ TraceFlow SCM — MVP-H01 / MI-01: Estabilización de pruebas de regresión (Rea
 ### 15.4 Actualización de matriz ADM-01 a ADM-26 (Certificación física PostgreSQL)
 - **Certificados en PostgreSQL 17 real (`traceflow_cert`):** `ADM-01`, `ADM-04`, `ADM-05`, `ADM-06`, `ADM-07`, `ADM-08`, `ADM-09`, `ADM-10`, `ADM-11`, `ADM-12`, `ADM-13`, `ADM-14` (concurrencia real), `ADM-15` (`FOR UPDATE`), `ADM-16`, `ADM-17`, `ADM-18` (índice parcial único + trigger), `ADM-19`, `ADM-20` (trigger `enforce_invitation_security`), `ADM-21`, `ADM-22`, `ADM-23` (`append_audit_log` + rollback transaccional), `ADM-24` (`user_role_assignment.status = 'REVOKED'` + `user_session`), `ADM-25` (trigger `PU-08` en invitaciones).
 - **Certificados en integración modular HTTP (`users-admin.spec.ts`) y pendientes de UI E2E (MI-04):** `ADM-02`, `ADM-03`, `ADM-26` (guardas HTTP `AuthGuard` / `RolesGuard`), más los flujos visuales React en navegador (`MI-04`).
+
+---
+
+## 16. Bloque D (MI-03): Preparación física de `traceflow_mvp_dev` y DEMO-01 real (2026-11-26)
+
+### 16.1 Migraciones, semillas institucionales y preservación histórica
+- Se aplicaron en orden las **12 migraciones** canónicas (`202611250001`..`202611250003` + `202611260001`..`202611260009`) sobre `traceflow_mvp_dev`, con extensión `extensions.pgcrypto` y permisos mínimos para `traceflow_app`.
+- Se cargaron semillas estructurales (`PRJ-001`..`PRJ-003` + 6 ECS vía `supabase/seeds/demo_seeds.sql.example`) y se preservaron íntegramente los 4 fundadores históricos (`USR-001`..`USR-004`).
+
+### 16.2 Aprovisionamiento y verificación real DEMO-01 (`npm run provision:demo`)
+- Ejecución 1 (`npm run provision:demo`): `[CREATED]` para las **9 cuentas institucionales** (`PU-08` `USR-005` `admin@exodo.pe` .. `PU-09` `USR-013` `jefeproyecto@exodo.pe` con `canCreateProjects=true`).
+- Ejecución 2 (idempotencia): `[SKIPPED_EXISTING]` para las **9 cuentas**, sin duplicados ni mutación destructiva.
+- Verificación física contra PostgreSQL 17 real: **9/9** cuentas autenticadas con contraseña real de evaluación, **9 hashes Argon2id distintos**, **0 duplicados**, **4 fundadores preservados** y **12 miembros activos en `ORG-EXODO`** (ningún secreto expuesto ni persistido en Git).
